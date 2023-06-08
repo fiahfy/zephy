@@ -5,37 +5,95 @@
 // import User from 'path/to/interfaces';
 
 export interface IElectronAPI {
-  basename: (path: string) => Promise<string>
-  darwin: () => Promise<boolean>
-  dirname: (path: string) => Promise<string>
-  getFileNode: (path: string) => Promise<FileNode>
-  getPresentationData: (
-    path: string
-  ) => Promise<{ title: string; files: File[] }>
-  handleDoubleClickTitleBar: () => Promise<void>
-  homePath: () => Promise<string>
-  listContents: (path: string) => Promise<Content[]>
-  listFiles: (path: string) => Promise<File[]>
+  createDirectory: (directoryPath: string) => Promise<DetailedEntry>
+  createThumbnail: (path: string) => Promise<string>
+  createVideoThumbnails: (path: string) => Promise<string[]>
+  getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
+  getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
+  getDetailedEntry: (path: string) => Promise<DetailedEntry>
+  getDirectoryPath: (path: string) => Promise<string>
+  getEntries: (directoryPath: string) => Promise<Entry[]>
+  getEntryHierarchy: (path: string) => Promise<Entry>
+  getMetadata: (path: string) => Promise<Metadata>
+  isDarwin: () => Promise<boolean>
+  moveEntries: (
+    paths: string[],
+    directoryPath: string
+  ) => Promise<DetailedEntry[]>
   openPath: (path: string) => Promise<void>
-  sendParamsForContextMenu: (params?: unknown) => Promise<void>
-  subscribeAddToFavorites: (callback: (path: string) => void) => () => void
-  subscribeRemoveFromFavorites: (callback: (path: string) => void) => () => void
-  subscribeShowSettings: (callback: () => void) => () => void
-  subscribeStartPresentation: (callback: (path: string) => void) => () => void
-  subscribeSearch: (callback: () => void) => () => void
+  renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
+  trashItems: (paths: string[]) => Promise<void>
+  applicationMenu: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addListener: (callback: (message: any) => void) => () => void
+  }
+  contextMenu: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addListener: (callback: (message: any) => void) => () => void
+    show: (
+      params: ContextMenuParams,
+      options: ContextMenuOption[]
+    ) => Promise<void>
+  }
+  fullscreen: {
+    addListener: (callback: (fullscreen: boolean) => void) => () => void
+    isFullscreen: () => Promise<boolean>
+  }
+  watcher: {
+    watch: (
+      directoryPaths: string[],
+      callback: (
+        eventType: 'create' | 'delete',
+        directoryPath: string,
+        filePath: string
+      ) => void
+    ) => Promise<void>
+  }
+  windowState: {
+    getIndex: () => Promise<number | undefined>
+    getParams: () => Promise<{ directory?: string } | undefined>
+  }
 }
 
-export type File = {
+export type ContextMenuParams = {
+  isEditable: boolean
+  selectionText: string
+  x: number
+  y: number
+}
+export type ContextMenuOption = {
+  id: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params?: any
+}
+
+export type Settings = {
+  darkMode: boolean
+  shouldShowHiddenFiles: boolean
+}
+
+type File = {
   name: string
   path: string
-  type: 'file' | 'directory' | 'other'
+  type: 'file'
 }
-export type FileNode = File & { children?: FileNode[] }
-export type Content = File & { dateModified: number }
-export type ExplorerContent = Content & { rating: number }
+type Directory = {
+  children?: Entry[]
+  name: string
+  path: string
+  type: 'directory'
+}
+export type Entry = File | Directory
+export type DetailedEntry = Entry & {
+  dateCreated: number
+  dateModified: number
+  dateLastOpened: number
+  size: number
+}
+export type Content = DetailedEntry & { rating: number }
 
-export type MenuParams = {
-  id: string
-  enabled: boolean
-  value: any // eslint-disable-line @typescript-eslint/no-explicit-any
+export type Metadata = {
+  duration?: number
+  height?: number
+  width?: number
 }

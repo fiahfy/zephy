@@ -1,16 +1,17 @@
-import { useCallback } from 'react'
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { styled } from '@mui/material/styles'
-import ExplorerTreeView from 'components/ExplorerTreeView'
-import FavoriteTreeView from 'components/FavoriteTreeView'
+import { useCallback } from 'react'
+
 import { useAppDispatch, useAppSelector } from 'store'
 import {
-  selectSidebarHidden,
-  selectSidebarWidth,
+  selectGetSidebarWidth,
+  selectIsSidebarHidden,
   setSidebarHidden,
   setSidebarWidth,
-} from 'store/settings'
+} from 'store/window'
+
+const minContentWidth = 64
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -23,25 +24,42 @@ const Drawer = styled(MuiDrawer, {
   }),
 }))
 
-const minContentWidth = 64
+type Props = {
+  children: React.ReactNode
+  variant: 'primary' | 'secondary'
+}
 
-const Sidebar = () => {
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
-  const sidebarWidth = useAppSelector(selectSidebarWidth)
+const Sidebar = (props: Props) => {
+  const { children, variant } = props
+
+  const position = variant === 'primary' ? 'left' : 'right'
+
+  const getSidebarWidth = useAppSelector(selectGetSidebarWidth)
+  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const dispatch = useAppDispatch()
+
+  const width = getSidebarWidth(variant)
+  const hidden = isSidebarHidden(variant)
+
+  const oppositeWidth = getSidebarWidth(
+    variant === 'primary' ? 'secondary' : 'primary'
+  )
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      const newWidth = e.clientX - document.body.offsetLeft + 3
+      const newWidth =
+        position === 'left'
+          ? e.clientX + 3
+          : document.body.offsetWidth - e.clientX + 3
       if (
         newWidth > minContentWidth &&
-        newWidth < document.body.offsetWidth - minContentWidth
+        document.body.offsetWidth - oppositeWidth - newWidth > minContentWidth
       ) {
-        dispatch(setSidebarWidth(newWidth))
+        dispatch(setSidebarWidth(variant, newWidth))
       }
-      dispatch(setSidebarHidden(newWidth < minContentWidth / 2))
+      dispatch(setSidebarHidden(variant, newWidth < minContentWidth / 2))
     },
-    [dispatch]
+    [dispatch, oppositeWidth, position, variant]
   )
 
   const handleMouseUp = useCallback(() => {
@@ -58,35 +76,28 @@ const Sidebar = () => {
 
   return (
     <Drawer
-      PaperProps={{ style: { width: sidebarWidth } }}
-      anchor="left"
-      className="scrollbar"
-      open={!sidebarHidden}
-      style={{ width: sidebarWidth }}
+      PaperProps={{ style: { width } }}
+      anchor={position}
+      open={!hidden}
+      style={{ width }}
       variant="permanent"
     >
       <Toolbar
         sx={{
           flexShrink: 0,
-          minHeight: (theme) => `${theme.mixins.titleBar.height}px!important`,
+          minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
         }}
       />
-      <Toolbar
-        sx={{
-          flexShrink: 0,
-          minHeight: '65px!important',
-        }}
-      />
+      <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
       <Box
         sx={{
           flexGrow: 1,
-          marginRight: '5px',
-          overflowX: 'hidden',
-          overflowY: 'auto',
+          overflow: 'auto',
+          [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
+            theme.spacing(0.625),
         }}
       >
-        <FavoriteTreeView />
-        <ExplorerTreeView />
+        {children}
       </Box>
       <Box
         onMouseDown={handleMouseDown}
@@ -96,9 +107,9 @@ const Sidebar = () => {
           bottom: 0,
           cursor: 'col-resize',
           position: 'absolute',
-          right: 0,
           top: 0,
-          width: '5px',
+          width: (theme) => theme.spacing(0.625),
+          [position === 'left' ? 'right' : 'left']: 0,
         }}
       />
     </Drawer>

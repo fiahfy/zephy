@@ -1,52 +1,85 @@
-import { join } from 'path'
-import { BrowserWindow, app, protocol } from 'electron'
+import { BrowserWindow, app } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
-import windowStateKeeper from 'electron-window-state'
-import { createApplicationMenu } from './application-menu'
-import { createContextMenu } from './context-menu'
-import { addHandlers } from './handlers'
+import { State } from 'electron-window-state'
+import { join } from 'path'
+import registerApplicationMenu from './applicationMenu'
+import registerContextMenu from './contextMenu'
+import createFullscreenManager from './fullscreen'
+import registerHandlers from './handlers'
+import createWatcher from './watcher'
+import createWindowStateManager from './windowState'
 
-let mainWindow: BrowserWindow
-
-// Prepare the renderer once the app is ready
-app.on('ready', async () => {
+app.whenReady().then(async () => {
   await prepareNext('./renderer')
 
-  const windowState = windowStateKeeper({})
+  const fullscreenManager = createFullscreenManager()
+  const watcher = createWatcher()
 
-  mainWindow = new BrowserWindow({
-    ...windowState,
-    titleBarStyle: 'hidden',
-    webPreferences: {
-      preload: join(__dirname, 'preload.js'),
-      webSecurity: !isDev,
-    },
-  })
+  const createWindow = (state: State) => {
+    const browserWindow = new BrowserWindow({
+      ...state,
+      titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
+      webPreferences: {
+        preload: join(__dirname, 'preload.js'),
+        webSecurity: !isDev,
+      },
+    })
 
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:8000/')
-    mainWindow.webContents.openDevTools()
-  } else {
-    const pathname = join(__dirname, '../renderer/out/index.html')
-    const url = `file://${pathname}`
-    mainWindow.loadURL(url)
+    if (isDev) {
+      browserWindow.loadURL('http://localhost:8000/')
+      browserWindow.on('ready-to-show', () => {
+        browserWindow.webContents.openDevTools()
+      })
+    } else {
+      const pathname = join(__dirname, '../renderer/out/index.html')
+      const url = `file://${pathname}`
+      browserWindow.loadURL(url)
+    }
+
+    fullscreenManager.register(browserWindow)
+    watcher.register(browserWindow)
+
+    return browserWindow
   }
 
-  windowState.manage(mainWindow)
+  const windowStateManager = createWindowStateManager(createWindow)
 
-  addHandlers(mainWindow)
-  createApplicationMenu(mainWindow)
-  createContextMenu()
-})
+  const create = (params?: { directory?: string }) => {
+    const directory = params?.directory ?? app.getPath('home')
+    windowStateManager.create({ directory })
+  }
 
-// Quit the app once all windows are closed
-app.on('window-all-closed', app.quit)
+  registerApplicationMenu(create)
+  registerContextMenu(create)
+  registerHandlers()
 
-// @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
-app.whenReady().then(() => {
-  protocol.registerFileProtocol('file', (request, callback) => {
-    const pathname = decodeURIComponent(request.url.replace('file:///', ''))
-    callback(pathname)
+  const browserWindows = windowStateManager.restore()
+  if (browserWindows.length === 0) {
+    create()
+  }
+
+  // TODO: fix
+  // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
+  // @see https://www.electronjs.org/ja/docs/latest/breaking-changes#%E9%9D%9E%E6%8E%A8%E5%A5%A8-protocolregisterinterceptbufferstringstreamfilehttpprotocol
+  // protocol.handle('file', (request) => {
+  //   console.log('handler called', request.url)
+  //   return net.fetch(request.url)
+  // })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      create()
+    }
+  })
+
+  app.on('before-quit', () => {
+    windowStateManager.save()
   })
 })

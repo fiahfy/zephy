@@ -1,10 +1,12 @@
-import clsx from 'clsx'
-import { ReactNode, Ref, forwardRef } from 'react'
 import { Box, BoxProps, Typography } from '@mui/material'
 import { TreeItem, TreeItemContentProps, TreeItemProps } from '@mui/lab'
 import { useTreeItem } from '@mui/lab/TreeItem'
+import clsx from 'clsx'
+import { MouseEvent, ReactNode, forwardRef } from 'react'
 
-const FileTreeItemContent = forwardRef(function FileContent(
+import Outline from 'components/Outline'
+
+const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,
   ref
 ) {
@@ -30,26 +32,14 @@ const FileTreeItemContent = forwardRef(function FileContent(
 
   const icon = iconProp || expansionIcon || displayIcon
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    preventSelection(event)
-  }
+  const handleMouseDown = (event: MouseEvent) => preventSelection(event)
 
-  const handleExpansionClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    handleExpansion(event)
-  }
+  const handleExpansionClick = (event: MouseEvent) => handleExpansion(event)
 
-  const handleSelectionClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    handleSelection(event)
-  }
+  const handleSelectionClick = (event: MouseEvent) => handleSelection(event)
 
   return (
-    <div
+    <Box
       className={clsx(className, classes.root, {
         [classes.expanded]: expanded,
         [classes.selected]: selected,
@@ -57,56 +47,57 @@ const FileTreeItemContent = forwardRef(function FileContent(
         [classes.disabled]: disabled,
       })}
       onMouseDown={handleMouseDown}
-      ref={ref as Ref<HTMLDivElement>}
+      ref={ref}
+      sx={{ height: 20 }}
     >
-      <div className={classes.iconContainer} onClick={handleExpansionClick}>
+      <Box className={classes.iconContainer} onClick={handleExpansionClick}>
         {icon}
-      </div>
-      <div className={classes.label} onClick={handleSelectionClick}>
+      </Box>
+      <Box className={classes.label} onClick={handleSelectionClick}>
         {label}
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 })
 
 type Props = TreeItemProps & {
   LabelProps?: BoxProps
-  fileIcon: ReactNode
+  icon: ReactNode
+  outlined?: boolean
 }
 
-const FileTreeItem = (props: Props) => {
-  const { LabelProps, children, fileIcon, label, ...others } = props
+const EntryTreeItem = (props: Props) => {
+  const { LabelProps, children, icon, label, outlined, ...others } = props
 
   return (
     <TreeItem
       {...others}
-      ContentComponent={FileTreeItemContent}
+      ContentComponent={EntryTreeItemContent}
       label={
         <Box
           {...LabelProps}
           sx={{
             alignItems: 'center',
             display: 'flex',
-            py: 0.75,
+            gap: 1,
             userSelect: 'none',
           }}
         >
-          <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-            {fileIcon}
-          </Box>
-          <Typography
-            noWrap
-            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
-            variant="caption"
-          >
+          {icon}
+          <Typography noWrap variant="caption">
             {label}
           </Typography>
+          {outlined && <Outline />}
         </Box>
       }
+      sx={{
+        position: 'relative',
+        '.MuiTreeItem-label': { position: 'static!important' },
+      }}
     >
       {children}
     </TreeItem>
   )
 }
 
-export default FileTreeItem
+export default EntryTreeItem

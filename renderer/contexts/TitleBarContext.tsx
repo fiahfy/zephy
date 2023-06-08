@@ -9,7 +9,7 @@ import {
 
 const TitleBarContext = createContext<
   | {
-      shown: boolean
+      visible: boolean
     }
   | undefined
 >(undefined)
@@ -21,33 +21,27 @@ export const TitleBarProvider = (props: Props) => {
 
   const [ready, setReady] = useState(false)
   const [darwin, setDarwin] = useState(false)
-  const [fullScreen, setFullScreen] = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
 
-  const shown = useMemo(() => darwin && !fullScreen, [darwin, fullScreen])
-
-  useEffect(() => {
-    const handleFullscreenChange = () =>
-      setFullScreen(!!document.fullscreenElement)
-    handleFullscreenChange()
-    document.body.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => {
-      document.body.removeEventListener(
-        'fullscreenchange',
-        handleFullscreenChange
-      )
-    }
-  }, [])
+  const visible = useMemo(() => darwin && !fullscreen, [darwin, fullscreen])
 
   useEffect(() => {
     ;(async () => {
-      const darwin = await window.electronAPI.darwin()
+      const darwin = await window.electronAPI.isDarwin()
       setDarwin(darwin)
+      const fullscreen = await window.electronAPI.fullscreen.isFullscreen()
+      setFullscreen(fullscreen)
       // for initial rendering
       setReady(true)
     })()
+
+    const removeListener =
+      window.electronAPI.fullscreen.addListener(setFullscreen)
+
+    return () => removeListener()
   }, [])
 
-  const value = { shown }
+  const value = { visible }
 
   return (
     <TitleBarContext.Provider value={value}>

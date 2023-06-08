@@ -1,54 +1,61 @@
+import { Box, LinearProgress } from '@mui/material'
 import {
-  FocusEvent,
   KeyboardEvent,
+  MouseEvent,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
 import { AutoSizer, Grid, GridCellProps } from 'react-virtualized'
-import { Box, LinearProgress } from '@mui/material'
+
 import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
-import { ExplorerContent } from 'interfaces'
+import { Content } from 'interfaces'
 
 const rowHeight = 256
 
 type Props = {
-  contentSelected: (content: ExplorerContent) => boolean
-  contents: ExplorerContent[]
+  contentFocused: (content: Content) => boolean
+  contentSelected: (content: Content) => boolean
+  contents: Content[]
+  focused: string | undefined
   loading: boolean
-  onClickContent: (content: ExplorerContent) => void
-  onDoubleClickContent: (content: ExplorerContent) => void
-  onFocusContent: (content: ExplorerContent) => void
-  onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
+  onClickContent: (e: MouseEvent, content: Content) => void
+  onContextMenuContent: (e: MouseEvent, content: Content) => void
+  onDoubleClickContent: (e: MouseEvent, content: Content) => void
+  onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
+  onKeyDownEnter: (e: KeyboardEvent) => void
   onScroll: (e: Event) => void
   scrollTop: number
 }
 
 const ExplorerGrid = (props: Props) => {
   const {
+    contentFocused,
     contentSelected,
     contents,
+    focused,
     loading,
     onClickContent,
+    onContextMenuContent,
     onDoubleClickContent,
-    onFocusContent,
+    onKeyDownArrow,
     onKeyDownEnter,
     onScroll,
     scrollTop,
   } = props
 
-  const ref = useRef<HTMLDivElement>(null)
-  const [wrapperWidth, setWrapperWidth] = useState(0)
   const previousLoading = usePrevious(loading)
+
+  const ref = useRef<HTMLElement>(null)
+  const [wrapperWidth, setWrapperWidth] = useState(0)
 
   useEffect(() => {
     const el = ref.current?.querySelector('.ReactVirtualized__Grid')
     if (!el) {
       return
     }
-    el.addEventListener('scroll', onScroll)
     const handleResize = (entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
       if (entry) {
@@ -57,10 +64,16 @@ const ExplorerGrid = (props: Props) => {
     }
     const observer = new ResizeObserver(handleResize)
     observer.observe(el)
-    return () => {
-      el.removeEventListener('scroll', onScroll)
-      observer.disconnect()
+    return () => observer.disconnect()
+  }, [onScroll])
+
+  useEffect(() => {
+    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    if (!el) {
+      return
     }
+    el.addEventListener('scroll', onScroll)
+    return () => el.removeEventListener('scroll', onScroll)
   }, [onScroll])
 
   useEffect(() => {
@@ -73,7 +86,19 @@ const ExplorerGrid = (props: Props) => {
     }
   }, [loading, previousLoading, scrollTop])
 
-  const size = useMemo(
+  useEffect(() => {
+    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    if (!el) {
+      return
+    }
+    const focusedEl = el.querySelector('.focused')
+    if (!focusedEl) {
+      return
+    }
+    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [focused])
+
+  const columns = useMemo(
     () => Math.ceil(wrapperWidth / rowHeight) || 1,
     [wrapperWidth]
   )
@@ -81,70 +106,46 @@ const ExplorerGrid = (props: Props) => {
   const chunks = useMemo(
     () =>
       contents.reduce(
-        (carry, _, i) =>
-          i % size ? carry : [...carry, contents.slice(i, i + size)],
-        [] as ExplorerContent[][]
+        (acc, _, i) =>
+          i % columns ? acc : [...acc, contents.slice(i, i + columns)],
+        [] as Content[][]
       ),
-    [contents, size]
+    [columns, contents]
   )
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const row = Number(document.activeElement?.getAttribute('data-grid-row'))
-    const column = Number(
-      document.activeElement?.getAttribute('data-grid-column')
-    )
+  const focus = (
+    e: KeyboardEvent,
+    row: number,
+    column: number,
+    focused: boolean
+  ) => {
+    const content =
+      chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])
+    if (content) {
+      onKeyDownArrow(e, content)
+    }
+  }
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const el = ref.current?.querySelector('.focused')
+    const row = Number(el?.getAttribute('data-grid-row'))
+    const column = Number(el?.getAttribute('data-grid-column'))
     switch (e.key) {
       case 'Enter':
         if (!e.nativeEvent.isComposing) {
           onKeyDownEnter(e)
         }
         return
-      case 'ArrowUp': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row - 1}"][data-grid-column="${column}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowDown': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row + 1}"][data-grid-column="${column}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowLeft': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row}"][data-grid-column="${column - 1}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowRight': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row}"][data-grid-column="${column + 1}"]`
-        )
-        el && el.focus()
-        break
-      }
+      case 'ArrowUp':
+        return focus(e, row - 1, column, !!el)
+      case 'ArrowDown':
+        return focus(e, row + 1, column, !!el)
+      case 'ArrowLeft':
+        return focus(e, row, column - 1, !!el)
+      case 'ArrowRight':
+        return focus(e, row, column + 1, !!el)
     }
   }
-
-  const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
-    const rowIndex = Number(e.target.getAttribute('data-grid-row')) - 1
-    const columnIndex = Number(e.target.getAttribute('data-grid-column')) - 1
-    if (rowIndex < 0 || columnIndex < 0) {
-      return
-    }
-    const content = chunks[rowIndex]?.[columnIndex]
-    content && onFocusContent(content)
-  }
-
-  const handleContentClick = (content: ExplorerContent) =>
-    onClickContent(content)
-
-  const handleContentDoubleClick = (content: ExplorerContent) =>
-    onDoubleClickContent(content)
 
   const cellRenderer = ({
     columnIndex,
@@ -159,8 +160,10 @@ const ExplorerGrid = (props: Props) => {
           <ExplorerGridItem
             columnIndex={columnIndex}
             content={content}
-            onClick={() => handleContentClick(content)}
-            onDoubleClick={() => handleContentDoubleClick(content)}
+            focused={contentFocused(content)}
+            onClick={(e) => onClickContent(e, content)}
+            onContextMenu={(e) => onContextMenuContent(e, content)}
+            onDoubleClick={(e) => onDoubleClickContent(e, content)}
             rowIndex={rowIndex}
             selected={contentSelected(content)}
           />
@@ -171,21 +174,28 @@ const ExplorerGrid = (props: Props) => {
 
   return (
     <Box
-      className="scrollbar"
-      onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       ref={ref}
-      sx={{ height: '100%' }}
+      sx={{
+        height: '100%',
+        '.ReactVirtualized__Grid:focus-visible .focused': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
+      }}
     >
       <AutoSizer>
         {({ height, width }) => (
           <Grid
             cellRenderer={cellRenderer}
-            columnCount={size}
-            columnWidth={wrapperWidth / size}
+            columnCount={columns}
+            columnWidth={wrapperWidth / columns}
             height={height}
             rowCount={chunks.length}
             rowHeight={rowHeight}
+            style={{
+              outline: 'none',
+              overflowY: 'scroll',
+            }}
             width={width}
           />
         )}

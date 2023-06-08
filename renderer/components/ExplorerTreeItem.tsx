@@ -1,75 +1,83 @@
-import { useMemo } from 'react'
-import { BoxProps, CircularProgress } from '@mui/material'
-import FileIcon from 'components/FileIcon'
-import FileTreeItem from 'components/FileTreeItem'
+import { CircularProgress } from '@mui/material'
+
+import EntryIcon from 'components/EntryIcon'
+import EntryTreeItem from 'components/EntryTreeItem'
 import Icon from 'components/Icon'
-import { FileNode } from 'interfaces'
+import useContextMenu from 'hooks/useContextMenu'
+import useFileDnd from 'hooks/useFileDnd'
+import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
-import { selectIsFavorite } from 'store/favorite'
-import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/image'
+import { selectShouldShowHiddenFiles } from 'store/settings'
+import { isHiddenFile } from 'utils/file'
 
 const max = 100
 
 type Props = {
-  file: FileNode
+  entry: Entry
 }
 
 const ExplorerTreeItem = (props: Props) => {
-  const { file } = props
+  const { entry } = props
 
-  const favorite = useAppSelector(selectIsFavorite)(file.path)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
-  const over = (file.children ?? []).length - max
+  const { createEntryMenuHandler } = useContextMenu()
+  const { createDroppableAttrs, dropping } = useFileDnd()
 
-  const enabled = useMemo(
-    () => file.type === 'directory' || isImageFile(file.path),
-    [file.path, file.type]
-  )
+  const over =
+    (entry.type === 'directory' && entry.children ? entry.children : [])
+      .length - max
+
+  const handleDoubleClick = async () => {
+    if (entry.type === 'file') {
+      await window.electronAPI.openPath(entry.path)
+    }
+  }
 
   return (
-    <FileTreeItem
-      LabelProps={
-        contextMenuProps([
-          {
-            id: 'start-presentation',
-            enabled,
-            value: file.path,
-          },
-          {
-            id: 'add-favorite',
-            enabled: !favorite,
-            value: file.path,
-          },
-        ]) as BoxProps
-      }
-      fileIcon={<FileIcon file={file} size="small" />}
-      label={file.name}
-      nodeId={file.path}
-      title={file.path}
+    <EntryTreeItem
+      LabelProps={{
+        onContextMenu: createEntryMenuHandler(entry),
+        onDoubleClick: handleDoubleClick,
+      }}
+      icon={<EntryIcon entry={entry} />}
+      label={entry.name}
+      nodeId={entry.path}
+      outlined={dropping}
+      title={entry.name}
+      {...createDroppableAttrs(entry)}
     >
-      {file.type === 'directory' &&
-        (file.children ? (
-          <>
-            {file.children.slice(0, max).map((file) => (
-              <ExplorerTreeItem file={file} key={file.path} />
-            ))}
-            {over > 0 && (
-              <FileTreeItem
-                fileIcon={<Icon size="small" type="insert-drive-file" />}
-                label={`Other ${over} items`}
-                nodeId={`${file.path}<others>`}
-              />
-            )}
-          </>
-        ) : (
-          <FileTreeItem
-            fileIcon={<CircularProgress size={20} />}
-            label="Loading items..."
-            nodeId={`${file.path}<loader>`}
-          />
-        ))}
-    </FileTreeItem>
+      {entry.type === 'directory' && (
+        <>
+          {entry.children ? (
+            <>
+              {entry.children
+                .filter(
+                  (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+                )
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .slice(0, max)
+                .map((entry) => (
+                  <ExplorerTreeItem entry={entry} key={entry.path} />
+                ))}
+              {over > 0 && (
+                <EntryTreeItem
+                  icon={<Icon iconType="insert-drive-file" />}
+                  label={`Other ${over} items`}
+                  nodeId={`${entry.path}<others>`}
+                />
+              )}
+            </>
+          ) : (
+            <EntryTreeItem
+              icon={<CircularProgress size={16} sx={{ mx: 0.25 }} />}
+              label="Loading items..."
+              nodeId={`${entry.path}<loader>`}
+            />
+          )}
+        </>
+      )}
+    </EntryTreeItem>
   )
 }
 

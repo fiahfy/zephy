@@ -1,4 +1,5 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
+
 import { AppState, AppThunk } from 'store'
 
 type State = {
@@ -22,20 +23,20 @@ export const favoriteSlice = createSlice({
       delete newState[action.payload]
       return newState
     },
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
   },
 })
 
-export const { add, remove } = favoriteSlice.actions
+export const { add, remove, replace } = favoriteSlice.actions
 
 export default favoriteSlice.reducer
 
 export const selectFavorite = (state: AppState) => state.favorite
 
 export const selectFavorites = createSelector(selectFavorite, (favorite) =>
-  Object.keys(favorite).reduce(
-    (carry, path) => [...carry, path],
-    [] as string[]
-  )
+  Object.keys(favorite).reduce((acc, path) => [...acc, path], [] as string[])
 )
 
 export const selectIsFavorite = createSelector(

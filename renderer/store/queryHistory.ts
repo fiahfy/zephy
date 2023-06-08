@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+
 import { AppState } from 'store'
 
 type State = string[]
@@ -21,10 +22,13 @@ export const querySlice = createSlice({
         return [...state, query]
       }
     },
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
   },
 })
 
-export const { add } = querySlice.actions
+export const { add, replace } = querySlice.actions
 
 export default querySlice.reducer
 

@@ -1,14 +1,13 @@
 import {
-  ChangeEvent,
-  KeyboardEvent,
-  MouseEvent,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  Close as CloseIcon,
+  Folder as FolderIcon,
+  MoreVert as MoreVertIcon,
+  Refresh as RefreshIcon,
+  Search as SearchIcon,
+} from '@mui/icons-material'
 import {
   AppBar,
   Autocomplete,
@@ -16,207 +15,129 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  MenuItem,
-  ToggleButton,
   Toolbar,
 } from '@mui/material'
 import {
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
-  ArrowUpward as ArrowUpwardIcon,
-  Close as CloseIcon,
-  Folder as FolderIcon,
-  Refresh as RefreshIcon,
-  Search as SearchIcon,
-  Settings as SettingsIcon,
-  Sort as SortIcon,
-  TableRows as TableRowsIcon,
-  ViewComfy as ViewComfyIcon,
-  ViewSidebar as ViewSidebarIcon,
-} from '@mui/icons-material'
-import FilledToggleButtonGroup from 'components/FilledToggleButtonGroup'
+  ChangeEvent,
+  KeyboardEvent,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
 import Icon from 'components/Icon'
-import RoundedFilledTextField from 'components/RoundedFilledTextField'
-import SettingsDialog from 'components/SettingsDialog'
+import RoundedFilledTextField from 'components/mui/RoundedFilledTextField'
+import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
-import { load, setQuery, unselectAll } from 'store/explorer'
+import { load, searchQuery, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
+import { selectQueryHistories } from 'store/queryHistory'
 import {
   back,
+  changeDirectory,
   forward,
-  move,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-} from 'store/history'
-import { add, selectQueryHistories } from 'store/queryHistory'
-import {
-  selectExplorerLayout,
-  selectSidebarHidden,
-  setExplorerLayout,
-  setSidebarHidden,
-} from 'store/settings'
-import { selectGetSortOption, sort } from 'store/sorting'
-
-const sortOptions = [
-  { text: 'Name Ascending', value: 'name-asc' },
-  { text: 'Name Descending', value: 'name-desc' },
-  { text: 'Rating Ascending', value: 'rating-asc' },
-  { text: 'Rating Descending', value: 'rating-desc' },
-  { text: 'Date Modified Ascending', value: 'dateModified-asc' },
-  { text: 'Date Modified Descending', value: 'dateModified-desc' },
-]
+  selectExplorable,
+  upward,
+} from 'store/window'
 
 const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const dispatch = useAppDispatch()
-  const explorerLayout = useAppSelector(selectExplorerLayout)
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
+  const explorable = useAppSelector(selectExplorable)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
-  const getSortOption = useAppSelector(selectGetSortOption)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const dispatch = useAppDispatch()
+
+  const { createMoreMenuHandler } = useContextMenu()
 
   const [directory, setDirectory] = useState('')
-  const [queryInput, setQueryInput] = useState('')
-  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const ref = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribeShowSettings(() =>
-      setOpen(true)
-    )
-    return () => unsubscribe()
-  }, [])
 
   const search = useCallback(
     (query: string) => {
-      setQueryInput(query)
-      dispatch(setQuery(query))
-      dispatch(add(query))
+      setQuery(query)
+      dispatch(searchQuery(query))
     },
     [dispatch]
   )
 
   useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribeSearch(() => {
-      search(document.getSelection()?.toString() ?? '')
-      ref.current && ref.current?.focus()
-    })
+    const removeListener = window.electronAPI.contextMenu.addListener(
+      (eventName) => {
+        if (eventName === 'search') {
+          search(document.getSelection()?.toString() ?? '')
+          ref.current?.focus()
+        }
+      }
+    )
+    return () => removeListener()
+  }, [dispatch, search])
+
+  useEffect(() => {
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if (
         e.key === 'f' &&
         ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))
       ) {
         search(document.getSelection()?.toString() ?? '')
-        ref.current && ref.current?.focus()
-      }
-    }
-    const handleMouseDown = (e: globalThis.MouseEvent) => {
-      switch (e.button) {
-        case 3:
-          return dispatch(back())
-        case 4:
-          return dispatch(forward())
+        ref.current?.focus()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
-      unsubscribe()
-    }
-  }, [dispatch, search])
-
-  const loadContents = useCallback(async () => {
-    if (!currentDirectory) {
-      return
-    }
-    dispatch(load(currentDirectory))
-  }, [currentDirectory, dispatch])
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [search])
 
   useEffect(() => {
-    ;(async () => {
-      if (!currentDirectory) {
-        const homePath = await window.electronAPI.homePath()
-        return dispatch(move(homePath))
-      }
-      setDirectory(currentDirectory)
-      dispatch(unselectAll())
-      await loadContents()
-    })()
-  }, [currentDirectory, dispatch, loadContents])
+    setDirectory(currentDirectory)
+    dispatch(load())
+    dispatch(unselect())
+  }, [currentDirectory, dispatch])
 
-  const sortOption = useMemo(
-    () => getSortOption(currentDirectory),
-    [currentDirectory, getSortOption]
-  )
-
-  // click handlers
   const handleClickBack = () => dispatch(back())
 
   const handleClickForward = () => dispatch(forward())
 
-  const handleClickUpward = async () => {
-    const dirPath = await window.electronAPI.dirname(directory)
-    dispatch(move(dirPath))
-  }
+  const handleClickUpward = async () => dispatch(upward())
 
   const handleClickRefresh = async () => {
     setDirectory(currentDirectory)
-    await loadContents()
+    dispatch(load())
   }
-
-  const handleClickSettings = async () => setOpen(true)
 
   const handleClickFolder = async () =>
     await window.electronAPI.openPath(currentDirectory)
 
   const handleClickFavorite = () => dispatch(toggle(currentDirectory))
 
-  const handleClickSearch = () => search(queryInput)
+  const handleClickSearch = () => search(query)
 
-  // change handlers
   const handleChangeDirectory = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value
     setDirectory(value)
-  }
-
-  const handleChangeViewSidebar = (
-    _e: MouseEvent<HTMLElement>,
-    value: 'sidebar'[]
-  ) => dispatch(setSidebarHidden(!value.includes('sidebar')))
-
-  const handleChangeExplorerLayout = (
-    _e: MouseEvent<HTMLElement>,
-    value: 'list' | 'thumbnail'
-  ) => dispatch(setExplorerLayout(value))
-
-  const handleChangeSortOption = (e: ChangeEvent<HTMLInputElement>) => {
-    const [orderBy, order] = e.target.value.split('-') as [
-      'name' | 'rating' | 'dateModified',
-      'asc' | 'desc'
-    ]
-    dispatch(sort({ path: currentDirectory, option: { orderBy, order } }))
   }
 
   const handleChangeQuery = (_e: SyntheticEvent, value: string | null) =>
     search(value ?? '')
 
   const handleInputChangeQuery = (_e: SyntheticEvent, value: string) =>
-    value ? setQueryInput(value) : search(value)
+    value ? setQuery(value) : search(value)
 
-  const handleKeyDownDirectory = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownDirectory = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
-      dispatch(move(directory))
+      dispatch(changeDirectory(directory))
     }
   }
 
-  const handleKeyDownQuery = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownQuery = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-      search(queryInput)
+      search(query)
     }
   }
 
@@ -227,7 +148,7 @@ const ExplorerBar = () => {
       elevation={0}
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
-      <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>
+      <Toolbar disableGutters sx={{ minHeight: '34px!important', px: 1 }}>
         <IconButton
           color="inherit"
           disabled={!canBack}
@@ -250,6 +171,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
+          disabled={!explorable}
           onClick={handleClickUpward}
           size="small"
           sx={{ mr: 0.5 }}
@@ -259,6 +181,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
+          disabled={!explorable}
           onClick={handleClickRefresh}
           size="small"
           title="Refresh"
@@ -273,13 +196,11 @@ const ExplorerBar = () => {
                   <InputAdornment position="end">
                     <IconButton
                       color="inherit"
+                      disabled={!explorable}
                       onClick={handleClickFavorite}
                       size="small"
                     >
-                      <Icon
-                        size="small"
-                        type={favorite ? 'star' : 'star-border'}
-                      />
+                      <Icon iconType={favorite ? 'star' : 'star-border'} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -287,6 +208,7 @@ const ExplorerBar = () => {
                   <InputAdornment position="start">
                     <IconButton
                       color="inherit"
+                      disabled={!explorable}
                       onClick={handleClickFolder}
                       size="small"
                     >
@@ -296,10 +218,8 @@ const ExplorerBar = () => {
                 ),
               }}
               fullWidth
-              hiddenLabel
               onChange={handleChangeDirectory}
               onKeyDown={handleKeyDownDirectory}
-              size="small"
               spellCheck={false}
               sx={{ mr: 0.5 }}
               value={directory}
@@ -312,7 +232,7 @@ const ExplorerBar = () => {
               clearIcon={<CloseIcon fontSize="small" />}
               freeSolo
               fullWidth
-              inputValue={queryInput}
+              inputValue={query}
               onChange={handleChangeQuery}
               onInputChange={handleInputChangeQuery}
               onKeyDown={handleKeyDownQuery}
@@ -335,7 +255,6 @@ const ExplorerBar = () => {
                     ),
                   }}
                   fullWidth
-                  hiddenLabel
                   inputRef={ref}
                   placeholder="Search..."
                 />
@@ -357,73 +276,14 @@ const ExplorerBar = () => {
         </Box>
         <IconButton
           color="inherit"
-          onClick={handleClickSettings}
+          onClick={createMoreMenuHandler()}
           size="small"
           title="Settings"
         >
-          <SettingsIcon fontSize="small" />
+          <MoreVertIcon fontSize="small" />
         </IconButton>
       </Toolbar>
-      <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>
-        <FilledToggleButtonGroup
-          onChange={handleChangeViewSidebar}
-          size="small"
-          value={sidebarHidden ? [] : ['sidebar']}
-        >
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Toggle Sidebar"
-            value="sidebar"
-          >
-            <ViewSidebarIcon fontSize="small" />
-          </ToggleButton>
-        </FilledToggleButtonGroup>
-        <div style={{ flexGrow: 1 }} />
-        <FilledToggleButtonGroup
-          exclusive
-          onChange={handleChangeExplorerLayout}
-          size="small"
-          sx={{ mr: 1 }}
-          value={explorerLayout}
-        >
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="List View"
-            value="list"
-          >
-            <TableRowsIcon fontSize="small" />
-          </ToggleButton>
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Thumbnail View"
-            value="thumbnail"
-          >
-            <ViewComfyIcon fontSize="small" />
-          </ToggleButton>
-        </FilledToggleButtonGroup>
-        <RoundedFilledTextField
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SortIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-          hiddenLabel
-          onChange={handleChangeSortOption}
-          select
-          size="small"
-          value={`${sortOption.orderBy}-${sortOption.order}`}
-        >
-          {sortOptions.map((option, index) => (
-            <MenuItem dense key={index} value={option.value}>
-              {option.text}
-            </MenuItem>
-          ))}
-        </RoundedFilledTextField>
-      </Toolbar>
       <Divider />
-      <SettingsDialog onRequestClose={() => setOpen(false)} open={open} />
     </AppBar>
   )
 }

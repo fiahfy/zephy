@@ -1,57 +1,83 @@
-import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
-import fileUrl from 'file-url'
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import FileIcon from 'components/FileIcon'
-import NoOutlineRating from 'components/NoOutlineRating'
-import { ExplorerContent, File } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectIsFavorite } from 'store/favorite'
-import { rate } from 'store/rating'
-import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/image'
+import clsx from 'clsx'
+import fileUrl from 'file-url'
+import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
 
-type State = { paths: string[]; loading: boolean }
+import NoOutlineRating from 'components/mui/NoOutlineRating'
+import EntryIcon from 'components/EntryIcon'
+import ExplorerNameTextField from 'components/ExplorerNameTextField'
+import Outline from 'components/Outline'
+import useFileDnd from 'hooks/useFileDnd'
+import { Content, Entry } from 'interfaces'
+import { useAppDispatch, useAppSelector } from 'store'
+import {
+  selectIsEditing,
+  selectIsSelected,
+  selectSelectedContents,
+} from 'store/explorer'
+import { rate } from 'store/rating'
+import { selectShouldShowHiddenFiles } from 'store/settings'
+import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
+
+type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
 type Action =
   | {
       type: 'loaded'
-      payload: string[]
+      payload: { paths: string[]; thumbnail?: string }
     }
   | { type: 'loading' }
 
-const reducer = (state: State, action: Action) => {
+const reducer = (_state: State, action: Action) => {
   switch (action.type) {
     case 'loaded':
       return {
-        ...state,
-        paths: action.payload,
+        ...action.payload,
         loading: false,
       }
     case 'loading':
-      return { ...state, paths: [], loading: true }
+      return { loading: true, paths: [], thumbnail: undefined }
   }
 }
 
 type Props = {
   columnIndex: number
-  content: ExplorerContent
-  onClick: (e: MouseEvent<HTMLDivElement>) => void
-  onDoubleClick: (e: MouseEvent<HTMLDivElement>) => void
+  content: Content
+  focused: boolean
+  onClick: (e: MouseEvent) => void
+  onContextMenu: (e: MouseEvent) => void
+  onDoubleClick: (e: MouseEvent) => void
   rowIndex: number
   selected: boolean
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const { columnIndex, content, onClick, onDoubleClick, rowIndex, selected } =
-    props
+  const {
+    columnIndex,
+    content,
+    focused,
+    onClick,
+    onContextMenu,
+    onDoubleClick,
+    rowIndex,
+    selected,
+  } = props
 
-  const favorite = useAppSelector(selectIsFavorite)(content.path)
+  const isEditing = useAppSelector(selectIsEditing)
+  const isSelected = useAppSelector(selectIsSelected)
+  const selectedContents = useAppSelector(selectSelectedContents)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const [{ paths, loading }, dispatch] = useReducer(reducer, {
-    paths: [],
+  const editing = isEditing(content.path)
+
+  const { createDraggableAttrs, createDroppableAttrs, dropping } = useFileDnd()
+
+  const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
+    paths: [],
+    thumbnail: undefined,
   })
 
   useEffect(() => {
@@ -60,66 +86,57 @@ const ExplorerGridItem = (props: Props) => {
     ;(async () => {
       dispatch({ type: 'loading' })
 
-      if (content.type === 'file') {
-        return dispatch({ type: 'loaded', payload: [content.path] })
-      }
+      const paths = await (async () => {
+        if (content.type === 'file') {
+          return [content.path]
+        }
 
-      let files: File[] = []
-      try {
-        files = await window.electronAPI.listFiles(content.path)
-      } catch (e) {
-        // noop
-      }
+        let entries: Entry[] = []
+        try {
+          entries = await window.electronAPI.getEntries(content.path)
+          return entries
+            .filter(
+              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+            )
+            .map((entry) => entry.path)
+        } catch (e) {
+          return []
+        }
+      })()
+      const thumbnail = await createThumbnailIfNeeded(paths)
       if (unmounted) {
         return
       }
-      const paths = files.map((file) => file.path)
-      return dispatch({ type: 'loaded', payload: paths })
+      dispatch({ type: 'loaded', payload: { paths, thumbnail } })
     })()
 
     return () => {
       unmounted = true
     }
-  }, [content.path, content.type])
-
-  const imagePath = useMemo(
-    () => paths.filter((path) => isImageFile(path))[0],
-    [paths]
-  )
+  }, [content.path, content.type, shouldShowHiddenFiles])
 
   const message = useMemo(
-    () => (loading ? 'Loading...' : 'No Images'),
+    () => (loading ? 'Loading...' : 'No Preview'),
     [loading]
   )
 
-  const enabled = useMemo(
-    () => content.type === 'directory' || isImageFile(content.path),
-    [content.path, content.type]
-  )
+  const draggingContents = isSelected(content.path)
+    ? selectedContents
+    : [content]
 
   return (
     <ImageListItem
-      {...contextMenuProps([
-        {
-          id: 'start-presentation',
-          enabled,
-          value: content.path,
-        },
-        {
-          id: 'add-favorite',
-          enabled: !favorite,
-          value: content.path,
-        },
-      ])}
-      className={selected ? 'selected' : undefined}
+      className={clsx({ focused, selected })}
       component="div"
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',
         height: '100%!important',
+        userSelect: 'none',
         width: '100%',
         '&:hover': {
           '.overlay': {
@@ -146,12 +163,14 @@ const ExplorerGridItem = (props: Props) => {
           },
         },
       }}
-      tabIndex={0}
+      {...createDraggableAttrs(draggingContents)}
+      {...createDroppableAttrs(content)}
     >
-      {imagePath ? (
+      {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={fileUrl(imagePath)}
+          loading="lazy"
+          src={fileUrl(thumbnail)}
           style={{ objectPosition: 'center top' }}
         />
       ) : (
@@ -169,7 +188,7 @@ const ExplorerGridItem = (props: Props) => {
       <ImageListItemBar
         actionIcon={
           <Box mt={-3} mx={1}>
-            <FileIcon file={content} size="small" />
+            <EntryIcon entry={content} />
           </Box>
         }
         actionPosition="left"
@@ -185,6 +204,7 @@ const ExplorerGridItem = (props: Props) => {
               onChange={(_e, value) =>
                 appDispatch(rate({ path: content.path, rating: value ?? 0 }))
               }
+              onClick={(e) => e.stopPropagation()}
               precision={0.5}
               size="small"
               sx={{ my: 0.25 }}
@@ -197,7 +217,17 @@ const ExplorerGridItem = (props: Props) => {
             )}
           </Box>
         }
-        sx={{ '.MuiImageListItemBar-titleWrap': { p: 0, pb: 1, pr: 1 } }}
+        sx={{
+          '.MuiImageListItemBar-titleWrap': {
+            overflow: 'visible',
+            p: 0,
+            pb: 1,
+            pr: 1,
+            '.MuiImageListItemBar-title': {
+              overflow: 'visible',
+            },
+          },
+        }}
         title={
           <Box
             sx={{
@@ -206,35 +236,47 @@ const ExplorerGridItem = (props: Props) => {
               height: (theme) => theme.spacing(5),
             }}
           >
-            <Typography
-              sx={{
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2,
-                display: '-webkit-box',
-                lineHeight: 1.4,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'initial',
-                wordBreak: 'break-all',
-              }}
-              title={content.name}
-              variant="caption"
-            >
-              {content.name}
-            </Typography>
+            {editing ? (
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  flexGrow: 1,
+                  ml: -0.5,
+                }}
+              >
+                <ExplorerNameTextField content={content} />
+              </Box>
+            ) : (
+              <Typography
+                sx={{
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 2,
+                  display: '-webkit-box',
+                  lineHeight: 1.4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'initial',
+                  wordBreak: 'break-all',
+                }}
+                title={content.name}
+                variant="caption"
+              >
+                {content.name}
+              </Typography>
+            )}
           </Box>
         }
       />
       <Box
         className="overlay"
         sx={{
-          height: '100%',
+          inset: 0,
           pointerEvents: 'none',
           position: 'absolute',
-          top: 0,
-          width: '100%',
         }}
       />
+      {dropping && <Outline />}
     </ImageListItem>
   )
 }

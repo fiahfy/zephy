@@ -1,57 +1,119 @@
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
 import { TreeView } from '@mui/lab'
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
+
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
-import { FileNode } from 'interfaces'
+import { useWatcher } from 'contexts/WatcherContext'
+import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { move, selectCurrentDirectory } from 'store/history'
+import {
+  changeDirectory,
+  selectCurrentDirectory,
+  selectExplorable,
+} from 'store/window'
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const explorable = useAppSelector(selectExplorable)
   const dispatch = useAppDispatch()
+
+  const { watch } = useWatcher()
 
   const [expanded, setExpanded] = useState<string[]>([])
   const [selected, setSelected] = useState<string[]>([])
-  const [fileNodes, setFileNodes] = useState<FileNode[]>([])
+  const [root, setRoot] = useState<Entry>()
+
+  const getLoadedDirectories = (entry: Entry) => {
+    const reducer = (acc: string[], entry: Entry): string[] => {
+      if (entry.type === 'directory' && entry.children) {
+        return [entry.path, ...entry.children.reduce(reducer, acc)]
+      }
+      return acc
+    }
+    return [entry].reduce(reducer, [])
+  }
+
+  const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
 
   useEffect(() => {
     ;(async () => {
-      const node = await window.electronAPI.getFileNode(currentDirectory)
-      const reducer = (carry: string[], node: FileNode): string[] => {
-        if (!node.children) {
-          return carry
-        }
-        return [node.path, ...node.children.reduce(reducer, carry)]
+      if (!explorable) {
+        return
       }
-      const expanded = [node].reduce(reducer, [])
+      const entry = await window.electronAPI.getEntryHierarchy(currentDirectory)
+      const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setSelected([currentDirectory])
-      setFileNodes([node])
+      setRoot(entry)
     })()
-  }, [currentDirectory])
+  }, [currentDirectory, explorable])
 
-  const contentNodeMap = useMemo(() => {
+  useEffect(
+    () =>
+      watch(loaded, async (eventType, directoryPath, filePath) => {
+        const entry =
+          eventType === 'create'
+            ? await window.electronAPI.getDetailedEntry(filePath)
+            : undefined
+        const mapper = (e: Entry): Entry => {
+          if (e.type === 'directory') {
+            if (e.path === directoryPath && e.children) {
+              // イベントが複数回発火するため、まず該当 entry を削除し、create の場合のみ追加する
+              let children = e.children.filter(
+                (entry) => entry.path !== filePath
+              )
+              if (entry) {
+                children = [...children, entry]
+              }
+              return {
+                ...e,
+                children,
+              }
+            }
+            if (e.children) {
+              return {
+                ...e,
+                children: e.children.map(mapper),
+              }
+            }
+          }
+          return e
+        }
+        setRoot((root) => (root ? mapper(root) : root))
+      }),
+    [loaded, watch]
+  )
+
+  const entryMap = useMemo(() => {
+    if (!root) {
+      return {}
+    }
     const reducer = (
-      carry: { [path: string]: FileNode },
-      node: FileNode
-    ): { [path: string]: FileNode } => {
+      acc: { [path: string]: Entry },
+      entry: Entry
+    ): { [path: string]: Entry } => {
       return {
-        [node.path]: node,
-        ...(node.children ?? []).reduce(reducer, carry),
+        [entry.path]: entry,
+        ...(entry.type === 'directory' ? entry.children ?? [] : []).reduce(
+          reducer,
+          acc
+        ),
       }
     }
-    return fileNodes.reduce(reducer, {})
-  }, [fileNodes])
+    return [root].reduce(reducer, {})
+  }, [root])
 
   const handleSelect = (_event: SyntheticEvent, nodeIds: string[] | string) => {
     if (Array.isArray(nodeIds)) {
       return
     }
-    const content = contentNodeMap[nodeIds]
-    content?.type === 'directory' && dispatch(move(nodeIds))
+    const entry = entryMap[nodeIds]
+    if (entry && entry.type === 'directory') {
+      dispatch(changeDirectory(nodeIds))
+    }
   }
 
   const handleToggle = async (_event: SyntheticEvent, nodeIds: string[]) => {
@@ -62,27 +124,29 @@ const ExplorerTreeView = () => {
     if (!expandedNodeId) {
       return
     }
-    const content = contentNodeMap[expandedNodeId]
-    if (content?.type !== 'directory' || content.children) {
+    const entry = entryMap[expandedNodeId]
+    if (!entry || entry.type !== 'directory' || entry.children) {
       return
     }
-    const children = await window.electronAPI.listContents(content.path)
-    const mapper = (node: FileNode): FileNode => {
-      if (node.path === content.path) {
-        return {
-          ...node,
-          children,
+    const children = await window.electronAPI.getEntries(entry.path)
+    const mapper = (e: Entry): Entry => {
+      if (e.type === 'directory') {
+        if (e.path === entry.path) {
+          return {
+            ...e,
+            children,
+          }
+        }
+        if (e.children) {
+          return {
+            ...e,
+            children: e.children.map(mapper),
+          }
         }
       }
-      if (node.children) {
-        return {
-          ...node,
-          children: node.children.map(mapper),
-        }
-      }
-      return node
+      return e
     }
-    setFileNodes((prevNodes) => prevNodes.map(mapper))
+    setRoot((root) => (root ? mapper(root) : root))
   }
 
   return (
@@ -93,10 +157,13 @@ const ExplorerTreeView = () => {
       onNodeSelect={handleSelect}
       onNodeToggle={handleToggle}
       selected={selected}
+      sx={{
+        '&:focus-visible .Mui-focused': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
+      }}
     >
-      {fileNodes.map((node) => (
-        <ExplorerTreeItem file={node} key={node.path} />
-      ))}
+      {root && <ExplorerTreeItem entry={root} key={root.path} />}
     </TreeView>
   )
 }

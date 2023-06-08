@@ -1,25 +1,16 @@
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-import { CssBaseline, PaletteMode, Theme } from '@mui/material'
+import { CssBaseline, Theme } from '@mui/material'
 import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
 } from '@mui/material/styles'
+import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
+
 import { useTitleBar } from 'contexts/TitleBarContext'
 import { useAppSelector } from 'store'
 import { selectDarkMode } from 'store/settings'
 
 const ThemeContext = createContext<
   | {
-      forceMode: (mode: PaletteMode) => void
-      resetMode: () => void
       theme: Theme
     }
   | undefined
@@ -32,19 +23,9 @@ export const ThemeProvider = (props: Props) => {
 
   const darkMode = useAppSelector(selectDarkMode)
 
-  const { shown } = useTitleBar()
+  const { visible } = useTitleBar()
 
-  const [forcedMode, setForcedMode] = useState<PaletteMode>()
-
-  const forceMode = useCallback((mode: PaletteMode) => setForcedMode(mode), [])
-  const resetMode = useCallback(() => setForcedMode(undefined), [])
-
-  const mode = useMemo(() => {
-    if (forcedMode) {
-      return forcedMode
-    }
-    return darkMode ? 'dark' : 'light'
-  }, [darkMode, forcedMode])
+  const mode = darkMode ? 'dark' : 'light'
 
   useEffect(() => {
     if (mode === 'dark') {
@@ -56,40 +37,40 @@ export const ThemeProvider = (props: Props) => {
     }
   }, [mode])
 
-  const theme = useMemo(
-    () =>
-      createTheme({
-        components: {
-          MuiAppBar: {
-            styleOverrides: {
-              root: {
-                top: shown ? 28 : 0,
-              },
+  const theme = useMemo(() => {
+    const theme = createTheme({
+      palette: {
+        mode,
+        primary: {
+          main: '#ff4081',
+        },
+        // secondary: {
+        //   main: '#19857b',
+        // },
+        // error: {
+        //   main: colors.red.A400,
+        // },
+      },
+    })
+    return createTheme(theme, {
+      components: {
+        MuiAppBar: {
+          styleOverrides: {
+            root: {
+              top: visible ? theme.spacing(3.5) : 0,
             },
           },
         },
-        mixins: {
-          titleBar: {
-            height: shown ? 28 : 0,
-          },
+      },
+      mixins: {
+        titleBar: {
+          height: visible ? theme.spacing(3.5) : 0,
         },
-        palette: {
-          mode,
-          primary: {
-            main: '#ff4081',
-          },
-          // secondary: {
-          //   main: '#19857b',
-          // },
-          // error: {
-          //   main: colors.red.A400,
-          // },
-        },
-      }),
-    [mode, shown]
-  )
+      },
+    })
+  }, [mode, visible])
 
-  const value = { forceMode, resetMode, theme }
+  const value = { theme }
 
   return (
     <ThemeContext.Provider value={value}>

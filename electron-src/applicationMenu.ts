@@ -6,7 +6,15 @@ import {
   shell,
 } from 'electron'
 
-const createTemplate = (browserWindow: BrowserWindow) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const send = (message: any) => {
+  const activeWindow = BrowserWindow.getFocusedWindow()
+  activeWindow?.webContents.send('application-menu-send', message)
+}
+
+const registerApplicationMenu = (
+  createWindow: (params?: { directory?: string }) => void
+) => {
   const isMac = process.platform === 'darwin'
 
   // @see https://www.electronjs.org/docs/latest/api/menu#examples
@@ -22,7 +30,7 @@ const createTemplate = (browserWindow: BrowserWindow) => {
               {
                 label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
-                click: () => browserWindow.webContents.send('show-settings'),
+                click: () => send({ type: 'goToSettings' }),
               },
               { type: 'separator' },
               { role: 'services' },
@@ -39,8 +47,22 @@ const createTemplate = (browserWindow: BrowserWindow) => {
     // { role: 'fileMenu' }
     {
       label: 'File',
-      submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
-    },
+      submenu: [
+        {
+          label: 'New Window',
+          accelerator: 'CmdOrCtrl+N',
+          click: () => createWindow({}),
+        },
+        ...[isMac ? { role: 'close' } : { role: 'quit' }],
+        { type: 'separator' },
+        // TODO: apply window state
+        {
+          label: 'Move to Trash',
+          accelerator: 'CmdOrCtrl+Backspace',
+          click: () => send({ type: 'moveToTrash' }),
+        },
+      ],
+    } as MenuItemConstructorOptions,
     // { role: 'editMenu' }
     {
       label: 'Edit',
@@ -69,6 +91,19 @@ const createTemplate = (browserWindow: BrowserWindow) => {
     {
       label: 'View',
       submenu: [
+        {
+          label: 'as List',
+          accelerator: 'CmdOrCtrl+1',
+          click: () =>
+            send({ type: 'changeViewMode', data: { viewMode: 'list' } }),
+        },
+        {
+          label: 'as Thumbnail',
+          accelerator: 'CmdOrCtrl+2',
+          click: () =>
+            send({ type: 'changeViewMode', data: { viewMode: 'thumbnail' } }),
+        },
+        { type: 'separator' },
         { role: 'reload' },
         { role: 'forceReload' },
         { role: 'toggleDevTools' },
@@ -101,18 +136,14 @@ const createTemplate = (browserWindow: BrowserWindow) => {
       submenu: [
         {
           label: 'Learn More',
-          click: async () => {
-            await shell.openExternal('https://electronjs.org')
-          },
+          click: () => shell.openExternal('https://github.com/fiahfy/zephy'),
         },
       ],
     },
   ]
-  return template
-}
 
-export const createApplicationMenu = (browserWindow: BrowserWindow) => {
-  const template = createTemplate(browserWindow)
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
+export default registerApplicationMenu

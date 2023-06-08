@@ -1,16 +1,30 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { Content } from 'interfaces'
+
+import { Content, DetailedEntry } from 'interfaces'
 import { AppState, AppThunk } from 'store'
+import { add } from 'store/queryHistory'
+import { selectGetRating } from 'store/rating'
+import { selectShouldShowHiddenFiles } from 'store/settings'
+import {
+  selectCurrentDirectory,
+  selectCurrentSortOption,
+  selectExplorable,
+} from 'store/window'
+import { isHiddenFile } from 'utils/file'
 
 type State = {
-  contents: Content[]
+  editing: string | undefined
+  entries: DetailedEntry[]
+  focused: string | undefined
   loading: boolean
   query: string
   selected: string[]
 }
 
 const initialState: State = {
-  contents: [],
+  editing: undefined,
+  entries: [],
+  focused: undefined,
   loading: false,
   query: '',
   selected: [],
@@ -20,34 +34,108 @@ export const explorerSlice = createSlice({
   name: 'explorer',
   initialState,
   reducers: {
-    loaded(state, action: PayloadAction<Content[]>) {
-      return { ...state, contents: action.payload, loading: false, query: '' }
+    setQuery(state, action: PayloadAction<string>) {
+      const query = action.payload
+      return { ...state, query }
+    },
+    loaded(state, action: PayloadAction<DetailedEntry[]>) {
+      const entries = action.payload
+      return {
+        ...state,
+        entries,
+        loading: false,
+        query: '',
+      }
     },
     loading(state) {
-      return { ...state, contents: [], loading: true }
+      return {
+        ...state,
+        entries: [],
+        loading: true,
+      }
+    },
+    add(state, action: PayloadAction<DetailedEntry[]>) {
+      const entries = action.payload
+      const paths = entries.map((entry) => entry.path)
+      const newEntries = [
+        ...state.entries.filter((entry) => !paths.includes(entry.path)),
+        ...entries,
+      ]
+      return { ...state, entries: newEntries }
+    },
+    remove(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
+      const entries = state.entries.filter(
+        (entry) => !paths.includes(entry.path)
+      )
+      return { ...state, entries }
+    },
+    focus(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, focused: path }
+    },
+    blur(state) {
+      return { ...state, focused: undefined }
     },
     select(state, action: PayloadAction<string>) {
-      return { ...state, selected: [action.payload] }
+      const path = action.payload
+      return { ...state, selected: [path] }
     },
-    setQuery(state, action: PayloadAction<string>) {
-      return { ...state, query: action.payload }
+    multiSelect(state, action: PayloadAction<string>) {
+      const path = action.payload
+      const selected = state.selected.includes(path)
+      return {
+        ...state,
+        selected: selected
+          ? state.selected.filter((p) => p !== path)
+          : [...state.selected, path],
+      }
     },
-    unselectAll(state) {
+    rangeSelect(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
+      const selected = state.selected.filter((p) => !paths.includes(p))
+      return { ...state, selected: [...selected, ...paths] }
+    },
+    unselect(state) {
       return { ...state, selected: [] }
+    },
+    startEditing(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, editing: path }
+    },
+    finishEditing(state) {
+      return { ...state, editing: undefined }
     },
   },
 })
 
-export const { loaded, loading, select, setQuery, unselectAll } =
-  explorerSlice.actions
+export const {
+  focus,
+  blur,
+  select,
+  multiSelect,
+  unselect,
+  startEditing,
+  finishEditing,
+} = explorerSlice.actions
 
 export default explorerSlice.reducer
 
 export const selectExplorer = (state: AppState) => state.explorer
 
-export const selectContents = createSelector(
+export const selectEditing = createSelector(
   selectExplorer,
-  (explorer) => explorer.contents
+  (explorer) => explorer.editing
+)
+
+export const selectIsEditing = createSelector(
+  selectEditing,
+  (editing) => (path: string) => editing === path
+)
+
+export const selectEntries = createSelector(
+  selectExplorer,
+  (explorer) => explorer.entries
 )
 
 export const selectLoading = createSelector(
@@ -60,26 +148,175 @@ export const selectQuery = createSelector(
   (explorer) => explorer.query
 )
 
-export const selectIsSelected = createSelector(
+export const selectFocused = createSelector(
   selectExplorer,
-  (explorer) => (path: string) => explorer.selected.includes(path)
+  (explorer) => explorer.focused
+)
+
+export const selectIsFocused = createSelector(
+  selectFocused,
+  (focused) => (path: string) => focused === path
+)
+
+export const selectSelected = createSelector(
+  selectExplorer,
+  (explorer) => explorer.selected
+)
+
+export const selectIsSelected = createSelector(
+  selectSelected,
+  (selected) => (path: string) => selected.includes(path)
+)
+
+export const selectContents = createSelector(
+  selectEntries,
+  selectQuery,
+  selectCurrentSortOption,
+  selectShouldShowHiddenFiles,
+  selectGetRating,
+  (entries, query, currentSortOption, shouldShowHiddenFiles, getRating) => {
+    const comparator = (a: Content, b: Content) => {
+      const aValue = a[currentSortOption.orderBy]
+      const bValue = b[currentSortOption.orderBy]
+      let result = 0
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        result = aValue.localeCompare(bValue)
+      } else {
+        if (aValue !== undefined && bValue !== undefined) {
+          if (aValue > bValue) {
+            result = 1
+          } else if (aValue < bValue) {
+            result = -1
+          }
+        } else {
+          result = 0
+        }
+      }
+      const orderSign = currentSortOption.order === 'desc' ? -1 : 1
+      return orderSign * result
+    }
+    return entries
+      .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+      .filter(
+        (entry) =>
+          !query || entry.name.toLowerCase().includes(query.toLowerCase())
+      )
+      .map((entry) => ({
+        ...entry,
+        rating: getRating(entry.path),
+      }))
+      .sort((a, b) => comparator(a, b))
+  }
 )
 
 export const selectSelectedContents = createSelector(
-  selectExplorer,
+  selectContents,
   selectIsSelected,
-  (explorer, isSelected) =>
-    explorer.contents.filter((content) => isSelected(content.path))
+  (contents, isSelected) =>
+    contents.filter((content) => isSelected(content.path))
 )
 
-export const load =
-  (path: string): AppThunk =>
+export const searchQuery =
+  (query: string): AppThunk =>
   async (dispatch) => {
-    dispatch(loading())
-    try {
-      const contents = await window.electronAPI.listContents(path)
-      dispatch(loaded(contents))
-    } catch (e) {
-      dispatch(loaded([]))
+    const { setQuery } = explorerSlice.actions
+    dispatch(setQuery(query))
+    dispatch(add(query))
+  }
+
+export const load = (): AppThunk => async (dispatch, getState) => {
+  const { loading, loaded } = explorerSlice.actions
+  const explorable = selectExplorable(getState())
+  if (!explorable) {
+    return
+  }
+  dispatch(loading())
+  try {
+    const currentDirectory = selectCurrentDirectory(getState())
+    const entries = await window.electronAPI.getDetailedEntries(
+      currentDirectory
+    )
+    dispatch(loaded(entries))
+  } catch (e) {
+    dispatch(loaded([]))
+  }
+}
+
+export const rangeSelect =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { rangeSelect } = explorerSlice.actions
+    const contents = selectContents(getState())
+    const selected = selectSelected(getState())
+    const paths = contents.map((content) => content.path)
+    const prevSelected = selected[selected.length - 1]
+    let newPaths
+    if (prevSelected) {
+      const index = paths.indexOf(path)
+      const prevIndex = paths.indexOf(prevSelected)
+      newPaths =
+        prevIndex < index
+          ? paths.slice(prevIndex, index + 1)
+          : paths.slice(index, prevIndex + 1)
+    } else {
+      const index = paths.indexOf(path)
+      newPaths = paths.slice(0, index + 1)
+    }
+    dispatch(rangeSelect(newPaths))
+  }
+
+export const newFolder =
+  (directoryPath: string): AppThunk =>
+  async (dispatch) => {
+    const { add, select } = explorerSlice.actions
+    const entry = await window.electronAPI.createDirectory(directoryPath)
+    dispatch(add([entry]))
+    dispatch(select(entry.path))
+  }
+
+export const moveToTrash =
+  (paths: string[]): AppThunk =>
+  async (dispatch) => {
+    const { remove } = explorerSlice.actions
+    await window.electronAPI.trashItems(paths)
+    dispatch(remove(paths))
+  }
+
+export const rename =
+  (path: string, newName: string): AppThunk =>
+  async (dispatch) => {
+    const { add, remove } = explorerSlice.actions
+    const entry = await window.electronAPI.renameEntry(path, newName)
+    dispatch(remove([path]))
+    dispatch(add([entry]))
+    dispatch(select(entry.path))
+  }
+
+export const move =
+  (paths: string[], directoryPath: string): AppThunk =>
+  async () => {
+    await window.electronAPI.moveEntries(paths, directoryPath)
+    // TODO: fix
+  }
+
+export const handle =
+  (
+    eventType: 'create' | 'delete',
+    directoryPath: string,
+    filePath: string
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const currentDirectory = selectCurrentDirectory(getState())
+    if (directoryPath !== currentDirectory) {
+      return
+    }
+    const { add, remove } = explorerSlice.actions
+    switch (eventType) {
+      case 'create': {
+        const entry = await window.electronAPI.getDetailedEntry(filePath)
+        return dispatch(add([entry]))
+      }
+      case 'delete':
+        return dispatch(remove([filePath]))
     }
   }

@@ -1,4 +1,5 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
+
 import { AppState } from 'store'
 
 type State = {
@@ -18,10 +19,13 @@ export const ratingSlice = createSlice({
         [path]: rating,
       }
     },
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
   },
 })
 
-export const { rate } = ratingSlice.actions
+export const { rate, replace } = ratingSlice.actions
 
 export default ratingSlice.reducer
 

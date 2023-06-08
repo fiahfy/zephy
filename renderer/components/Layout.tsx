@@ -1,88 +1,96 @@
-import { MouseEvent, ReactNode, useEffect } from 'react'
-import { Box, Toolbar } from '@mui/material'
+import { Box, GlobalStyles, Toolbar } from '@mui/material'
+import { ReactNode } from 'react'
+
 import ExplorerBar from 'components/ExplorerBar'
+import Inspector from 'components/Inspector'
+import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
-import { useAppDispatch } from 'store'
-import { add, remove } from 'store/favorite'
-import { getContextMenuParams } from 'utils/contextMenu'
+import useApplicationMenuListener from 'hooks/useApplicationMenuListener'
+import useContextMenu from 'hooks/useContextMenu'
+import useContextMenuSubscription from 'hooks/useContextMenuListener'
+import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
+import useWindowInitializer from 'hooks/useWindowInitializer'
 
 type Props = {
   children: ReactNode
-  dialog?: boolean
 }
 
 const Layout = (props: Props) => {
-  const { children, dialog = false } = props
+  const { children } = props
 
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    if (dialog) {
-      return
-    }
-
-    const unsubscribeAddToFavorites =
-      window.electronAPI.subscribeAddToFavorites((path) => dispatch(add(path)))
-    const unsubscribeRemoveFromFavorites =
-      window.electronAPI.subscribeRemoveFromFavorites((path) =>
-        dispatch(remove(path))
-      )
-    return () => {
-      unsubscribeAddToFavorites()
-      unsubscribeRemoveFromFavorites()
-    }
-  }, [dialog, dispatch])
-
-  const handleMouseDown = async (e: MouseEvent<HTMLDivElement>) => {
-    const params = getContextMenuParams(e.target as HTMLElement)
-    await window.electronAPI.sendParamsForContextMenu(params)
-  }
+  useApplicationMenuListener()
+  const { createDefaultMenuHandler } = useContextMenu()
+  useContextMenuSubscription()
+  useDocumentEventHandler()
+  useWindowInitializer()
 
   return (
     <Box
-      onMouseDown={dialog ? undefined : handleMouseDown}
+      onContextMenu={createDefaultMenuHandler()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
-      {/* eslint-disable-next-line react/no-unknown-property */}
-      <style global jsx>{`
-        html,
-        body,
-        body > div:first-child,
-        div#__next,
-        div#__next > div {
-          height: 100%;
-        }
-      `}</style>
+      <GlobalStyles
+        styles={{
+          'html, body, #__next': {
+            height: '100%',
+          },
+          '::-webkit-scrollbar': {
+            width: 10,
+            height: 10,
+            '&-corner': {
+              backgroundColor: 'transparent',
+            },
+          },
+          '.theme-light': {
+            '& ::-webkit-scrollbar-thumb': {
+              backgroundColor: '#e0e0e0',
+              '&:hover': {
+                backgroundColor: '#d2d2d2',
+              },
+              '&:active': {
+                backgroundColor: '#bdbdbd',
+              },
+            },
+          },
+          '.theme-dark': {
+            '& ::-webkit-scrollbar-thumb': {
+              backgroundColor: '#424242',
+              '&:hover': {
+                backgroundColor: '#505050',
+              },
+              '&:active': {
+                backgroundColor: '#616161',
+              },
+            },
+          },
+          '.col-resizing *': {
+            cursor: 'col-resize',
+            userSelect: 'none',
+          },
+        }}
+      />
       <TitleBar />
-      {!dialog && <ExplorerBar />}
-      {!dialog && <Sidebar />}
+      <ExplorerBar />
+      <Sidebar variant="primary">
+        <Navigator />
+      </Sidebar>
       <Box
         component="main"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-        }}
+        sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
       >
         <Toolbar
           sx={{
             flexShrink: 0,
-            minHeight: (theme) => `${theme.mixins.titleBar.height}px!important`,
+            minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
           }}
         />
-        {!dialog && (
-          <Toolbar
-            sx={{
-              flexShrink: 0,
-              minHeight: '65px!important',
-            }}
-          />
-        )}
-        <Box sx={{ flexGrow: 1, position: 'relative', overflow: 'auto' }}>
-          {children}
-        </Box>
+        <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>
       </Box>
+      <Sidebar variant="secondary">
+        <Inspector />
+      </Sidebar>
     </Box>
   )
 }
