@@ -7,8 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getFileNode: (path: string) => ipcRenderer.invoke('get-file-node', path),
   getPresentationData: (path: string) =>
     ipcRenderer.invoke('get-presentation-data', path),
-  handleDoubleClickTitleBar: () =>
-    ipcRenderer.invoke('handle-double-click-title-bar'),
   homePath: () => ipcRenderer.invoke('home-path'),
   listContents: (path: string) => ipcRenderer.invoke('list-contents', path),
   listFiles: (path: string) => ipcRenderer.invoke('list-files', path),

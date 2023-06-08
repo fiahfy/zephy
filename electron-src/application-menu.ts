@@ -6,7 +6,9 @@ import {
   shell,
 } from 'electron'
 
-const createTemplate = (browserWindow: BrowserWindow) => {
+const getActiveWindow = () => BrowserWindow.getFocusedWindow()
+
+const createTemplate = (createWindow: () => void) => {
   const isMac = process.platform === 'darwin'
 
   // @see https://www.electronjs.org/docs/latest/api/menu#examples
@@ -22,7 +24,8 @@ const createTemplate = (browserWindow: BrowserWindow) => {
               {
                 label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
-                click: () => browserWindow.webContents.send('show-settings'),
+                click: () =>
+                  getActiveWindow()?.webContents.send('show-settings'),
               },
               { type: 'separator' },
               { role: 'services' },
@@ -39,8 +42,15 @@ const createTemplate = (browserWindow: BrowserWindow) => {
     // { role: 'fileMenu' }
     {
       label: 'File',
-      submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
-    },
+      submenu: [
+        {
+          label: 'New Window',
+          accelerator: 'CmdOrCtrl+N',
+          click: () => createWindow(),
+        },
+        ...[isMac ? { role: 'close' } : { role: 'quit' }],
+      ],
+    } as MenuItemConstructorOptions,
     // { role: 'editMenu' }
     {
       label: 'Edit',
@@ -111,8 +121,8 @@ const createTemplate = (browserWindow: BrowserWindow) => {
   return template
 }
 
-export const createApplicationMenu = (browserWindow: BrowserWindow) => {
-  const template = createTemplate(browserWindow)
+export const createApplicationMenu = (createWindow: () => void) => {
+  const template = createTemplate(createWindow)
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }

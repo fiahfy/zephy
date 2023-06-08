@@ -12,7 +12,6 @@ export interface IElectronAPI {
   getPresentationData: (
     path: string
   ) => Promise<{ title: string; files: File[] }>
-  handleDoubleClickTitleBar: () => Promise<void>
   homePath: () => Promise<string>
   listContents: (path: string) => Promise<Content[]>
   listFiles: (path: string) => Promise<File[]>

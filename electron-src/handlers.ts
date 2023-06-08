@@ -1,13 +1,6 @@
 import { Dirent, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
-import {
-  BrowserWindow,
-  IpcMainInvokeEvent,
-  app,
-  ipcMain,
-  shell,
-  systemPreferences,
-} from 'electron'
+import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 
 const { readdir, stat } = promises
 
@@ -54,7 +47,7 @@ const listFiles = async (path: string): Promise<File[]> => {
     .filter((file) => !file.name.match(/^\./) && file.type !== 'other')
 }
 
-export const addHandlers = (browserWindow: BrowserWindow) => {
+export const addHandlers = () => {
   ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
     basename(path)
   )
@@ -62,25 +55,6 @@ export const addHandlers = (browserWindow: BrowserWindow) => {
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path)
   )
-  // @see https://github.com/electron/electron/issues/16385
-  ipcMain.handle('handle-double-click-title-bar', () => {
-    const action = systemPreferences.getUserDefault(
-      'AppleActionOnDoubleClick',
-      'string'
-    )
-
-    if (action === 'None') {
-      // noop
-    } else if (action === 'Minimize') {
-      browserWindow.minimize()
-    } else {
-      if (browserWindow.isMaximized()) {
-        browserWindow.unmaximize()
-      } else {
-        browserWindow.maximize()
-      }
-    }
-  })
   ipcMain.handle('home-path', () => app.getPath('home'))
   ipcMain.handle(
     'get-file-node',

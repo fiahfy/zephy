@@ -4,10 +4,6 @@ import { useTitleBar } from 'contexts/TitleBarContext'
 const TitleBar = () => {
   const { shown } = useTitleBar()
 
-  const handleDoubleClick = async () => {
-    await window.electronAPI.handleDoubleClickTitleBar()
-  }
-
   return (
     <>
       {shown && (
@@ -15,7 +11,6 @@ const TitleBar = () => {
           color="default"
           component="div"
           elevation={0}
-          onDoubleClick={handleDoubleClick}
           sx={{
             top: 0,
             zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -32,7 +27,7 @@ const TitleBar = () => {
             }}
           >
             <Typography align="center" noWrap variant="caption">
-              zephy
+              Zephy
             </Typography>
           </Toolbar>
         </AppBar>
