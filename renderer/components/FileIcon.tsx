@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import Icon from 'components/Icon'
 import { File } from 'interfaces'
-import { isImageFile } from 'utils/image'
+import { isImageFile, isVideoFile } from 'utils/file'
 
 type Props = {
   file: File
@@ -15,7 +15,11 @@ const FileIcon = (props: Props) => {
     if (file.type === 'directory') {
       return 'folder'
     }
-    return isImageFile(file.path) ? 'photo' : 'insert-drive-file'
+    return isImageFile(file.path)
+      ? 'photo'
+      : isVideoFile(file.path)
+      ? 'video-file'
+      : 'insert-drive-file'
   }, [file.path, file.type])
 
   return <Icon size={size} type={type} />

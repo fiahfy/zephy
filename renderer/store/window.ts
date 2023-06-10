@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from 'interfaces'
 import { AppState, AppThunk } from 'store'
+import { add } from 'store/queryHistory'
 
 type ExplorerState = {
   contents: Content[]
@@ -487,12 +488,13 @@ export const setLayout =
     dispatch(setLayout({ windowId, layout }))
   }
 
-export const setQuery =
+export const searchQuery =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery } = windowSlice.actions
     const windowId = getState().windowId
     dispatch(setQuery({ windowId, query }))
+    dispatch(add(query))
   }
 
 export const go =

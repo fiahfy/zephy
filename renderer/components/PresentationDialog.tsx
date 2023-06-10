@@ -40,7 +40,7 @@ import {
   selectFullscreen,
   setContentLayout,
 } from 'store/settings'
-import { isImageFile } from 'utils/image'
+import { isImageFile } from 'utils/file'
 
 type State = { images: File[]; index: number; loading: boolean; title: string }
 

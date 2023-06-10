@@ -28,7 +28,27 @@ const imageExtensions = [
   // 'tiff',
 ]
 
+const videoExtensions = [
+  // AVI
+  'avi',
+  // MOV
+  'mov',
+  // MP4
+  'mp4',
+  // WMV
+  'wmv',
+  // FLV
+  'flv',
+  // WebM
+  'webm',
+]
+
 export const isImageFile = (path: string) => {
   const extension = (path.match(/\.([^.]+)$/)?.[1] ?? '').toLocaleLowerCase()
   return imageExtensions.includes(extension)
+}
+
+export const isVideoFile = (path: string) => {
+  const extension = (path.match(/\.([^.]+)$/)?.[1] ?? '').toLocaleLowerCase()
+  return videoExtensions.includes(extension)
 }

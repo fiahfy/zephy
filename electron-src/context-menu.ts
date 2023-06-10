@@ -6,13 +6,13 @@ import {
 } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-type CustomContextMenu = {
+type ContextMenuItem = {
   id: string
   enabled: boolean
   path: string
 }
 
-type ContextMenu = CustomContextMenu | { type: string }
+type ContextMenu = ContextMenuItem | { type: string }
 
 // @see https://github.com/sindresorhus/electron-context-menu/issues/102#issuecomment-735434790
 const registerContextMenu = () => {
@@ -29,9 +29,7 @@ const registerContextMenu = () => {
       }
 
       const actions: {
-        [id in string]: (
-          params: CustomContextMenu
-        ) => MenuItemConstructorOptions
+        [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
       } = {
         startPresentation: (params) => ({
           accelerator: 'Enter',

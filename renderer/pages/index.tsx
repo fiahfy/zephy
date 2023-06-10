@@ -20,7 +20,7 @@ import {
   selectSelectedContents,
   sort,
 } from 'store/window'
-import { isImageFile } from 'utils/image'
+import { isImageFile } from 'utils/file'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)

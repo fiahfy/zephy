@@ -1,16 +1,23 @@
 import { useMemo } from 'react'
-import { blue, green, grey } from '@mui/material/colors'
+import { blue, green, grey, red } from '@mui/material/colors'
 import {
   Folder as FolderIcon,
   InsertDriveFile as InsertDriveFileIcon,
   Photo as PhotoIcon,
   StarBorder as StarBorderIcon,
   Star as StarIcon,
+  VideoFile as VideoFileIcon,
 } from '@mui/icons-material'
 
 type Props = {
   size?: 'small' | 'medium'
-  type: 'star' | 'star-border' | 'folder' | 'photo' | 'insert-drive-file'
+  type:
+    | 'star'
+    | 'star-border'
+    | 'folder'
+    | 'photo'
+    | 'video-file'
+    | 'insert-drive-file'
 }
 
 const Icon = (props: Props) => {
@@ -26,6 +33,8 @@ const Icon = (props: Props) => {
         return FolderIcon
       case 'photo':
         return PhotoIcon
+      case 'video-file':
+        return VideoFileIcon
       case 'insert-drive-file':
         return InsertDriveFileIcon
     }
@@ -41,6 +50,8 @@ const Icon = (props: Props) => {
         return blue['200']
       case 'photo':
         return green['200']
+      case 'video-file':
+        return red['300']
       case 'insert-drive-file':
         return grey['400']
     }

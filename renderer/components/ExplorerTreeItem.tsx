@@ -7,7 +7,7 @@ import { FileNode } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/image'
+import { isImageFile } from 'utils/file'
 
 const max = 100
 

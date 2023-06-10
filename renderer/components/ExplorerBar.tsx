@@ -40,12 +40,13 @@ import RoundedFilledTextField from 'components/RoundedFilledTextField'
 import SettingsDialog from 'components/SettingsDialog'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite, toggle } from 'store/favorite'
-import { add, selectQueryHistories } from 'store/queryHistory'
+import { selectQueryHistories } from 'store/queryHistory'
 import {
   back,
   forward,
   load,
   move,
+  searchQuery,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
@@ -53,7 +54,6 @@ import {
   selectLayout,
   selectSidebarHidden,
   setLayout,
-  setQuery,
   setSidebarHidden,
   sort,
   unselectAll,
@@ -94,8 +94,7 @@ const ExplorerBar = () => {
   const search = useCallback(
     (query: string) => {
       setQueryInput(query)
-      dispatch(setQuery(query))
-      dispatch(add(query))
+      dispatch(searchQuery(query))
     },
     [dispatch]
   )

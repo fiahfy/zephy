@@ -12,6 +12,7 @@ export interface IElectronAPI {
   getPresentationData: (
     path: string
   ) => Promise<{ title: string; files: File[] }>
+  getThumbnail: (path: string) => Promise<File>
   getWindowId: () => Promise<number | undefined>
   homePath: () => Promise<string>
   listContents: (path: string) => Promise<Content[]>

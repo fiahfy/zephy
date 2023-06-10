@@ -30,7 +30,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
 import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/image'
+import { isImageFile } from 'utils/file'
 
 const headerHeight = 32
 const rowHeight = 32

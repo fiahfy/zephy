@@ -28,11 +28,6 @@ import {
   setFullscreen,
 } from 'store/settings'
 
-const explorerLayoutOptions = [
-  { text: 'List View', value: 'list' },
-  { text: 'Thumbnail View', value: 'thumbnail' },
-]
-
 const contentLayoutOptions = [
   { text: 'Default', value: 'default' },
   { text: 'Contain', value: 'contain' },

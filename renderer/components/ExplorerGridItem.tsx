@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
 import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/image'
+import { isImageFile, isVideoFile } from 'utils/file'
 
 type State = { paths: string[]; loading: boolean }
 
@@ -61,7 +61,12 @@ const ExplorerGridItem = (props: Props) => {
       dispatch({ type: 'loading' })
 
       if (content.type === 'file') {
-        return dispatch({ type: 'loaded', payload: [content.path] })
+        if (isVideoFile(content.path)) {
+          const file = await window.electronAPI.getThumbnail(content.path)
+          return dispatch({ type: 'loaded', payload: [file.path] })
+        } else {
+          return dispatch({ type: 'loaded', payload: [content.path] })
+        }
       }
 
       let files: File[] = []
@@ -88,7 +93,7 @@ const ExplorerGridItem = (props: Props) => {
   )
 
   const message = useMemo(
-    () => (loading ? 'Loading...' : 'No Images'),
+    () => (loading ? 'Loading...' : 'No Preview'),
     [loading]
   )
 
