@@ -93,8 +93,8 @@ const ExplorerTable = (props: Props) => {
     sortOption,
   } = props
 
-  const isFavorite = useAppSelector(selectIsFavorite)
   const getRating = useAppSelector(selectGetRating)
+  const isFavorite = useAppSelector(selectIsFavorite)
   const dispatch = useAppDispatch()
 
   const ref = useRef<HTMLDivElement>(null)

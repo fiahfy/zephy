@@ -4,33 +4,32 @@ import ExplorerTable from 'components/ExplorerTable'
 import PresentationDialog from 'components/PresentationDialog'
 import { ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import {
-  select,
-  selectContents,
-  selectIsSelected,
-  selectLoading,
-  selectQuery,
-  selectSelectedContents,
-} from 'store/explorer'
+import { selectGetRating } from 'store/rating'
 import {
   move,
   scroll,
+  select,
+  selectContents,
   selectCurrentDirectory,
   selectCurrentScrollTop,
-} from 'store/history'
-import { selectGetRating } from 'store/rating'
-import { selectExplorerLayout } from 'store/settings'
-import { selectGetSortOption, sort } from 'store/sorting'
+  selectGetSortOption,
+  selectIsSelected,
+  selectLayout,
+  selectLoading,
+  selectQuery,
+  selectSelectedContents,
+  sort,
+} from 'store/window'
 import { isImageFile } from 'utils/image'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
-  const explorerLayout = useAppSelector(selectExplorerLayout)
   const getRating = useAppSelector(selectGetRating)
   const getSortOption = useAppSelector(selectGetSortOption)
   const isSelected = useAppSelector(selectIsSelected)
+  const layout = useAppSelector(selectLayout)
   const loading = useAppSelector(selectLoading)
   const query = useAppSelector(selectQuery)
   const selectedContents = useAppSelector(selectSelectedContents)
@@ -105,7 +104,7 @@ const IndexPage = () => {
     order: 'asc' | 'desc'
     orderBy: 'name' | 'rating' | 'dateModified'
   }) => {
-    dispatch(sort({ path: currentDirectory, option: sortOption }))
+    dispatch(sort(currentDirectory, sortOption))
   }
 
   const handleClickContent = (content: ExplorerContent) =>
@@ -129,7 +128,7 @@ const IndexPage = () => {
 
   return (
     <>
-      {createElement(explorerLayout === 'list' ? ExplorerTable : ExplorerGrid, {
+      {createElement(layout === 'list' ? ExplorerTable : ExplorerGrid, {
         contentSelected: isContentSelected,
         contents: explorerContents,
         loading,

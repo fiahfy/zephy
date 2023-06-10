@@ -22,14 +22,10 @@ import { useAppDispatch, useAppSelector } from 'store'
 import {
   selectContentLayout,
   selectDarkMode,
-  selectExplorerLayout,
   selectFullscreen,
-  selectSidebarHidden,
   setContentLayout,
   setDarkMode,
-  setExplorerLayout,
   setFullscreen,
-  setSidebarHidden,
 } from 'store/settings'
 
 const explorerLayoutOptions = [
@@ -53,26 +49,12 @@ const SettingsDialog = (props: Props) => {
 
   const contentLayout = useAppSelector(selectContentLayout)
   const darkMode = useAppSelector(selectDarkMode)
-  const explorerLayout = useAppSelector(selectExplorerLayout)
   const fullscreen = useAppSelector(selectFullscreen)
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
   const dispatch = useAppDispatch()
 
   const handleChangeDarkMode = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.checked
     dispatch(setDarkMode(value))
-  }
-
-  const handleChangeSidebarHidden = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = !e.currentTarget.checked
-    dispatch(setSidebarHidden(value))
-  }
-
-  const handleChangeExplorerLayout = (
-    e: SelectChangeEvent<'list' | 'thumbnail'>
-  ) => {
-    const value = e.target.value as 'list' | 'thumbnail'
-    dispatch(setExplorerLayout(value))
   }
 
   const handleChangeFullscreen = (e: ChangeEvent<HTMLInputElement>) => {
@@ -115,35 +97,6 @@ const SettingsDialog = (props: Props) => {
                 label="Use Dark Mode"
               />
             </FormGroup>
-          </Box>
-          <Box sx={{ my: 2 }}>
-            <Typography variant="subtitle2">Explorer</Typography>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={!sidebarHidden}
-                    onChange={handleChangeSidebarHidden}
-                  />
-                }
-                label="Show Sidebar"
-              />
-            </FormGroup>
-            <FormControl sx={{ mt: 2 }}>
-              <InputLabel>Explorer Layout</InputLabel>
-              <Select
-                label="Explorer Layout"
-                onChange={handleChangeExplorerLayout}
-                sx={{ minWidth: (theme) => theme.spacing(20) }}
-                value={explorerLayout}
-              >
-                {explorerLayoutOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.text}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Box>
           <Box sx={{ my: 2 }}>
             <Typography variant="subtitle2">Presentation</Typography>

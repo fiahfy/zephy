@@ -10,7 +10,7 @@ import {
   selectSidebarWidth,
   setSidebarHidden,
   setSidebarWidth,
-} from 'store/settings'
+} from 'store/window'
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',

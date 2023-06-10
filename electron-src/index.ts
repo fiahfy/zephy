@@ -1,4 +1,4 @@
-import { BrowserWindow, app, globalShortcut, protocol } from 'electron'
+import { BrowserWindow, app, protocol } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'

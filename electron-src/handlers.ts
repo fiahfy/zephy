@@ -1,6 +1,12 @@
 import { Dirent, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
-import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
+import {
+  BrowserWindow,
+  IpcMainInvokeEvent,
+  app,
+  ipcMain,
+  shell,
+} from 'electron'
 
 const { readdir, stat } = promises
 
@@ -109,6 +115,11 @@ export const addHandlers = () => {
       const files = await listFiles(dirPath)
       return { title: basename(dirPath), files }
     }
+  )
+  ipcMain.handle(
+    'get-window-id',
+    (event: IpcMainInvokeEvent) =>
+      BrowserWindow.fromWebContents(event.sender)?.id
   )
   ipcMain.handle('list-contents', (_event: IpcMainInvokeEvent, path: string) =>
     listContents(path)

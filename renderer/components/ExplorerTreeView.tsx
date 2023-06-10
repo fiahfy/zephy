@@ -7,7 +7,7 @@ import { TreeView } from '@mui/lab'
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { FileNode } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { move, selectCurrentDirectory } from 'store/history'
+import { move, selectCurrentDirectory } from 'store/window'
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)

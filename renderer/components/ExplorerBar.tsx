@@ -39,24 +39,25 @@ import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/RoundedFilledTextField'
 import SettingsDialog from 'components/SettingsDialog'
 import { useAppDispatch, useAppSelector } from 'store'
-import { load, setQuery, unselectAll } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
+import { add, selectQueryHistories } from 'store/queryHistory'
 import {
   back,
   forward,
+  load,
   move,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-} from 'store/history'
-import { add, selectQueryHistories } from 'store/queryHistory'
-import {
-  selectExplorerLayout,
+  selectGetSortOption,
+  selectLayout,
   selectSidebarHidden,
-  setExplorerLayout,
+  setLayout,
+  setQuery,
   setSidebarHidden,
-} from 'store/settings'
-import { selectGetSortOption, sort } from 'store/sorting'
+  sort,
+  unselectAll,
+} from 'store/window'
 
 const sortOptions = [
   { text: 'Name Ascending', value: 'name-asc' },
@@ -71,12 +72,12 @@ const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const dispatch = useAppDispatch()
-  const explorerLayout = useAppSelector(selectExplorerLayout)
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const getSortOption = useAppSelector(selectGetSortOption)
+  const layout = useAppSelector(selectLayout)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const sidebarHidden = useAppSelector(selectSidebarHidden)
+  const dispatch = useAppDispatch()
 
   const [directory, setDirectory] = useState('')
   const [queryInput, setQueryInput] = useState('')
@@ -189,17 +190,17 @@ const ExplorerBar = () => {
     value: 'sidebar'[]
   ) => dispatch(setSidebarHidden(!value.includes('sidebar')))
 
-  const handleChangeExplorerLayout = (
+  const handleChangeLayout = (
     _e: MouseEvent<HTMLElement>,
     value: 'list' | 'thumbnail'
-  ) => dispatch(setExplorerLayout(value))
+  ) => dispatch(setLayout(value))
 
   const handleChangeSortOption = (e: ChangeEvent<HTMLInputElement>) => {
     const [orderBy, order] = e.target.value.split('-') as [
       'name' | 'rating' | 'dateModified',
       'asc' | 'desc'
     ]
-    dispatch(sort({ path: currentDirectory, option: { orderBy, order } }))
+    dispatch(sort(currentDirectory, { orderBy, order }))
   }
 
   const handleChangeQuery = (_e: SyntheticEvent, value: string | null) =>
@@ -381,10 +382,10 @@ const ExplorerBar = () => {
         <div style={{ flexGrow: 1 }} />
         <FilledToggleButtonGroup
           exclusive
-          onChange={handleChangeExplorerLayout}
+          onChange={handleChangeLayout}
           size="small"
           sx={{ mr: 1 }}
-          value={explorerLayout}
+          value={layout}
         >
           <ToggleButton
             sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}

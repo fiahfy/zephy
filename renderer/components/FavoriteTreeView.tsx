@@ -7,7 +7,7 @@ import {
 import FavoriteTreeItem from 'components/FavoriteTreeItem'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'
-import { move } from 'store/history'
+import { move } from 'store/window'
 
 const FavoriteTreeView = () => {
   const favorites = useAppSelector(selectFavorites)

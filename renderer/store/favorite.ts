@@ -22,10 +22,13 @@ export const favoriteSlice = createSlice({
       delete newState[action.payload]
       return newState
     },
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
   },
 })
 
-export const { add, remove } = favoriteSlice.actions
+export const { add, remove, replace } = favoriteSlice.actions
 
 export default favoriteSlice.reducer
 
