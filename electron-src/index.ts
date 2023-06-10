@@ -3,10 +3,10 @@ import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
 import { join } from 'path'
-import { createApplicationMenu } from './application-menu'
-import { createContextMenu } from './context-menu'
+import registerApplicationMenu from './application-menu'
+import registerContextMenu from './context-menu'
 import { addHandlers } from './handlers'
-import createWindowStateManager from './window-state-manager'
+import createWindowStateManager from './window-state'
 
 const createWindow = (state: State) => {
   const browserWindow = new BrowserWindow({
@@ -36,10 +36,10 @@ app.whenReady().then(async () => {
   await prepareNext('./renderer')
 
   windowStateManager.restore()
+  registerApplicationMenu(windowStateManager.create)
+  registerContextMenu()
 
   addHandlers()
-  createApplicationMenu(windowStateManager.create)
-  createContextMenu()
 
   // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
   protocol.registerFileProtocol('file', (request, callback) => {

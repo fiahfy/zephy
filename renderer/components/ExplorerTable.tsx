@@ -230,14 +230,21 @@ const ExplorerTable = (props: Props) => {
       <TableCell
         {...contextMenuProps([
           {
-            id: 'start-presentation',
+            id: 'startPresentation',
             enabled: rowData.type === 'directory' || isImageFile(rowData.path),
-            value: rowData.path,
+            path: rowData.path,
           },
+          { type: 'separator' },
           {
-            id: 'add-favorite',
-            enabled: !isFavorite(rowData.path),
-            value: rowData.path,
+            id: 'open',
+            enabled: true,
+            path: rowData.path,
+          },
+          { type: 'separator' },
+          {
+            id: 'addFavorite',
+            enabled: !isFavorite(rowData.path) && rowData.type === 'directory',
+            path: rowData.path,
           },
         ])}
         component="div"

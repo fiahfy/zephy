@@ -32,14 +32,21 @@ const ExplorerTreeItem = (props: Props) => {
       LabelProps={
         contextMenuProps([
           {
-            id: 'start-presentation',
+            id: 'startPresentation',
             enabled,
-            value: file.path,
+            path: file.path,
           },
+          { type: 'separator' },
           {
-            id: 'add-favorite',
-            enabled: !favorite,
-            value: file.path,
+            id: 'open',
+            enabled: true,
+            path: file.path,
+          },
+          { type: 'separator' },
+          {
+            id: 'addFavorite',
+            enabled: !favorite && file.type === 'directory',
+            path: file.path,
           },
         ]) as BoxProps
       }

@@ -17,12 +17,14 @@ export interface IElectronAPI {
   listContents: (path: string) => Promise<Content[]>
   listFiles: (path: string) => Promise<File[]>
   openPath: (path: string) => Promise<void>
-  sendParamsForContextMenu: (params?: unknown) => Promise<void>
   subscribeAddToFavorites: (callback: (path: string) => void) => () => void
   subscribeRemoveFromFavorites: (callback: (path: string) => void) => () => void
   subscribeShowSettings: (callback: () => void) => () => void
   subscribeStartPresentation: (callback: (path: string) => void) => () => void
   subscribeSearch: (callback: () => void) => () => void
+  contextMenu: {
+    send: (params?: unknown) => Promise<void>
+  }
 }
 
 export type File = {
@@ -33,9 +35,3 @@ export type File = {
 export type FileNode = File & { children?: FileNode[] }
 export type Content = File & { dateModified: number }
 export type ExplorerContent = Content & { rating: number }
-
-export type MenuParams = {
-  id: string
-  enabled: boolean
-  value: any // eslint-disable-line @typescript-eslint/no-explicit-any
-}

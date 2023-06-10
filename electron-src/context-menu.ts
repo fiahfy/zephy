@@ -1,97 +1,85 @@
 import {
-  BrowserView,
-  BrowserWindow,
   IpcMainInvokeEvent,
   MenuItemConstructorOptions,
-  WebContents,
   ipcMain,
+  shell,
 } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-const webContents = (
-  win: BrowserWindow | BrowserView | Electron.WebviewTag | WebContents
-) => ('webContents' in win ? win.webContents : win)
-
-type MenuParams = {
+type CustomContextMenu = {
   id: string
   enabled: boolean
-  value: any // eslint-disable-line @typescript-eslint/no-explicit-any
+  path: string
 }
 
-// @see https://github.com/sindresorhus/electron-context-menu/issues/102#issuecomment-735434790
-export const createContextMenu = () => {
-  let menuParams: MenuParams[]
+type ContextMenu = CustomContextMenu | { type: string }
 
-  const buildMenus = (
-    options: (MenuItemConstructorOptions & {
-      callback?: (params: MenuParams) => MenuItemConstructorOptions
-    })[]
-  ) => {
-    return options.reduce((carry, options) => {
-      if (options.id && options.callback) {
-        const params = menuParams.find((params) => params.id === options.id)
-        return params ? [...carry, options.callback(params)] : carry
-      } else {
-        return [...carry, options]
-      }
-    }, [] as MenuItemConstructorOptions[])
-  }
+// @see https://github.com/sindresorhus/electron-context-menu/issues/102#issuecomment-735434790
+const registerContextMenu = () => {
+  let contextMenus: ContextMenu[]
 
   contextMenu({
     prepend: (_defaultActions, parameters, browserWindow) => {
-      return buildMenus([
+      const send = (channel: string, ...args: unknown[]) => {
+        const webContents =
+          'webContents' in browserWindow
+            ? browserWindow.webContents
+            : browserWindow
+        webContents.send(channel, ...args)
+      }
+
+      const actions: {
+        [id in string]: (
+          params: CustomContextMenu
+        ) => MenuItemConstructorOptions
+      } = {
+        startPresentation: (params) => ({
+          accelerator: 'Enter',
+          click: () => send('start-presentation', params.path),
+          enabled: params.enabled,
+          label: 'Start Presentation',
+        }),
+        addFavorite: (params) => ({
+          click: () => send('add-favorite', params.path),
+          enabled: params.enabled,
+          label: 'Add to Favorites',
+        }),
+        removeFavorite: (params) => ({
+          click: () => send('remove-favorite', params.path),
+          enabled: params.enabled,
+          label: 'Remove from Favorites',
+        }),
+        open: (params) => ({
+          click: () => shell.openPath(params.path),
+          enabled: params.enabled,
+          label: 'Open',
+        }),
+      }
+
+      return [
         {
           accelerator: 'CommandOrControl+F',
-          click: () => {
-            const wc = webContents(browserWindow)
-            wc && wc.send('search')
-          },
+          click: () => send('search'),
           label: 'Search for “{selection}”',
           visible: parameters.selectionText.trim().length > 0,
         },
-        {
-          id: 'start-presentation',
-          callback: (params) => ({
-            accelerator: 'Enter',
-            click: () => {
-              const wc = webContents(browserWindow)
-              wc && wc.send('start-presentation', params.value)
-            },
-            enabled: params.enabled,
-            label: 'Start Presentation',
-          }),
-        },
-        { type: 'separator' },
-        {
-          id: 'add-favorite',
-          callback: (params) => ({
-            click: () => {
-              const wc = webContents(browserWindow)
-              wc && wc.send('add-favorite', params.value)
-            },
-            enabled: params.enabled,
-            label: 'Add to Favorites',
-          }),
-        },
-        {
-          id: 'remove-favorite',
-          callback: (params) => ({
-            click: () => {
-              const wc = webContents(browserWindow)
-              wc && wc.send('remove-favorite', params.value)
-            },
-            enabled: params.enabled,
-            label: 'Remove from Favorites',
-          }),
-        },
-      ])
+        ...contextMenus.flatMap((params) => {
+          if ('type' in params) {
+            return params
+          }
+          const creator = actions[params.id]
+          return creator ? creator(params) : []
+        }),
+      ] as MenuItemConstructorOptions[]
     },
   })
 
   ipcMain.handle(
-    'send-params-for-context-menu',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (_event: IpcMainInvokeEvent, targetMenuParams?: any) =>
-      (menuParams = targetMenuParams ?? [])
+    'context-menu-send',
+    (_event: IpcMainInvokeEvent, targetContextMenus?: ContextMenu[]) => {
+      contextMenus = targetContextMenus ?? []
+    }
   )
 }
+
+export default registerContextMenu

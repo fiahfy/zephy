@@ -6,9 +6,12 @@ import {
   shell,
 } from 'electron'
 
-const getActiveWindow = () => BrowserWindow.getFocusedWindow()
+const send = (channel: string, ...args: unknown[]) => {
+  const activeWindow = BrowserWindow.getFocusedWindow()
+  activeWindow?.webContents.send(channel, ...args)
+}
 
-const createTemplate = (createWindow: () => void) => {
+const registerApplicationMenu = (createWindow: () => void) => {
   const isMac = process.platform === 'darwin'
 
   // @see https://www.electronjs.org/docs/latest/api/menu#examples
@@ -24,8 +27,7 @@ const createTemplate = (createWindow: () => void) => {
               {
                 label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
-                click: () =>
-                  getActiveWindow()?.webContents.send('show-settings'),
+                click: () => send('show-settings'),
               },
               { type: 'separator' },
               { role: 'services' },
@@ -111,18 +113,14 @@ const createTemplate = (createWindow: () => void) => {
       submenu: [
         {
           label: 'Learn More',
-          click: async () => {
-            await shell.openExternal('https://electronjs.org')
-          },
+          click: () => shell.openExternal('https://github.com/fiahfy/zephy'),
         },
       ],
     },
   ]
-  return template
-}
 
-export const createApplicationMenu = (createWindow: () => void) => {
-  const template = createTemplate(createWindow)
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
+export default registerApplicationMenu

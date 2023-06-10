@@ -1,16 +1,29 @@
-import { MenuParams } from 'interfaces'
+import { MouseEvent } from 'react'
 
-export const contextMenuProps = (menuParams: MenuParams[]) => {
+type ContextMenu =
+  | {
+      id: string
+      enabled: boolean
+      path: string
+    }
+  | { type: string }
+
+export const contextMenuProps = (contextMenus: ContextMenu[]) => {
   return {
-    'data-params': JSON.stringify(menuParams),
+    'data-context-menus': JSON.stringify(contextMenus),
   }
 }
 
-export const getContextMenuParams = (e: HTMLElement): string | undefined => {
-  const params = e.dataset.params
+const getContextMenus = (e: HTMLElement): string | undefined => {
+  const params = e.dataset.contextMenus
   if (params) {
     return JSON.parse(params)
   }
   const parent = e.parentElement
-  return parent ? getContextMenuParams(parent) : undefined
+  return parent ? getContextMenus(parent) : undefined
+}
+
+export const openContextMenu = async (e: MouseEvent<HTMLDivElement>) => {
+  const params = getContextMenus(e.target as HTMLElement)
+  await window.electronAPI.contextMenu.send(params)
 }

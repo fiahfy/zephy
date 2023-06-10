@@ -22,14 +22,21 @@ const FavoriteTreeItem = (props: Props) => {
           ? {}
           : (contextMenuProps([
               {
-                id: 'start-presentation',
+                id: 'startPresentation',
                 enabled: true,
-                value: nodeId,
+                path: nodeId,
               },
+              { type: 'separator' },
               {
-                id: 'remove-favorite',
+                id: 'open',
                 enabled: true,
-                value: nodeId,
+                path: nodeId,
+              },
+              { type: 'separator' },
+              {
+                id: 'removeFavorite',
+                enabled: true,
+                path: nodeId,
               },
             ]) as BoxProps)
       }

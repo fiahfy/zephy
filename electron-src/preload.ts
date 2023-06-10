@@ -12,8 +12,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listContents: (path: string) => ipcRenderer.invoke('list-contents', path),
   listFiles: (path: string) => ipcRenderer.invoke('list-files', path),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
-  sendParamsForContextMenu: (params?: unknown) =>
-    ipcRenderer.invoke('send-params-for-context-menu', params),
   subscribeAddToFavorites: (callback: (path: string) => void) => {
     const cb = (_e: IpcRendererEvent, path: string) => callback(path)
     ipcRenderer.on('add-favorite', cb)
@@ -48,5 +46,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => {
       ipcRenderer.removeListener('search', cb)
     }
+  },
+  contextMenu: {
+    send: (params?: unknown) => ipcRenderer.invoke('context-menu-send', params),
   },
 })

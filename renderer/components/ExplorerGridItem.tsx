@@ -101,14 +101,21 @@ const ExplorerGridItem = (props: Props) => {
     <ImageListItem
       {...contextMenuProps([
         {
-          id: 'start-presentation',
+          id: 'startPresentation',
           enabled,
-          value: content.path,
+          path: content.path,
         },
+        { type: 'separator' },
         {
-          id: 'add-favorite',
-          enabled: !favorite,
-          value: content.path,
+          id: 'open',
+          enabled: true,
+          path: content.path,
+        },
+        { type: 'separator' },
+        {
+          id: 'addFavorite',
+          enabled: !favorite && content.type === 'directory',
+          path: content.path,
         },
       ])}
       className={selected ? 'selected' : undefined}

@@ -1,11 +1,11 @@
-import { MouseEvent, ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { Box, Toolbar } from '@mui/material'
 import ExplorerBar from 'components/ExplorerBar'
 import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import { useAppDispatch } from 'store'
 import { add, remove } from 'store/favorite'
-import { getContextMenuParams } from 'utils/contextMenu'
+import { openContextMenu } from 'utils/contextMenu'
 
 type Props = {
   children: ReactNode
@@ -28,20 +28,16 @@ const Layout = (props: Props) => {
       window.electronAPI.subscribeRemoveFromFavorites((path) =>
         dispatch(remove(path))
       )
+
     return () => {
       unsubscribeAddToFavorites()
       unsubscribeRemoveFromFavorites()
     }
   }, [dialog, dispatch])
 
-  const handleMouseDown = async (e: MouseEvent<HTMLDivElement>) => {
-    const params = getContextMenuParams(e.target as HTMLElement)
-    await window.electronAPI.sendParamsForContextMenu(params)
-  }
-
   return (
     <Box
-      onMouseDown={dialog ? undefined : handleMouseDown}
+      onMouseDown={dialog ? undefined : openContextMenu}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}
