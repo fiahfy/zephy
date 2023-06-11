@@ -23,14 +23,13 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import FileIcon from 'components/FileIcon'
-import NoOutlineRating from 'components/NoOutlineRating'
+import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePrevious from 'hooks/usePrevious'
 import { ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
 import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/file'
 
 const headerHeight = 32
 const rowHeight = 32
@@ -230,12 +229,6 @@ const ExplorerTable = (props: Props) => {
       <TableCell
         {...contextMenuProps([
           {
-            id: 'startPresentation',
-            enabled: rowData.type === 'directory' || isImageFile(rowData.path),
-            path: rowData.path,
-          },
-          { type: 'separator' },
-          {
             id: 'open',
             enabled: true,
             path: rowData.path,
@@ -345,6 +338,9 @@ const ExplorerTable = (props: Props) => {
           const widths = getWidths(width)
           return (
             <Table
+              gridStyle={{
+                overflowY: 'scroll',
+              }}
               headerHeight={headerHeight}
               height={height}
               onRowClick={handleRowClick}

@@ -12,7 +12,6 @@ export interface IElectronAPI {
   getPresentationData: (
     path: string
   ) => Promise<{ title: string; files: File[] }>
-  getThumbnail: (path: string) => Promise<File>
   getWindowId: () => Promise<number | undefined>
   homePath: () => Promise<string>
   listContents: (path: string) => Promise<Content[]>
@@ -21,10 +20,12 @@ export interface IElectronAPI {
   subscribeAddToFavorites: (callback: (path: string) => void) => () => void
   subscribeRemoveFromFavorites: (callback: (path: string) => void) => () => void
   subscribeShowSettings: (callback: () => void) => () => void
-  subscribeStartPresentation: (callback: (path: string) => void) => () => void
   subscribeSearch: (callback: () => void) => () => void
   contextMenu: {
     send: (params?: unknown) => Promise<void>
+  }
+  ffmpeg: {
+    thumbnail: (path: string) => Promise<string>
   }
 }
 

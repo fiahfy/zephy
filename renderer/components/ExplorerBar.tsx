@@ -5,7 +5,6 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -34,9 +33,9 @@ import {
   ViewComfy as ViewComfyIcon,
   ViewSidebar as ViewSidebarIcon,
 } from '@mui/icons-material'
-import FilledToggleButtonGroup from 'components/FilledToggleButtonGroup'
 import Icon from 'components/Icon'
-import RoundedFilledTextField from 'components/RoundedFilledTextField'
+import FilledToggleButtonGroup from 'components/enhanced/FilledToggleButtonGroup'
+import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
 import SettingsDialog from 'components/SettingsDialog'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite, toggle } from 'store/favorite'
@@ -50,7 +49,7 @@ import {
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-  selectGetSortOption,
+  selectCurrentSortOption,
   selectLayout,
   selectSidebarHidden,
   setLayout,
@@ -72,8 +71,8 @@ const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentSortOption = useAppSelector(selectCurrentSortOption)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
-  const getSortOption = useAppSelector(selectGetSortOption)
   const layout = useAppSelector(selectLayout)
   const queryHistories = useAppSelector(selectQueryHistories)
   const sidebarHidden = useAppSelector(selectSidebarHidden)
@@ -148,11 +147,6 @@ const ExplorerBar = () => {
       await loadContents()
     })()
   }, [currentDirectory, dispatch, loadContents])
-
-  const sortOption = useMemo(
-    () => getSortOption(currentDirectory),
-    [currentDirectory, getSortOption]
-  )
 
   // click handlers
   const handleClickBack = () => dispatch(back())
@@ -413,7 +407,7 @@ const ExplorerBar = () => {
           onChange={handleChangeSortOption}
           select
           size="small"
-          value={`${sortOption.orderBy}-${sortOption.order}`}
+          value={`${currentSortOption.orderBy}-${currentSortOption.order}`}
         >
           {sortOptions.map((option, index) => (
             <MenuItem dense key={index} value={option.value}>

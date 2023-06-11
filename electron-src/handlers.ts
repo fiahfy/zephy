@@ -1,5 +1,3 @@
-import crypto from 'crypto'
-import ffmpeg from 'fluent-ffmpeg'
 import { Dirent, Stats, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
 import {
@@ -118,32 +116,7 @@ export const addHandlers = () => {
       return { title: basename(dirPath), files }
     }
   )
-  ipcMain.handle(
-    'get-thumbnail',
-    async (_event: IpcMainInvokeEvent, path: string) => {
-      console.log(path)
-      const dir = join(app.getPath('userData'), 'thumbnails')
-      const filename =
-        crypto.createHash('md5').update(path).digest('hex') + '.png'
-      await new Promise<void>((resolve, reject) => {
-        ffmpeg(path)
-          .screenshots({
-            count: 1,
-            folder: dir,
-            filename: filename,
-          })
-          .on('error', (e) => reject(e))
-          .on('end', () => resolve())
-      })
-      const thumbnailPath = join(dir, filename)
-      const stats = await stat(thumbnailPath)
-      return {
-        name: basename(thumbnailPath).normalize('NFC'),
-        path: thumbnailPath,
-        type: getFileType(stats),
-      }
-    }
-  )
+
   ipcMain.handle(
     'get-window-id',
     (event: IpcMainInvokeEvent) =>

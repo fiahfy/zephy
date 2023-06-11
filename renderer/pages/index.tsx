@@ -1,7 +1,6 @@
-import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
+import { createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
-import PresentationDialog from 'components/PresentationDialog'
 import { ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectGetRating } from 'store/rating'
@@ -12,7 +11,7 @@ import {
   selectContents,
   selectCurrentDirectory,
   selectCurrentScrollTop,
-  selectGetSortOption,
+  selectCurrentSortOption,
   selectIsSelected,
   selectLayout,
   selectLoading,
@@ -20,14 +19,13 @@ import {
   selectSelectedContents,
   sort,
 } from 'store/window'
-import { isImageFile } from 'utils/file'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
+  const currentSortOption = useAppSelector(selectCurrentSortOption)
   const getRating = useAppSelector(selectGetRating)
-  const getSortOption = useAppSelector(selectGetSortOption)
   const isSelected = useAppSelector(selectIsSelected)
   const layout = useAppSelector(selectLayout)
   const loading = useAppSelector(selectLoading)
@@ -35,28 +33,11 @@ const IndexPage = () => {
   const selectedContents = useAppSelector(selectSelectedContents)
   const dispatch = useAppDispatch()
 
-  const [dialogState, setDialogState] = useState<{
-    open: boolean
-    path: string
-  }>({ open: false, path: '' })
-
-  useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribeStartPresentation((path) =>
-      setDialogState({ open: true, path })
-    )
-    return () => unsubscribe()
-  }, [])
-
-  const sortOption = useMemo(
-    () => getSortOption(currentDirectory),
-    [currentDirectory, getSortOption]
-  )
-
   const comparator = useCallback(
     (a: ExplorerContent, b: ExplorerContent) => {
       let result = 0
-      const aValue = a[sortOption.orderBy]
-      const bValue = b[sortOption.orderBy]
+      const aValue = a[currentSortOption.orderBy]
+      const bValue = b[currentSortOption.orderBy]
       if (aValue !== undefined && bValue !== undefined) {
         if (aValue > bValue) {
           result = 1
@@ -66,10 +47,10 @@ const IndexPage = () => {
       } else {
         result = 0
       }
-      const orderSign = sortOption.order === 'desc' ? -1 : 1
+      const orderSign = currentSortOption.order === 'desc' ? -1 : 1
       return orderSign * result
     },
-    [sortOption]
+    [currentSortOption]
   )
 
   const explorerContents = useMemo(
@@ -90,16 +71,6 @@ const IndexPage = () => {
   const isContentSelected = (content: ExplorerContent) =>
     isSelected(content.path)
 
-  const handleKeyDownEnter = () => {
-    const content = selectedContents[0]
-    if (
-      content &&
-      (content.type === 'directory' || isImageFile(content.path))
-    ) {
-      setDialogState({ path: content.path, open: true })
-    }
-  }
-
   const handleChangeSortOption = (sortOption: {
     order: 'asc' | 'desc'
     orderBy: 'name' | 'rating' | 'dateModified'
@@ -118,7 +89,12 @@ const IndexPage = () => {
   const handleFocusContent = (content: ExplorerContent) =>
     dispatch(select(content.path))
 
-  const handleRequestClose = () => setDialogState({ open: false, path: '' })
+  const handleKeyDownEnter = async () => {
+    const content = selectedContents[0]
+    if (content) {
+      await window.electronAPI.openPath(content.path)
+    }
+  }
 
   const handleScroll = (e: Event) => {
     if (!loading && e.target instanceof HTMLElement) {
@@ -139,13 +115,8 @@ const IndexPage = () => {
         onKeyDownEnter: handleKeyDownEnter,
         onScroll: handleScroll,
         scrollTop: currentScrollTop,
-        sortOption,
+        sortOption: currentSortOption,
       })}
-      <PresentationDialog
-        onRequestClose={handleRequestClose}
-        open={dialogState.open}
-        path={dialogState.path}
-      />
     </>
   )
 }

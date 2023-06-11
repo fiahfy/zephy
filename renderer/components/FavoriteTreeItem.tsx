@@ -22,12 +22,6 @@ const FavoriteTreeItem = (props: Props) => {
           ? {}
           : (contextMenuProps([
               {
-                id: 'startPresentation',
-                enabled: true,
-                path: nodeId,
-              },
-              { type: 'separator' },
-              {
                 id: 'open',
                 enabled: true,
                 path: nodeId,

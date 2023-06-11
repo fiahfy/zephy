@@ -5,6 +5,7 @@ import { State } from 'electron-window-state'
 import { join } from 'path'
 import registerApplicationMenu from './application-menu'
 import registerContextMenu from './context-menu'
+import registerFfmpegHandlers from './ffmpeg'
 import { addHandlers } from './handlers'
 import createWindowStateManager from './window-state'
 
@@ -38,7 +39,7 @@ app.whenReady().then(async () => {
   windowStateManager.restore()
   registerApplicationMenu(windowStateManager.create)
   registerContextMenu()
-
+  registerFfmpegHandlers()
   addHandlers()
 
   // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333

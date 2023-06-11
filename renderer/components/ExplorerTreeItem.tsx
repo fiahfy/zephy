@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { BoxProps, CircularProgress } from '@mui/material'
 import FileIcon from 'components/FileIcon'
 import FileTreeItem from 'components/FileTreeItem'
@@ -7,7 +6,6 @@ import { FileNode } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { contextMenuProps } from 'utils/contextMenu'
-import { isImageFile } from 'utils/file'
 
 const max = 100
 
@@ -22,21 +20,10 @@ const ExplorerTreeItem = (props: Props) => {
 
   const over = (file.children ?? []).length - max
 
-  const enabled = useMemo(
-    () => file.type === 'directory' || isImageFile(file.path),
-    [file.path, file.type]
-  )
-
   return (
     <FileTreeItem
       LabelProps={
         contextMenuProps([
-          {
-            id: 'startPresentation',
-            enabled,
-            path: file.path,
-          },
-          { type: 'separator' },
           {
             id: 'open',
             enabled: true,

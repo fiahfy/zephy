@@ -446,10 +446,11 @@ export const selectSidebarWidth = createSelector(
   (settings) => settings.width
 )
 
-export const selectGetSortOption = createSelector(
+export const selectCurrentSortOption = createSelector(
   selectSorting,
-  (sorting) => (path: string) =>
-    sorting[path] ?? ({ order: 'asc', orderBy: 'name' } as const)
+  selectCurrentDirectory,
+  (sorting, currentDirectory) =>
+    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
 )
 
 export const load =

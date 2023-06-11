@@ -31,12 +31,6 @@ const registerContextMenu = () => {
       const actions: {
         [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
       } = {
-        startPresentation: (params) => ({
-          accelerator: 'Enter',
-          click: () => send('start-presentation', params.path),
-          enabled: params.enabled,
-          label: 'Start Presentation',
-        }),
         addFavorite: (params) => ({
           click: () => send('add-favorite', params.path),
           enabled: params.enabled,

@@ -34,13 +34,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.removeListener('show-settings', cb)
     }
   },
-  subscribeStartPresentation: (callback: (path: string) => void) => {
-    const cb = (_e: IpcRendererEvent, path: string) => callback(path)
-    ipcRenderer.on('start-presentation', cb)
-    return () => {
-      ipcRenderer.removeListener('start-presentation', cb)
-    }
-  },
   subscribeSearch: (callback: () => void) => {
     const cb = () => callback()
     ipcRenderer.on('search', cb)
@@ -50,5 +43,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   contextMenu: {
     send: (params?: unknown) => ipcRenderer.invoke('context-menu-send', params),
+  },
+  ffmpeg: {
+    thumbnail: (path: string) => ipcRenderer.invoke('ffmpeg-thumbnail', path),
   },
 })

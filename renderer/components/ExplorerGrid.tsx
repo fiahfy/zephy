@@ -186,6 +186,9 @@ const ExplorerGrid = (props: Props) => {
             height={height}
             rowCount={chunks.length}
             rowHeight={rowHeight}
+            style={{
+              overflowY: 'scroll',
+            }}
             width={width}
           />
         )}

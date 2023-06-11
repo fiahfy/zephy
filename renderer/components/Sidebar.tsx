@@ -82,7 +82,7 @@ const Sidebar = () => {
           flexGrow: 1,
           marginRight: '5px',
           overflowX: 'hidden',
-          overflowY: 'auto',
+          overflowY: 'scroll',
         }}
       >
         <FavoriteTreeView />

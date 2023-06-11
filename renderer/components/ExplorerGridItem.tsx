@@ -3,7 +3,7 @@ import fileUrl from 'file-url'
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import FileIcon from 'components/FileIcon'
-import NoOutlineRating from 'components/NoOutlineRating'
+import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import { ExplorerContent, File } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
@@ -11,25 +11,40 @@ import { rate } from 'store/rating'
 import { contextMenuProps } from 'utils/contextMenu'
 import { isImageFile, isVideoFile } from 'utils/file'
 
-type State = { paths: string[]; loading: boolean }
+type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
 type Action =
   | {
       type: 'loaded'
-      payload: string[]
+      payload: { paths: string[]; thumbnail?: string }
     }
   | { type: 'loading' }
 
-const reducer = (state: State, action: Action) => {
+const reducer = (_state: State, action: Action) => {
   switch (action.type) {
     case 'loaded':
       return {
-        ...state,
-        paths: action.payload,
+        ...action.payload,
         loading: false,
       }
     case 'loading':
-      return { ...state, paths: [], loading: true }
+      return { loading: true, paths: [], thumbnail: undefined }
+  }
+}
+
+const getThumbnail = async (paths: string | string[]) => {
+  const path = Array.isArray(paths)
+    ? paths.filter((path) => isImageFile(path) || isVideoFile(path))[0]
+    : paths
+  if (!path) {
+    return undefined
+  }
+  if (isVideoFile(path)) {
+    return await window.electronAPI.ffmpeg.thumbnail(path)
+  } else if (isImageFile(path)) {
+    return path
+  } else {
+    return undefined
   }
 }
 
@@ -49,9 +64,10 @@ const ExplorerGridItem = (props: Props) => {
   const favorite = useAppSelector(selectIsFavorite)(content.path)
   const appDispatch = useAppDispatch()
 
-  const [{ paths, loading }, dispatch] = useReducer(reducer, {
-    paths: [],
+  const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
+    paths: [],
+    thumbnail: undefined,
   })
 
   useEffect(() => {
@@ -61,12 +77,11 @@ const ExplorerGridItem = (props: Props) => {
       dispatch({ type: 'loading' })
 
       if (content.type === 'file') {
-        if (isVideoFile(content.path)) {
-          const file = await window.electronAPI.getThumbnail(content.path)
-          return dispatch({ type: 'loaded', payload: [file.path] })
-        } else {
-          return dispatch({ type: 'loaded', payload: [content.path] })
-        }
+        const thumbnail = await getThumbnail(content.path)
+        return dispatch({
+          type: 'loaded',
+          payload: { paths: [content.path], thumbnail },
+        })
       }
 
       let files: File[] = []
@@ -79,7 +94,8 @@ const ExplorerGridItem = (props: Props) => {
         return
       }
       const paths = files.map((file) => file.path)
-      return dispatch({ type: 'loaded', payload: paths })
+      const thumbnail = await getThumbnail(paths)
+      return dispatch({ type: 'loaded', payload: { paths, thumbnail } })
     })()
 
     return () => {
@@ -87,30 +103,14 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [content.path, content.type])
 
-  const imagePath = useMemo(
-    () => paths.filter((path) => isImageFile(path))[0],
-    [paths]
-  )
-
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No Preview'),
     [loading]
   )
 
-  const enabled = useMemo(
-    () => content.type === 'directory' || isImageFile(content.path),
-    [content.path, content.type]
-  )
-
   return (
     <ImageListItem
       {...contextMenuProps([
-        {
-          id: 'startPresentation',
-          enabled,
-          path: content.path,
-        },
-        { type: 'separator' },
         {
           id: 'open',
           enabled: true,
@@ -160,10 +160,10 @@ const ExplorerGridItem = (props: Props) => {
       }}
       tabIndex={0}
     >
-      {imagePath ? (
+      {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={fileUrl(imagePath)}
+          src={fileUrl(thumbnail)}
           style={{ objectPosition: 'center top' }}
         />
       ) : (
