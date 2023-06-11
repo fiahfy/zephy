@@ -18,7 +18,7 @@
 
 ## Installation
 
-Download the app from [release page](https://github.com/fiahfy/zephy/releases) and install it.
+Download the app from [release page](https://github.com/fiahfy/zephy/releases) and install it.  
 :warning: For macOS, this app is not signed, so a warning will be displayed at startup.
 
 ## Development
