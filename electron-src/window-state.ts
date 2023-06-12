@@ -8,6 +8,8 @@ const windowStateManager = (
 ) => {
   const file = path.join(app.getPath('userData'), 'window-state.json')
 
+  const getFile = (index: number) => `window-state_${index}.json`
+
   const restoreState = () => {
     try {
       if (fs.existsSync(file)) {
@@ -27,8 +29,6 @@ const windowStateManager = (
   const saveState = ({ windowCount }: { windowCount: number }) => {
     fs.writeFileSync(file, JSON.stringify({ windowCount }))
   }
-
-  const getFile = (index: number) => `window-state_${index}.json`
 
   const getNewWindowOptions = () => {
     const activeWindow = BrowserWindow.getFocusedWindow()

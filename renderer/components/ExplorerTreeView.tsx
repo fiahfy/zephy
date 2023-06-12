@@ -1,16 +1,17 @@
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
 import { TreeView } from '@mui/lab'
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { FileNode } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { move, selectCurrentDirectory } from 'store/window'
+import { move, selectCurrentDirectory, selectIndexPage } from 'store/window'
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const indexPage = useAppSelector(selectIndexPage)
   const dispatch = useAppDispatch()
 
   const [expanded, setExpanded] = useState<string[]>([])
@@ -19,6 +20,9 @@ const ExplorerTreeView = () => {
 
   useEffect(() => {
     ;(async () => {
+      if (!indexPage) {
+        return
+      }
       const node = await window.electronAPI.getFileNode(currentDirectory)
       const reducer = (carry: string[], node: FileNode): string[] => {
         if (!node.children) {
@@ -31,7 +35,7 @@ const ExplorerTreeView = () => {
       setSelected([currentDirectory])
       setFileNodes([node])
     })()
-  }, [currentDirectory])
+  }, [currentDirectory, indexPage])
 
   const contentNodeMap = useMemo(() => {
     const reducer = (

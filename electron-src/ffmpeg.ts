@@ -1,13 +1,18 @@
 import crypto from 'crypto'
 import { IpcMainInvokeEvent, app, ipcMain } from 'electron'
-import ffmpegPath from 'ffmpeg-static'
-import ffprobe from 'ffprobe-static'
+import ffmpegStatic from 'ffmpeg-static-electron'
+import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
 import { join } from 'path'
 
 const registerFfmpegHandlers = () => {
-  ffmpeg.setFfmpegPath(ffmpegPath ?? '')
-  ffmpeg.setFfprobePath(ffprobe.path)
+  // @see https://stackoverflow.com/q/63106834
+  ffmpeg.setFfmpegPath(
+    ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked')
+  )
+  ffmpeg.setFfprobePath(
+    ffprobeStatic.path.replace('app.asar', 'app.asar.unpacked')
+  )
 
   const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 

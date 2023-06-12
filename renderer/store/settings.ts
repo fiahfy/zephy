@@ -1,11 +1,8 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
+import { Settings } from 'interfaces'
 import { AppState } from 'store'
 
-type State = {
-  contentLayout: 'default' | 'contain' | 'cover'
-  darkMode: boolean
-  fullscreen: boolean
-}
+type State = Settings
 
 const initialState: State = {
   contentLayout: 'default',

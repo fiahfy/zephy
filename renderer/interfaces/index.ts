@@ -29,6 +29,12 @@ export interface IElectronAPI {
   }
 }
 
+export type Settings = {
+  contentLayout: 'default' | 'contain' | 'cover'
+  darkMode: boolean
+  fullscreen: boolean
+}
+
 export type File = {
   name: string
   path: string

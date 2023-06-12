@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { blue, green, grey, red } from '@mui/material/colors'
 import {
   Folder as FolderIcon,
@@ -8,6 +7,7 @@ import {
   Star as StarIcon,
   VideoFile as VideoFileIcon,
 } from '@mui/icons-material'
+import { useMemo } from 'react'
 
 type Props = {
   size?: 'small' | 'medium'

@@ -40,7 +40,7 @@ const ExplorerTreeItem = (props: Props) => {
       fileIcon={<FileIcon file={file} size="small" />}
       label={file.name}
       nodeId={file.path}
-      title={file.path}
+      title={file.name}
     >
       {file.type === 'directory' &&
         (file.children ? (

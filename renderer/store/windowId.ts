@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AppThunk } from 'store'
+import { AppState, AppThunk } from 'store'
 import { initialize } from 'store/window'
 
 type State = number
@@ -19,6 +19,8 @@ export const windowIdSlice = createSlice({
 export const { set } = windowIdSlice.actions
 
 export default windowIdSlice.reducer
+
+export const selectWindowId = (state: AppState) => state.windowId
 
 export const load = (): AppThunk => async (dispatch) => {
   const windowId = await window.electronAPI.getWindowId()

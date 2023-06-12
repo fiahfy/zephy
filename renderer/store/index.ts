@@ -16,13 +16,12 @@ import {
   persistReducer,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-
-import favoriteReducer from './favorite'
-import queryHistoryReducer from './queryHistory'
-import ratingReducer from './rating'
-import settingsReducer from './settings'
-import windowReducer from './window'
-import windowIdReducer from './windowId'
+import favoriteReducer from 'store/favorite'
+import queryHistoryReducer from 'store/queryHistory'
+import ratingReducer from 'store/rating'
+import settingsReducer from 'store/settings'
+import windowReducer from 'store/window'
+import windowIdReducer from 'store/windowId'
 
 const reducers = combineReducers({
   favorite: favoriteReducer,

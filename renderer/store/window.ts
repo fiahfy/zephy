@@ -2,6 +2,7 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from 'interfaces'
 import { AppState, AppThunk } from 'store'
 import { add } from 'store/queryHistory'
+import { selectWindowId } from 'store/windowId'
 
 type ExplorerState = {
   contents: Content[]
@@ -221,6 +222,11 @@ export const windowSlice = createSlice({
       if (!windowState) {
         return state
       }
+      const lastHistory =
+        windowState.history.histories[windowState.history.index]?.directory
+      if (path === lastHistory) {
+        return
+      }
       const index = windowState.history.index + 1
       const histories = [
         ...windowState.history.histories.slice(0, index),
@@ -421,6 +427,23 @@ export const selectCurrentDirectory = createSelector(
   (currentHistory) => currentHistory.directory
 )
 
+export const selectCurrentPage = createSelector(
+  selectCurrentDirectory,
+  (currentDirectory) => {
+    switch (currentDirectory) {
+      case 'zephy://settings':
+        return '/settings'
+      default:
+        return '/'
+    }
+  }
+)
+
+export const selectIndexPage = createSelector(
+  selectCurrentPage,
+  (currentPage) => currentPage === '/'
+)
+
 export const selectCurrentScrollTop = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.scrollTop
@@ -457,7 +480,7 @@ export const load =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { loading, loaded } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(loading({ windowId }))
     try {
       const contents = await window.electronAPI.listContents(path)
@@ -471,13 +494,13 @@ export const select =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { select } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(select({ windowId, path }))
   }
 
 export const unselectAll = (): AppThunk => async (dispatch, getState) => {
   const { unselectAll } = windowSlice.actions
-  const windowId = getState().windowId
+  const windowId = selectWindowId(getState())
   dispatch(unselectAll({ windowId }))
 }
 
@@ -485,7 +508,7 @@ export const setLayout =
   (layout: ExplorerState['layout']): AppThunk =>
   async (dispatch, getState) => {
     const { setLayout } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(setLayout({ windowId, layout }))
   }
 
@@ -493,7 +516,7 @@ export const searchQuery =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(setQuery({ windowId, query }))
     dispatch(add(query))
   }
@@ -502,7 +525,7 @@ export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const { go } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(go({ windowId, offset }))
   }
 
@@ -510,15 +533,24 @@ export const move =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { move } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(move({ windowId, path }))
   }
+
+export const moveToHome = (): AppThunk => async (dispatch) => {
+  const homePath = await window.electronAPI.homePath()
+  return dispatch(move(homePath))
+}
+
+export const moveToSettings = (): AppThunk => async (dispatch) => {
+  dispatch(move('zephy://settings'))
+}
 
 export const scroll =
   (scrollTop: number): AppThunk =>
   async (dispatch, getState) => {
     const { scroll } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(scroll({ windowId, scrollTop }))
   }
 
@@ -526,7 +558,7 @@ export const setSidebarHidden =
   (hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarHidden } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(setSidebarHidden({ windowId, hidden }))
   }
 
@@ -534,14 +566,14 @@ export const setSidebarWidth =
   (width: number): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarWidth } = windowSlice.actions
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     dispatch(setSidebarWidth({ windowId, width }))
   }
 
 export const sort =
   (path: string, option: SortOption): AppThunk =>
   async (dispatch, getState) => {
-    const windowId = getState().windowId
+    const windowId = selectWindowId(getState())
     const { sort } = windowSlice.actions
     dispatch(sort({ windowId, path, option }))
   }

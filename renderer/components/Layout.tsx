@@ -1,27 +1,29 @@
-import { ReactNode, useEffect } from 'react'
 import { Box, Toolbar } from '@mui/material'
+import { useRouter } from 'next/router'
+import { ReactNode, useEffect } from 'react'
 import ExplorerBar from 'components/ExplorerBar'
 import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
-import { useAppDispatch } from 'store'
+import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
+import { moveToSettings, selectCurrentPage } from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
 
 type Props = {
   children: ReactNode
-  dialog?: boolean
 }
 
 const Layout = (props: Props) => {
-  const { children, dialog = false } = props
+  const { children } = props
 
+  const currentPage = useAppSelector(selectCurrentPage)
   const dispatch = useAppDispatch()
+  const router = useRouter()
 
   useEffect(() => {
-    if (dialog) {
-      return
-    }
-
+    const unsubscribeShowSettings = window.electronAPI.subscribeShowSettings(
+      () => dispatch(moveToSettings())
+    )
     const unsubscribeAddToFavorites =
       window.electronAPI.subscribeAddToFavorites((path) => dispatch(add(path)))
     const unsubscribeRemoveFromFavorites =
@@ -30,14 +32,19 @@ const Layout = (props: Props) => {
       )
 
     return () => {
+      unsubscribeShowSettings()
       unsubscribeAddToFavorites()
       unsubscribeRemoveFromFavorites()
     }
-  }, [dialog, dispatch])
+  }, [dispatch])
+
+  useEffect(() => {
+    router.replace(currentPage)
+  }, [currentPage, router])
 
   return (
     <Box
-      onMouseDown={dialog ? undefined : openContextMenu}
+      onMouseDown={openContextMenu}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}
@@ -51,8 +58,8 @@ const Layout = (props: Props) => {
         }
       `}</style>
       <TitleBar />
-      {!dialog && <ExplorerBar />}
-      {!dialog && <Sidebar />}
+      <ExplorerBar />
+      <Sidebar />
       <Box
         component="main"
         sx={{
@@ -67,14 +74,12 @@ const Layout = (props: Props) => {
             minHeight: (theme) => `${theme.mixins.titleBar.height}px!important`,
           }}
         />
-        {!dialog && (
-          <Toolbar
-            sx={{
-              flexShrink: 0,
-              minHeight: '65px!important',
-            }}
-          />
-        )}
+        <Toolbar
+          sx={{
+            flexShrink: 0,
+            minHeight: '65px!important',
+          }}
+        />
         <Box sx={{ flexGrow: 1, position: 'relative', overflow: 'auto' }}>
           {children}
         </Box>

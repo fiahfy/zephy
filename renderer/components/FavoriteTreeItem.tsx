@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
 import { BoxProps } from '@mui/material'
+import { ReactNode } from 'react'
 import FileTreeItem from 'components/FileTreeItem'
 import Icon from 'components/Icon'
 import { contextMenuProps } from 'utils/contextMenu'
@@ -43,7 +43,7 @@ const FavoriteTreeItem = (props: Props) => {
       }
       label={label}
       nodeId={nodeId}
-      title={root ? undefined : nodeId}
+      title={root ? undefined : label}
     >
       {children}
     </FileTreeItem>

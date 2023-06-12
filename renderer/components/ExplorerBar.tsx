@@ -1,14 +1,4 @@
 import {
-  ChangeEvent,
-  KeyboardEvent,
-  MouseEvent,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import {
   AppBar,
   Autocomplete,
   Box,
@@ -33,10 +23,19 @@ import {
   ViewComfy as ViewComfyIcon,
   ViewSidebar as ViewSidebarIcon,
 } from '@mui/icons-material'
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  MouseEvent,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Icon from 'components/Icon'
 import FilledToggleButtonGroup from 'components/enhanced/FilledToggleButtonGroup'
 import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
-import SettingsDialog from 'components/SettingsDialog'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
@@ -45,11 +44,14 @@ import {
   forward,
   load,
   move,
+  moveToHome,
+  moveToSettings,
   searchQuery,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
   selectCurrentSortOption,
+  selectIndexPage,
   selectLayout,
   selectSidebarHidden,
   setLayout,
@@ -72,6 +74,7 @@ const ExplorerBar = () => {
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const indexPage = useAppSelector(selectIndexPage)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const layout = useAppSelector(selectLayout)
   const queryHistories = useAppSelector(selectQueryHistories)
@@ -80,15 +83,7 @@ const ExplorerBar = () => {
 
   const [directory, setDirectory] = useState('')
   const [queryInput, setQueryInput] = useState('')
-  const [open, setOpen] = useState(false)
   const ref = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribeShowSettings(() =>
-      setOpen(true)
-    )
-    return () => unsubscribe()
-  }, [])
 
   const search = useCallback(
     (query: string) => {
@@ -139,14 +134,21 @@ const ExplorerBar = () => {
   useEffect(() => {
     ;(async () => {
       if (!currentDirectory) {
-        const homePath = await window.electronAPI.homePath()
-        return dispatch(move(homePath))
+        return
       }
       setDirectory(currentDirectory)
       dispatch(unselectAll())
-      await loadContents()
+      if (indexPage) {
+        await loadContents()
+      }
     })()
-  }, [currentDirectory, dispatch, loadContents])
+  }, [currentDirectory, dispatch, indexPage, loadContents])
+
+  useEffect(() => {
+    if (!currentDirectory) {
+      dispatch(moveToHome())
+    }
+  }, [currentDirectory, dispatch])
 
   // click handlers
   const handleClickBack = () => dispatch(back())
@@ -163,7 +165,7 @@ const ExplorerBar = () => {
     await loadContents()
   }
 
-  const handleClickSettings = async () => setOpen(true)
+  const handleClickSettings = () => dispatch(moveToSettings())
 
   const handleClickFolder = async () =>
     await window.electronAPI.openPath(currentDirectory)
@@ -244,6 +246,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
+          disabled={!indexPage}
           onClick={handleClickUpward}
           size="small"
           sx={{ mr: 0.5 }}
@@ -253,6 +256,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
+          disabled={!indexPage}
           onClick={handleClickRefresh}
           size="small"
           title="Refresh"
@@ -267,6 +271,7 @@ const ExplorerBar = () => {
                   <InputAdornment position="end">
                     <IconButton
                       color="inherit"
+                      disabled={!indexPage}
                       onClick={handleClickFavorite}
                       size="small"
                     >
@@ -281,6 +286,7 @@ const ExplorerBar = () => {
                   <InputAdornment position="start">
                     <IconButton
                       color="inherit"
+                      disabled={!indexPage}
                       onClick={handleClickFolder}
                       size="small"
                     >
@@ -417,7 +423,6 @@ const ExplorerBar = () => {
         </RoundedFilledTextField>
       </Toolbar>
       <Divider />
-      <SettingsDialog onRequestClose={() => setOpen(false)} open={open} />
     </AppBar>
   )
 }

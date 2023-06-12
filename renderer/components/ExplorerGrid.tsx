@@ -1,3 +1,4 @@
+import { Box, LinearProgress } from '@mui/material'
 import {
   FocusEvent,
   KeyboardEvent,
@@ -7,7 +8,6 @@ import {
   useState,
 } from 'react'
 import { AutoSizer, Grid, GridCellProps } from 'react-virtualized'
-import { Box, LinearProgress } from '@mui/material'
 import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
 import { ExplorerContent } from 'interfaces'

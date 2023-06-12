@@ -1,9 +1,9 @@
-import { SyntheticEvent, useEffect, useState } from 'react'
 import { TreeView } from '@mui/lab'
 import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import FavoriteTreeItem from 'components/FavoriteTreeItem'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'

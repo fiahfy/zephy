@@ -1,7 +1,7 @@
-import { useCallback } from 'react'
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { styled } from '@mui/material/styles'
+import { useCallback } from 'react'
 import ExplorerTreeView from 'components/ExplorerTreeView'
 import FavoriteTreeView from 'components/FavoriteTreeView'
 import { useAppDispatch, useAppSelector } from 'store'

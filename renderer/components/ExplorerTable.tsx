@@ -1,4 +1,13 @@
 import {
+  Box,
+  LinearProgress,
+  TableCell,
+  TableSortLabel,
+  Typography,
+} from '@mui/material'
+import { alpha } from '@mui/material/styles'
+import { format } from 'date-fns'
+import {
   FocusEvent,
   KeyboardEvent,
   useCallback,
@@ -13,15 +22,6 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized'
-import { format } from 'date-fns'
-import {
-  Box,
-  LinearProgress,
-  TableCell,
-  TableSortLabel,
-  Typography,
-} from '@mui/material'
-import { alpha } from '@mui/material/styles'
 import FileIcon from 'components/FileIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePrevious from 'hooks/usePrevious'
