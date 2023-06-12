@@ -33,18 +33,23 @@ const registerContextMenu = () => {
       } = {
         addFavorite: (params) => ({
           click: () => send('subscription-favorite', params.path, 'add'),
-          enabled: params.enabled,
           label: 'Add to Favorites',
         }),
         removeFavorite: (params) => ({
           click: () => send('subscription-favorite', params.path, 'remove'),
-          enabled: params.enabled,
           label: 'Remove from Favorites',
         }),
         open: (params) => ({
           click: () => shell.openPath(params.path),
-          enabled: params.enabled,
           label: 'Open',
+        }),
+        openDirectory: (params) => ({
+          click: () => send('subscription-open-directory', params.path),
+          label: 'Open',
+        }),
+        revealInFinder: (params) => ({
+          click: () => shell.showItemInFolder(params.path),
+          label: 'Reveal in Finder',
         }),
       }
 
@@ -60,7 +65,7 @@ const registerContextMenu = () => {
             return params
           }
           const creator = actions[params.id]
-          return creator ? creator(params) : []
+          return creator ? { ...params, ...creator(params) } : []
         }),
       ] as MenuItemConstructorOptions[]
     },

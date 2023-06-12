@@ -3,7 +3,10 @@ import { IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
+import { constants, promises } from 'fs'
 import { join } from 'path'
+
+const { access } = promises
 
 const registerFfmpegHandlers = () => {
   // @see https://stackoverflow.com/q/63106834
@@ -16,19 +19,25 @@ const registerFfmpegHandlers = () => {
 
   const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
-  const createThumbnail = (path: string) => {
+  const createThumbnail = async (imagePath: string) => {
     const filename =
-      crypto.createHash('md5').update(path).digest('hex') + '.png'
-    return new Promise<string>((resolve, reject) => {
-      ffmpeg(path)
-        .screenshots({
-          count: 1,
-          folder: thumbnailDir,
-          filename: filename,
-        })
-        .on('error', (e) => reject(e))
-        .on('end', () => resolve(join(thumbnailDir, filename)))
-    })
+      crypto.createHash('md5').update(imagePath).digest('hex') + '.png'
+    const path = join(thumbnailDir, filename)
+    try {
+      await access(path, constants.F_OK)
+    } catch (e) {
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(imagePath)
+          .screenshots({
+            count: 1,
+            folder: thumbnailDir,
+            filename: filename,
+          })
+          .on('error', (e) => reject(e))
+          .on('end', () => resolve())
+      })
+    }
+    return path
   }
 
   ipcMain.handle(

@@ -112,7 +112,12 @@ const ExplorerGridItem = (props: Props) => {
     <ImageListItem
       {...contextMenuProps([
         {
-          id: 'open',
+          id: content.type === 'directory' ? 'openDirectory' : 'open',
+          enabled: true,
+          path: content.path,
+        },
+        {
+          id: 'revealInFinder',
           enabled: true,
           path: content.path,
         },

@@ -91,7 +91,12 @@ const IndexPage = () => {
 
   const handleKeyDownEnter = async () => {
     const content = selectedContents[0]
-    if (content) {
+    if (!content) {
+      return
+    }
+    if (content.type === 'directory') {
+      dispatch(move(content.path))
+    } else {
       await window.electronAPI.openPath(content.path)
     }
   }

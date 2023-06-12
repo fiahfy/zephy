@@ -6,7 +6,13 @@ import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
-import { back, forward, moveToSettings, selectCurrentPage } from 'store/window'
+import {
+  back,
+  forward,
+  move,
+  moveToSettings,
+  selectCurrentPage,
+} from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
 
 type Props = {
@@ -22,11 +28,15 @@ const Layout = (props: Props) => {
 
   useEffect(() => {
     const unsubscribeFavorite = window.electronAPI.subscription.favorite(
-      (mode, path) => dispatch(mode === 'add' ? add(path) : remove(path))
+      (path, mode) => dispatch(mode === 'add' ? add(path) : remove(path))
     )
     const unsubscribeSettings = window.electronAPI.subscription.settings(() =>
       dispatch(moveToSettings())
     )
+    const unsubscribeOpenDirectory =
+      window.electronAPI.subscription.openDirectory((path) =>
+        dispatch(move(path))
+      )
 
     const handleMouseDown = (e: globalThis.MouseEvent) => {
       switch (e.button) {
@@ -42,6 +52,7 @@ const Layout = (props: Props) => {
       document.removeEventListener('mousedown', handleMouseDown)
       unsubscribeFavorite()
       unsubscribeSettings()
+      unsubscribeOpenDirectory()
     }
   }, [dispatch])
 

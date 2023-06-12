@@ -19,8 +19,8 @@ import {
   Search as SearchIcon,
   Settings as SettingsIcon,
   Sort as SortIcon,
-  TableRows as TableRowsIcon,
-  ViewComfy as ViewComfyIcon,
+  ViewList as ViewListIcon,
+  ViewModule as ViewModuleIcon,
   ViewSidebar as ViewSidebarIcon,
 } from '@mui/icons-material'
 import {
@@ -382,14 +382,14 @@ const ExplorerBar = () => {
             title="List View"
             value="list"
           >
-            <TableRowsIcon fontSize="small" />
+            <ViewListIcon fontSize="small" />
           </ToggleButton>
           <ToggleButton
             sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
             title="Thumbnail View"
             value="thumbnail"
           >
-            <ViewComfyIcon fontSize="small" />
+            <ViewModuleIcon fontSize="small" />
           </ToggleButton>
         </FilledToggleButtonGroup>
         <RoundedFilledTextField

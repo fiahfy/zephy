@@ -26,6 +26,7 @@ export interface IElectronAPI {
       callback: (path: string, mode: 'add' | 'remove') => void
     ) => () => void
     fullscreen: (callback: (fullscreen: boolean) => void) => () => void
+    openDirectory: (callback: (path: string) => void) => () => void
     search: (callback: () => void) => () => void
     settings: (callback: () => void) => () => void
   }

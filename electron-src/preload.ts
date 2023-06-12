@@ -31,6 +31,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('subscription-fullscreen', cb)
       return () => ipcRenderer.removeListener('subscription-fullscreen', cb)
     },
+    openDirectory: (callback: (path: string) => void) => {
+      const cb = (_e: IpcRendererEvent, path: string) => callback(path)
+      ipcRenderer.on('subscription-open-directory', cb)
+      return () => ipcRenderer.removeListener('subscription-open-directory', cb)
+    },
     search: (callback: () => void) => {
       const cb = () => callback()
       ipcRenderer.on('subscription-search', cb)
