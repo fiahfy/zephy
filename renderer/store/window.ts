@@ -538,7 +538,7 @@ export const move =
   }
 
 export const moveToHome = (): AppThunk => async (dispatch) => {
-  const homePath = await window.electronAPI.homePath()
+  const homePath = await window.electronAPI.getHomePath()
   return dispatch(move(homePath))
 }
 

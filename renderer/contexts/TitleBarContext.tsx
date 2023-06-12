@@ -26,25 +26,20 @@ export const TitleBarProvider = (props: Props) => {
   const shown = useMemo(() => darwin && !fullScreen, [darwin, fullScreen])
 
   useEffect(() => {
-    const handleFullscreenChange = () =>
-      setFullScreen(!!document.fullscreenElement)
-    handleFullscreenChange()
-    document.body.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => {
-      document.body.removeEventListener(
-        'fullscreenchange',
-        handleFullscreenChange
-      )
-    }
-  }, [])
-
-  useEffect(() => {
     ;(async () => {
       const darwin = await window.electronAPI.darwin()
       setDarwin(darwin)
+      const fullscreen = await window.electronAPI.isFullscreen()
+      setFullScreen(fullscreen)
       // for initial rendering
       setReady(true)
     })()
+
+    const unsubscribe = window.electronAPI.subscription.fullscreen(
+      (fullscreen) => setFullScreen(fullscreen)
+    )
+
+    return () => unsubscribe()
   }, [])
 
   const value = { shown }

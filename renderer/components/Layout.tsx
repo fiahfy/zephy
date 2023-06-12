@@ -6,7 +6,7 @@ import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
-import { moveToSettings, selectCurrentPage } from 'store/window'
+import { back, forward, moveToSettings, selectCurrentPage } from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
 
 type Props = {
@@ -21,20 +21,27 @@ const Layout = (props: Props) => {
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribeShowSettings = window.electronAPI.subscribeShowSettings(
-      () => dispatch(moveToSettings())
+    const unsubscribeFavorite = window.electronAPI.subscription.favorite(
+      (mode, path) => dispatch(mode === 'add' ? add(path) : remove(path))
     )
-    const unsubscribeAddToFavorites =
-      window.electronAPI.subscribeAddToFavorites((path) => dispatch(add(path)))
-    const unsubscribeRemoveFromFavorites =
-      window.electronAPI.subscribeRemoveFromFavorites((path) =>
-        dispatch(remove(path))
-      )
+    const unsubscribeSettings = window.electronAPI.subscription.settings(() =>
+      dispatch(moveToSettings())
+    )
+
+    const handleMouseDown = (e: globalThis.MouseEvent) => {
+      switch (e.button) {
+        case 3:
+          return dispatch(back())
+        case 4:
+          return dispatch(forward())
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
 
     return () => {
-      unsubscribeShowSettings()
-      unsubscribeAddToFavorites()
-      unsubscribeRemoveFromFavorites()
+      document.removeEventListener('mousedown', handleMouseDown)
+      unsubscribeFavorite()
+      unsubscribeSettings()
     }
   }, [dispatch])
 

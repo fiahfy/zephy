@@ -9,30 +9,30 @@ export interface IElectronAPI {
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
   getFileNode: (path: string) => Promise<FileNode>
-  getPresentationData: (
-    path: string
-  ) => Promise<{ title: string; files: File[] }>
   getWindowId: () => Promise<number | undefined>
-  homePath: () => Promise<string>
+  getHomePath: () => Promise<string>
+  isFullscreen: () => Promise<boolean>
   listContents: (path: string) => Promise<Content[]>
   listFiles: (path: string) => Promise<File[]>
   openPath: (path: string) => Promise<void>
-  subscribeAddToFavorites: (callback: (path: string) => void) => () => void
-  subscribeRemoveFromFavorites: (callback: (path: string) => void) => () => void
-  subscribeShowSettings: (callback: () => void) => () => void
-  subscribeSearch: (callback: () => void) => () => void
   contextMenu: {
     send: (params?: unknown) => Promise<void>
   }
   ffmpeg: {
     thumbnail: (path: string) => Promise<string>
   }
+  subscription: {
+    favorite: (
+      callback: (path: string, mode: 'add' | 'remove') => void
+    ) => () => void
+    fullscreen: (callback: (fullscreen: boolean) => void) => () => void
+    search: (callback: () => void) => () => void
+    settings: (callback: () => void) => () => void
+  }
 }
 
 export type Settings = {
-  contentLayout: 'default' | 'contain' | 'cover'
   darkMode: boolean
-  fullscreen: boolean
 }
 
 export type File = {

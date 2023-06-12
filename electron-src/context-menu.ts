@@ -32,12 +32,12 @@ const registerContextMenu = () => {
         [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
       } = {
         addFavorite: (params) => ({
-          click: () => send('add-favorite', params.path),
+          click: () => send('subscription-favorite', params.path, 'add'),
           enabled: params.enabled,
           label: 'Add to Favorites',
         }),
         removeFavorite: (params) => ({
-          click: () => send('remove-favorite', params.path),
+          click: () => send('subscription-favorite', params.path, 'remove'),
           enabled: params.enabled,
           label: 'Remove from Favorites',
         }),
@@ -51,7 +51,7 @@ const registerContextMenu = () => {
       return [
         {
           accelerator: 'CommandOrControl+F',
-          click: () => send('search'),
+          click: () => send('subscription-search'),
           label: 'Search for “{selection}”',
           visible: parameters.selectionText.trim().length > 0,
         },

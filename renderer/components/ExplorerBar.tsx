@@ -94,7 +94,7 @@ const ExplorerBar = () => {
   )
 
   useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribeSearch(() => {
+    const unsubscribe = window.electronAPI.subscription.search(() => {
       search(document.getSelection()?.toString() ?? '')
       ref.current && ref.current?.focus()
     })
@@ -107,19 +107,10 @@ const ExplorerBar = () => {
         ref.current && ref.current?.focus()
       }
     }
-    const handleMouseDown = (e: globalThis.MouseEvent) => {
-      switch (e.button) {
-        case 3:
-          return dispatch(back())
-        case 4:
-          return dispatch(forward())
-      }
-    }
     document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
       unsubscribe()
     }
   }, [dispatch, search])

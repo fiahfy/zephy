@@ -28,6 +28,13 @@ const createWindow = (state: State) => {
     browserWindow.loadURL(url)
   }
 
+  browserWindow.on('resize', () => {
+    browserWindow.webContents.send(
+      'subscription-fullscreen',
+      browserWindow.isFullScreen()
+    )
+  })
+
   return browserWindow
 }
 

@@ -61,7 +61,6 @@ export const addHandlers = () => {
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path)
   )
-  ipcMain.handle('home-path', () => app.getPath('home'))
   ipcMain.handle(
     'get-file-node',
     async (_event: IpcMainInvokeEvent, path: string) => {
@@ -106,21 +105,16 @@ export const addHandlers = () => {
       return node.children?.[0]
     }
   )
-  ipcMain.handle(
-    'get-presentation-data',
-    async (_event: IpcMainInvokeEvent, path: string) => {
-      const stats = await stat(path)
-      const directory = stats.isDirectory()
-      const dirPath = directory ? path : dirname(path)
-      const files = await listFiles(dirPath)
-      return { title: basename(dirPath), files }
-    }
-  )
-
+  ipcMain.handle('get-home-path', () => app.getPath('home'))
   ipcMain.handle(
     'get-window-id',
     (event: IpcMainInvokeEvent) =>
       BrowserWindow.fromWebContents(event.sender)?.id
+  )
+  ipcMain.handle(
+    'is-fullscreen',
+    (event: IpcMainInvokeEvent) =>
+      BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
   )
   ipcMain.handle('list-contents', (_event: IpcMainInvokeEvent, path: string) =>
     listContents(path)
