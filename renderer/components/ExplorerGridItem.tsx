@@ -2,14 +2,14 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import fileUrl from 'file-url'
 import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
-import FileIcon from 'components/FileIcon'
+import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import { ExplorerContent, File } from 'interfaces'
+import { Entry, ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
-import { fileContextMenuProps } from 'utils/contextMenu'
-import { isImageFile, isVideoFile } from 'utils/file'
+import { entryContextMenuProps } from 'utils/contextMenu'
+import { isImageFile, isVideoFile } from 'utils/entry'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
@@ -84,16 +84,16 @@ const ExplorerGridItem = (props: Props) => {
         })
       }
 
-      let files: File[] = []
+      let entries: Entry[] = []
       try {
-        files = await window.electronAPI.listFiles(content.path)
+        entries = await window.electronAPI.listEntries(content.path)
       } catch (e) {
         // noop
       }
       if (unmounted) {
         return
       }
-      const paths = files.map((file) => file.path)
+      const paths = entries.map((entry) => entry.path)
       const thumbnail = await getThumbnail(paths)
       return dispatch({ type: 'loaded', payload: { paths, thumbnail } })
     })()
@@ -110,7 +110,7 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      {...fileContextMenuProps(
+      {...entryContextMenuProps(
         content.path,
         content.type === 'directory',
         favorite
@@ -174,7 +174,7 @@ const ExplorerGridItem = (props: Props) => {
       <ImageListItemBar
         actionIcon={
           <Box mt={-3} mx={1}>
-            <FileIcon file={content} size="small" />
+            <EntryIcon entry={content} size="small" />
           </Box>
         }
         actionPosition="left"

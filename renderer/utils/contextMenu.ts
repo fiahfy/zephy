@@ -14,7 +14,7 @@ export const contextMenuProps = (contextMenus: ContextMenu[]) => {
   }
 }
 
-export const fileContextMenuProps = (
+export const entryContextMenuProps = (
   path: string,
   directory: boolean,
   favorite: boolean

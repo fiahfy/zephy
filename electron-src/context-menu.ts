@@ -37,7 +37,7 @@ const registerContextMenu = () => {
           label: 'Open',
         }),
         openDirectory: (params) => ({
-          click: () => send('subscription-file', params.path, 'move'),
+          click: () => send('subscription-entry', params.path, 'move'),
           label: 'Open',
         }),
         revealInFinder: (params) => ({
@@ -46,7 +46,7 @@ const registerContextMenu = () => {
         }),
         newFolder: (params) => ({
           click: async () =>
-            send('subscription-file', params.path, 'newFolder'),
+            send('subscription-entry', params.path, 'newFolder'),
           label: 'New Folder',
         }),
         copyPath: (params) => ({
@@ -55,16 +55,17 @@ const registerContextMenu = () => {
         }),
         moveToTrash: (params) => ({
           click: async () =>
-            send('subscription-file', params.path, 'moveToTrash'),
+            send('subscription-entry', params.path, 'moveToTrash'),
           label: 'Move to Trash',
         }),
         addToFavorites: (params) => ({
-          click: () => send('subscription-file', params.path, 'addToFavorites'),
+          click: () =>
+            send('subscription-entry', params.path, 'addToFavorites'),
           label: 'Add to Favorites',
         }),
         removeFromFavorites: (params) => ({
           click: () =>
-            send('subscription-file', params.path, 'removeFromFavorites'),
+            send('subscription-entry', params.path, 'removeFromFavorites'),
           label: 'Remove from Favorites',
         }),
       }

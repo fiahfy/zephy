@@ -8,12 +8,12 @@ export interface IElectronAPI {
   basename: (path: string) => Promise<string>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
-  getFileNode: (path: string) => Promise<FileNode>
+  getEntryTree: (path: string) => Promise<Entry>
   getWindowId: () => Promise<number | undefined>
   getHomePath: () => Promise<string>
   isFullscreen: () => Promise<boolean>
   listContents: (path: string) => Promise<Content[]>
-  listFiles: (path: string) => Promise<File[]>
+  listEntries: (path: string) => Promise<Entry[]>
   openPath: (path: string) => Promise<void>
   trashItem: (path: string) => Promise<void>
   contextMenu: {
@@ -23,7 +23,7 @@ export interface IElectronAPI {
     thumbnail: (path: string) => Promise<string>
   }
   subscription: {
-    file: (
+    entry: (
       callback: (
         path: string,
         operation:
@@ -44,11 +44,20 @@ export type Settings = {
   darkMode: boolean
 }
 
-export type File = {
+type EntryBase = {
   name: string
   path: string
-  type: 'file' | 'directory' | 'other'
 }
-export type FileNode = File & { children?: FileNode[] }
-export type Content = File & { dateModified: number }
+type FileEntry = EntryBase & {
+  type: 'file'
+}
+type DirectoryEntry = EntryBase & {
+  type: 'directory'
+  children?: Entry[]
+}
+type OtherEntry = EntryBase & {
+  type: 'other'
+}
+export type Entry = FileEntry | DirectoryEntry | OtherEntry
+export type Content = Entry & { dateModified: number }
 export type ExplorerContent = Content & { rating: number }

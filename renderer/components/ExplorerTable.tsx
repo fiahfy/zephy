@@ -22,14 +22,14 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized'
-import FileIcon from 'components/FileIcon'
+import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePrevious from 'hooks/usePrevious'
 import { ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
-import { fileContextMenuProps } from 'utils/contextMenu'
+import { entryContextMenuProps } from 'utils/contextMenu'
 
 const headerHeight = 32
 const rowHeight = 32
@@ -227,7 +227,7 @@ const ExplorerTable = (props: Props) => {
   const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
     return (
       <TableCell
-        {...fileContextMenuProps(
+        {...entryContextMenuProps(
           rowData.path,
           rowData.type === 'directory',
           isFavorite(rowData.path)
@@ -255,7 +255,7 @@ const ExplorerTable = (props: Props) => {
               name: (
                 <Box sx={{ alignItems: 'center', display: 'flex' }}>
                   <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-                    <FileIcon file={rowData} size="small" />
+                    <EntryIcon entry={rowData} size="small" />
                   </Box>
                   <Typography noWrap title={rowData.name} variant="caption">
                     {rowData.name}

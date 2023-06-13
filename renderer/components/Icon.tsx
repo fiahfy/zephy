@@ -11,57 +11,57 @@ import {
 import { useMemo } from 'react'
 
 type Props = {
-  size?: 'small' | 'medium'
-  type:
+  iconType:
+    | 'audio-file'
+    | 'folder'
+    | 'insert-drive-file'
+    | 'photo'
     | 'star'
     | 'star-border'
-    | 'folder'
-    | 'photo'
-    | 'audio-file'
     | 'video-file'
-    | 'insert-drive-file'
+  size?: 'small' | 'medium'
 }
 
 const Icon = (props: Props) => {
-  const { size, type } = props
+  const { iconType, size } = props
 
   const MaterialIcon = useMemo(() => {
-    switch (type) {
+    switch (iconType) {
+      case 'audio-file':
+        return AudioFileIcon
+      case 'folder':
+        return FolderIcon
+      case 'insert-drive-file':
+        return InsertDriveFileIcon
+      case 'photo':
+        return PhotoIcon
       case 'star':
         return StarIcon
       case 'star-border':
         return StarBorderIcon
-      case 'folder':
-        return FolderIcon
-      case 'photo':
-        return PhotoIcon
-      case 'audio-file':
-        return AudioFileIcon
       case 'video-file':
         return VideoFileIcon
-      case 'insert-drive-file':
-        return InsertDriveFileIcon
     }
-  }, [type])
+  }, [iconType])
 
   const color = useMemo(() => {
-    switch (type) {
+    switch (iconType) {
+      case 'audio-file':
+        return green['300']
+      case 'folder':
+        return blue['300']
+      case 'insert-drive-file':
+        return grey['500']
+      case 'photo':
+        return indigo['300']
       case 'star':
         return '#faaf00'
       case 'star-border':
         return undefined
-      case 'folder':
-        return blue['300']
-      case 'photo':
-        return indigo['300']
-      case 'audio-file':
-        return green['300']
       case 'video-file':
         return red['300']
-      case 'insert-drive-file':
-        return grey['500']
     }
-  }, [type])
+  }, [iconType])
 
   return <MaterialIcon fontSize={size} sx={{ color }} />
 }

@@ -5,7 +5,7 @@ import {
 import { TreeView } from '@mui/lab'
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
-import { FileNode } from 'interfaces'
+import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { move, selectCurrentDirectory, selectIndexPage } from 'store/window'
 
@@ -16,46 +16,51 @@ const ExplorerTreeView = () => {
 
   const [expanded, setExpanded] = useState<string[]>([])
   const [selected, setSelected] = useState<string[]>([])
-  const [fileNodes, setFileNodes] = useState<FileNode[]>([])
+  const [entries, setEntries] = useState<Entry[]>([])
 
   useEffect(() => {
     ;(async () => {
       if (!indexPage) {
         return
       }
-      const node = await window.electronAPI.getFileNode(currentDirectory)
-      const reducer = (carry: string[], node: FileNode): string[] => {
-        if (!node.children) {
+      const entry = await window.electronAPI.getEntryTree(currentDirectory)
+      const reducer = (carry: string[], entry: Entry): string[] => {
+        if (entry.type !== 'directory' || !entry.children) {
           return carry
         }
-        return [node.path, ...node.children.reduce(reducer, carry)]
+        return [entry.path, ...entry.children.reduce(reducer, carry)]
       }
-      const expanded = [node].reduce(reducer, [])
+      const expanded = [entry].reduce(reducer, [])
       setExpanded(expanded)
       setSelected([currentDirectory])
-      setFileNodes([node])
+      setEntries([entry])
     })()
   }, [currentDirectory, indexPage])
 
-  const contentNodeMap = useMemo(() => {
+  const entryMap = useMemo(() => {
     const reducer = (
-      carry: { [path: string]: FileNode },
-      node: FileNode
-    ): { [path: string]: FileNode } => {
+      carry: { [path: string]: Entry },
+      entry: Entry
+    ): { [path: string]: Entry } => {
       return {
-        [node.path]: node,
-        ...(node.children ?? []).reduce(reducer, carry),
+        [entry.path]: entry,
+        ...(entry.type === 'directory' ? entry.children ?? [] : []).reduce(
+          reducer,
+          carry
+        ),
       }
     }
-    return fileNodes.reduce(reducer, {})
-  }, [fileNodes])
+    return entries.reduce(reducer, {})
+  }, [entries])
 
   const handleSelect = (_event: SyntheticEvent, nodeIds: string[] | string) => {
     if (Array.isArray(nodeIds)) {
       return
     }
-    const content = contentNodeMap[nodeIds]
-    content?.type === 'directory' && dispatch(move(nodeIds))
+    const entry = entryMap[nodeIds]
+    if (entry && entry.type === 'directory') {
+      dispatch(move(nodeIds))
+    }
   }
 
   const handleToggle = async (_event: SyntheticEvent, nodeIds: string[]) => {
@@ -66,27 +71,29 @@ const ExplorerTreeView = () => {
     if (!expandedNodeId) {
       return
     }
-    const content = contentNodeMap[expandedNodeId]
-    if (content?.type !== 'directory' || content.children) {
+    const entry = entryMap[expandedNodeId]
+    if (!entry || entry.type !== 'directory' || entry.children) {
       return
     }
-    const children = await window.electronAPI.listContents(content.path)
-    const mapper = (node: FileNode): FileNode => {
-      if (node.path === content.path) {
-        return {
-          ...node,
-          children,
+    const children = await window.electronAPI.listContents(entry.path)
+    const mapper = (e: Entry): Entry => {
+      if (e.type === 'directory') {
+        if (e.path === entry.path) {
+          return {
+            ...e,
+            children,
+          }
+        }
+        if (e.children) {
+          return {
+            ...e,
+            children: e.children.map(mapper),
+          }
         }
       }
-      if (node.children) {
-        return {
-          ...node,
-          children: node.children.map(mapper),
-        }
-      }
-      return node
+      return e
     }
-    setFileNodes((prevNodes) => prevNodes.map(mapper))
+    setEntries((prevEntries) => prevEntries.map(mapper))
   }
 
   return (
@@ -98,8 +105,8 @@ const ExplorerTreeView = () => {
       onNodeToggle={handleToggle}
       selected={selected}
     >
-      {fileNodes.map((node) => (
-        <ExplorerTreeItem file={node} key={node.path} />
+      {entries.map((entry) => (
+        <ExplorerTreeItem entry={entry} key={entry.path} />
       ))}
     </TreeView>
   )

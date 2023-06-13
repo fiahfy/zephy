@@ -4,7 +4,7 @@ import { useTreeItem } from '@mui/lab/TreeItem'
 import clsx from 'clsx'
 import { ReactNode, Ref, forwardRef } from 'react'
 
-const FileTreeItemContent = forwardRef(function FileContent(
+const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,
   ref
 ) {
@@ -71,16 +71,16 @@ const FileTreeItemContent = forwardRef(function FileContent(
 
 type Props = TreeItemProps & {
   LabelProps?: BoxProps
-  fileIcon: ReactNode
+  icon: ReactNode
 }
 
-const FileTreeItem = (props: Props) => {
-  const { LabelProps, children, fileIcon, label, ...others } = props
+const EntryTreeItem = (props: Props) => {
+  const { LabelProps, children, icon, label, ...others } = props
 
   return (
     <TreeItem
       {...others}
-      ContentComponent={FileTreeItemContent}
+      ContentComponent={EntryTreeItemContent}
       label={
         <Box
           {...LabelProps}
@@ -92,7 +92,7 @@ const FileTreeItem = (props: Props) => {
           }}
         >
           <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-            {fileIcon}
+            {icon}
           </Box>
           <Typography
             noWrap
@@ -109,4 +109,4 @@ const FileTreeItem = (props: Props) => {
   )
 }
 
-export default FileTreeItem
+export default EntryTreeItem

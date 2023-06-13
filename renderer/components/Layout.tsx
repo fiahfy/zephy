@@ -34,7 +34,7 @@ const Layout = (props: Props) => {
   }, [currentPathname, router])
 
   useEffect(() => {
-    const unsubscribeFile = window.electronAPI.subscription.file(
+    const unsubscribeEntry = window.electronAPI.subscription.entry(
       (path, operation) => {
         switch (operation) {
           case 'move':
@@ -67,7 +67,7 @@ const Layout = (props: Props) => {
 
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
-      unsubscribeFile()
+      unsubscribeEntry()
       unsubscribeSettings()
     }
   }, [dispatch])

@@ -260,8 +260,8 @@ const ExplorerBar = () => {
                       size="small"
                     >
                       <Icon
+                        iconType={favorite ? 'star' : 'star-border'}
                         size="small"
-                        type={favorite ? 'star' : 'star-border'}
                       />
                     </IconButton>
                   </InputAdornment>

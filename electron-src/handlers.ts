@@ -10,15 +10,24 @@ import {
 
 const { readdir, stat } = promises
 
-type File = {
+type EntryBase = {
   name: string
   path: string
-  type: 'file' | 'directory' | 'other'
 }
-type FileNode = File & { children?: FileNode[] }
-type Content = File & { dateModified: number }
+type FileEntry = EntryBase & {
+  type: 'file'
+}
+type DirectoryEntry = EntryBase & {
+  type: 'directory'
+  children?: Entry[]
+}
+type OtherEntry = EntryBase & {
+  type: 'other'
+}
+type Entry = FileEntry | DirectoryEntry | OtherEntry
+type Content = Entry & { dateModified: number }
 
-const getFileType = (obj: Dirent | Stats) => {
+const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
     return 'file' as const
   } else if (obj.isDirectory()) {
@@ -34,21 +43,21 @@ const getDateModified = async (path: string) => {
 }
 
 const listContents = async (path: string): Promise<Content[]> => {
-  const files = await listFiles(path)
-  return await files.reduce(async (c, file) => {
+  const entries = await listEntries(path)
+  return await entries.reduce(async (c, entry) => {
     const carry = await c
-    const dateModified = await getDateModified(file.path)
-    return [...carry, { ...file, dateModified }]
+    const dateModified = await getDateModified(entry.path)
+    return [...carry, { ...entry, dateModified }]
   }, Promise.resolve([]) as Promise<Content[]>)
 }
 
-const listFiles = async (path: string): Promise<File[]> => {
+const listEntries = async (path: string): Promise<Entry[]> => {
   const dirents = await readdir(path, { withFileTypes: true })
   return dirents
     .map((dirent) => ({
       name: dirent.name.normalize('NFC'),
       path: join(path, dirent.name),
-      type: getFileType(dirent),
+      type: getEntryType(dirent),
     }))
     .filter((file) => !file.name.match(/^\./) && file.type !== 'other')
 }
@@ -62,7 +71,7 @@ export const addHandlers = () => {
     dirname(path)
   )
   ipcMain.handle(
-    'get-file-node',
+    'get-entry-tree',
     async (_event: IpcMainInvokeEvent, path: string) => {
       const dirnames = path.split(sep)
 
@@ -73,9 +82,10 @@ export const addHandlers = () => {
       }
       dirnames[0] = rootPath
 
-      let node: FileNode = {
+      let entry: DirectoryEntry = {
         children: [
           {
+            children: [],
             name: rootPath,
             path: rootPath,
             type: 'directory',
@@ -86,23 +96,25 @@ export const addHandlers = () => {
         type: 'directory',
       }
 
-      node = await dirnames.reduce(async (n, _dirname, i) => {
-        const node = await n
-        const targetNode = dirnames
+      entry = await dirnames.reduce(async (e, _dirname, i) => {
+        const entry = await e
+        const targetEntry = dirnames
           .slice(0, i + 1)
           .reduce(
-            (carry: FileNode | undefined, dirname) =>
-              carry?.children?.find((node) => node.name === dirname),
-            node
+            (carry: Entry | undefined, dirname) =>
+              carry?.type === 'directory'
+                ? carry.children?.find((entry) => entry.name === dirname)
+                : undefined,
+            entry
           )
-        if (targetNode) {
+        if (targetEntry && targetEntry.type === 'directory') {
           const path = dirnames.slice(0, i + 1).join(sep)
-          targetNode.children = await listFiles(path)
+          targetEntry.children = await listEntries(path)
         }
-        return node
-      }, Promise.resolve(node))
+        return entry
+      }, Promise.resolve(entry))
 
-      return node.children?.[0]
+      return entry.children?.[0]
     }
   )
   ipcMain.handle('get-home-path', () => app.getPath('home'))
@@ -119,8 +131,8 @@ export const addHandlers = () => {
   ipcMain.handle('list-contents', (_event: IpcMainInvokeEvent, path: string) =>
     listContents(path)
   )
-  ipcMain.handle('list-files', (_event: IpcMainInvokeEvent, path: string) =>
-    listFiles(path)
+  ipcMain.handle('list-entries', (_event: IpcMainInvokeEvent, path: string) =>
+    listEntries(path)
   )
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path)

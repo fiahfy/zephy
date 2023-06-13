@@ -1,61 +1,62 @@
 import { BoxProps, CircularProgress } from '@mui/material'
-import FileIcon from 'components/FileIcon'
-import FileTreeItem from 'components/FileTreeItem'
+import EntryIcon from 'components/EntryIcon'
+import EntryTreeItem from 'components/EntryTreeItem'
 import Icon from 'components/Icon'
-import { FileNode } from 'interfaces'
+import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
-import { fileContextMenuProps } from 'utils/contextMenu'
+import { entryContextMenuProps } from 'utils/contextMenu'
 
 const max = 100
 
 type Props = {
-  file: FileNode
+  entry: Entry
 }
 
 const ExplorerTreeItem = (props: Props) => {
-  const { file } = props
+  const { entry } = props
 
-  const favorite = useAppSelector(selectIsFavorite)(file.path)
+  const favorite = useAppSelector(selectIsFavorite)(entry.path)
 
-  const over = (file.children ?? []).length - max
+  const over =
+    (entry.type === 'directory' ? entry.children ?? [] : []).length - max
 
   return (
-    <FileTreeItem
+    <EntryTreeItem
       LabelProps={
-        fileContextMenuProps(
-          file.path,
-          file.type === 'directory',
+        entryContextMenuProps(
+          entry.path,
+          entry.type === 'directory',
           favorite
         ) as BoxProps
       }
-      fileIcon={<FileIcon file={file} size="small" />}
-      label={file.name}
-      nodeId={file.path}
-      title={file.name}
+      icon={<EntryIcon entry={entry} size="small" />}
+      label={entry.name}
+      nodeId={entry.path}
+      title={entry.name}
     >
-      {file.type === 'directory' &&
-        (file.children ? (
+      {entry.type === 'directory' &&
+        (entry.children ? (
           <>
-            {file.children.slice(0, max).map((file) => (
-              <ExplorerTreeItem file={file} key={file.path} />
+            {entry.children.slice(0, max).map((entry) => (
+              <ExplorerTreeItem entry={entry} key={entry.path} />
             ))}
             {over > 0 && (
-              <FileTreeItem
-                fileIcon={<Icon size="small" type="insert-drive-file" />}
+              <EntryTreeItem
+                icon={<Icon iconType="insert-drive-file" size="small" />}
                 label={`Other ${over} items`}
-                nodeId={`${file.path}<others>`}
+                nodeId={`${entry.path}<others>`}
               />
             )}
           </>
         ) : (
-          <FileTreeItem
-            fileIcon={<CircularProgress size={20} />}
+          <EntryTreeItem
+            icon={<CircularProgress size={20} />}
             label="Loading items..."
-            nodeId={`${file.path}<loader>`}
+            nodeId={`${entry.path}<loader>`}
           />
         ))}
-    </FileTreeItem>
+    </EntryTreeItem>
   )
 }
 

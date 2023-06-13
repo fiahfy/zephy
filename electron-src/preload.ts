@@ -4,13 +4,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   basename: (path: string) => ipcRenderer.invoke('basename', path),
   darwin: () => ipcRenderer.invoke('darwin'),
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
-  getFileNode: (path: string) => ipcRenderer.invoke('get-file-node', path),
+  getEntryTree: (path: string) => ipcRenderer.invoke('get-entry-tree', path),
   getThumbnail: (path: string) => ipcRenderer.invoke('get-thumbnail', path),
   getWindowId: () => ipcRenderer.invoke('get-window-id'),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   listContents: (path: string) => ipcRenderer.invoke('list-contents', path),
-  listFiles: (path: string) => ipcRenderer.invoke('list-files', path),
+  listEntries: (path: string) => ipcRenderer.invoke('list-entries', path),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   trashItem: (path: string) => ipcRenderer.invoke('trash-item', path),
   contextMenu: {
@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     thumbnail: (path: string) => ipcRenderer.invoke('ffmpeg-thumbnail', path),
   },
   subscription: {
-    file: (
+    entry: (
       callback: (
         path: string,
         operation:
@@ -41,8 +41,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
           | 'addToFavorites'
           | 'removeFromFavorites'
       ) => callback(path, operation)
-      ipcRenderer.on('subscription-file', cb)
-      return () => ipcRenderer.removeListener('subscription-file', cb)
+      ipcRenderer.on('subscription-entry', cb)
+      return () => ipcRenderer.removeListener('subscription-entry', cb)
     },
     fullscreen: (callback: (fullscreen: boolean) => void) => {
       const cb = (_e: IpcRendererEvent, fullscreen: boolean) =>
