@@ -11,7 +11,8 @@ import {
   forward,
   move,
   moveToSettings,
-  selectCurrentPage,
+  moveToTrash,
+  selectCurrentPathname,
 } from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
 
@@ -22,21 +23,37 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  const currentPage = useAppSelector(selectCurrentPage)
+  const currentPathname = useAppSelector(selectCurrentPathname)
   const dispatch = useAppDispatch()
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribeFavorite = window.electronAPI.subscription.favorite(
-      (path, mode) => dispatch(mode === 'add' ? add(path) : remove(path))
+    if (router.pathname !== currentPathname) {
+      router.replace(currentPathname)
+    }
+  }, [currentPathname, router])
+
+  useEffect(() => {
+    const unsubscribeFile = window.electronAPI.subscription.file(
+      (path, operation) => {
+        switch (operation) {
+          case 'move':
+            return dispatch(move(path))
+          case 'moveToTrash':
+            return dispatch(moveToTrash(path))
+          case 'newFolder':
+            // TODO: Implement
+            return
+          case 'addToFavorites':
+            return dispatch(add(path))
+          case 'removeFromFavorites':
+            return dispatch(remove(path))
+        }
+      }
     )
     const unsubscribeSettings = window.electronAPI.subscription.settings(() =>
       dispatch(moveToSettings())
     )
-    const unsubscribeOpenDirectory =
-      window.electronAPI.subscription.openDirectory((path) =>
-        dispatch(move(path))
-      )
 
     const handleMouseDown = (e: globalThis.MouseEvent) => {
       switch (e.button) {
@@ -50,15 +67,10 @@ const Layout = (props: Props) => {
 
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
-      unsubscribeFavorite()
+      unsubscribeFile()
       unsubscribeSettings()
-      unsubscribeOpenDirectory()
     }
   }, [dispatch])
-
-  useEffect(() => {
-    router.replace(currentPage)
-  }, [currentPage, router])
 
   return (
     <Box

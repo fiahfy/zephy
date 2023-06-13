@@ -2,7 +2,7 @@ import { BoxProps } from '@mui/material'
 import { ReactNode } from 'react'
 import FileTreeItem from 'components/FileTreeItem'
 import Icon from 'components/Icon'
-import { contextMenuProps } from 'utils/contextMenu'
+import { fileContextMenuProps } from 'utils/contextMenu'
 
 type Props = {
   children?: ReactNode
@@ -18,21 +18,7 @@ const FavoriteTreeItem = (props: Props) => {
   return (
     <FileTreeItem
       LabelProps={
-        root
-          ? {}
-          : (contextMenuProps([
-              {
-                id: 'open',
-                enabled: true,
-                path: nodeId,
-              },
-              { type: 'separator' },
-              {
-                id: 'removeFavorite',
-                enabled: true,
-                path: nodeId,
-              },
-            ]) as BoxProps)
+        root ? {} : (fileContextMenuProps(nodeId, true, true) as BoxProps)
       }
       fileIcon={
         root ? (

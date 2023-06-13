@@ -132,6 +132,30 @@ export const windowSlice = createSlice({
         },
       }
     },
+    moveToTrash(
+      state,
+      action: PayloadAction<{ windowId: number; path: string }>
+    ) {
+      const { windowId, path } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      const contents = windowState.explorer.contents.filter(
+        (content) => content.path !== path
+      )
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          explorer: {
+            ...windowState.explorer,
+            contents,
+          },
+        },
+      }
+    },
     setLayout(
       state,
       action: PayloadAction<{
@@ -427,7 +451,7 @@ export const selectCurrentDirectory = createSelector(
   (currentHistory) => currentHistory.directory
 )
 
-export const selectCurrentPage = createSelector(
+export const selectCurrentPathname = createSelector(
   selectCurrentDirectory,
   (currentDirectory) => {
     switch (currentDirectory) {
@@ -440,8 +464,8 @@ export const selectCurrentPage = createSelector(
 )
 
 export const selectIndexPage = createSelector(
-  selectCurrentPage,
-  (currentPage) => currentPage === '/'
+  selectCurrentPathname,
+  (currentPathname) => currentPathname === '/'
 )
 
 export const selectCurrentScrollTop = createSelector(
@@ -476,19 +500,21 @@ export const selectCurrentSortOption = createSelector(
     sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
 )
 
-export const load =
-  (path: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { loading, loaded } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(loading({ windowId }))
-    try {
-      const contents = await window.electronAPI.listContents(path)
-      dispatch(loaded({ windowId, contents }))
-    } catch (e) {
-      dispatch(loaded({ windowId, contents: [] }))
-    }
+export const load = (): AppThunk => async (dispatch, getState) => {
+  const { loading, loaded } = windowSlice.actions
+  const windowId = selectWindowId(getState())
+  const currentDirectory = selectCurrentDirectory(getState())
+  if (!currentDirectory) {
+    return
   }
+  dispatch(loading({ windowId }))
+  try {
+    const contents = await window.electronAPI.listContents(currentDirectory)
+    dispatch(loaded({ windowId, contents }))
+  } catch (e) {
+    dispatch(loaded({ windowId, contents: [] }))
+  }
+}
 
 export const select =
   (path: string): AppThunk =>
@@ -496,6 +522,15 @@ export const select =
     const { select } = windowSlice.actions
     const windowId = selectWindowId(getState())
     dispatch(select({ windowId, path }))
+  }
+
+export const moveToTrash =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { moveToTrash } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    await window.electronAPI.trashItem(path)
+    dispatch(moveToTrash({ windowId, path }))
   }
 
 export const unselectAll = (): AppThunk => async (dispatch, getState) => {

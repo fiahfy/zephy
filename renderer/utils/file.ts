@@ -1,54 +1,33 @@
-// @see https://developer.mozilla.org/ja/docs/Web/HTML/Element/img
-const imageExtensions = [
-  // APNG
-  'apng',
-  // AVIF
-  'avif',
-  // GIF
-  'gif',
-  // JPEG
-  'jpg',
-  'jpeg',
-  'jfif',
-  'pjpeg',
-  'pjp',
-  // PNG
-  'png',
-  // SVG
-  'svg',
-  // WebP
-  'webp',
-  // BMP
-  'bmp',
-  // ICO
-  'ico',
-  'cur',
-  // TIFF
-  // 'tif',
-  // 'tiff',
-]
-
-const videoExtensions = [
-  // AVI
-  'avi',
-  // MOV
-  'mov',
-  // MP4
-  'mp4',
-  // WMV
-  'wmv',
-  // FLV
-  'flv',
-  // WebM
-  'webm',
-]
+import mime from 'mime-types'
 
 export const isImageFile = (path: string) => {
-  const extension = (path.match(/\.([^.]+)$/)?.[1] ?? '').toLocaleLowerCase()
-  return imageExtensions.includes(extension)
+  const mimeType = mime.lookup(path)
+  return mimeType && mimeType.startsWith('image/')
 }
 
 export const isVideoFile = (path: string) => {
-  const extension = (path.match(/\.([^.]+)$/)?.[1] ?? '').toLocaleLowerCase()
-  return videoExtensions.includes(extension)
+  const mimeType = mime.lookup(path)
+  return mimeType && mimeType.startsWith('video/')
+}
+
+export const isAudioFile = (path: string) => {
+  const mimeType = mime.lookup(path)
+  return mimeType && mimeType.startsWith('audio/')
+}
+
+export const detectFileType = (path: string) => {
+  const mimeType = mime.lookup(path)
+  if (!mimeType) {
+    return 'unknown'
+  }
+  switch (true) {
+    case mimeType.startsWith('image/'):
+      return 'image'
+    case mimeType.startsWith('video/'):
+      return 'video'
+    case mimeType.startsWith('audio/'):
+      return 'audio'
+    default:
+      return 'unknown'
+  }
 }

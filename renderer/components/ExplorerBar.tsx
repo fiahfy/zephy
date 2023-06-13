@@ -115,13 +115,6 @@ const ExplorerBar = () => {
     }
   }, [dispatch, search])
 
-  const loadContents = useCallback(async () => {
-    if (!currentDirectory) {
-      return
-    }
-    dispatch(load(currentDirectory))
-  }, [currentDirectory, dispatch])
-
   useEffect(() => {
     ;(async () => {
       if (!currentDirectory) {
@@ -130,10 +123,10 @@ const ExplorerBar = () => {
       setDirectory(currentDirectory)
       dispatch(unselectAll())
       if (indexPage) {
-        await loadContents()
+        dispatch(load())
       }
     })()
-  }, [currentDirectory, dispatch, indexPage, loadContents])
+  }, [currentDirectory, dispatch, indexPage])
 
   useEffect(() => {
     if (!currentDirectory) {
@@ -153,7 +146,7 @@ const ExplorerBar = () => {
 
   const handleClickRefresh = async () => {
     setDirectory(currentDirectory)
-    await loadContents()
+    dispatch(load())
   }
 
   const handleClickSettings = () => dispatch(moveToSettings())
@@ -369,7 +362,7 @@ const ExplorerBar = () => {
             <ViewSidebarIcon fontSize="small" />
           </ToggleButton>
         </FilledToggleButtonGroup>
-        <div style={{ flexGrow: 1 }} />
+        <Box style={{ flexGrow: 1 }} />
         <FilledToggleButtonGroup
           exclusive
           onChange={handleChangeLayout}

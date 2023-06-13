@@ -1,6 +1,7 @@
 import {
   IpcMainInvokeEvent,
   MenuItemConstructorOptions,
+  clipboard,
   ipcMain,
   shell,
 } from 'electron'
@@ -31,25 +32,40 @@ const registerContextMenu = () => {
       const actions: {
         [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
       } = {
-        addFavorite: (params) => ({
-          click: () => send('subscription-favorite', params.path, 'add'),
-          label: 'Add to Favorites',
-        }),
-        removeFavorite: (params) => ({
-          click: () => send('subscription-favorite', params.path, 'remove'),
-          label: 'Remove from Favorites',
-        }),
         open: (params) => ({
           click: () => shell.openPath(params.path),
           label: 'Open',
         }),
         openDirectory: (params) => ({
-          click: () => send('subscription-open-directory', params.path),
+          click: () => send('subscription-file', params.path, 'move'),
           label: 'Open',
         }),
         revealInFinder: (params) => ({
           click: () => shell.showItemInFolder(params.path),
           label: 'Reveal in Finder',
+        }),
+        newFolder: (params) => ({
+          click: async () =>
+            send('subscription-file', params.path, 'newFolder'),
+          label: 'New Folder',
+        }),
+        copyPath: (params) => ({
+          click: () => clipboard.writeText(params.path),
+          label: 'Copy Path',
+        }),
+        moveToTrash: (params) => ({
+          click: async () =>
+            send('subscription-file', params.path, 'moveToTrash'),
+          label: 'Move to Trash',
+        }),
+        addToFavorites: (params) => ({
+          click: () => send('subscription-file', params.path, 'addToFavorites'),
+          label: 'Add to Favorites',
+        }),
+        removeFromFavorites: (params) => ({
+          click: () =>
+            send('subscription-file', params.path, 'removeFromFavorites'),
+          label: 'Remove from Favorites',
         }),
       }
 
@@ -60,6 +76,7 @@ const registerContextMenu = () => {
           label: 'Search for “{selection}”',
           visible: parameters.selectionText.trim().length > 0,
         },
+        { type: 'separator' },
         ...contextMenus.flatMap((params) => {
           if ('type' in params) {
             return params

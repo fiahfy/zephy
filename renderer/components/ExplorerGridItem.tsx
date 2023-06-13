@@ -8,7 +8,7 @@ import { ExplorerContent, File } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
-import { contextMenuProps } from 'utils/contextMenu'
+import { fileContextMenuProps } from 'utils/contextMenu'
 import { isImageFile, isVideoFile } from 'utils/file'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
@@ -110,24 +110,11 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      {...contextMenuProps([
-        {
-          id: content.type === 'directory' ? 'openDirectory' : 'open',
-          enabled: true,
-          path: content.path,
-        },
-        {
-          id: 'revealInFinder',
-          enabled: true,
-          path: content.path,
-        },
-        { type: 'separator' },
-        {
-          id: 'addFavorite',
-          enabled: !favorite && content.type === 'directory',
-          path: content.path,
-        },
-      ])}
+      {...fileContextMenuProps(
+        content.path,
+        content.type === 'directory',
+        favorite
+      )}
       className={selected ? 'selected' : undefined}
       component="div"
       data-grid-column={columnIndex + 1}
@@ -178,6 +165,7 @@ const ExplorerGridItem = (props: Props) => {
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
+            userSelect: 'none',
           }}
         >
           <Typography variant="caption">{message}</Typography>
@@ -195,6 +183,7 @@ const ExplorerGridItem = (props: Props) => {
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
+              userSelect: 'none',
             }}
           >
             <NoOutlineRating

@@ -14,6 +14,58 @@ export const contextMenuProps = (contextMenus: ContextMenu[]) => {
   }
 }
 
+export const fileContextMenuProps = (
+  path: string,
+  directory: boolean,
+  favorite: boolean
+) => {
+  return contextMenuProps([
+    {
+      id: directory ? 'openDirectory' : 'open',
+      enabled: true,
+      path,
+    },
+    {
+      id: 'revealInFinder',
+      enabled: true,
+      path,
+    },
+    { type: 'separator' },
+    {
+      id: 'copyPath',
+      enabled: true,
+      path,
+    },
+    { type: 'separator' },
+    ...(directory
+      ? [
+          {
+            id: favorite ? 'removeFromFavorites' : 'addToFavorites',
+            enabled: true,
+            path,
+          },
+        ]
+      : []),
+    { type: 'separator' },
+    {
+      id: 'moveToTrash',
+      enabled: true,
+      path,
+    },
+  ])
+}
+
+export const directoryContextMenuProps = (path: string) => {
+  return contextMenuProps([
+    {
+      id: 'newFolder',
+      enabled: true,
+      path,
+    },
+    { type: 'separator' },
+  ])
+}
+
 const getContextMenus = (e: HTMLElement): string | undefined => {
   const params = e.dataset.contextMenus
   if (params) {

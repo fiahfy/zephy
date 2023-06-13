@@ -19,6 +19,8 @@ import {
   selectSelectedContents,
   sort,
 } from 'store/window'
+import { Box } from '@mui/material'
+import { directoryContextMenuProps } from 'utils/contextMenu'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)
@@ -108,7 +110,10 @@ const IndexPage = () => {
   }
 
   return (
-    <>
+    <Box
+      {...directoryContextMenuProps(currentDirectory)}
+      sx={{ height: '100%' }}
+    >
       {createElement(layout === 'list' ? ExplorerTable : ExplorerGrid, {
         contentSelected: isContentSelected,
         contents: explorerContents,
@@ -122,7 +127,7 @@ const IndexPage = () => {
         scrollTop: currentScrollTop,
         sortOption: currentSortOption,
       })}
-    </>
+    </Box>
   )
 }
 

@@ -29,7 +29,7 @@ import { ExplorerContent } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
-import { contextMenuProps } from 'utils/contextMenu'
+import { fileContextMenuProps } from 'utils/contextMenu'
 
 const headerHeight = 32
 const rowHeight = 32
@@ -227,19 +227,11 @@ const ExplorerTable = (props: Props) => {
   const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
     return (
       <TableCell
-        {...contextMenuProps([
-          {
-            id: 'open',
-            enabled: true,
-            path: rowData.path,
-          },
-          { type: 'separator' },
-          {
-            id: 'addFavorite',
-            enabled: !isFavorite(rowData.path) && rowData.type === 'directory',
-            path: rowData.path,
-          },
-        ])}
+        {...fileContextMenuProps(
+          rowData.path,
+          rowData.type === 'directory',
+          isFavorite(rowData.path)
+        )}
         component="div"
         sx={{
           alignItems: 'center',

@@ -5,7 +5,7 @@ import Icon from 'components/Icon'
 import { FileNode } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
-import { contextMenuProps } from 'utils/contextMenu'
+import { fileContextMenuProps } from 'utils/contextMenu'
 
 const max = 100
 
@@ -23,19 +23,11 @@ const ExplorerTreeItem = (props: Props) => {
   return (
     <FileTreeItem
       LabelProps={
-        contextMenuProps([
-          {
-            id: 'open',
-            enabled: true,
-            path: file.path,
-          },
-          { type: 'separator' },
-          {
-            id: 'addFavorite',
-            enabled: !favorite && file.type === 'directory',
-            path: file.path,
-          },
-        ]) as BoxProps
+        fileContextMenuProps(
+          file.path,
+          file.type === 'directory',
+          favorite
+        ) as BoxProps
       }
       fileIcon={<FileIcon file={file} size="small" />}
       label={file.name}

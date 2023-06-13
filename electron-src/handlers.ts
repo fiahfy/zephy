@@ -125,4 +125,7 @@ export const addHandlers = () => {
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path)
   )
+  ipcMain.handle('trash-item', (_event: IpcMainInvokeEvent, path: string) =>
+    shell.trashItem(path)
+  )
 }

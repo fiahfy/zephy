@@ -49,7 +49,7 @@ const FileTreeItemContent = forwardRef(function FileContent(
   }
 
   return (
-    <div
+    <Box
       className={clsx(className, classes.root, {
         [classes.expanded]: expanded,
         [classes.selected]: selected,
@@ -59,13 +59,13 @@ const FileTreeItemContent = forwardRef(function FileContent(
       onMouseDown={handleMouseDown}
       ref={ref as Ref<HTMLDivElement>}
     >
-      <div className={classes.iconContainer} onClick={handleExpansionClick}>
+      <Box className={classes.iconContainer} onClick={handleExpansionClick}>
         {icon}
-      </div>
-      <div className={classes.label} onClick={handleSelectionClick}>
+      </Box>
+      <Box className={classes.label} onClick={handleSelectionClick}>
         {label}
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 })
 

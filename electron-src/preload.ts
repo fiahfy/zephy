@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listContents: (path: string) => ipcRenderer.invoke('list-contents', path),
   listFiles: (path: string) => ipcRenderer.invoke('list-files', path),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
+  trashItem: (path: string) => ipcRenderer.invoke('trash-item', path),
   contextMenu: {
     send: (params?: unknown) => ipcRenderer.invoke('context-menu-send', params),
   },
@@ -19,22 +20,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
     thumbnail: (path: string) => ipcRenderer.invoke('ffmpeg-thumbnail', path),
   },
   subscription: {
-    favorite: (callback: (path: string, mode: 'add' | 'remove') => void) => {
-      const cb = (_e: IpcRendererEvent, path: string, mode: 'add' | 'remove') =>
-        callback(path, mode)
-      ipcRenderer.on('subscription-favorite', cb)
-      return () => ipcRenderer.removeListener('subscription-favorite', cb)
+    file: (
+      callback: (
+        path: string,
+        operation:
+          | 'move'
+          | 'moveToTrash'
+          | 'newFolder'
+          | 'addToFavorites'
+          | 'removeFromFavorites'
+      ) => void
+    ) => {
+      const cb = (
+        _e: IpcRendererEvent,
+        path: string,
+        operation:
+          | 'move'
+          | 'moveToTrash'
+          | 'newFolder'
+          | 'addToFavorites'
+          | 'removeFromFavorites'
+      ) => callback(path, operation)
+      ipcRenderer.on('subscription-file', cb)
+      return () => ipcRenderer.removeListener('subscription-file', cb)
     },
     fullscreen: (callback: (fullscreen: boolean) => void) => {
       const cb = (_e: IpcRendererEvent, fullscreen: boolean) =>
         callback(fullscreen)
       ipcRenderer.on('subscription-fullscreen', cb)
       return () => ipcRenderer.removeListener('subscription-fullscreen', cb)
-    },
-    openDirectory: (callback: (path: string) => void) => {
-      const cb = (_e: IpcRendererEvent, path: string) => callback(path)
-      ipcRenderer.on('subscription-open-directory', cb)
-      return () => ipcRenderer.removeListener('subscription-open-directory', cb)
     },
     search: (callback: () => void) => {
       const cb = () => callback()

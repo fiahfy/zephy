@@ -15,6 +15,7 @@ export interface IElectronAPI {
   listContents: (path: string) => Promise<Content[]>
   listFiles: (path: string) => Promise<File[]>
   openPath: (path: string) => Promise<void>
+  trashItem: (path: string) => Promise<void>
   contextMenu: {
     send: (params?: unknown) => Promise<void>
   }
@@ -22,11 +23,18 @@ export interface IElectronAPI {
     thumbnail: (path: string) => Promise<string>
   }
   subscription: {
-    favorite: (
-      callback: (path: string, mode: 'add' | 'remove') => void
+    file: (
+      callback: (
+        path: string,
+        operation:
+          | 'move'
+          | 'moveToTrash'
+          | 'newFolder'
+          | 'addToFavorites'
+          | 'removeFromFavorites'
+      ) => void
     ) => () => void
     fullscreen: (callback: (fullscreen: boolean) => void) => () => void
-    openDirectory: (callback: (path: string) => void) => () => void
     search: (callback: () => void) => () => void
     settings: (callback: () => void) => () => void
   }
