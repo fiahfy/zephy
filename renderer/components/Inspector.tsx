@@ -2,14 +2,12 @@ import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { styled } from '@mui/material/styles'
 import { useCallback } from 'react'
-import ExplorerTreeView from 'components/ExplorerTreeView'
-import FavoriteTreeView from 'components/FavoriteTreeView'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
-  selectSidebarHidden,
-  selectSidebarWidth,
-  setSidebarHidden,
-  setSidebarWidth,
+  selectInspectorHidden,
+  selectInspectorWidth,
+  setInspectorHidden,
+  setInspectorWidth,
 } from 'store/window'
 
 const Drawer = styled(MuiDrawer, {
@@ -25,21 +23,21 @@ const Drawer = styled(MuiDrawer, {
 
 const minContentWidth = 64
 
-const Sidebar = () => {
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
-  const sidebarWidth = useAppSelector(selectSidebarWidth)
+const Inspector = () => {
+  const inspectorHidden = useAppSelector(selectInspectorHidden)
+  const inspectorWidth = useAppSelector(selectInspectorWidth)
   const dispatch = useAppDispatch()
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      const newWidth = e.clientX - document.body.offsetLeft + 3
+      const newWidth = document.body.offsetWidth - e.clientX + 3
       if (
         newWidth > minContentWidth &&
         newWidth < document.body.offsetWidth - minContentWidth
       ) {
-        dispatch(setSidebarWidth(newWidth))
+        dispatch(setInspectorWidth(newWidth))
       }
-      dispatch(setSidebarHidden(newWidth < minContentWidth / 2))
+      dispatch(setInspectorHidden(newWidth < minContentWidth / 2))
     },
     [dispatch]
   )
@@ -58,11 +56,11 @@ const Sidebar = () => {
 
   return (
     <Drawer
-      PaperProps={{ style: { width: sidebarWidth } }}
-      anchor="left"
+      PaperProps={{ style: { width: inspectorWidth } }}
+      anchor="right"
       className="scrollbar"
-      open={!sidebarHidden}
-      style={{ width: sidebarWidth }}
+      open={!inspectorHidden}
+      style={{ width: inspectorWidth }}
       variant="permanent"
     >
       <Toolbar
@@ -80,13 +78,12 @@ const Sidebar = () => {
       <Box
         sx={{
           flexGrow: 1,
-          marginRight: '5px',
+          marginLeft: '5px',
           overflowX: 'hidden',
           overflowY: 'scroll',
         }}
       >
-        <FavoriteTreeView />
-        <ExplorerTreeView />
+        {/* TODO: Implement Inspector */}
       </Box>
       <Box
         onMouseDown={handleMouseDown}
@@ -95,8 +92,8 @@ const Sidebar = () => {
             theme.palette.mode === 'light' ? grey[100] : grey[900],
           bottom: 0,
           cursor: 'col-resize',
+          left: 0,
           position: 'absolute',
-          right: 0,
           top: 0,
           width: '5px',
         }}
@@ -105,4 +102,4 @@ const Sidebar = () => {
   )
 }
 
-export default Sidebar
+export default Inspector

@@ -2,7 +2,8 @@ import { Box, Toolbar } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect } from 'react'
 import ExplorerBar from 'components/ExplorerBar'
-import Sidebar from 'components/Sidebar'
+import Inspector from 'components/Inspector'
+import Navigator from 'components/Navigator'
 import TitleBar from 'components/TitleBar'
 import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
@@ -89,7 +90,7 @@ const Layout = (props: Props) => {
       `}</style>
       <TitleBar />
       <ExplorerBar />
-      <Sidebar />
+      <Navigator />
       <Box
         component="main"
         sx={{
@@ -114,6 +115,7 @@ const Layout = (props: Props) => {
           {children}
         </Box>
       </Box>
+      <Inspector />
     </Box>
   )
 }

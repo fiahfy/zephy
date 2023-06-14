@@ -21,7 +21,7 @@ import {
   Sort as SortIcon,
   ViewList as ViewListIcon,
   ViewModule as ViewModuleIcon,
-  ViewSidebar as ViewSidebarIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material'
 import {
   ChangeEvent,
@@ -52,11 +52,13 @@ import {
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectIndexPage,
+  selectInspectorHidden,
   selectLayout,
+  selectNavigatorHidden,
   selectSettingsPage,
-  selectSidebarHidden,
+  setInspectorHidden,
   setLayout,
-  setSidebarHidden,
+  setNavigatorHidden,
   sort,
   unselectAll,
 } from 'store/window'
@@ -76,11 +78,12 @@ const ExplorerBar = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const indexPage = useAppSelector(selectIndexPage)
+  const inspectorHidden = useAppSelector(selectInspectorHidden)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const layout = useAppSelector(selectLayout)
+  const navigatorHidden = useAppSelector(selectNavigatorHidden)
   const queryHistories = useAppSelector(selectQueryHistories)
   const settingsPage = useAppSelector(selectSettingsPage)
-  const sidebarHidden = useAppSelector(selectSidebarHidden)
   const dispatch = useAppDispatch()
 
   const [directory, setDirectory] = useState('')
@@ -167,10 +170,15 @@ const ExplorerBar = () => {
     setDirectory(value)
   }
 
-  const handleChangeViewSidebar = (
+  const handleChangeViewNavigator = (
     _e: MouseEvent<HTMLElement>,
-    value: 'sidebar'[]
-  ) => dispatch(setSidebarHidden(!value.includes('sidebar')))
+    value: 'navigator'[]
+  ) => dispatch(setNavigatorHidden(!value.includes('navigator')))
+
+  const handleChangeViewInspector = (
+    _e: MouseEvent<HTMLElement>,
+    value: 'inspector'[]
+  ) => dispatch(setInspectorHidden(!value.includes('inspector')))
 
   const handleChangeLayout = (
     _e: MouseEvent<HTMLElement>,
@@ -353,16 +361,29 @@ const ExplorerBar = () => {
       </Toolbar>
       <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>
         <FilledToggleButtonGroup
-          onChange={handleChangeViewSidebar}
+          onChange={handleChangeViewNavigator}
           size="small"
-          value={sidebarHidden ? [] : ['sidebar']}
+          value={navigatorHidden ? [] : ['navigator']}
         >
           <ToggleButton
             sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Toggle Sidebar"
-            value="sidebar"
+            title="Toggle Navigator"
+            value="navigator"
           >
-            <ViewSidebarIcon fontSize="small" />
+            <FolderIcon fontSize="small" />
+          </ToggleButton>
+        </FilledToggleButtonGroup>
+        <FilledToggleButtonGroup
+          onChange={handleChangeViewInspector}
+          size="small"
+          value={inspectorHidden ? [] : ['inspector']}
+        >
+          <ToggleButton
+            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
+            title="Toggle Inspector"
+            value="inspector"
+          >
+            <VisibilityIcon fontSize="small" />
           </ToggleButton>
         </FilledToggleButtonGroup>
         <Box style={{ flexGrow: 1 }} />
