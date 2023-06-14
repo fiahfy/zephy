@@ -8,8 +8,9 @@ import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
+import { selectShouldShowHiddenFiles } from 'store/settings'
 import { entryContextMenuProps } from 'utils/contextMenu'
-import { isImageFile, isVideoFile } from 'utils/entry'
+import { isHiddenFile, isImageFile, isVideoFile } from 'utils/entry'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
@@ -62,6 +63,7 @@ const ExplorerGridItem = (props: Props) => {
     props
 
   const favorite = useAppSelector(selectIsFavorite)(content.path)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
@@ -93,7 +95,9 @@ const ExplorerGridItem = (props: Props) => {
       if (unmounted) {
         return
       }
-      const paths = entries.map((entry) => entry.path)
+      const paths = entries
+        .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+        .map((entry) => entry.path)
       const thumbnail = await getThumbnail(paths)
       return dispatch({ type: 'loaded', payload: { paths, thumbnail } })
     })()
@@ -101,7 +105,7 @@ const ExplorerGridItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [content.path, content.type])
+  }, [content.path, content.type, shouldShowHiddenFiles])
 
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No Preview'),

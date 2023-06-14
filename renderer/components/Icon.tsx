@@ -2,6 +2,7 @@ import { blue, green, grey, indigo, red } from '@mui/material/colors'
 import {
   AudioFile as AudioFileIcon,
   Folder as FolderIcon,
+  Image as ImageIcon,
   InsertDriveFile as InsertDriveFileIcon,
   Photo as PhotoIcon,
   StarBorder as StarBorderIcon,
@@ -14,8 +15,8 @@ type Props = {
   iconType:
     | 'audio-file'
     | 'folder'
+    | 'image'
     | 'insert-drive-file'
-    | 'photo'
     | 'star'
     | 'star-border'
     | 'video-file'
@@ -31,10 +32,10 @@ const Icon = (props: Props) => {
         return AudioFileIcon
       case 'folder':
         return FolderIcon
+      case 'image':
+        return ImageIcon
       case 'insert-drive-file':
         return InsertDriveFileIcon
-      case 'photo':
-        return PhotoIcon
       case 'star':
         return StarIcon
       case 'star-border':
@@ -50,10 +51,10 @@ const Icon = (props: Props) => {
         return green['300']
       case 'folder':
         return blue['300']
+      case 'image':
+        return indigo['300']
       case 'insert-drive-file':
         return grey['500']
-      case 'photo':
-        return indigo['300']
       case 'star':
         return '#faaf00'
       case 'star-border':

@@ -5,7 +5,7 @@ import { detectFileType } from 'utils/entry'
 
 const icons = {
   audio: 'audio-file',
-  image: 'photo',
+  image: 'image',
   unknown: 'insert-drive-file',
   video: 'video-file',
 } as const
