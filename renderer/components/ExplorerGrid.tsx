@@ -10,17 +10,17 @@ import {
 import { AutoSizer, Grid, GridCellProps } from 'react-virtualized'
 import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
-import { ExplorerContent } from 'interfaces'
+import { Content } from 'interfaces'
 
 const rowHeight = 256
 
 type Props = {
-  contentSelected: (content: ExplorerContent) => boolean
-  contents: ExplorerContent[]
+  contentSelected: (content: Content) => boolean
+  contents: Content[]
   loading: boolean
-  onClickContent: (content: ExplorerContent) => void
-  onDoubleClickContent: (content: ExplorerContent) => void
-  onFocusContent: (content: ExplorerContent) => void
+  onClickContent: (content: Content) => void
+  onDoubleClickContent: (content: Content) => void
+  onFocusContent: (content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
   onScroll: (e: Event) => void
   scrollTop: number
@@ -83,7 +83,7 @@ const ExplorerGrid = (props: Props) => {
       contents.reduce(
         (carry, _, i) =>
           i % size ? carry : [...carry, contents.slice(i, i + size)],
-        [] as ExplorerContent[][]
+        [] as Content[][]
       ),
     [contents, size]
   )
@@ -140,10 +140,9 @@ const ExplorerGrid = (props: Props) => {
     content && onFocusContent(content)
   }
 
-  const handleContentClick = (content: ExplorerContent) =>
-    onClickContent(content)
+  const handleContentClick = (content: Content) => onClickContent(content)
 
-  const handleContentDoubleClick = (content: ExplorerContent) =>
+  const handleContentDoubleClick = (content: Content) =>
     onDoubleClickContent(content)
 
   const cellRenderer = ({

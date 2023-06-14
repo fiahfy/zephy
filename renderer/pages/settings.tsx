@@ -10,15 +10,26 @@ import {
 } from '@mui/material'
 import { ChangeEvent } from 'react'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectDarkMode, setDarkMode } from 'store/settings'
+import {
+  selectDarkMode,
+  selectShouldShowHiddenFiles,
+  setDarkMode,
+  setShouldShowHiddenFiles,
+} from 'store/settings'
 
 const SettingsPage = () => {
   const darkMode = useAppSelector(selectDarkMode)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const dispatch = useAppDispatch()
 
   const handleChangeDarkMode = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.checked
     dispatch(setDarkMode(value))
+  }
+
+  const handleShouldShowHiddenFiles = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.checked
+    dispatch(setShouldShowHiddenFiles(value))
   }
 
   return (
@@ -39,6 +50,20 @@ const SettingsPage = () => {
                 <Checkbox checked={darkMode} onChange={handleChangeDarkMode} />
               }
               label="Use Dark Mode"
+            />
+          </FormGroup>
+        </Box>
+        <Box sx={{ my: 2 }}>
+          <Typography variant="subtitle2">Explorer</Typography>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={shouldShowHiddenFiles}
+                  onChange={handleShouldShowHiddenFiles}
+                />
+              }
+              label="Show Hidden Files"
             />
           </FormGroup>
         </Box>

@@ -4,7 +4,7 @@ import fileUrl from 'file-url'
 import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import { Entry, ExplorerContent } from 'interfaces'
+import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
@@ -50,7 +50,7 @@ const getThumbnail = async (paths: string | string[]) => {
 
 type Props = {
   columnIndex: number
-  content: ExplorerContent
+  content: Content
   onClick: (e: MouseEvent<HTMLDivElement>) => void
   onDoubleClick: (e: MouseEvent<HTMLDivElement>) => void
   rowIndex: number

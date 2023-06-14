@@ -9,7 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getWindowId: () => ipcRenderer.invoke('get-window-id'),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
-  listContents: (path: string) => ipcRenderer.invoke('list-contents', path),
+  listDetailedEntries: (path: string) =>
+    ipcRenderer.invoke('list-detailed-entries', path),
   listEntries: (path: string) => ipcRenderer.invoke('list-entries', path),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   trashItem: (path: string) => ipcRenderer.invoke('trash-item', path),

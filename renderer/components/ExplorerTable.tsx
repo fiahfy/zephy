@@ -25,7 +25,7 @@ import {
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePrevious from 'hooks/usePrevious'
-import { ExplorerContent } from 'interfaces'
+import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
@@ -64,13 +64,13 @@ const columns: ColumnType[] = [
 ]
 
 type Props = {
-  contentSelected: (content: ExplorerContent) => boolean
-  contents: ExplorerContent[]
+  contentSelected: (content: Content) => boolean
+  contents: Content[]
   loading: boolean
   onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
-  onClickContent: (content: ExplorerContent) => void
-  onDoubleClickContent: (content: ExplorerContent) => void
-  onFocusContent: (content: ExplorerContent) => void
+  onClickContent: (content: Content) => void
+  onDoubleClickContent: (content: Content) => void
+  onFocusContent: (content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
   onScroll: (e: Event) => void
   scrollTop: number

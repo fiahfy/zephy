@@ -75,7 +75,7 @@ const ExplorerTreeView = () => {
     if (!entry || entry.type !== 'directory' || entry.children) {
       return
     }
-    const children = await window.electronAPI.listContents(entry.path)
+    const children = await window.electronAPI.listEntries(entry.path)
     const mapper = (e: Entry): Entry => {
       if (e.type === 'directory') {
         if (e.path === entry.path) {

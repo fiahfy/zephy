@@ -5,7 +5,9 @@ import Icon from 'components/Icon'
 import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
+import { selectShouldShowHiddenFiles } from 'store/settings'
 import { entryContextMenuProps } from 'utils/contextMenu'
+import { isHiddenFile } from 'utils/entry'
 
 const max = 100
 
@@ -17,6 +19,7 @@ const ExplorerTreeItem = (props: Props) => {
   const { entry } = props
 
   const favorite = useAppSelector(selectIsFavorite)(entry.path)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const over =
     (entry.type === 'directory' ? entry.children ?? [] : []).length - max
@@ -38,9 +41,14 @@ const ExplorerTreeItem = (props: Props) => {
       {entry.type === 'directory' &&
         (entry.children ? (
           <>
-            {entry.children.slice(0, max).map((entry) => (
-              <ExplorerTreeItem entry={entry} key={entry.path} />
-            ))}
+            {entry.children
+              .filter(
+                (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+              )
+              .slice(0, max)
+              .map((entry) => (
+                <ExplorerTreeItem entry={entry} key={entry.path} />
+              ))}
             {over > 0 && (
               <EntryTreeItem
                 icon={<Icon iconType="insert-drive-file" size="small" />}

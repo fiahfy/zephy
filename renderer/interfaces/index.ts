@@ -12,7 +12,7 @@ export interface IElectronAPI {
   getWindowId: () => Promise<number | undefined>
   getHomePath: () => Promise<string>
   isFullscreen: () => Promise<boolean>
-  listContents: (path: string) => Promise<Content[]>
+  listDetailedEntries: (path: string) => Promise<DetailedEntry[]>
   listEntries: (path: string) => Promise<Entry[]>
   openPath: (path: string) => Promise<void>
   trashItem: (path: string) => Promise<void>
@@ -42,22 +42,20 @@ export interface IElectronAPI {
 
 export type Settings = {
   darkMode: boolean
+  shouldShowHiddenFiles: boolean
 }
 
-type EntryBase = {
+type File = {
   name: string
   path: string
-}
-type FileEntry = EntryBase & {
   type: 'file'
 }
-type DirectoryEntry = EntryBase & {
-  type: 'directory'
+type Directory = {
   children?: Entry[]
+  name: string
+  path: string
+  type: 'directory'
 }
-type OtherEntry = EntryBase & {
-  type: 'other'
-}
-export type Entry = FileEntry | DirectoryEntry | OtherEntry
-export type Content = Entry & { dateModified: number }
-export type ExplorerContent = Content & { rating: number }
+export type Entry = File | Directory
+export type DetailedEntry = Entry & { dateModified: number }
+export type Content = DetailedEntry & { rating: number }

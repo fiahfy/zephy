@@ -15,6 +15,8 @@ export const isAudioFile = (path: string) => {
   return mimeType && mimeType.startsWith('audio/')
 }
 
+export const isHiddenFile = (path: string) => path.startsWith('.')
+
 export const detectFileType = (path: string) => {
   const mimeType = mime.lookup(path)
   if (!mimeType) {

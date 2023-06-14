@@ -53,6 +53,7 @@ import {
   selectCurrentSortOption,
   selectIndexPage,
   selectLayout,
+  selectSettingsPage,
   selectSidebarHidden,
   setLayout,
   setSidebarHidden,
@@ -78,6 +79,7 @@ const ExplorerBar = () => {
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const layout = useAppSelector(selectLayout)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const settingsPage = useAppSelector(selectSettingsPage)
   const sidebarHidden = useAppSelector(selectSidebarHidden)
   const dispatch = useAppDispatch()
 
@@ -149,7 +151,8 @@ const ExplorerBar = () => {
     dispatch(load())
   }
 
-  const handleClickSettings = () => dispatch(moveToSettings())
+  const handleClickSettings = () =>
+    settingsPage ? dispatch(back()) : dispatch(moveToSettings())
 
   const handleClickFolder = async () =>
     await window.electronAPI.openPath(currentDirectory)

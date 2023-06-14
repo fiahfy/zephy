@@ -10,22 +10,19 @@ import {
 
 const { readdir, stat } = promises
 
-type EntryBase = {
+type File = {
   name: string
   path: string
-}
-type FileEntry = EntryBase & {
   type: 'file'
 }
-type DirectoryEntry = EntryBase & {
-  type: 'directory'
+type Directory = {
   children?: Entry[]
+  name: string
+  path: string
+  type: 'directory'
 }
-type OtherEntry = EntryBase & {
-  type: 'other'
-}
-type Entry = FileEntry | DirectoryEntry | OtherEntry
-type Content = Entry & { dateModified: number }
+type Entry = File | Directory
+type DetailedEntry = Entry & { dateModified: number }
 
 const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
@@ -37,29 +34,35 @@ const getEntryType = (obj: Dirent | Stats) => {
   }
 }
 
-const getDateModified = async (path: string) => {
-  const stats = await stat(path)
-  return stats.mtimeMs
-}
-
-const listContents = async (path: string): Promise<Content[]> => {
+const listDetailedEntries = async (path: string): Promise<DetailedEntry[]> => {
   const entries = await listEntries(path)
-  return await entries.reduce(async (c, entry) => {
-    const carry = await c
-    const dateModified = await getDateModified(entry.path)
-    return [...carry, { ...entry, dateModified }]
-  }, Promise.resolve([]) as Promise<Content[]>)
+  return await Promise.all(
+    entries.map(async (entry) => {
+      const stats = await stat(entry.path)
+      return {
+        ...entry,
+        dateModified: stats.mtimeMs,
+      }
+    })
+  )
 }
 
 const listEntries = async (path: string): Promise<Entry[]> => {
   const dirents = await readdir(path, { withFileTypes: true })
-  return dirents
-    .map((dirent) => ({
-      name: dirent.name.normalize('NFC'),
-      path: join(path, dirent.name),
-      type: getEntryType(dirent),
-    }))
-    .filter((file) => !file.name.match(/^\./) && file.type !== 'other')
+  return dirents.reduce((carry, dirent) => {
+    const type = getEntryType(dirent)
+    if (type === 'other') {
+      return carry
+    }
+    return [
+      ...carry,
+      {
+        name: dirent.name.normalize('NFC'),
+        path: join(path, dirent.name),
+        type,
+      },
+    ]
+  }, [] as Entry[])
 }
 
 export const addHandlers = () => {
@@ -82,7 +85,7 @@ export const addHandlers = () => {
       }
       dirnames[0] = rootPath
 
-      let entry: DirectoryEntry = {
+      let entry: Directory = {
         children: [
           {
             children: [],
@@ -128,8 +131,9 @@ export const addHandlers = () => {
     (event: IpcMainInvokeEvent) =>
       BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
   )
-  ipcMain.handle('list-contents', (_event: IpcMainInvokeEvent, path: string) =>
-    listContents(path)
+  ipcMain.handle(
+    'list-detailed-entries',
+    (_event: IpcMainInvokeEvent, path: string) => listDetailedEntries(path)
   )
   ipcMain.handle('list-entries', (_event: IpcMainInvokeEvent, path: string) =>
     listEntries(path)

@@ -1,16 +1,11 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { Content } from 'interfaces'
+import { Content, DetailedEntry } from 'interfaces'
 import { AppState, AppThunk } from 'store'
 import { add } from 'store/queryHistory'
 import { selectWindowId } from 'store/windowId'
-
-type ExplorerState = {
-  contents: Content[]
-  layout: 'list' | 'thumbnail'
-  loading: boolean
-  query: string
-  selected: string[]
-}
+import { selectShouldShowHiddenFiles } from './settings'
+import { selectGetRating } from './rating'
+import { isHiddenFile } from 'utils/entry'
 
 type History = {
   directory: string
@@ -37,8 +32,12 @@ type SortingState = {
 }
 
 type WindowState = {
-  explorer: ExplorerState
+  entries: DetailedEntry[]
   history: HistoryState
+  layout: 'list' | 'thumbnail'
+  loading: boolean
+  query: string
+  selected: string[]
   sidebar: SidebarState
   sorting: SortingState
 }
@@ -48,17 +47,15 @@ type State = {
 }
 
 const defaultState: WindowState = {
-  explorer: {
-    contents: [],
-    layout: 'list',
-    loading: false,
-    query: '',
-    selected: [],
-  },
+  entries: [],
   history: {
     histories: [],
     index: -1,
   },
+  layout: 'list',
+  loading: false,
+  query: '',
+  selected: [],
   sidebar: {
     hidden: false,
     width: 256,
@@ -74,9 +71,9 @@ export const windowSlice = createSlice({
   reducers: {
     loaded(
       state,
-      action: PayloadAction<{ windowId: number; contents: Content[] }>
+      action: PayloadAction<{ windowId: number; entries: DetailedEntry[] }>
     ) {
-      const { windowId, contents } = action.payload
+      const { windowId, entries } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
         return state
@@ -86,12 +83,9 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            contents,
-            loading: false,
-            query: '',
-          },
+          entries,
+          loading: false,
+          query: '',
         },
       }
     },
@@ -106,11 +100,8 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            contents: [],
-            loading: true,
-          },
+          entries: [],
+          loading: true,
         },
       }
     },
@@ -125,10 +116,7 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            selected: [path],
-          },
+          selected: [path],
         },
       }
     },
@@ -141,18 +129,13 @@ export const windowSlice = createSlice({
       if (!windowState) {
         return state
       }
-      const contents = windowState.explorer.contents.filter(
-        (content) => content.path !== path
-      )
+      const entries = windowState.entries.filter((entry) => entry.path !== path)
       return {
         ...state,
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            contents,
-          },
+          entries,
         },
       }
     },
@@ -160,7 +143,7 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         windowId: number
-        layout: ExplorerState['layout']
+        layout: WindowState['layout']
       }>
     ) {
       const { windowId, layout } = action.payload
@@ -173,10 +156,7 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            layout,
-          },
+          layout,
         },
       }
     },
@@ -194,10 +174,7 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            query,
-          },
+          query,
         },
       }
     },
@@ -212,10 +189,7 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          explorer: {
-            ...windowState.explorer,
-            selected: [],
-          },
+          selected: [],
         },
       }
     },
@@ -388,14 +362,34 @@ export const selectWindow = (state: AppState) => {
   return windowState
 }
 
-export const selectExplorer = createSelector(
+export const selectEntries = createSelector(
   selectWindow,
-  (window) => window.explorer
+  (window) => window.entries
 )
 
 export const selectHistory = createSelector(
   selectWindow,
   (window) => window.history
+)
+
+export const selectLayout = createSelector(
+  selectWindow,
+  (window) => window.layout
+)
+
+export const selectLoading = createSelector(
+  selectWindow,
+  (window) => window.loading
+)
+
+export const selectQuery = createSelector(
+  selectWindow,
+  (window) => window.query
+)
+
+export const selectSelected = createSelector(
+  selectWindow,
+  (window) => window.selected
 )
 
 export const selectSidebar = createSelector(
@@ -408,36 +402,9 @@ export const selectSorting = createSelector(
   (window) => window.sorting
 )
 
-export const selectContents = createSelector(
-  selectExplorer,
-  (explorer) => explorer.contents
-)
-
-export const selectLayout = createSelector(
-  selectExplorer,
-  (explorer) => explorer.layout
-)
-
-export const selectLoading = createSelector(
-  selectExplorer,
-  (explorer) => explorer.loading
-)
-
-export const selectQuery = createSelector(
-  selectExplorer,
-  (explorer) => explorer.query
-)
-
 export const selectIsSelected = createSelector(
-  selectExplorer,
-  (explorer) => (path: string) => explorer.selected.includes(path)
-)
-
-export const selectSelectedContents = createSelector(
-  selectExplorer,
-  selectIsSelected,
-  (explorer, isSelected) =>
-    explorer.contents.filter((content) => isSelected(content.path))
+  selectSelected,
+  (selected) => (path: string) => selected.includes(path)
 )
 
 export const selectCurrentHistory = createSelector(
@@ -468,6 +435,11 @@ export const selectIndexPage = createSelector(
   (currentPathname) => currentPathname === '/'
 )
 
+export const selectSettingsPage = createSelector(
+  selectCurrentPathname,
+  (currentPathname) => currentPathname === '/settings'
+)
+
 export const selectCurrentScrollTop = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.scrollTop
@@ -483,6 +455,57 @@ export const selectCanForward = createSelector(
   (history) => history.index < history.histories.length - 1
 )
 
+export const selectCurrentSortOption = createSelector(
+  selectSorting,
+  selectCurrentDirectory,
+  (sorting, currentDirectory) =>
+    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
+)
+
+export const selectContents = createSelector(
+  selectEntries,
+  selectQuery,
+  selectCurrentSortOption,
+  selectShouldShowHiddenFiles,
+  selectGetRating,
+  (entries, query, currentSortOption, shouldShowHiddenFiles, getRating) => {
+    const comparator = (a: Content, b: Content) => {
+      let result = 0
+      const aValue = a[currentSortOption.orderBy]
+      const bValue = b[currentSortOption.orderBy]
+      if (aValue !== undefined && bValue !== undefined) {
+        if (aValue > bValue) {
+          result = 1
+        } else if (aValue < bValue) {
+          result = -1
+        }
+      } else {
+        result = 0
+      }
+      const orderSign = currentSortOption.order === 'desc' ? -1 : 1
+      return orderSign * result
+    }
+    return entries
+      .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+      .filter(
+        (entry) =>
+          !query || entry.name.toLowerCase().includes(query.toLowerCase())
+      )
+      .map((entry) => ({
+        ...entry,
+        rating: getRating(entry.path),
+      }))
+      .sort((a, b) => comparator(a, b))
+  }
+)
+
+export const selectSelectedContents = createSelector(
+  selectContents,
+  selectIsSelected,
+  (contents, isSelected) =>
+    contents.filter((content) => isSelected(content.path))
+)
+
 export const selectSidebarHidden = createSelector(
   selectSidebar,
   (settings) => settings.hidden
@@ -491,13 +514,6 @@ export const selectSidebarHidden = createSelector(
 export const selectSidebarWidth = createSelector(
   selectSidebar,
   (settings) => settings.width
-)
-
-export const selectCurrentSortOption = createSelector(
-  selectSorting,
-  selectCurrentDirectory,
-  (sorting, currentDirectory) =>
-    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
 )
 
 export const load = (): AppThunk => async (dispatch, getState) => {
@@ -509,10 +525,12 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   }
   dispatch(loading({ windowId }))
   try {
-    const contents = await window.electronAPI.listContents(currentDirectory)
-    dispatch(loaded({ windowId, contents }))
+    const entries = await window.electronAPI.listDetailedEntries(
+      currentDirectory
+    )
+    dispatch(loaded({ windowId, entries }))
   } catch (e) {
-    dispatch(loaded({ windowId, contents: [] }))
+    dispatch(loaded({ windowId, entries: [] }))
   }
 }
 
@@ -540,7 +558,7 @@ export const unselectAll = (): AppThunk => async (dispatch, getState) => {
 }
 
 export const setLayout =
-  (layout: ExplorerState['layout']): AppThunk =>
+  (layout: WindowState['layout']): AppThunk =>
   async (dispatch, getState) => {
     const { setLayout } = windowSlice.actions
     const windowId = selectWindowId(getState())
