@@ -4,7 +4,6 @@ import {
   Folder as FolderIcon,
   Image as ImageIcon,
   InsertDriveFile as InsertDriveFileIcon,
-  Photo as PhotoIcon,
   StarBorder as StarBorderIcon,
   Star as StarIcon,
   VideoFile as VideoFileIcon,

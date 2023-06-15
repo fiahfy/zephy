@@ -38,12 +38,12 @@ const createWindow = (state: State) => {
   return browserWindow
 }
 
-const windowStateManager = createWindowStateManager(createWindow)
-
 app.whenReady().then(async () => {
   await prepareNext('./renderer')
 
+  const windowStateManager = createWindowStateManager(createWindow)
   windowStateManager.restore()
+
   registerApplicationMenu(windowStateManager.create)
   registerContextMenu()
   registerFfmpegHandlers()
@@ -54,20 +54,20 @@ app.whenReady().then(async () => {
     const pathname = decodeURIComponent(request.url.replace('file:///', ''))
     callback(pathname)
   })
-})
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    windowStateManager.create()
-  }
-})
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      windowStateManager.create()
+    }
+  })
 
-app.on('before-quit', () => {
-  windowStateManager.save()
+  app.on('before-quit', () => {
+    windowStateManager.save()
+  })
 })
