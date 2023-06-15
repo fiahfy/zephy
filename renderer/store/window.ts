@@ -6,6 +6,7 @@ import { selectWindowId } from 'store/windowId'
 import { selectShouldShowHiddenFiles } from './settings'
 import { selectGetRating } from './rating'
 import { isHiddenFile } from 'utils/entry'
+import { LargeNumberLike } from 'crypto'
 
 type History = {
   directory: string
@@ -34,12 +35,14 @@ type SortingState = {
 type WindowState = {
   entries: DetailedEntry[]
   history: HistoryState
-  inspector: SidebarState
   layout: 'list' | 'thumbnail'
   loading: boolean
-  navigator: SidebarState
   query: string
   selected: string[]
+  sidebar: {
+    primary: SidebarState
+    secondary: SidebarState
+  }
   sorting: SortingState
 }
 
@@ -53,18 +56,20 @@ const defaultState: WindowState = {
     histories: [],
     index: -1,
   },
-  inspector: {
-    hidden: false,
-    width: 256,
-  },
   layout: 'list',
   loading: false,
-  navigator: {
-    hidden: false,
-    width: 256,
-  },
   query: '',
   selected: [],
+  sidebar: {
+    primary: {
+      hidden: false,
+      width: 256,
+    },
+    secondary: {
+      hidden: false,
+      width: 256,
+    },
+  },
   sorting: {},
 }
 
@@ -272,11 +277,15 @@ export const windowSlice = createSlice({
         },
       }
     },
-    setNavigatorHidden(
+    setSidebarHidden(
       state,
-      action: PayloadAction<{ windowId: number; hidden: boolean }>
+      action: PayloadAction<{
+        windowId: number
+        variant: 'primary' | 'secondary'
+        hidden: boolean
+      }>
     ) {
-      const { windowId, hidden } = action.payload
+      const { windowId, variant, hidden } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
         return state
@@ -286,18 +295,25 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          navigator: {
-            ...windowState.navigator,
-            hidden,
+          sidebar: {
+            ...windowState.sidebar,
+            [variant]: {
+              ...windowState.sidebar[variant],
+              hidden,
+            },
           },
         },
       }
     },
-    setNavigatorWidth(
+    setSidebarWidth(
       state,
-      action: PayloadAction<{ windowId: number; width: number }>
+      action: PayloadAction<{
+        windowId: number
+        variant: 'primary' | 'secondary'
+        width: number
+      }>
     ) {
-      const { windowId, width } = action.payload
+      const { windowId, variant, width } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
         return state
@@ -307,51 +323,12 @@ export const windowSlice = createSlice({
         [windowId]: {
           ...defaultState,
           ...windowState,
-          navigator: {
-            ...windowState.navigator,
-            width,
-          },
-        },
-      }
-    },
-    setInspectorHidden(
-      state,
-      action: PayloadAction<{ windowId: number; hidden: boolean }>
-    ) {
-      const { windowId, hidden } = action.payload
-      const windowState = state[windowId]
-      if (!windowState) {
-        return state
-      }
-      return {
-        ...state,
-        [windowId]: {
-          ...defaultState,
-          ...windowState,
-          inspector: {
-            ...windowState.inspector,
-            hidden,
-          },
-        },
-      }
-    },
-    setInspectorWidth(
-      state,
-      action: PayloadAction<{ windowId: number; width: number }>
-    ) {
-      const { windowId, width } = action.payload
-      const windowState = state[windowId]
-      if (!windowState) {
-        return state
-      }
-      return {
-        ...state,
-        [windowId]: {
-          ...defaultState,
-          ...windowState,
-          inspector: {
-            ...windowState.inspector,
-            width,
+          sidebar: {
+            ...windowState.sidebar,
+            [variant]: {
+              ...windowState.sidebar[variant],
+              width,
+            },
           },
         },
       }
@@ -439,14 +416,9 @@ export const selectSelected = createSelector(
   (window) => window.selected
 )
 
-export const selectNavigator = createSelector(
+export const selectSidebar = createSelector(
   selectWindow,
-  (window) => window.navigator
-)
-
-export const selectInspector = createSelector(
-  selectWindow,
-  (window) => window.inspector
+  (window) => window.sidebar
 )
 
 export const selectSorting = createSelector(
@@ -558,24 +530,14 @@ export const selectSelectedContents = createSelector(
     contents.filter((content) => isSelected(content.path))
 )
 
-export const selectNavigatorHidden = createSelector(
-  selectNavigator,
-  (settings) => settings.hidden
+export const selectIsSidebarHidden = createSelector(
+  selectSidebar,
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden
 )
 
-export const selectNavigatorWidth = createSelector(
-  selectNavigator,
-  (settings) => settings.width
-)
-
-export const selectInspectorHidden = createSelector(
-  selectInspector,
-  (settings) => settings.hidden
-)
-
-export const selectInspectorWidth = createSelector(
-  selectInspector,
-  (settings) => settings.width
+export const selectGetSidebarWidth = createSelector(
+  selectSidebar,
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width
 )
 
 export const load = (): AppThunk => async (dispatch, getState) => {
@@ -669,36 +631,20 @@ export const scroll =
     dispatch(scroll({ windowId, scrollTop }))
   }
 
-export const setNavigatorHidden =
-  (hidden: boolean): AppThunk =>
+export const setSidebarHidden =
+  (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
-    const { setNavigatorHidden } = windowSlice.actions
+    const { setSidebarHidden } = windowSlice.actions
     const windowId = selectWindowId(getState())
-    dispatch(setNavigatorHidden({ windowId, hidden }))
+    dispatch(setSidebarHidden({ windowId, variant, hidden }))
   }
 
-export const setNavigatorWidth =
-  (width: number): AppThunk =>
+export const setSidebarWidth =
+  (variant: 'primary' | 'secondary', width: number): AppThunk =>
   async (dispatch, getState) => {
-    const { setNavigatorWidth } = windowSlice.actions
+    const { setSidebarWidth } = windowSlice.actions
     const windowId = selectWindowId(getState())
-    dispatch(setNavigatorWidth({ windowId, width }))
-  }
-
-export const setInspectorHidden =
-  (hidden: boolean): AppThunk =>
-  async (dispatch, getState) => {
-    const { setInspectorHidden } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setInspectorHidden({ windowId, hidden }))
-  }
-
-export const setInspectorWidth =
-  (width: number): AppThunk =>
-  async (dispatch, getState) => {
-    const { setInspectorWidth } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setInspectorWidth({ windowId, width }))
+    dispatch(setSidebarWidth({ windowId, variant, width }))
   }
 
 export const sort =

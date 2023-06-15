@@ -16,6 +16,7 @@ import {
   selectCurrentPathname,
 } from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
+import Sidebar from './Sidebar'
 
 type Props = {
   children: ReactNode
@@ -90,7 +91,9 @@ const Layout = (props: Props) => {
       `}</style>
       <TitleBar />
       <ExplorerBar />
-      <Navigator />
+      <Sidebar variant="primary">
+        <Navigator />
+      </Sidebar>
       <Box
         component="main"
         sx={{
@@ -115,7 +118,9 @@ const Layout = (props: Props) => {
           {children}
         </Box>
       </Box>
-      <Inspector />
+      <Sidebar variant="secondary">
+        <Inspector />
+      </Sidebar>
     </Box>
   )
 }

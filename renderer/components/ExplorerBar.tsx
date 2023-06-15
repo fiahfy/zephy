@@ -52,13 +52,11 @@ import {
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectIndexPage,
-  selectInspectorHidden,
+  selectIsSidebarHidden,
   selectLayout,
-  selectNavigatorHidden,
   selectSettingsPage,
-  setInspectorHidden,
   setLayout,
-  setNavigatorHidden,
+  setSidebarHidden,
   sort,
   unselectAll,
 } from 'store/window'
@@ -78,10 +76,9 @@ const ExplorerBar = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const indexPage = useAppSelector(selectIndexPage)
-  const inspectorHidden = useAppSelector(selectInspectorHidden)
+  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const layout = useAppSelector(selectLayout)
-  const navigatorHidden = useAppSelector(selectNavigatorHidden)
   const queryHistories = useAppSelector(selectQueryHistories)
   const settingsPage = useAppSelector(selectSettingsPage)
   const dispatch = useAppDispatch()
@@ -173,12 +170,12 @@ const ExplorerBar = () => {
   const handleChangeViewNavigator = (
     _e: MouseEvent<HTMLElement>,
     value: 'navigator'[]
-  ) => dispatch(setNavigatorHidden(!value.includes('navigator')))
+  ) => dispatch(setSidebarHidden('primary', !value.includes('navigator')))
 
   const handleChangeViewInspector = (
     _e: MouseEvent<HTMLElement>,
     value: 'inspector'[]
-  ) => dispatch(setInspectorHidden(!value.includes('inspector')))
+  ) => dispatch(setSidebarHidden('secondary', !value.includes('inspector')))
 
   const handleChangeLayout = (
     _e: MouseEvent<HTMLElement>,
@@ -363,7 +360,7 @@ const ExplorerBar = () => {
         <FilledToggleButtonGroup
           onChange={handleChangeViewNavigator}
           size="small"
-          value={navigatorHidden ? [] : ['navigator']}
+          value={isSidebarHidden('primary') ? [] : ['navigator']}
         >
           <ToggleButton
             sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
@@ -376,7 +373,7 @@ const ExplorerBar = () => {
         <FilledToggleButtonGroup
           onChange={handleChangeViewInspector}
           size="small"
-          value={inspectorHidden ? [] : ['inspector']}
+          value={isSidebarHidden('secondary') ? [] : ['inspector']}
         >
           <ToggleButton
             sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
