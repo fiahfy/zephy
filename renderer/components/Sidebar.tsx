@@ -73,7 +73,6 @@ const Sidebar = (props: Props) => {
     <Drawer
       PaperProps={{ style: { width } }}
       anchor={position}
-      className="scrollbar"
       open={!hidden}
       style={{ width }}
       variant="permanent"
@@ -93,8 +92,7 @@ const Sidebar = (props: Props) => {
       <Box
         sx={{
           flexGrow: 1,
-          overflowX: 'hidden',
-          overflowY: 'scroll',
+          overflow: 'auto',
           [position === 'left' ? 'marginRight' : 'marginLeft']: '5px',
         }}
       >

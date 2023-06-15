@@ -19,30 +19,39 @@ const registerFfmpegHandlers = () => {
 
   const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
-  const createThumbnail = async (imagePath: string) => {
-    const filename =
-      crypto.createHash('md5').update(imagePath).digest('hex') + '.png'
-    const path = join(thumbnailDir, filename)
-    try {
-      await access(path, constants.F_OK)
-    } catch (e) {
-      await new Promise<void>((resolve, reject) => {
-        ffmpeg(imagePath)
-          .screenshots({
-            count: 1,
-            folder: thumbnailDir,
-            filename: filename,
-          })
-          .on('error', (e) => reject(e))
-          .on('end', () => resolve())
+  ipcMain.handle(
+    'ffmpeg-metadata',
+    async (_event: IpcMainInvokeEvent, path: string) => {
+      const metadata = await new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(path, (err, metadata) => {
+          err ? reject(err) : resolve(metadata)
+        })
       })
+      return metadata
     }
-    return path
-  }
-
+  )
   ipcMain.handle(
     'ffmpeg-thumbnail',
-    (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path)
+    async (_event: IpcMainInvokeEvent, path: string) => {
+      const filename =
+        crypto.createHash('md5').update(path).digest('hex') + '.png'
+      const thumbnailPath = join(thumbnailDir, filename)
+      try {
+        await access(path, constants.F_OK)
+      } catch (e) {
+        await new Promise<void>((resolve, reject) => {
+          ffmpeg(path)
+            .screenshots({
+              count: 1,
+              folder: thumbnailDir,
+              filename: filename,
+            })
+            .on('error', (e) => reject(e))
+            .on('end', () => resolve())
+        })
+      }
+      return thumbnailPath
+    }
   )
 }
 

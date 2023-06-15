@@ -9,8 +9,8 @@ export interface IElectronAPI {
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
   getEntryTree: (path: string) => Promise<Entry>
-  getWindowId: () => Promise<number | undefined>
   getHomePath: () => Promise<string>
+  getWindowId: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
   listDetailedEntries: (path: string) => Promise<DetailedEntry[]>
   listEntries: (path: string) => Promise<Entry[]>
@@ -21,6 +21,7 @@ export interface IElectronAPI {
   }
   ffmpeg: {
     thumbnail: (path: string) => Promise<string>
+    metadata: (path: string) => Promise<unknown>
   }
   subscription: {
     entry: (
@@ -57,5 +58,9 @@ type Directory = {
   type: 'directory'
 }
 export type Entry = File | Directory
-export type DetailedEntry = Entry & { dateModified: number }
+export type DetailedEntry = Entry & {
+  dateCreated: number
+  dateModified: number
+  dateLastOpened: number
+}
 export type Content = DetailedEntry & { rating: number }

@@ -22,7 +22,11 @@ type Directory = {
   type: 'directory'
 }
 type Entry = File | Directory
-type DetailedEntry = Entry & { dateModified: number }
+type DetailedEntry = Entry & {
+  dateCreated: number
+  dateModified: number
+  dateLastOpened: number
+}
 
 const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
@@ -41,7 +45,9 @@ const listDetailedEntries = async (path: string): Promise<DetailedEntry[]> => {
       const stats = await stat(entry.path)
       return {
         ...entry,
+        dateCreated: stats.birthtimeMs,
         dateModified: stats.mtimeMs,
+        dateLastOpened: stats.atimeMs,
       }
     })
   )

@@ -5,9 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   darwin: () => ipcRenderer.invoke('darwin'),
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
   getEntryTree: (path: string) => ipcRenderer.invoke('get-entry-tree', path),
-  getThumbnail: (path: string) => ipcRenderer.invoke('get-thumbnail', path),
-  getWindowId: () => ipcRenderer.invoke('get-window-id'),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
+  getWindowId: () => ipcRenderer.invoke('get-window-id'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   listDetailedEntries: (path: string) =>
     ipcRenderer.invoke('list-detailed-entries', path),
@@ -18,6 +17,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     send: (params?: unknown) => ipcRenderer.invoke('context-menu-send', params),
   },
   ffmpeg: {
+    metadata: (path: string) => ipcRenderer.invoke('ffmpeg-metadata', path),
     thumbnail: (path: string) => ipcRenderer.invoke('ffmpeg-thumbnail', path),
   },
   subscription: {

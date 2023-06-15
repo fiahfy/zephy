@@ -207,18 +207,9 @@ const ExplorerTable = (props: Props) => {
             })
           }}
         >
-          <Box
-            component="span"
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <Typography noWrap variant="caption">
-              {label}
-            </Typography>
-          </Box>
+          <Typography noWrap variant="caption">
+            {label}
+          </Typography>
         </TableSortLabel>
       </TableCell>
     )
@@ -289,7 +280,6 @@ const ExplorerTable = (props: Props) => {
 
   return (
     <Box
-      className="scrollbar"
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       ref={ref}

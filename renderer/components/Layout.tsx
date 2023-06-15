@@ -114,9 +114,7 @@ const Layout = (props: Props) => {
             minHeight: '65px!important',
           }}
         />
-        <Box sx={{ flexGrow: 1, position: 'relative', overflow: 'auto' }}>
-          {children}
-        </Box>
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>
       </Box>
       <Sidebar variant="secondary">
         <Inspector />
