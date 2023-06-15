@@ -21,7 +21,7 @@ export interface IElectronAPI {
   }
   ffmpeg: {
     thumbnail: (path: string) => Promise<string>
-    metadata: (path: string) => Promise<unknown>
+    metadata: (path: string) => Promise<Metadata>
   }
   subscription: {
     entry: (
@@ -64,3 +64,9 @@ export type DetailedEntry = Entry & {
   dateLastOpened: number
 }
 export type Content = DetailedEntry & { rating: number }
+
+export type Metadata = {
+  duration?: number
+  height?: number
+  width?: number
+}

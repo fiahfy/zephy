@@ -7,20 +7,44 @@ import {
   Typography,
 } from '@mui/material'
 import { format } from 'date-fns'
-import { useEffect } from 'react'
+import { Metadata } from 'interfaces'
+import { useEffect, useState } from 'react'
 import { useAppSelector } from 'store'
 import { selectSelectedContents } from 'store/window'
+
+const formatTime = (sec: number) => {
+  const hours = Math.floor(sec / 3600)
+  const minutes = Math.floor((sec % 3600) / 60)
+  const seconds = Math.round(sec % 60)
+
+  const hh = hours > 0 ? String(hours).padStart(2, '0') : ''
+  const mm = String(minutes).padStart(2, '0')
+  const ss = String(seconds).padStart(2, '0')
+
+  let result = ''
+
+  if (hh) {
+    result += `${hh}:`
+  }
+
+  result += `${mm}:${ss}`
+
+  return result
+}
 
 const Inspector = () => {
   const [content] = useAppSelector(selectSelectedContents)
 
+  const [metadata, setMetadata] = useState<Metadata>()
+
   useEffect(() => {
     ;(async () => {
-      if (!content) {
-        return
+      if (!content || content.type === 'directory') {
+        return setMetadata(undefined)
       }
       const metadata = await window.electronAPI.ffmpeg.metadata(content.path)
       console.log(metadata)
+      setMetadata(metadata)
     })()
   }, [content])
 
@@ -38,6 +62,26 @@ const Inspector = () => {
           label: 'Date Last Opened',
           value: format(content.dateLastOpened, 'PP HH:mm'),
         },
+        ...(metadata
+          ? [
+              ...(metadata.height && metadata.width
+                ? [
+                    {
+                      label: 'Dimensions',
+                      value: `${metadata.width}x${metadata.height}`,
+                    },
+                  ]
+                : []),
+              ...(metadata.duration
+                ? [
+                    {
+                      label: 'Duration',
+                      value: formatTime(metadata.duration),
+                    },
+                  ]
+                : []),
+            ]
+          : []),
       ]
     : []
 

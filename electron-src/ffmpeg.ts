@@ -8,6 +8,12 @@ import { join } from 'path'
 
 const { access } = promises
 
+type Metadata = {
+  duration?: number
+  height?: number
+  width?: number
+}
+
 const registerFfmpegHandlers = () => {
   // @see https://stackoverflow.com/q/63106834
   ffmpeg.setFfmpegPath(
@@ -21,13 +27,18 @@ const registerFfmpegHandlers = () => {
 
   ipcMain.handle(
     'ffmpeg-metadata',
-    async (_event: IpcMainInvokeEvent, path: string) => {
+    async (_event: IpcMainInvokeEvent, path: string): Promise<Metadata> => {
       const metadata = await new Promise((resolve, reject) => {
         ffmpeg.ffprobe(path, (err, metadata) => {
           err ? reject(err) : resolve(metadata)
         })
       })
-      return metadata
+      return {
+        // TODO: fix any type
+        duration: (metadata as any)?.format?.duration,
+        height: (metadata as any)?.streams[0]?.height,
+        width: (metadata as any)?.streams[0]?.width,
+      }
     }
   )
   ipcMain.handle(
