@@ -15,9 +15,9 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   Close as CloseIcon,
   Folder as FolderIcon,
+  MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
   Search as SearchIcon,
-  Settings as SettingsIcon,
   Sort as SortIcon,
   ViewList as ViewListIcon,
   ViewModule as ViewModuleIcon,
@@ -60,6 +60,7 @@ import {
   sort,
   unselectAll,
 } from 'store/window'
+import { contextMenuProps, openCM } from 'utils/contextMenu'
 
 const sortOptions = [
   { text: 'Name Ascending', value: 'name-asc' },
@@ -348,12 +349,13 @@ const ExplorerBar = () => {
           </Box>
         </Box>
         <IconButton
+          {...contextMenuProps([{ id: 'settings' }])}
           color="inherit"
-          onClick={handleClickSettings}
+          onMouseUp={openCM}
           size="small"
           title="Settings"
         >
-          <SettingsIcon fontSize="small" />
+          <MoreVertIcon fontSize="small" />
         </IconButton>
       </Toolbar>
       <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>

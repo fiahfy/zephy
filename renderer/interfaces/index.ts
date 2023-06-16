@@ -62,6 +62,7 @@ export type DetailedEntry = Entry & {
   dateCreated: number
   dateModified: number
   dateLastOpened: number
+  size: number
 }
 export type Content = DetailedEntry & { rating: number }
 

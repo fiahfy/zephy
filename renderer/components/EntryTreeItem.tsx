@@ -87,7 +87,6 @@ const EntryTreeItem = (props: Props) => {
           sx={{
             alignItems: 'center',
             display: 'flex',
-            py: 0.75,
             userSelect: 'none',
           }}
         >

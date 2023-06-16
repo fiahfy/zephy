@@ -9,8 +9,7 @@ import contextMenu from 'electron-context-menu'
 
 type ContextMenuItem = {
   id: string
-  enabled: boolean
-  path: string
+  path?: string
 }
 
 type ContextMenu = ContextMenuItem | { type: string }
@@ -33,7 +32,7 @@ const registerContextMenu = () => {
         [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
       } = {
         open: (params) => ({
-          click: () => shell.openPath(params.path),
+          click: () => shell.openPath(params.path ?? ''),
           label: 'Open',
         }),
         openDirectory: (params) => ({
@@ -41,7 +40,7 @@ const registerContextMenu = () => {
           label: 'Open',
         }),
         revealInFinder: (params) => ({
-          click: () => shell.showItemInFolder(params.path),
+          click: () => shell.showItemInFolder(params.path ?? ''),
           label: 'Reveal in Finder',
         }),
         newFolder: (params) => ({
@@ -50,7 +49,7 @@ const registerContextMenu = () => {
           label: 'New Folder',
         }),
         copyPath: (params) => ({
-          click: () => clipboard.writeText(params.path),
+          click: () => clipboard.writeText(params.path ?? ''),
           label: 'Copy Path',
         }),
         moveToTrash: (params) => ({
@@ -68,6 +67,10 @@ const registerContextMenu = () => {
             send('subscription-entry', params.path, 'removeFromFavorites'),
           label: 'Remove from Favorites',
         }),
+        settings: () => ({
+          click: () => send('subscription-settings'),
+          label: 'Settings',
+        }),
       }
 
       return [
@@ -83,7 +86,7 @@ const registerContextMenu = () => {
             return params
           }
           const creator = actions[params.id]
-          return creator ? { ...params, ...creator(params) } : []
+          return creator ? creator(params) : []
         }),
       ] as MenuItemConstructorOptions[]
     },

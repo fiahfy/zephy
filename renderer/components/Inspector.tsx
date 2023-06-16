@@ -6,31 +6,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import { format } from 'date-fns'
 import { Metadata } from 'interfaces'
 import { useEffect, useState } from 'react'
 import { useAppSelector } from 'store'
 import { selectSelectedContents } from 'store/window'
-
-const formatTime = (sec: number) => {
-  const hours = Math.floor(sec / 3600)
-  const minutes = Math.floor((sec % 3600) / 60)
-  const seconds = Math.round(sec % 60)
-
-  const hh = hours > 0 ? String(hours).padStart(2, '0') : ''
-  const mm = String(minutes).padStart(2, '0')
-  const ss = String(seconds).padStart(2, '0')
-
-  let result = ''
-
-  if (hh) {
-    result += `${hh}:`
-  }
-
-  result += `${mm}:${ss}`
-
-  return result
-}
+import { formatDate, formatTime } from 'utils/entry'
 
 const Inspector = () => {
   const [content] = useAppSelector(selectSelectedContents)
@@ -43,7 +23,6 @@ const Inspector = () => {
         return setMetadata(undefined)
       }
       const metadata = await window.electronAPI.ffmpeg.metadata(content.path)
-      console.log(metadata)
       setMetadata(metadata)
     })()
   }, [content])
@@ -52,15 +31,15 @@ const Inspector = () => {
     ? [
         {
           label: 'Date Created',
-          value: format(content.dateCreated, 'PP HH:mm'),
+          value: formatDate(content.dateCreated),
         },
         {
           label: 'Date Modified',
-          value: format(content.dateModified, 'PP HH:mm'),
+          value: formatDate(content.dateModified),
         },
         {
           label: 'Date Last Opened',
-          value: format(content.dateLastOpened, 'PP HH:mm'),
+          value: formatDate(content.dateLastOpened),
         },
         ...(metadata
           ? [
@@ -97,12 +76,12 @@ const Inspector = () => {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.label}>
-              <TableCell component="th">
+              <TableCell component="th" sx={{ height: 20, py: 0 }}>
                 <Typography noWrap variant="caption">
                   {row.label}
                 </Typography>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{ height: 20, py: 0 }}>
                 <Typography noWrap variant="caption">
                   {row.value}
                 </Typography>

@@ -3,8 +3,7 @@ import { MouseEvent } from 'react'
 type ContextMenu =
   | {
       id: string
-      enabled: boolean
-      path: string
+      path?: string
     }
   | { type: string }
 
@@ -22,18 +21,15 @@ export const entryContextMenuProps = (
   return contextMenuProps([
     {
       id: directory ? 'openDirectory' : 'open',
-      enabled: true,
       path,
     },
     {
       id: 'revealInFinder',
-      enabled: true,
       path,
     },
     { type: 'separator' },
     {
       id: 'copyPath',
-      enabled: true,
       path,
     },
     { type: 'separator' },
@@ -41,7 +37,6 @@ export const entryContextMenuProps = (
       ? [
           {
             id: favorite ? 'removeFromFavorites' : 'addToFavorites',
-            enabled: true,
             path,
           },
         ]
@@ -49,7 +44,6 @@ export const entryContextMenuProps = (
     { type: 'separator' },
     {
       id: 'moveToTrash',
-      enabled: true,
       path,
     },
   ])
@@ -59,7 +53,6 @@ export const directoryContextMenuProps = (path: string) => {
   return contextMenuProps([
     {
       id: 'newFolder',
-      enabled: true,
       path,
     },
     { type: 'separator' },
@@ -75,7 +68,18 @@ const getContextMenus = (e: HTMLElement): string | undefined => {
   return parent ? getContextMenus(parent) : undefined
 }
 
-export const openContextMenu = async (e: MouseEvent<HTMLDivElement>) => {
+export const openContextMenu = async (e: MouseEvent<HTMLElement>) => {
   const params = getContextMenus(e.target as HTMLElement)
   await window.electronAPI.contextMenu.send(params)
+}
+
+export const openCM = () => {
+  // TODO: Fix this
+  const contextMenuEvent = new window.MouseEvent('contextmenu', {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+  })
+  window.dispatchEvent(contextMenuEvent)
+  console.log('openCM')
 }

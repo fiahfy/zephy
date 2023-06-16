@@ -30,14 +30,16 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
 import { entryContextMenuProps } from 'utils/contextMenu'
+import { formatDate, formatFileSize } from 'utils/entry'
 
-const headerHeight = 32
-const rowHeight = 32
+const headerHeight = 30
+const rowHeight = 20
 
-type Key = 'name' | 'rating' | 'dateModified'
+type Key = keyof Content
 type Order = 'asc' | 'desc'
 
 type ColumnType = {
+  align: 'left' | 'right'
   defaultOrder?: Order
   key: Key
   label: string
@@ -46,20 +48,30 @@ type ColumnType = {
 
 const columns: ColumnType[] = [
   {
+    align: 'left',
     key: 'name',
     label: 'Name',
   },
   {
+    align: 'left',
     defaultOrder: 'desc',
     key: 'rating',
     label: 'Rating',
-    width: 128,
+    width: 110,
   },
   {
+    align: 'right',
+    defaultOrder: 'desc',
+    key: 'size',
+    label: 'Size',
+    width: 90,
+  },
+  {
+    align: 'left',
     defaultOrder: 'desc',
     key: 'dateModified',
     label: 'Date Modified',
-    width: 160,
+    width: 130,
   },
 ]
 
@@ -128,7 +140,8 @@ const ExplorerTable = (props: Props) => {
       (carry, width) => carry + (width ?? 0),
       0
     )
-    const flexibleWidth = (wrapperWidth - sumWidth) / flexibleNum
+    // 10px is custom scrollbar width
+    const flexibleWidth = (wrapperWidth - sumWidth - 10) / flexibleNum
     return widths.map((width) => (width === undefined ? flexibleWidth : width))
   }, [])
 
@@ -184,6 +197,7 @@ const ExplorerTable = (props: Props) => {
           borderBottom: 'none',
           display: 'flex',
           height: headerHeight,
+          px: 1,
           py: 0,
         }}
         variant="head"
@@ -216,6 +230,7 @@ const ExplorerTable = (props: Props) => {
   }
 
   const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
+    const align = columns.find((column) => column.key === dataKey)?.align
     return (
       <TableCell
         {...entryContextMenuProps(
@@ -223,12 +238,14 @@ const ExplorerTable = (props: Props) => {
           rowData.type === 'directory',
           isFavorite(rowData.path)
         )}
+        align={align}
         component="div"
         sx={{
           alignItems: 'center',
           borderBottom: 'none',
           display: 'flex',
           height: rowHeight,
+          px: 1,
           py: 0,
         }}
         variant="body"
@@ -266,9 +283,14 @@ const ExplorerTable = (props: Props) => {
                   />
                 </Box>
               ),
+              size: (
+                <Typography noWrap variant="caption">
+                  {rowData.type === 'file' && formatFileSize(rowData.size)}
+                </Typography>
+              ),
               dateModified: (
                 <Typography noWrap variant="caption">
-                  {format(rowData.dateModified, 'PP HH:mm')}
+                  {formatDate(rowData.dateModified)}
                 </Typography>
               ),
             }[dataKey]

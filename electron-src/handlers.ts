@@ -26,6 +26,7 @@ type DetailedEntry = Entry & {
   dateCreated: number
   dateModified: number
   dateLastOpened: number
+  size: number
 }
 
 const getEntryType = (obj: Dirent | Stats) => {
@@ -48,6 +49,7 @@ const listDetailedEntries = async (path: string): Promise<DetailedEntry[]> => {
         dateCreated: stats.birthtimeMs,
         dateModified: stats.mtimeMs,
         dateLastOpened: stats.atimeMs,
+        size: stats.size,
       }
     })
   )
@@ -116,7 +118,11 @@ export const addHandlers = () => {
                 : undefined,
             entry
           )
-        if (targetEntry && targetEntry.type === 'directory') {
+        if (
+          targetEntry &&
+          targetEntry.type === 'directory' &&
+          i < dirnames.length - 1
+        ) {
           const path = dirnames.slice(0, i + 1).join(sep)
           targetEntry.children = await listEntries(path)
         }
