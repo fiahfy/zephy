@@ -41,6 +41,11 @@ export interface IElectronAPI {
     fullscreen: (callback: (fullscreen: boolean) => void) => () => void
     search: (callback: () => void) => () => void
     settings: (callback: () => void) => () => void
+    sidebarHidden: (
+      callback: (variant: 'primary' | 'secondary', hidden: boolean) => void
+    ) => () => void
+    sort: (callback: (orderBy: keyof Content) => void) => () => void
+    viewMode: (callback: (viewMode: 'list' | 'thumbnail') => void) => () => void
   }
 }
 
@@ -50,12 +55,11 @@ export type ContextMenuParams = {
   x: number
   y: number
 }
-export type ContextMenuOption =
-  | {
-      id: string
-      path?: string
-    }
-  | { type: string }
+export type ContextMenuOption = {
+  id: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value?: any
+}
 
 export type Settings = {
   darkMode: boolean

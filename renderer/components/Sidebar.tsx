@@ -90,7 +90,7 @@ const Sidebar = (props: Props) => {
       <Toolbar
         sx={{
           flexShrink: 0,
-          minHeight: '65px!important',
+          minHeight: '33px!important',
         }}
       />
       <Box

@@ -5,8 +5,6 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  MenuItem,
-  ToggleButton,
   Toolbar,
 } from '@mui/material'
 import {
@@ -18,15 +16,10 @@ import {
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
   Search as SearchIcon,
-  Sort as SortIcon,
-  ViewList as ViewListIcon,
-  ViewModule as ViewModuleIcon,
-  Visibility as VisibilityIcon,
 } from '@mui/icons-material'
 import {
   ChangeEvent,
   KeyboardEvent,
-  MouseEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -34,8 +27,8 @@ import {
   useState,
 } from 'react'
 import Icon from 'components/Icon'
-import FilledToggleButtonGroup from 'components/enhanced/FilledToggleButtonGroup'
 import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
+import { useContextMenu } from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
@@ -45,44 +38,24 @@ import {
   load,
   move,
   moveToHome,
-  moveToSettings,
   searchQuery,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-  selectCurrentSortOption,
   selectIndexPage,
-  selectIsSidebarHidden,
-  selectLayout,
-  selectSettingsPage,
-  setLayout,
-  setSidebarHidden,
-  sort,
   unselectAll,
 } from 'store/window'
-import { openContextMenu } from 'utils/contextMenu'
-
-const sortOptions = [
-  { text: 'Name Ascending', value: 'name-asc' },
-  { text: 'Name Descending', value: 'name-desc' },
-  { text: 'Rating Ascending', value: 'rating-asc' },
-  { text: 'Rating Descending', value: 'rating-desc' },
-  { text: 'Date Modified Ascending', value: 'dateModified-asc' },
-  { text: 'Date Modified Descending', value: 'dateModified-desc' },
-]
 
 const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const currentSortOption = useAppSelector(selectCurrentSortOption)
   const indexPage = useAppSelector(selectIndexPage)
-  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
-  const layout = useAppSelector(selectLayout)
   const queryHistories = useAppSelector(selectQueryHistories)
-  const settingsPage = useAppSelector(selectSettingsPage)
   const dispatch = useAppDispatch()
+
+  const { openMore } = useContextMenu()
 
   const [directory, setDirectory] = useState('')
   const [queryInput, setQueryInput] = useState('')
@@ -152,9 +125,6 @@ const ExplorerBar = () => {
     dispatch(load())
   }
 
-  const handleClickSettings = () =>
-    settingsPage ? dispatch(back()) : dispatch(moveToSettings())
-
   const handleClickFolder = async () =>
     await window.electronAPI.openPath(currentDirectory)
 
@@ -166,29 +136,6 @@ const ExplorerBar = () => {
   const handleChangeDirectory = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value
     setDirectory(value)
-  }
-
-  const handleChangeViewNavigator = (
-    _e: MouseEvent<HTMLElement>,
-    value: 'navigator'[]
-  ) => dispatch(setSidebarHidden('primary', !value.includes('navigator')))
-
-  const handleChangeViewInspector = (
-    _e: MouseEvent<HTMLElement>,
-    value: 'inspector'[]
-  ) => dispatch(setSidebarHidden('secondary', !value.includes('inspector')))
-
-  const handleChangeLayout = (
-    _e: MouseEvent<HTMLElement>,
-    value: 'list' | 'thumbnail'
-  ) => dispatch(setLayout(value))
-
-  const handleChangeSortOption = (e: ChangeEvent<HTMLInputElement>) => {
-    const [orderBy, order] = e.target.value.split('-') as [
-      'name' | 'rating' | 'dateModified',
-      'asc' | 'desc'
-    ]
-    dispatch(sort(currentDirectory, { orderBy, order }))
   }
 
   const handleChangeQuery = (_e: SyntheticEvent, value: string | null) =>
@@ -350,83 +297,12 @@ const ExplorerBar = () => {
         </Box>
         <IconButton
           color="inherit"
-          onClick={openContextMenu([{ id: 'settings' }])}
+          onClick={openMore()}
           size="small"
           title="Settings"
         >
           <MoreVertIcon fontSize="small" />
         </IconButton>
-      </Toolbar>
-      <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>
-        <FilledToggleButtonGroup
-          onChange={handleChangeViewNavigator}
-          size="small"
-          value={isSidebarHidden('primary') ? [] : ['navigator']}
-        >
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Toggle Navigator"
-            value="navigator"
-          >
-            <FolderIcon fontSize="small" />
-          </ToggleButton>
-        </FilledToggleButtonGroup>
-        <FilledToggleButtonGroup
-          onChange={handleChangeViewInspector}
-          size="small"
-          value={isSidebarHidden('secondary') ? [] : ['inspector']}
-        >
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Toggle Inspector"
-            value="inspector"
-          >
-            <VisibilityIcon fontSize="small" />
-          </ToggleButton>
-        </FilledToggleButtonGroup>
-        <Box style={{ flexGrow: 1 }} />
-        <FilledToggleButtonGroup
-          exclusive
-          onChange={handleChangeLayout}
-          size="small"
-          sx={{ mr: 1 }}
-          value={layout}
-        >
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="List View"
-            value="list"
-          >
-            <ViewListIcon fontSize="small" />
-          </ToggleButton>
-          <ToggleButton
-            sx={{ height: (theme) => theme.spacing(3.5), py: 0 }}
-            title="Thumbnail View"
-            value="thumbnail"
-          >
-            <ViewModuleIcon fontSize="small" />
-          </ToggleButton>
-        </FilledToggleButtonGroup>
-        <RoundedFilledTextField
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SortIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-          hiddenLabel
-          onChange={handleChangeSortOption}
-          select
-          size="small"
-          value={`${currentSortOption.orderBy}-${currentSortOption.order}`}
-        >
-          {sortOptions.map((option, index) => (
-            <MenuItem dense key={index} value={option.value}>
-              {option.text}
-            </MenuItem>
-          ))}
-        </RoundedFilledTextField>
       </Toolbar>
       <Divider />
     </AppBar>

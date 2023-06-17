@@ -6,7 +6,6 @@ import {
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { format } from 'date-fns'
 import {
   FocusEvent,
   KeyboardEvent,
@@ -24,12 +23,12 @@ import {
 } from 'react-virtualized'
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
+import { useContextMenu } from 'hooks/useContextMenu'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
-import { openEntryContextMenu } from 'utils/contextMenu'
+import { defaultOrders } from 'store/window'
 import { formatDate, formatFileSize } from 'utils/entry'
 
 const headerHeight = 30
@@ -40,7 +39,6 @@ type Order = 'asc' | 'desc'
 
 type ColumnType = {
   align: 'left' | 'right'
-  defaultOrder?: Order
   key: Key
   label: string
   width?: number
@@ -54,21 +52,18 @@ const columns: ColumnType[] = [
   },
   {
     align: 'left',
-    defaultOrder: 'desc',
     key: 'rating',
     label: 'Rating',
     width: 110,
   },
   {
     align: 'right',
-    defaultOrder: 'desc',
     key: 'size',
     label: 'Size',
     width: 90,
   },
   {
     align: 'left',
-    defaultOrder: 'desc',
     key: 'dateModified',
     label: 'Date Modified',
     width: 130,
@@ -105,11 +100,12 @@ const ExplorerTable = (props: Props) => {
   } = props
 
   const getRating = useAppSelector(selectGetRating)
-  const isFavorite = useAppSelector(selectIsFavorite)
   const dispatch = useAppDispatch()
 
-  const ref = useRef<HTMLDivElement>(null)
+  const { openEntry } = useContextMenu()
   const previousLoading = usePrevious(loading)
+
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const el = ref.current?.querySelector('.ReactVirtualized__Grid')
@@ -207,8 +203,7 @@ const ExplorerTable = (props: Props) => {
           direction={sortOption.orderBy === dataKey ? sortOption.order : 'asc'}
           onClick={() => {
             const defaultOrder =
-              columns.find((column) => column.key === dataKey)?.defaultOrder ??
-              'asc'
+              defaultOrders[dataKey as keyof typeof defaultOrders] ?? 'asc'
             const reverseSign =
               sortOption.orderBy === dataKey &&
               sortOption.order === defaultOrder
@@ -235,11 +230,7 @@ const ExplorerTable = (props: Props) => {
       <TableCell
         align={align}
         component="div"
-        onContextMenu={openEntryContextMenu(
-          rowData.path,
-          rowData.type === 'directory',
-          isFavorite(rowData.path)
-        )}
+        onContextMenu={openEntry(rowData.path, rowData.type === 'directory')}
         sx={{
           alignItems: 'center',
           borderBottom: 'none',

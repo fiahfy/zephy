@@ -63,5 +63,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('subscription-settings', cb)
       return () => ipcRenderer.removeListener('subscription-settings', cb)
     },
+    sidebarHidden: (
+      callback: (variant: 'primary' | 'secondary', hidden: boolean) => void
+    ) => {
+      const cb = (
+        _e: IpcRendererEvent,
+        variant: 'primary' | 'secondary',
+        hidden: boolean
+      ) => callback(variant, hidden)
+      ipcRenderer.on('subscription-sidebar-hidden', cb)
+      return () => ipcRenderer.removeListener('subscription-sidebar-hidden', cb)
+    },
+    sort: (callback: (orderBy: string) => void) => {
+      const cb = (_e: IpcRendererEvent, orderBy: string) => callback(orderBy)
+      ipcRenderer.on('subscription-sort', cb)
+      return () => ipcRenderer.removeListener('subscription-sort', cb)
+    },
+    viewMode: (callback: (viewMode: string) => void) => {
+      const cb = (_e: IpcRendererEvent, viewMode: string) => callback(viewMode)
+      ipcRenderer.on('subscription-view-mode', cb)
+      return () => ipcRenderer.removeListener('subscription-view-mode', cb)
+    },
   },
 })

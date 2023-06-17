@@ -14,12 +14,11 @@ export type ContextMenuParams = {
   x: number
   y: number
 }
-export type ContextMenuOption =
-  | {
-      id: string
-      path?: string
-    }
-  | { type: string }
+export type ContextMenuOption = {
+  id: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value?: any
+}
 
 const registerContextMenu = () => {
   ipcMain.handle(
@@ -32,64 +31,8 @@ const registerContextMenu = () => {
       const send = (channel: string, ...args: unknown[]) =>
         event.sender.send(channel, ...args)
 
-      const actionCreators: {
-        [id in string]: (option: {
-          id: string
-          path?: string
-        }) => MenuItemConstructorOptions
-      } = {
-        open: (option) => ({
-          click: () => shell.openPath(option.path ?? ''),
-          label: 'Open',
-        }),
-        openDirectory: (option) => ({
-          click: () => send('subscription-entry', option.path, 'move'),
-          label: 'Open',
-        }),
-        revealInFinder: (option) => ({
-          click: () => shell.showItemInFolder(option.path ?? ''),
-          label: 'Reveal in Finder',
-        }),
-        newFolder: (option) => ({
-          click: async () =>
-            send('subscription-entry', option.path, 'newFolder'),
-          label: 'New Folder',
-        }),
-        copyPath: (option) => ({
-          click: () => clipboard.writeText(option.path ?? ''),
-          label: 'Copy Path',
-        }),
-        moveToTrash: (option) => ({
-          click: async () =>
-            send('subscription-entry', option.path, 'moveToTrash'),
-          label: 'Move to Trash',
-        }),
-        addToFavorites: (option) => ({
-          click: () =>
-            send('subscription-entry', option.path, 'addToFavorites'),
-          label: 'Add to Favorites',
-        }),
-        removeFromFavorites: (option) => ({
-          click: () =>
-            send('subscription-entry', option.path, 'removeFromFavorites'),
-          label: 'Remove from Favorites',
-        }),
-        settings: () => ({
-          click: () => send('subscription-settings'),
-          label: 'Settings',
-        }),
-      }
-
-      const actions = options.flatMap((option) => {
-        if ('type' in option) {
-          return option
-        }
-        const creator = actionCreators[option.id]
-        return creator ? creator(option) : []
-      })
-
       const defaultActions = {
-        separator: { type: 'separator' },
+        separator: { type: 'separator' as const },
         cut: params.isEditable && { role: 'cut' },
         copy: (params.isEditable || params.selectionText.length > 0) && {
           role: 'copy',
@@ -114,6 +57,98 @@ const registerContextMenu = () => {
           visible: params.selectionText.trim().length > 0,
         },
       }
+
+      const actionCreators: {
+        [id in string]: (
+          option: ContextMenuOption
+        ) => MenuItemConstructorOptions
+      } = {
+        separator: () => defaultActions.separator,
+        open: (option) => ({
+          click: () => shell.openPath(option.value),
+          label: 'Open',
+        }),
+        openDirectory: (option) => ({
+          click: () => send('subscription-entry', option.value, 'move'),
+          label: 'Open',
+        }),
+        revealInFinder: (option) => ({
+          click: () => shell.showItemInFolder(option.value),
+          label: 'Reveal in Finder',
+        }),
+        newFolder: (option) => ({
+          click: async () =>
+            send('subscription-entry', option.value, 'newFolder'),
+          label: 'New Folder',
+        }),
+        copyPath: (option) => ({
+          click: () => clipboard.writeText(option.value),
+          label: 'Copy Path',
+        }),
+        moveToTrash: (option) => ({
+          click: async () =>
+            send('subscription-entry', option.value, 'moveToTrash'),
+          label: 'Move to Trash',
+        }),
+        toggleFavorite: (option) => ({
+          click: () =>
+            send(
+              'subscription-entry',
+              option.value.path,
+              option.value.favorite ? 'removeFromFavorites' : 'addToFavorites'
+            ),
+          label: option.value.favorite
+            ? 'Remove from Favorites'
+            : 'Add to Favorites',
+        }),
+        settings: () => ({
+          click: () => send('subscription-settings'),
+          label: 'Settings',
+        }),
+        sortBy: (option) => ({
+          label: 'Sort By',
+          submenu: [
+            { label: 'Name', key: 'name' },
+            { label: 'Date Last Opened', key: 'dateLastOpened' },
+            { label: 'Date Modified', key: 'dateModified' },
+            { label: 'Date Created', key: 'dateCreated' },
+            { label: 'Size', key: 'size' },
+            { label: 'Rating', key: 'rating' },
+          ].map((menu) => ({
+            ...menu,
+            checked: menu.key === option.value,
+            click: () => send('subscription-sort', menu.key),
+            type: 'checkbox',
+          })),
+        }),
+        asList: (option) => ({
+          label: 'as List',
+          checked: option.value,
+          click: () => send('subscription-view-mode', 'list'),
+          type: 'checkbox',
+        }),
+        asThumbnail: (option) => ({
+          label: 'as Thumbnail',
+          checked: option.value,
+          click: () => send('subscription-view-mode', 'thumbnail'),
+          type: 'checkbox',
+        }),
+        toggleNavigator: (option) => ({
+          label: option.value ? 'Show Navigator' : 'Hide Navigator',
+          click: () =>
+            send('subscription-sidebar-hidden', 'primary', !option.value),
+        }),
+        toggleInspector: (option) => ({
+          label: option.value ? 'Show Inspector' : 'Hide Inspector',
+          click: () =>
+            send('subscription-inspector-hidden', 'secondary', !option.value),
+        }),
+      }
+
+      const actions = options.flatMap((option) => {
+        const creator = actionCreators[option.id]
+        return creator ? creator(option) : []
+      })
 
       const template = [
         defaultActions.search,

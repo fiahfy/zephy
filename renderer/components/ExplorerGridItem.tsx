@@ -4,12 +4,11 @@ import fileUrl from 'file-url'
 import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
+import { useContextMenu } from 'hooks/useContextMenu'
 import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { openEntryContextMenu } from 'utils/contextMenu'
 import { isHiddenFile, isImageFile, isVideoFile } from 'utils/entry'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
@@ -62,9 +61,10 @@ const ExplorerGridItem = (props: Props) => {
   const { columnIndex, content, onClick, onDoubleClick, rowIndex, selected } =
     props
 
-  const favorite = useAppSelector(selectIsFavorite)(content.path)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
+
+  const { openEntry } = useContextMenu()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -119,11 +119,7 @@ const ExplorerGridItem = (props: Props) => {
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
-      onContextMenu={openEntryContextMenu(
-        content.path,
-        content.type === 'directory',
-        favorite
-      )}
+      onContextMenu={openEntry(content.path, content.type === 'directory')}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',

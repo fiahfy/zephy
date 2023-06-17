@@ -5,6 +5,7 @@ import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import TitleBar from 'components/TitleBar'
+import { useContextMenu } from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
 import {
@@ -14,8 +15,10 @@ import {
   moveToSettings,
   moveToTrash,
   selectCurrentPathname,
+  setSidebarHidden,
+  setViewMode,
+  sort,
 } from 'store/window'
-import { openContextMenu } from 'utils/contextMenu'
 import Sidebar from './Sidebar'
 
 type Props = {
@@ -27,6 +30,9 @@ const Layout = (props: Props) => {
 
   const currentPathname = useAppSelector(selectCurrentPathname)
   const dispatch = useAppDispatch()
+
+  const { open } = useContextMenu()
+
   const router = useRouter()
 
   useEffect(() => {
@@ -56,6 +62,17 @@ const Layout = (props: Props) => {
     const unsubscribeSettings = window.electronAPI.subscription.settings(() =>
       dispatch(moveToSettings())
     )
+    const unsubscribeSidebarHidden =
+      window.electronAPI.subscription.sidebarHidden(
+        (variant: 'primary' | 'secondary', hidden: boolean) =>
+          dispatch(setSidebarHidden(variant, hidden))
+      )
+    const unsubscribeSort = window.electronAPI.subscription.sort((orderBy) =>
+      dispatch(sort(orderBy))
+    )
+    const unsubscribeViewMode = window.electronAPI.subscription.viewMode(
+      (viewMode) => dispatch(setViewMode(viewMode))
+    )
 
     const handleMouseDown = (e: globalThis.MouseEvent) => {
       switch (e.button) {
@@ -71,12 +88,15 @@ const Layout = (props: Props) => {
       document.removeEventListener('mousedown', handleMouseDown)
       unsubscribeEntry()
       unsubscribeSettings()
+      unsubscribeSidebarHidden()
+      unsubscribeSort()
+      unsubscribeViewMode()
     }
   }, [dispatch])
 
   return (
     <Box
-      onContextMenu={openContextMenu()}
+      onContextMenu={open()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}
@@ -111,7 +131,7 @@ const Layout = (props: Props) => {
         <Toolbar
           sx={{
             flexShrink: 0,
-            minHeight: '65px!important',
+            minHeight: '33px!important',
           }}
         />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>

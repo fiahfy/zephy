@@ -9,26 +9,23 @@ import {
   scroll,
   select,
   selectContents,
-  selectCurrentDirectory,
   selectCurrentScrollTop,
   selectCurrentSortOption,
   selectIsSelected,
-  selectLayout,
   selectLoading,
   selectSelectedContents,
+  selectViewMode,
   sort,
 } from 'store/window'
-import { openDirectoryContextMenu } from 'utils/contextMenu'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const isSelected = useAppSelector(selectIsSelected)
-  const layout = useAppSelector(selectLayout)
   const loading = useAppSelector(selectLoading)
   const selectedContents = useAppSelector(selectSelectedContents)
+  const viewMode = useAppSelector(selectViewMode)
   const dispatch = useAppDispatch()
 
   const isContentSelected = (content: Content) => isSelected(content.path)
@@ -36,9 +33,7 @@ const IndexPage = () => {
   const handleChangeSortOption = (sortOption: {
     order: 'asc' | 'desc'
     orderBy: keyof Content
-  }) => {
-    dispatch(sort(currentDirectory, sortOption))
-  }
+  }) => dispatch(sort(sortOption.orderBy, sortOption.order))
 
   const handleClickContent = (content: Content) =>
     dispatch(select(content.path))
@@ -70,11 +65,8 @@ const IndexPage = () => {
   }
 
   return (
-    <Box
-      onContextMenu={openDirectoryContextMenu(currentDirectory)}
-      sx={{ height: '100%' }}
-    >
-      {createElement(layout === 'list' ? ExplorerTable : ExplorerGrid, {
+    <Box sx={{ height: '100%' }}>
+      {createElement(viewMode === 'list' ? ExplorerTable : ExplorerGrid, {
         contentSelected: isContentSelected,
         contents,
         loading,

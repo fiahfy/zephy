@@ -15,58 +15,6 @@ export const openContextMenu = (options?: ContextMenuOption[]) => {
 
     const params = { isEditable, selectionText, x, y }
 
-    console.log(params)
-
     await window.electronAPI.contextMenu.show(params, options ?? [])
   }
-}
-
-export const openEntryContextMenu = (
-  path: string,
-  directory: boolean,
-  favorite: boolean
-) => {
-  const options = [
-    {
-      id: directory ? 'openDirectory' : 'open',
-      path,
-    },
-    {
-      id: 'revealInFinder',
-      path,
-    },
-    { type: 'separator' },
-    {
-      id: 'copyPath',
-      path,
-    },
-    { type: 'separator' },
-    ...(directory
-      ? [
-          {
-            id: favorite ? 'removeFromFavorites' : 'addToFavorites',
-            path,
-          },
-        ]
-      : []),
-    { type: 'separator' },
-    {
-      id: 'moveToTrash',
-      path,
-    },
-  ]
-
-  return openContextMenu(options)
-}
-
-export const openDirectoryContextMenu = (path: string) => {
-  const options = [
-    {
-      id: 'newFolder',
-      path,
-    },
-    { type: 'separator' },
-  ]
-
-  return openContextMenu(options)
 }
