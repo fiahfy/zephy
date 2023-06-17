@@ -51,6 +51,7 @@ export const useContextMenu = () => {
   const openMore = () =>
     openContextMenu([
       { id: 'newFolder', value: currentDirectory },
+      { id: 'revealInFinder', value: currentDirectory },
       { id: 'separator' },
       { id: 'asList', value: viewMode === 'list' },
       { id: 'asThumbnail', value: viewMode === 'thumbnail' },

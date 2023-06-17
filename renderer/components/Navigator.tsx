@@ -9,8 +9,10 @@ const Navigator = () => (
       overflowY: 'auto',
     }}
   >
-    <FavoriteTreeView />
-    <ExplorerTreeView />
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, py: 1 }}>
+      <FavoriteTreeView />
+      <ExplorerTreeView />
+    </Box>
   </Box>
 )
 

@@ -47,7 +47,11 @@ const SettingsPage = () => {
           <FormGroup>
             <FormControlLabel
               control={
-                <Checkbox checked={darkMode} onChange={handleChangeDarkMode} />
+                <Checkbox
+                  checked={darkMode}
+                  onChange={handleChangeDarkMode}
+                  size="small"
+                />
               }
               label="Use Dark Mode"
             />
@@ -61,6 +65,7 @@ const SettingsPage = () => {
                 <Checkbox
                   checked={shouldShowHiddenFiles}
                   onChange={handleShouldShowHiddenFiles}
+                  size="small"
                 />
               }
               label="Show Hidden Files"

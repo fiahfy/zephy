@@ -163,7 +163,7 @@ const ExplorerBar = () => {
       elevation={0}
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
-      <Toolbar disableGutters sx={{ minHeight: '32px!important', px: 1 }}>
+      <Toolbar disableGutters sx={{ minHeight: '34px!important', px: 1 }}>
         <IconButton
           color="inherit"
           disabled={!canBack}
