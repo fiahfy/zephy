@@ -58,6 +58,11 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
       })}
       onMouseDown={handleMouseDown}
       ref={ref as Ref<HTMLDivElement>}
+      sx={{
+        '&.Mui-focused': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
+      }}
     >
       <Box className={classes.iconContainer} onClick={handleExpansionClick}>
         {icon}

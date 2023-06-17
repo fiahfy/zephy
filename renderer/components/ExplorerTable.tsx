@@ -31,7 +31,7 @@ import { rate, selectGetRating } from 'store/rating'
 import { defaultOrders } from 'store/window'
 import { formatDate, formatFileSize } from 'utils/entry'
 
-const headerHeight = 30
+const headerHeight = 32
 const rowHeight = 20
 
 type Key = keyof Content
@@ -239,7 +239,6 @@ const ExplorerTable = (props: Props) => {
           px: 1,
           py: 0,
         }}
-        variant="body"
       >
         <Box
           component="span"

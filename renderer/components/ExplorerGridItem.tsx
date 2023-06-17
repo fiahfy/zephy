@@ -9,7 +9,7 @@ import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { isHiddenFile, isImageFile, isVideoFile } from 'utils/entry'
+import { getThumbnail, isHiddenFile } from 'utils/entry'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
@@ -29,22 +29,6 @@ const reducer = (_state: State, action: Action) => {
       }
     case 'loading':
       return { loading: true, paths: [], thumbnail: undefined }
-  }
-}
-
-const getThumbnail = async (paths: string | string[]) => {
-  const path = Array.isArray(paths)
-    ? paths.filter((path) => isImageFile(path) || isVideoFile(path))[0]
-    : paths
-  if (!path) {
-    return undefined
-  }
-  if (isVideoFile(path)) {
-    return await window.electronAPI.ffmpeg.thumbnail(path)
-  } else if (isImageFile(path)) {
-    return path
-  } else {
-    return undefined
   }
 }
 

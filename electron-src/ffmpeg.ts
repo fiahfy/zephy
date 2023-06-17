@@ -48,7 +48,7 @@ const registerFfmpegHandlers = () => {
         crypto.createHash('md5').update(path).digest('hex') + '.png'
       const thumbnailPath = join(thumbnailDir, filename)
       try {
-        await access(path, constants.F_OK)
+        await access(thumbnailPath, constants.F_OK)
       } catch (e) {
         await new Promise<void>((resolve, reject) => {
           ffmpeg(path)

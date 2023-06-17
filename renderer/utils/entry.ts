@@ -1,21 +1,6 @@
 import { format } from 'date-fns'
 import mime from 'mime-types'
 
-export const isImageFile = (path: string) => {
-  const mimeType = mime.lookup(path)
-  return mimeType && mimeType.startsWith('image/')
-}
-
-export const isVideoFile = (path: string) => {
-  const mimeType = mime.lookup(path)
-  return mimeType && mimeType.startsWith('video/')
-}
-
-export const isAudioFile = (path: string) => {
-  const mimeType = mime.lookup(path)
-  return mimeType && mimeType.startsWith('audio/')
-}
-
 export const isHiddenFile = (path: string) => path.startsWith('.')
 
 export const detectFileType = (path: string) => {
@@ -35,7 +20,46 @@ export const detectFileType = (path: string) => {
   }
 }
 
-export const formatFileSize = (bytes: 0) => {
+const isImageFile = (path: string) => detectFileType(path) === 'image'
+const isVideoFile = (path: string) => detectFileType(path) === 'video'
+const isAudioFile = (path: string) => detectFileType(path) === 'audio'
+export const isMediaFile = (path: string) =>
+  isImageFile(path) || isVideoFile(path) || isAudioFile(path)
+
+export const getThumbnail = async (paths: string | string[]) => {
+  const path = Array.isArray(paths)
+    ? paths.filter((path) => isImageFile(path) || isVideoFile(path))[0]
+    : paths
+  if (!path) {
+    return undefined
+  }
+  if (isVideoFile(path)) {
+    try {
+      return await window.electronAPI.ffmpeg.thumbnail(path)
+    } catch (e) {
+      return undefined
+    }
+  } else if (isImageFile(path)) {
+    return path
+  } else {
+    return undefined
+  }
+}
+
+export const getMetadata = async (path: string) => {
+  try {
+    const metadata = await window.electronAPI.ffmpeg.metadata(path)
+    const hasDuration = isVideoFile(path) || isAudioFile(path)
+    return {
+      ...metadata,
+      ...(hasDuration ? {} : { duration: undefined }),
+    }
+  } catch (e) {
+    return undefined
+  }
+}
+
+export const formatFileSize = (bytes: number) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
 
   if (bytes === 0) {

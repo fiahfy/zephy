@@ -1,6 +1,6 @@
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import ExplorerTreeView from 'components/ExplorerTreeView'
-import FavoriteTreeView from 'components/FavoriteTreeView'
+import FavoriteTable from 'components/FavoriteTable'
 
 const Navigator = () => (
   <Box
@@ -9,9 +9,19 @@ const Navigator = () => (
       overflowY: 'auto',
     }}
   >
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, py: 1 }}>
-      <FavoriteTreeView />
-      <ExplorerTreeView />
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Box>
+        <Typography paragraph sx={{ mb: 0, mx: 1 }} variant="overline">
+          Favorites
+        </Typography>
+        <FavoriteTable />
+      </Box>
+      <Box>
+        <Typography paragraph sx={{ mb: 0, mx: 1 }} variant="overline">
+          Explorer
+        </Typography>
+        <ExplorerTreeView />
+      </Box>
     </Box>
   </Box>
 )
