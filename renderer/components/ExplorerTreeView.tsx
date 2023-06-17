@@ -104,6 +104,11 @@ const ExplorerTreeView = () => {
       onNodeSelect={handleSelect}
       onNodeToggle={handleToggle}
       selected={selected}
+      sx={{
+        '&:focus-visible .Mui-focused': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
+      }}
     >
       {entries.map((entry) => (
         <ExplorerTreeItem entry={entry} key={entry.path} />

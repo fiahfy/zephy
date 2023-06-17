@@ -136,40 +136,60 @@ const Inspector = () => {
         </Box>
       )}
       {content && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Box>
-            <Typography paragraph sx={{ mb: 0, mx: 1 }} variant="overline">
-              Preview
-            </Typography>
-            <Box
-              sx={{
-                alignItems: 'center',
-                aspectRatio: '1 / 1',
-                display: 'flex',
-                justifyContent: 'center',
-                maxHeight: 128,
-                userSelect: 'none',
-                width: '100%',
-              }}
-            >
-              {thumbnail ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={fileUrl(thumbnail)} style={{ maxWidth: '100%' }} />
-              ) : (
-                <Typography variant="caption">{message}</Typography>
-              )}
-            </Box>
+        <>
+          <Typography
+            paragraph
+            sx={{
+              background: (theme) => theme.palette.background.default,
+              mb: 0,
+              position: 'sticky',
+              px: 1,
+              top: 0,
+              zIndex: 1,
+            }}
+            variant="overline"
+          >
+            Preview
+          </Typography>
+          <Box
+            sx={{
+              alignItems: 'center',
+              aspectRatio: '1 / 1',
+              display: 'flex',
+              justifyContent: 'center',
+              maxHeight: 128,
+              userSelect: 'none',
+              width: '100%',
+            }}
+          >
+            {thumbnail ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={fileUrl(thumbnail)} style={{ maxWidth: '100%' }} />
+            ) : (
+              <Typography variant="caption">{message}</Typography>
+            )}
+          </Box>
+          <Box
+            sx={{
+              background: (theme) => theme.palette.background.default,
+              position: 'sticky',
+              pt: 1,
+              bottom: 0,
+              zIndex: 1,
+            }}
+          >
             <Typography
               align="center"
               fontWeight="bold"
               paragraph
-              sx={{ mb: 0, mt: 1, mx: 1 }}
+              sx={{
+                mb: 0,
+                mx: 1,
+              }}
               variant="caption"
             >
               {content.name}
             </Typography>
-          </Box>
-          <Box>
             <Typography paragraph sx={{ mb: 0, mx: 1 }} variant="overline">
               Metadata
             </Typography>
@@ -192,7 +212,7 @@ const Inspector = () => {
               </TableBody>
             </Table>
           </Box>
-        </Box>
+        </>
       )}
     </Box>
   )

@@ -11,6 +11,18 @@
 - Light/Dark mode
 - Cross platform support
 
+## TODOs
+
+- [ ] New Folder
+- [ ] Rename Item
+- [ ] Move Item
+- [ ] Copy Item
+- [ ] Sort Favorites
+- [ ] Rating List
+- [ ] Change Thumbnail Size
+- [ ] Video Preview Thumbnails
+- [ ] Folder Preview
+
 ## Screenshots
 
 ![screenshot](.github/img/screenshot1.png)
