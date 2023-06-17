@@ -17,7 +17,10 @@ export interface IElectronAPI {
   openPath: (path: string) => Promise<void>
   trashItem: (path: string) => Promise<void>
   contextMenu: {
-    send: (params?: unknown) => Promise<void>
+    show: (
+      params: ContextMenuParams,
+      options: ContextMenuOption[]
+    ) => Promise<void>
   }
   ffmpeg: {
     thumbnail: (path: string) => Promise<string>
@@ -40,6 +43,19 @@ export interface IElectronAPI {
     settings: (callback: () => void) => () => void
   }
 }
+
+export type ContextMenuParams = {
+  isEditable: boolean
+  selectionText: string
+  x: number
+  y: number
+}
+export type ContextMenuOption =
+  | {
+      id: string
+      path?: string
+    }
+  | { type: string }
 
 export type Settings = {
   darkMode: boolean

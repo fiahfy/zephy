@@ -1,4 +1,4 @@
-import { BoxProps, CircularProgress } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import EntryIcon from 'components/EntryIcon'
 import EntryTreeItem from 'components/EntryTreeItem'
 import Icon from 'components/Icon'
@@ -6,7 +6,7 @@ import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { entryContextMenuProps } from 'utils/contextMenu'
+import { openEntryContextMenu } from 'utils/contextMenu'
 import { isHiddenFile } from 'utils/entry'
 
 const max = 100
@@ -26,13 +26,13 @@ const ExplorerTreeItem = (props: Props) => {
 
   return (
     <EntryTreeItem
-      LabelProps={
-        entryContextMenuProps(
+      LabelProps={{
+        onContextMenu: openEntryContextMenu(
           entry.path,
           entry.type === 'directory',
           favorite
-        ) as BoxProps
-      }
+        ),
+      }}
       icon={<EntryIcon entry={entry} size="small" />}
       label={entry.name}
       nodeId={entry.path}

@@ -1,3 +1,4 @@
+import { Box } from '@mui/material'
 import { createElement } from 'react'
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
@@ -17,8 +18,7 @@ import {
   selectSelectedContents,
   sort,
 } from 'store/window'
-import { Box } from '@mui/material'
-import { directoryContextMenuProps } from 'utils/contextMenu'
+import { openDirectoryContextMenu } from 'utils/contextMenu'
 
 const IndexPage = () => {
   const contents = useAppSelector(selectContents)
@@ -35,7 +35,7 @@ const IndexPage = () => {
 
   const handleChangeSortOption = (sortOption: {
     order: 'asc' | 'desc'
-    orderBy: 'name' | 'rating' | 'dateModified'
+    orderBy: keyof Content
   }) => {
     dispatch(sort(currentDirectory, sortOption))
   }
@@ -71,7 +71,7 @@ const IndexPage = () => {
 
   return (
     <Box
-      {...directoryContextMenuProps(currentDirectory)}
+      onContextMenu={openDirectoryContextMenu(currentDirectory)}
       sx={{ height: '100%' }}
     >
       {createElement(layout === 'list' ? ExplorerTable : ExplorerGrid, {

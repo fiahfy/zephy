@@ -76,7 +76,7 @@ const Layout = (props: Props) => {
 
   return (
     <Box
-      onMouseDown={openContextMenu}
+      onContextMenu={openContextMenu()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}

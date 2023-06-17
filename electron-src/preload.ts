@@ -1,4 +1,5 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import { ContextMenuOption, ContextMenuParams } from './context-menu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   basename: (path: string) => ipcRenderer.invoke('basename', path),
@@ -14,7 +15,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   trashItem: (path: string) => ipcRenderer.invoke('trash-item', path),
   contextMenu: {
-    send: (params?: unknown) => ipcRenderer.invoke('context-menu-send', params),
+    show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
+      ipcRenderer.invoke('context-menu-show', params, options),
   },
   ffmpeg: {
     metadata: (path: string) => ipcRenderer.invoke('ffmpeg-metadata', path),

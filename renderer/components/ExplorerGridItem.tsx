@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { entryContextMenuProps } from 'utils/contextMenu'
+import { openEntryContextMenu } from 'utils/contextMenu'
 import { isHiddenFile, isImageFile, isVideoFile } from 'utils/entry'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
@@ -114,16 +114,16 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      {...entryContextMenuProps(
-        content.path,
-        content.type === 'directory',
-        favorite
-      )}
       className={selected ? 'selected' : undefined}
       component="div"
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
+      onContextMenu={openEntryContextMenu(
+        content.path,
+        content.type === 'directory',
+        favorite
+      )}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',

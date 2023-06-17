@@ -1,70 +1,77 @@
 import {
+  BrowserWindow,
   IpcMainInvokeEvent,
+  Menu,
   MenuItemConstructorOptions,
   clipboard,
   ipcMain,
   shell,
 } from 'electron'
-import contextMenu from 'electron-context-menu'
 
-type ContextMenuItem = {
-  id: string
-  path?: string
+export type ContextMenuParams = {
+  isEditable: boolean
+  selectionText: string
+  x: number
+  y: number
 }
+export type ContextMenuOption =
+  | {
+      id: string
+      path?: string
+    }
+  | { type: string }
 
-type ContextMenu = ContextMenuItem | { type: string }
-
-// @see https://github.com/sindresorhus/electron-context-menu/issues/102#issuecomment-735434790
 const registerContextMenu = () => {
-  let contextMenus: ContextMenu[]
+  ipcMain.handle(
+    'context-menu-show',
+    (
+      event: IpcMainInvokeEvent,
+      params: ContextMenuParams,
+      options: ContextMenuOption[]
+    ) => {
+      const send = (channel: string, ...args: unknown[]) =>
+        event.sender.send(channel, ...args)
 
-  contextMenu({
-    prepend: (_defaultActions, parameters, browserWindow) => {
-      const send = (channel: string, ...args: unknown[]) => {
-        const webContents =
-          'webContents' in browserWindow
-            ? browserWindow.webContents
-            : browserWindow
-        webContents.send(channel, ...args)
-      }
-
-      const actions: {
-        [id in string]: (params: ContextMenuItem) => MenuItemConstructorOptions
+      const actionCreators: {
+        [id in string]: (option: {
+          id: string
+          path?: string
+        }) => MenuItemConstructorOptions
       } = {
-        open: (params) => ({
-          click: () => shell.openPath(params.path ?? ''),
+        open: (option) => ({
+          click: () => shell.openPath(option.path ?? ''),
           label: 'Open',
         }),
-        openDirectory: (params) => ({
-          click: () => send('subscription-entry', params.path, 'move'),
+        openDirectory: (option) => ({
+          click: () => send('subscription-entry', option.path, 'move'),
           label: 'Open',
         }),
-        revealInFinder: (params) => ({
-          click: () => shell.showItemInFolder(params.path ?? ''),
+        revealInFinder: (option) => ({
+          click: () => shell.showItemInFolder(option.path ?? ''),
           label: 'Reveal in Finder',
         }),
-        newFolder: (params) => ({
+        newFolder: (option) => ({
           click: async () =>
-            send('subscription-entry', params.path, 'newFolder'),
+            send('subscription-entry', option.path, 'newFolder'),
           label: 'New Folder',
         }),
-        copyPath: (params) => ({
-          click: () => clipboard.writeText(params.path ?? ''),
+        copyPath: (option) => ({
+          click: () => clipboard.writeText(option.path ?? ''),
           label: 'Copy Path',
         }),
-        moveToTrash: (params) => ({
+        moveToTrash: (option) => ({
           click: async () =>
-            send('subscription-entry', params.path, 'moveToTrash'),
+            send('subscription-entry', option.path, 'moveToTrash'),
           label: 'Move to Trash',
         }),
-        addToFavorites: (params) => ({
+        addToFavorites: (option) => ({
           click: () =>
-            send('subscription-entry', params.path, 'addToFavorites'),
+            send('subscription-entry', option.path, 'addToFavorites'),
           label: 'Add to Favorites',
         }),
-        removeFromFavorites: (params) => ({
+        removeFromFavorites: (option) => ({
           click: () =>
-            send('subscription-entry', params.path, 'removeFromFavorites'),
+            send('subscription-entry', option.path, 'removeFromFavorites'),
           label: 'Remove from Favorites',
         }),
         settings: () => ({
@@ -73,29 +80,56 @@ const registerContextMenu = () => {
         }),
       }
 
-      return [
-        {
+      const actions = options.flatMap((option) => {
+        if ('type' in option) {
+          return option
+        }
+        const creator = actionCreators[option.id]
+        return creator ? creator(option) : []
+      })
+
+      const defaultActions = {
+        separator: { type: 'separator' },
+        cut: params.isEditable && { role: 'cut' },
+        copy: (params.isEditable || params.selectionText.length > 0) && {
+          role: 'copy',
+        },
+        paste: params.isEditable && {
+          role: 'paste',
+          visible: params.isEditable,
+        },
+        inspectElement: {
+          label: 'Inspect Element',
+          click: () => {
+            event.sender.inspectElement(params.x, params.y)
+            if (event.sender.isDevToolsOpened()) {
+              event.sender.devToolsWebContents?.focus()
+            }
+          },
+        },
+        search: {
           accelerator: 'CommandOrControl+F',
           click: () => send('subscription-search'),
-          label: 'Search for “{selection}”',
-          visible: parameters.selectionText.trim().length > 0,
+          label: `Search for “${params.selectionText.trim()}”`,
+          visible: params.selectionText.trim().length > 0,
         },
-        { type: 'separator' },
-        ...contextMenus.flatMap((params) => {
-          if ('type' in params) {
-            return params
-          }
-          const creator = actions[params.id]
-          return creator ? creator(params) : []
-        }),
-      ] as MenuItemConstructorOptions[]
-    },
-  })
+      }
 
-  ipcMain.handle(
-    'context-menu-send',
-    (_event: IpcMainInvokeEvent, targetContextMenus?: ContextMenu[]) => {
-      contextMenus = targetContextMenus ?? []
+      const template = [
+        defaultActions.search,
+        defaultActions.separator,
+        ...actions,
+        defaultActions.separator,
+        defaultActions.cut,
+        defaultActions.copy,
+        defaultActions.paste,
+        defaultActions.separator,
+        defaultActions.inspectElement,
+      ].filter((a) => a) as MenuItemConstructorOptions[]
+
+      const menu = Menu.buildFromTemplate(template)
+      const window = BrowserWindow.fromWebContents(event.sender)
+      window && menu.popup({ window })
     }
   )
 }

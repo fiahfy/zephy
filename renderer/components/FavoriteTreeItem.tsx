@@ -1,8 +1,7 @@
-import { BoxProps } from '@mui/material'
 import { ReactNode } from 'react'
 import EntryTreeItem from 'components/EntryTreeItem'
 import Icon from 'components/Icon'
-import { entryContextMenuProps } from 'utils/contextMenu'
+import { openEntryContextMenu } from 'utils/contextMenu'
 
 type Props = {
   children?: ReactNode
@@ -18,7 +17,7 @@ const FavoriteTreeItem = (props: Props) => {
   return (
     <EntryTreeItem
       LabelProps={
-        root ? {} : (entryContextMenuProps(nodeId, true, true) as BoxProps)
+        root ? {} : { onContextMenu: openEntryContextMenu(nodeId, true, true) }
       }
       icon={
         root ? (

@@ -1,24 +1,32 @@
 import { MouseEvent } from 'react'
+import { ContextMenuOption } from 'interfaces'
 
-type ContextMenu =
-  | {
-      id: string
-      path?: string
-    }
-  | { type: string }
+export const openContextMenu = (options?: ContextMenuOption[]) => {
+  return async (e: MouseEvent<HTMLElement>) => {
+    e.preventDefault()
 
-export const contextMenuProps = (contextMenus: ContextMenu[]) => {
-  return {
-    'data-context-menus': JSON.stringify(contextMenus),
+    const isEditable =
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
+        ? !e.target.readOnly
+        : false
+    const selectionText = window.getSelection()?.toString() ?? ''
+    const { clientX: x, clientY: y } = e
+
+    const params = { isEditable, selectionText, x, y }
+
+    console.log(params)
+
+    await window.electronAPI.contextMenu.show(params, options ?? [])
   }
 }
 
-export const entryContextMenuProps = (
+export const openEntryContextMenu = (
   path: string,
   directory: boolean,
   favorite: boolean
 ) => {
-  return contextMenuProps([
+  const options = [
     {
       id: directory ? 'openDirectory' : 'open',
       path,
@@ -46,40 +54,19 @@ export const entryContextMenuProps = (
       id: 'moveToTrash',
       path,
     },
-  ])
+  ]
+
+  return openContextMenu(options)
 }
 
-export const directoryContextMenuProps = (path: string) => {
-  return contextMenuProps([
+export const openDirectoryContextMenu = (path: string) => {
+  const options = [
     {
       id: 'newFolder',
       path,
     },
     { type: 'separator' },
-  ])
-}
+  ]
 
-const getContextMenus = (e: HTMLElement): string | undefined => {
-  const params = e.dataset.contextMenus
-  if (params) {
-    return JSON.parse(params)
-  }
-  const parent = e.parentElement
-  return parent ? getContextMenus(parent) : undefined
-}
-
-export const openContextMenu = async (e: MouseEvent<HTMLElement>) => {
-  const params = getContextMenus(e.target as HTMLElement)
-  await window.electronAPI.contextMenu.send(params)
-}
-
-export const openCM = () => {
-  // TODO: Fix this
-  const contextMenuEvent = new window.MouseEvent('contextmenu', {
-    bubbles: true,
-    cancelable: true,
-    view: window,
-  })
-  window.dispatchEvent(contextMenuEvent)
-  console.log('openCM')
+  return openContextMenu(options)
 }

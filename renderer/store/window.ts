@@ -6,7 +6,6 @@ import { selectWindowId } from 'store/windowId'
 import { selectShouldShowHiddenFiles } from './settings'
 import { selectGetRating } from './rating'
 import { isHiddenFile } from 'utils/entry'
-import { LargeNumberLike } from 'crypto'
 
 type History = {
   directory: string
@@ -25,7 +24,7 @@ type SidebarState = {
 
 type SortOption = {
   order: 'asc' | 'desc'
-  orderBy: 'name' | 'rating' | 'dateModified'
+  orderBy: keyof Content
 }
 
 type SortingState = {

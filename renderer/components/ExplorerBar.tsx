@@ -60,7 +60,7 @@ import {
   sort,
   unselectAll,
 } from 'store/window'
-import { contextMenuProps, openCM } from 'utils/contextMenu'
+import { openContextMenu } from 'utils/contextMenu'
 
 const sortOptions = [
   { text: 'Name Ascending', value: 'name-asc' },
@@ -349,9 +349,8 @@ const ExplorerBar = () => {
           </Box>
         </Box>
         <IconButton
-          {...contextMenuProps([{ id: 'settings' }])}
           color="inherit"
-          onMouseUp={openCM}
+          onClick={openContextMenu([{ id: 'settings' }])}
           size="small"
           title="Settings"
         >

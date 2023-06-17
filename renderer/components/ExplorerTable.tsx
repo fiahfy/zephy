@@ -29,7 +29,7 @@ import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import { rate, selectGetRating } from 'store/rating'
-import { entryContextMenuProps } from 'utils/contextMenu'
+import { openEntryContextMenu } from 'utils/contextMenu'
 import { formatDate, formatFileSize } from 'utils/entry'
 
 const headerHeight = 30
@@ -233,13 +233,13 @@ const ExplorerTable = (props: Props) => {
     const align = columns.find((column) => column.key === dataKey)?.align
     return (
       <TableCell
-        {...entryContextMenuProps(
+        align={align}
+        component="div"
+        onContextMenu={openEntryContextMenu(
           rowData.path,
           rowData.type === 'directory',
           isFavorite(rowData.path)
         )}
-        align={align}
-        component="div"
         sx={{
           alignItems: 'center',
           borderBottom: 'none',

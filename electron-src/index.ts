@@ -21,7 +21,9 @@ const createWindow = (state: State) => {
 
   if (isDev) {
     browserWindow.loadURL('http://localhost:8000/')
-    browserWindow.webContents.openDevTools()
+    browserWindow.on('ready-to-show', () => {
+      browserWindow.webContents.openDevTools()
+    })
   } else {
     const pathname = join(__dirname, '../renderer/out/index.html')
     const url = `file://${pathname}`
