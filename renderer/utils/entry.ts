@@ -35,7 +35,7 @@ export const getThumbnail = async (paths: string | string[]) => {
   }
   if (isVideoFile(path)) {
     try {
-      return await window.electronAPI.ffmpeg.thumbnail(path)
+      return await window.electronAPI.createThumbnail(path)
     } catch (e) {
       return undefined
     }
@@ -46,9 +46,12 @@ export const getThumbnail = async (paths: string | string[]) => {
   }
 }
 
+export const getThumbnails = (paths: string[]) =>
+  Promise.all(paths.map(getThumbnail))
+
 export const getMetadata = async (path: string) => {
   try {
-    const metadata = await window.electronAPI.ffmpeg.metadata(path)
+    const metadata = await window.electronAPI.getMetadata(path)
     const hasDuration = isVideoFile(path) || isAudioFile(path)
     return {
       ...metadata,

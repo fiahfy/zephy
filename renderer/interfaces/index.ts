@@ -8,23 +8,21 @@ export interface IElectronAPI {
   basename: (path: string) => Promise<string>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
-  getEntryTree: (path: string) => Promise<Entry>
   getHomePath: () => Promise<string>
   getWindowId: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
-  listDetailedEntries: (path: string) => Promise<DetailedEntry[]>
-  listEntries: (path: string) => Promise<Entry[]>
   openPath: (path: string) => Promise<void>
   trashItem: (path: string) => Promise<void>
+  getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
+  getEntries: (path: string) => Promise<Entry[]>
+  getEntryHierarchy: (path: string) => Promise<Entry>
+  createThumbnail: (path: string) => Promise<string>
+  getMetadata: (path: string) => Promise<Metadata>
   contextMenu: {
     show: (
       params: ContextMenuParams,
       options: ContextMenuOption[]
     ) => Promise<void>
-  }
-  ffmpeg: {
-    thumbnail: (path: string) => Promise<string>
-    metadata: (path: string) => Promise<Metadata>
   }
   subscription: {
     entry: (

@@ -240,7 +240,7 @@ const ExplorerTable = (props: Props) => {
           px: 1,
           py: 0,
         }}
-        title={dataKey === 'name' && rowData.name}
+        title={dataKey === 'name' ? rowData.name : undefined}
       >
         {
           {

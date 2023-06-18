@@ -5,22 +5,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
   basename: (path: string) => ipcRenderer.invoke('basename', path),
   darwin: () => ipcRenderer.invoke('darwin'),
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
-  getEntryTree: (path: string) => ipcRenderer.invoke('get-entry-tree', path),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
   getWindowId: () => ipcRenderer.invoke('get-window-id'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
-  listDetailedEntries: (path: string) =>
-    ipcRenderer.invoke('list-detailed-entries', path),
-  listEntries: (path: string) => ipcRenderer.invoke('list-entries', path),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   trashItem: (path: string) => ipcRenderer.invoke('trash-item', path),
+  getDetailedEntries: (path: string) =>
+    ipcRenderer.invoke('get-detailed-entries', path),
+  getEntries: (path: string) => ipcRenderer.invoke('get-entries', path),
+  getEntryHierarchy: (path: string) =>
+    ipcRenderer.invoke('get-entry-hierarchy', path),
+  createThumbnail: (path: string) =>
+    ipcRenderer.invoke('create-thumbnail', path),
+  getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
   contextMenu: {
     show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
       ipcRenderer.invoke('context-menu-show', params, options),
-  },
-  ffmpeg: {
-    metadata: (path: string) => ipcRenderer.invoke('ffmpeg-metadata', path),
-    thumbnail: (path: string) => ipcRenderer.invoke('ffmpeg-thumbnail', path),
   },
   subscription: {
     entry: (

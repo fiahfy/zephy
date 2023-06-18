@@ -596,7 +596,7 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   }
   dispatch(loading({ windowId }))
   try {
-    const entries = await window.electronAPI.listDetailedEntries(
+    const entries = await window.electronAPI.getDetailedEntries(
       currentDirectory
     )
     dispatch(loaded({ windowId, entries }))

@@ -72,7 +72,7 @@ const ExplorerGridItem = (props: Props) => {
 
       let entries: Entry[] = []
       try {
-        entries = await window.electronAPI.listEntries(content.path)
+        entries = await window.electronAPI.getEntries(content.path)
       } catch (e) {
         // noop
       }

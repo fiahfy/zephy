@@ -5,8 +5,7 @@ import { State } from 'electron-window-state'
 import { join } from 'path'
 import registerApplicationMenu from './application-menu'
 import registerContextMenu from './context-menu'
-import registerFfmpegHandlers from './ffmpeg'
-import { addHandlers } from './handlers'
+import registerHandlers from './handlers'
 import createWindowStateManager from './window-state'
 
 const createWindow = (state: State) => {
@@ -48,8 +47,7 @@ app.whenReady().then(async () => {
 
   registerApplicationMenu(windowStateManager.create)
   registerContextMenu()
-  registerFfmpegHandlers()
-  addHandlers()
+  registerHandlers()
 
   // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
   protocol.registerFileProtocol('file', (request, callback) => {

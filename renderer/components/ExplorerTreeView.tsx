@@ -23,7 +23,7 @@ const ExplorerTreeView = () => {
       if (!indexPage) {
         return
       }
-      const entry = await window.electronAPI.getEntryTree(currentDirectory)
+      const entry = await window.electronAPI.getEntryHierarchy(currentDirectory)
       const reducer = (carry: string[], entry: Entry): string[] => {
         if (entry.type !== 'directory' || !entry.children) {
           return carry
@@ -75,7 +75,7 @@ const ExplorerTreeView = () => {
     if (!entry || entry.type !== 'directory' || entry.children) {
       return
     }
-    const children = await window.electronAPI.listEntries(entry.path)
+    const children = await window.electronAPI.getEntries(entry.path)
     const mapper = (e: Entry): Entry => {
       if (e.type === 'directory') {
         if (e.path === entry.path) {
