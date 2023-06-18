@@ -22,7 +22,7 @@ const TitleBar = () => {
               WebkitAppRegion: 'drag',
               justifyContent: 'center',
               minHeight: '28px!important',
-              padding: '2px 72px 0',
+              padding: '4px 72px 0',
               userSelect: 'none',
             }}
           >

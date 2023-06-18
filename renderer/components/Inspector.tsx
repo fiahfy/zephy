@@ -173,7 +173,6 @@ const Inspector = () => {
             sx={{
               background: (theme) => theme.palette.background.default,
               position: 'sticky',
-              pt: 1,
               bottom: 0,
               zIndex: 1,
             }}
@@ -184,25 +183,28 @@ const Inspector = () => {
               paragraph
               sx={{
                 mb: 0,
-                mx: 1,
+                p: 1,
               }}
               variant="caption"
             >
               {content.name}
             </Typography>
-            <Typography paragraph sx={{ mb: 0, mx: 1 }} variant="overline">
-              Metadata
-            </Typography>
             <Table size="small" sx={{ width: '100%' }}>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.label}>
-                    <TableCell component="th" sx={{ height: 20, px: 1, py: 0 }}>
+                    <TableCell
+                      component="th"
+                      sx={{ borderBottom: 0, height: 20, px: 1, py: 0 }}
+                    >
                       <Typography noWrap variant="caption">
                         {row.label}
                       </Typography>
                     </TableCell>
-                    <TableCell align="right" sx={{ height: 20, px: 1, py: 0 }}>
+                    <TableCell
+                      align="right"
+                      sx={{ borderBottom: 0, height: 20, px: 1, py: 0 }}
+                    >
                       <Typography noWrap variant="caption">
                         {row.value}
                       </Typography>

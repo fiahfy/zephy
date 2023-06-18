@@ -235,57 +235,45 @@ const ExplorerTable = (props: Props) => {
           alignItems: 'center',
           borderBottom: 'none',
           display: 'flex',
+          gap: 1,
           height: rowHeight,
           px: 1,
           py: 0,
         }}
+        title={dataKey === 'name' && rowData.name}
       >
-        <Box
-          component="span"
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        {
           {
-            {
-              name: (
-                <Box sx={{ alignItems: 'center', display: 'flex' }}>
-                  <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-                    <EntryIcon entry={rowData} size="small" />
-                  </Box>
-                  <Typography noWrap title={rowData.name} variant="caption">
-                    {rowData.name}
-                  </Typography>
-                </Box>
-              ),
-              rating: (
-                <Box sx={{ display: 'flex' }}>
-                  <NoOutlineRating
-                    color="primary"
-                    onChange={(_e, value) =>
-                      dispatch(rate({ path: rowData.path, rating: value ?? 0 }))
-                    }
-                    precision={0.5}
-                    size="small"
-                    value={getRating(rowData.path)}
-                  />
-                </Box>
-              ),
-              size: (
+            name: (
+              <>
+                <EntryIcon entry={rowData} size="small" />
                 <Typography noWrap variant="caption">
-                  {rowData.type === 'file' && formatFileSize(rowData.size)}
+                  {rowData.name}
                 </Typography>
-              ),
-              dateModified: (
-                <Typography noWrap variant="caption">
-                  {formatDate(rowData.dateModified)}
-                </Typography>
-              ),
-            }[dataKey]
-          }
-        </Box>
+              </>
+            ),
+            rating: (
+              <NoOutlineRating
+                onChange={(_e, value) =>
+                  dispatch(rate({ path: rowData.path, rating: value ?? 0 }))
+                }
+                precision={0.5}
+                size="small"
+                value={getRating(rowData.path)}
+              />
+            ),
+            size: rowData.type === 'file' && (
+              <Typography noWrap variant="caption">
+                {formatFileSize(rowData.size)}{' '}
+              </Typography>
+            ),
+            dateModified: (
+              <Typography noWrap variant="caption">
+                {formatDate(rowData.dateModified)}
+              </Typography>
+            ),
+          }[dataKey]
+        }
       </TableCell>
     )
   }
@@ -332,9 +320,7 @@ const ExplorerTable = (props: Props) => {
           const widths = getWidths(width)
           return (
             <Table
-              gridStyle={{
-                overflowY: 'scroll',
-              }}
+              gridStyle={{ overflowY: 'scroll' }}
               headerHeight={headerHeight}
               height={height}
               onRowClick={handleRowClick}

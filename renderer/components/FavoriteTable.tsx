@@ -9,11 +9,13 @@ import {
 import { useEffect, useState } from 'react'
 import Icon from 'components/Icon'
 import { useContextMenu } from 'hooks/useContextMenu'
-import { useAppSelector } from 'store'
+import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'
+import { move } from 'store/window'
 
 const FavoriteTable = () => {
   const favorites = useAppSelector(selectFavorites)
+  const dispatch = useAppDispatch()
 
   const { openEntry } = useContextMenu()
 
@@ -37,6 +39,8 @@ const FavoriteTable = () => {
 
   const handleBlur = () => setSelected([])
 
+  const handleClick = (path: string) => dispatch(move(path))
+
   const handleFocus = (path: string) => setSelected([path])
 
   return (
@@ -47,6 +51,7 @@ const FavoriteTable = () => {
             hover
             key={item.path}
             onBlur={() => handleBlur()}
+            onClick={() => handleClick(item.path)}
             onContextMenu={openEntry(item.path, true)}
             onFocus={() => handleFocus(item.path)}
             selected={selected.includes(item.path)}
@@ -59,6 +64,7 @@ const FavoriteTable = () => {
               },
             }}
             tabIndex={0}
+            title={item.name}
           >
             <TableCell
               sx={{
@@ -66,28 +72,16 @@ const FavoriteTable = () => {
                 borderBottom: 'none',
                 display: 'flex',
                 height: 20,
+                gap: 1,
                 px: 1,
                 py: 0,
                 width: '100%',
               }}
             >
-              <Box
-                component="span"
-                sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <Box sx={{ alignItems: 'center', display: 'flex' }}>
-                  <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-                    <Icon iconType="folder" size="small" />
-                  </Box>
-                  <Typography noWrap title={item.name} variant="caption">
-                    {item.name}
-                  </Typography>
-                </Box>
-              </Box>
+              <Icon iconType="folder" size="small" />
+              <Typography noWrap variant="caption">
+                {item.name}
+              </Typography>
             </TableCell>
           </TableRow>
         ))}

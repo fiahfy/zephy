@@ -87,17 +87,12 @@ const EntryTreeItem = (props: Props) => {
           sx={{
             alignItems: 'center',
             display: 'flex',
+            gap: 1,
             userSelect: 'none',
           }}
         >
-          <Box sx={{ alignItems: 'center', display: 'flex', mr: 1 }}>
-            {icon}
-          </Box>
-          <Typography
-            noWrap
-            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
-            variant="caption"
-          >
+          {icon}
+          <Typography noWrap variant="caption">
             {label}
           </Typography>
         </Box>
