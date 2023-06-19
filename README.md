@@ -2,7 +2,7 @@
 
 ![badge](https://github.com/fiahfy/zephy/workflows/Electron/badge.svg)
 
-> Simple File Manager based on Electron.
+> Simple Media File Manager based on Electron.
 
 ## Features
 

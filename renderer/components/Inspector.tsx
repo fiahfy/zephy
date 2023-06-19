@@ -204,7 +204,11 @@ const Inspector = () => {
           >
             Preview
           </Typography>
-          {loading && <ImageBox>Loading...</ImageBox>}
+          {loading && (
+            <ImageBox>
+              <Typography variant="caption">Loading...</Typography>
+            </ImageBox>
+          )}
           {!loading && (
             <>
               {content.type === 'file' && (
@@ -222,7 +226,11 @@ const Inspector = () => {
               )}
               {content.type === 'directory' && (
                 <>
-                  {entries.length === 0 && <ImageBox>No Preview</ImageBox>}
+                  {entries.length === 0 && (
+                    <ImageBox>
+                      <Typography variant="caption">No Preview</Typography>
+                    </ImageBox>
+                  )}
                   {entries.length > 0 &&
                     entries.map((entry) => (
                       <ImageBox key={entry.path}>
@@ -240,6 +248,10 @@ const Inspector = () => {
           <Box
             sx={{
               background: (theme) => theme.palette.background.default,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+              py: 1,
               position: 'sticky',
               bottom: 0,
               zIndex: 1,
@@ -251,7 +263,7 @@ const Inspector = () => {
               paragraph
               sx={{
                 mb: 0,
-                p: 1,
+                px: 1,
               }}
               variant="caption"
             >

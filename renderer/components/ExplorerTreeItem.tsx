@@ -55,7 +55,7 @@ const ExplorerTreeItem = (props: Props) => {
           </>
         ) : (
           <EntryTreeItem
-            icon={<CircularProgress size={20} />}
+            icon={<CircularProgress size={16} sx={{ mx: 0.25 }} />}
             label="Loading items..."
             nodeId={`${entry.path}<loader>`}
           />

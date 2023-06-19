@@ -58,6 +58,7 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
       })}
       onMouseDown={handleMouseDown}
       ref={ref as Ref<HTMLDivElement>}
+      sx={{ height: 20 }}
     >
       <Box className={classes.iconContainer} onClick={handleExpansionClick}>
         {icon}

@@ -9,39 +9,41 @@ const Navigator = () => (
       overflowY: 'auto',
     }}
   >
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <Box>
-        <Typography
-          paragraph
-          sx={{
-            background: (theme) => theme.palette.background.default,
-            mb: 0,
-            position: 'sticky',
-            px: 1,
-            top: 0,
-            zIndex: 1,
-          }}
-          variant="overline"
-        >
-          Favorites
-        </Typography>
+    <Box>
+      <Typography
+        paragraph
+        sx={{
+          background: (theme) => theme.palette.background.default,
+          mb: 0,
+          position: 'sticky',
+          px: 1,
+          top: 0,
+          zIndex: 1,
+        }}
+        variant="overline"
+      >
+        Favorites
+      </Typography>
+      <Box sx={{ pb: 1 }}>
         <FavoriteTable />
       </Box>
-      <Box>
-        <Typography
-          paragraph
-          sx={{
-            background: (theme) => theme.palette.background.default,
-            mb: 0,
-            position: 'sticky',
-            px: 1,
-            top: 0,
-            zIndex: 1,
-          }}
-          variant="overline"
-        >
-          Explorer
-        </Typography>
+    </Box>
+    <Box>
+      <Typography
+        paragraph
+        sx={{
+          background: (theme) => theme.palette.background.default,
+          mb: 0,
+          position: 'sticky',
+          px: 1,
+          top: 0,
+          zIndex: 1,
+        }}
+        variant="overline"
+      >
+        Explorer
+      </Typography>
+      <Box sx={{ pb: 1 }}>
         <ExplorerTreeView />
       </Box>
     </Box>
