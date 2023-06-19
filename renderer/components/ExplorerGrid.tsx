@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import { AutoSizer, Grid, GridCellProps } from 'react-virtualized'
+
 import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'

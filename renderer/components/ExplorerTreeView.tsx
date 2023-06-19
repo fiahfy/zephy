@@ -4,6 +4,7 @@ import {
 } from '@mui/icons-material'
 import { TreeView } from '@mui/lab'
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
+
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'

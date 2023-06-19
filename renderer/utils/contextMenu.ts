@@ -1,4 +1,5 @@
 import { MouseEvent } from 'react'
+
 import { ContextMenuOption } from 'interfaces'
 
 export const openContextMenu = (options?: ContextMenuOption[]) => {

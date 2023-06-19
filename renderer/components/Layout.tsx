@@ -1,9 +1,11 @@
 import { Box, Toolbar } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect } from 'react'
+
 import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
+import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import { useContextMenu } from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
@@ -19,7 +21,6 @@ import {
   setViewMode,
   sort,
 } from 'store/window'
-import Sidebar from './Sidebar'
 
 type Props = {
   children: ReactNode

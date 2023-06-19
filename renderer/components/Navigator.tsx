@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material'
+
 import ExplorerTreeView from 'components/ExplorerTreeView'
 import FavoriteTable from 'components/FavoriteTable'
 
@@ -18,6 +19,7 @@ const Navigator = () => (
           position: 'sticky',
           px: 1,
           top: 0,
+          userSelect: 'none',
           zIndex: 1,
         }}
         variant="overline"
@@ -37,6 +39,7 @@ const Navigator = () => (
           position: 'sticky',
           px: 1,
           top: 0,
+          userSelect: 'none',
           zIndex: 1,
         }}
         variant="overline"

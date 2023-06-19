@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
 import { createElement } from 'react'
+
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
 import { Content } from 'interfaces'

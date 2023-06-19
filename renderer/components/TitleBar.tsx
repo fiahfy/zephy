@@ -1,4 +1,5 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
+
 import { useTitleBar } from 'contexts/TitleBarContext'
 
 const TitleBar = () => {

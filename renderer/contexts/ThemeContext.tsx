@@ -12,6 +12,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+
 import { useTitleBar } from 'contexts/TitleBarContext'
 import { useAppSelector } from 'store'
 import { selectDarkMode } from 'store/settings'

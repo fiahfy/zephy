@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+
 import { AppState, AppThunk } from 'store'
 import { initialize } from 'store/window'
 

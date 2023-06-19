@@ -2,6 +2,7 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import fileUrl from 'file-url'
 import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
+
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import { useContextMenu } from 'hooks/useContextMenu'

@@ -1,4 +1,5 @@
 import { ComponentProps, useMemo } from 'react'
+
 import Icon from 'components/Icon'
 import { Entry } from 'interfaces'
 import { detectFileType } from 'utils/entry'

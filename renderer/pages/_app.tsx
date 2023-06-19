@@ -5,12 +5,13 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
+
 import Layout from 'components/Layout'
 import { StoreProvider } from 'contexts/StoreContext'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { TitleBarProvider } from 'contexts/TitleBarContext'
-import createEmotionCache from 'utils/createEmotionCache'
 import 'styles.css'
+import createEmotionCache from 'utils/createEmotionCache'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

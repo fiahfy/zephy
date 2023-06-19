@@ -1,10 +1,11 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
+
 import { Content, DetailedEntry } from 'interfaces'
 import { AppState, AppThunk } from 'store'
 import { add } from 'store/queryHistory'
+import { selectGetRating } from 'store/rating'
+import { selectShouldShowHiddenFiles } from 'store/settings'
 import { selectWindowId } from 'store/windowId'
-import { selectShouldShowHiddenFiles } from './settings'
-import { selectGetRating } from './rating'
 import { isHiddenFile } from 'utils/entry'
 
 type History = {

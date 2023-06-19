@@ -21,6 +21,7 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized'
+
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import { useContextMenu } from 'hooks/useContextMenu'

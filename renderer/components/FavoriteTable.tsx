@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+
 import Icon from 'components/Icon'
 import { useContextMenu } from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
@@ -43,7 +44,7 @@ const FavoriteTable = () => {
   const handleFocus = (path: string) => setSelected([path])
 
   return (
-    <Table size="small" sx={{ display: 'flex' }}>
+    <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>
       <TableBody sx={{ width: '100%' }}>
         {items.map((item) => (
           <TableRow
