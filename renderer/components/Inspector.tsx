@@ -1,7 +1,14 @@
-import { Box, Typography } from '@mui/material'
+import {
+  Box,
+  IconButton,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
+  Typography,
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import fileUrl from 'file-url'
-import { useEffect, useReducer } from 'react'
+import { ReactNode, useEffect, useReducer } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
 import { Entry, Metadata } from 'interfaces'
@@ -54,15 +61,21 @@ const reducer = (state: State, action: Action) => {
   }
 }
 
-const ImageBox = styled(Box)(() => ({
-  alignItems: 'center',
-  aspectRatio: '1 / 1',
-  display: 'flex',
-  justifyContent: 'center',
-  maxHeight: 128,
-  userSelect: 'none',
-  width: '100%',
-}))
+const MessageBox = (props: { children: ReactNode }) => {
+  const { children } = props
+  return (
+    <Box
+      sx={{
+        alignItems: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        height: 128,
+      }}
+    >
+      <Typography variant="caption">{children}</Typography>
+    </Box>
+  )
+}
 
 const Inspector = () => {
   const [content] = useAppSelector(selectSelectedContents)
@@ -152,47 +165,56 @@ const Inspector = () => {
           >
             Preview
           </Typography>
-          {loading && (
-            <ImageBox>
-              <Typography variant="caption">Loading...</Typography>
-            </ImageBox>
-          )}
-          {!loading && (
-            <>
-              {content.type === 'file' && (
-                <ImageBox>
-                  {thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={fileUrl(thumbnail)}
-                      style={{ maxWidth: '100%' }}
-                    />
-                  ) : (
-                    <Typography variant="caption">No Preview</Typography>
-                  )}
-                </ImageBox>
-              )}
-              {content.type === 'directory' && (
-                <>
-                  {entries.length === 0 && (
-                    <ImageBox>
-                      <Typography variant="caption">No Preview</Typography>
-                    </ImageBox>
-                  )}
-                  {entries.length > 0 &&
-                    entries.map((entry) => (
-                      <ImageBox key={entry.path}>
+          <ImageList cols={1} gap={1} sx={{ my: 0 }}>
+            {loading && (
+              <ImageListItem>
+                <MessageBox>Loading...</MessageBox>
+              </ImageListItem>
+            )}
+            {!loading && (
+              <>
+                {content.type === 'file' && (
+                  <>
+                    {thumbnail ? (
+                      <ImageListItem>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={fileUrl(entry.thumbnail)}
-                          style={{ maxWidth: '100%' }}
+                          loading="lazy"
+                          src={fileUrl(thumbnail)}
+                          style={{ minHeight: 128 }}
                         />
-                      </ImageBox>
-                    ))}
-                </>
-              )}
-            </>
-          )}
+                      </ImageListItem>
+                    ) : (
+                      <ImageListItem>
+                        <MessageBox>No Preview</MessageBox>
+                      </ImageListItem>
+                    )}
+                  </>
+                )}
+                {content.type === 'directory' && (
+                  <>
+                    {entries.length > 0 ? (
+                      entries.map((entry) => (
+                        <ImageListItem key={entry.path}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            loading="lazy"
+                            src={fileUrl(entry.thumbnail)}
+                            style={{ minHeight: 128 }}
+                          />
+                          <ImageListItemBar subtitle={entry.name} />
+                        </ImageListItem>
+                      ))
+                    ) : (
+                      <ImageListItem>
+                        <MessageBox>No Preview</MessageBox>
+                      </ImageListItem>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </ImageList>
           <Box
             sx={{
               background: (theme) => theme.palette.background.default,
@@ -202,7 +224,6 @@ const Inspector = () => {
               gap: 1,
               position: 'sticky',
               py: 1,
-              userSelect: 'none',
               zIndex: 1,
             }}
           >
@@ -213,6 +234,7 @@ const Inspector = () => {
               sx={{
                 mb: 0,
                 px: 1,
+                userSelect: 'none',
               }}
               variant="caption"
             >

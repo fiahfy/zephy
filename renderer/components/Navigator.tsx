@@ -4,12 +4,7 @@ import ExplorerTreeView from 'components/ExplorerTreeView'
 import FavoriteTable from 'components/FavoriteTable'
 
 const Navigator = () => (
-  <Box
-    sx={{
-      height: '100%',
-      overflowY: 'auto',
-    }}
-  >
+  <Box sx={{ height: '100%', overflowY: 'auto' }}>
     <Box>
       <Typography
         paragraph

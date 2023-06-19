@@ -117,11 +117,7 @@ const Layout = (props: Props) => {
       </Sidebar>
       <Box
         component="main"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-        }}
+        sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
       >
         <Toolbar
           sx={{
@@ -129,12 +125,7 @@ const Layout = (props: Props) => {
             minHeight: (theme) => `${theme.mixins.titleBar.height}px!important`,
           }}
         />
-        <Toolbar
-          sx={{
-            flexShrink: 0,
-            minHeight: '35px!important',
-          }}
-        />
+        <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>
       </Box>
       <Sidebar variant="secondary">

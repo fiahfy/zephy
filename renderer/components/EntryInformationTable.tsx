@@ -62,7 +62,7 @@ const EntryInformationTable = (props: Props) => {
     : []
 
   return (
-    <Table size="small" sx={{ width: '100%', userSelect: 'none' }}>
+    <Table size="small" sx={{ userSelect: 'none' }}>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.label}>

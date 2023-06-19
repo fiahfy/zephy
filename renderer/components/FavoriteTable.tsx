@@ -24,6 +24,7 @@ const FavoriteTable = () => {
 
   useEffect(() => {
     ;(async () => {
+      // TODO: filter out non-existent paths
       const names = await Promise.all(
         favorites.map((path) => window.electronAPI.basename(path))
       )
