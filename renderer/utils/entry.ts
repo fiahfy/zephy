@@ -20,9 +20,9 @@ export const detectFileType = (path: string) => {
   }
 }
 
-const isImageFile = (path: string) => detectFileType(path) === 'image'
-const isVideoFile = (path: string) => detectFileType(path) === 'video'
-const isAudioFile = (path: string) => detectFileType(path) === 'audio'
+export const isImageFile = (path: string) => detectFileType(path) === 'image'
+export const isVideoFile = (path: string) => detectFileType(path) === 'video'
+export const isAudioFile = (path: string) => detectFileType(path) === 'audio'
 export const isMediaFile = (path: string) =>
   isImageFile(path) || isVideoFile(path) || isAudioFile(path)
 
@@ -48,6 +48,14 @@ export const getThumbnail = async (paths: string | string[]) => {
 
 export const getThumbnails = (paths: string[]) =>
   Promise.all(paths.map(getThumbnail))
+
+export const getVideoThumbnails = async (path: string) => {
+  try {
+    return await window.electronAPI.createVideoThumbnails(path)
+  } catch (e) {
+    return []
+  }
+}
 
 export const getMetadata = async (path: string) => {
   try {

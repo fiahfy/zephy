@@ -5,7 +5,7 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
   <TextField {...props} variant="filled" />
 ))(({ theme }) =>
   theme.unstable_sx({
-    '& .MuiFilledInput-root': {
+    '.MuiFilledInput-root': {
       borderRadius: 4,
       '::after': {
         display: 'none',

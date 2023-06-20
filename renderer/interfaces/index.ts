@@ -17,6 +17,7 @@ export interface IElectronAPI {
   getEntries: (path: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
   createThumbnail: (path: string) => Promise<string>
+  createVideoThumbnails: (path: string) => Promise<string[]>
   getMetadata: (path: string) => Promise<Metadata>
   contextMenu: {
     show: (

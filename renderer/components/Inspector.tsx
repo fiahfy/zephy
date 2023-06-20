@@ -1,12 +1,10 @@
 import {
   Box,
-  IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
   Typography,
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
 import fileUrl from 'file-url'
 import { ReactNode, useEffect, useReducer } from 'react'
 
@@ -16,48 +14,71 @@ import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { selectSelectedContents } from 'store/window'
 import {
+  formatTime,
   getMetadata,
   getThumbnail,
   getThumbnails,
+  getVideoThumbnails,
   isHiddenFile,
   isMediaFile,
+  isVideoFile,
 } from 'utils/entry'
+import { useContextMenu } from 'hooks/useContextMenu'
 
 type EntryWithThumbnail = Entry & { thumbnail: string }
 
-type State = {
-  entries: EntryWithThumbnail[]
-  loading: boolean
-  metadata?: Metadata
-  thumbnail?: string
-}
+type State =
+  | {
+      loading: true
+    }
+  | {
+      loading: false
+      type: 'directory'
+      entries: EntryWithThumbnail[]
+    }
+  | {
+      loading: false
+      type: 'video'
+      metadata?: Metadata
+      thumbnails: string[]
+    }
+  | {
+      loading: false
+      type: 'file'
+      metadata?: Metadata
+      thumbnail?: string
+    }
 
 type Action =
   | {
       type: 'loaded'
-      payload: {
-        metadata?: Metadata
-        thumbnail?: string
-        entries?: EntryWithThumbnail[]
-      }
+      payload:
+        | {
+            type: 'directory'
+            entries: EntryWithThumbnail[]
+          }
+        | {
+            type: 'video'
+            metadata?: Metadata
+            thumbnails: string[]
+          }
+        | {
+            type: 'file'
+            metadata?: Metadata
+            thumbnail?: string
+          }
     }
   | { type: 'loading' }
 
-const reducer = (state: State, action: Action) => {
+const reducer = (_state: State, action: Action) => {
   switch (action.type) {
     case 'loaded':
       return {
-        ...state,
         ...action.payload,
-        loading: false,
+        loading: false as const,
       }
     case 'loading':
-      return {
-        entries: [],
-        loading: true,
-        metadata: undefined,
-        thumbnail: undefined,
-      }
+      return { loading: true as const }
   }
 }
 
@@ -81,22 +102,18 @@ const Inspector = () => {
   const [content] = useAppSelector(selectSelectedContents)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
-  const [{ loading, metadata, thumbnail, entries }, dispatch] = useReducer(
-    reducer,
-    {
-      entries: [],
-      loading: false,
-      metadata: undefined,
-      thumbnail: undefined,
-    }
-  )
+  const { openEntry } = useContextMenu()
+
+  const [state, dispatch] = useReducer(reducer, { loading: true })
 
   useEffect(() => {
+    let unmounted = false
+
     ;(async () => {
-      dispatch({ type: 'loading' })
       if (!content) {
-        return dispatch({ type: 'loaded', payload: {} })
+        return
       }
+      dispatch({ type: 'loading' })
       if (content.type === 'directory') {
         let entries: Entry[] = []
         try {
@@ -113,19 +130,52 @@ const Inspector = () => {
           const thumbnail = thumbnails[i]
           return thumbnail ? [...carry, { ...entry, thumbnail }] : carry
         }, [] as EntryWithThumbnail[])
-        return dispatch({ type: 'loaded', payload: { entries: newEntries } })
+        if (unmounted) {
+          return
+        }
+        if (unmounted) {
+          return
+        }
+        dispatch({
+          type: 'loaded',
+          payload: { type: 'directory', entries: newEntries },
+        })
+      } else if (isVideoFile(content.path)) {
+        const [metadata, thumbnails] = await Promise.all([
+          getMetadata(content.path),
+          getVideoThumbnails(content.path),
+        ])
+        if (unmounted) {
+          return
+        }
+        dispatch({
+          type: 'loaded',
+          payload: { type: 'video', metadata, thumbnails },
+        })
+      } else if (isMediaFile(content.path)) {
+        const [metadata, thumbnail] = await Promise.all([
+          getMetadata(content.path),
+          getThumbnail(content.path),
+        ])
+        if (unmounted) {
+          return
+        }
+        dispatch({
+          type: 'loaded',
+          payload: { type: 'file', metadata, thumbnail },
+        })
+      } else {
+        dispatch({ type: 'loaded', payload: { type: 'file' } })
       }
-      if (!isMediaFile(content.path)) {
-        return dispatch({ type: 'loaded', payload: {} })
-      }
-
-      const [metadata, thumbnail] = await Promise.all([
-        getMetadata(content.path),
-        getThumbnail(content.path),
-      ])
-      dispatch({ type: 'loaded', payload: { metadata, thumbnail } })
     })()
+
+    return () => {
+      unmounted = true
+    }
   }, [content, shouldShowHiddenFiles])
+
+  const handleDoubleClick = async (entry: Entry) =>
+    await window.electronAPI.openPath(entry.path)
 
   return (
     <Box
@@ -166,36 +216,26 @@ const Inspector = () => {
             Preview
           </Typography>
           <ImageList cols={1} gap={1} sx={{ my: 0 }}>
-            {loading && (
+            {state.loading && (
               <ImageListItem>
                 <MessageBox>Loading...</MessageBox>
               </ImageListItem>
             )}
-            {!loading && (
+            {!state.loading && (
               <>
-                {content.type === 'file' && (
+                {state.type === 'directory' && (
                   <>
-                    {thumbnail ? (
-                      <ImageListItem>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          loading="lazy"
-                          src={fileUrl(thumbnail)}
-                          style={{ minHeight: 128 }}
-                        />
-                      </ImageListItem>
-                    ) : (
-                      <ImageListItem>
-                        <MessageBox>No Preview</MessageBox>
-                      </ImageListItem>
-                    )}
-                  </>
-                )}
-                {content.type === 'directory' && (
-                  <>
-                    {entries.length > 0 ? (
-                      entries.map((entry) => (
-                        <ImageListItem key={entry.path}>
+                    {state.entries.length > 0 ? (
+                      state.entries.map((entry) => (
+                        <ImageListItem
+                          key={entry.path}
+                          onContextMenu={openEntry(entry.path, false)}
+                          onDoubleClick={() => handleDoubleClick(entry)}
+                          sx={{
+                            cursor: 'pointer',
+                          }}
+                          tabIndex={0}
+                        >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             loading="lazy"
@@ -205,6 +245,54 @@ const Inspector = () => {
                           <ImageListItemBar subtitle={entry.name} />
                         </ImageListItem>
                       ))
+                    ) : (
+                      <ImageListItem>
+                        <MessageBox>No Preview</MessageBox>
+                      </ImageListItem>
+                    )}
+                  </>
+                )}
+                {state.type === 'video' && (
+                  <>
+                    {state.thumbnails.length > 0 ? (
+                      state.thumbnails.map((thumbnail, i) => (
+                        <ImageListItem key={thumbnail}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            loading="lazy"
+                            src={fileUrl(thumbnail)}
+                            style={{ minHeight: 128 }}
+                          />
+                          <ImageListItemBar
+                            subtitle={formatTime(
+                              ((state.metadata?.duration ?? 0) / 10) * (i + 1)
+                            )}
+                            sx={{
+                              '.MuiImageListItemBar-subtitle': {
+                                textAlign: 'center',
+                              },
+                            }}
+                          />
+                        </ImageListItem>
+                      ))
+                    ) : (
+                      <ImageListItem>
+                        <MessageBox>No Preview</MessageBox>
+                      </ImageListItem>
+                    )}
+                  </>
+                )}
+                {state.type === 'file' && (
+                  <>
+                    {state.thumbnail ? (
+                      <ImageListItem>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          loading="lazy"
+                          src={fileUrl(state.thumbnail)}
+                          style={{ minHeight: 128 }}
+                        />
+                      </ImageListItem>
                     ) : (
                       <ImageListItem>
                         <MessageBox>No Preview</MessageBox>
@@ -240,7 +328,13 @@ const Inspector = () => {
             >
               {content.name}
             </Typography>
-            <EntryInformationTable content={content} metadata={metadata} />
+            {!state.loading &&
+              (state.type === 'video' || state.type === 'file') && (
+                <EntryInformationTable
+                  content={content}
+                  metadata={state.metadata}
+                />
+              )}
           </Box>
         </>
       )}

@@ -6,7 +6,11 @@ import {
   ipcMain,
   shell,
 } from 'electron'
-import { createThumbnail, getMetadata } from './utils/ffmpeg'
+import {
+  createThumbnail,
+  createVideoThumbnails,
+  getMetadata,
+} from './utils/ffmpeg'
 import {
   getDetailedEntries,
   getEntries,
@@ -55,6 +59,10 @@ const registerHandlers = () => {
   ipcMain.handle(
     'create-thumbnail',
     (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path)
+  )
+  ipcMain.handle(
+    'create-video-thumbnails',
+    (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path)
   )
   ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
     getMetadata(path)

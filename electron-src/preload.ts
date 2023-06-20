@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('get-entry-hierarchy', path),
   createThumbnail: (path: string) =>
     ipcRenderer.invoke('create-thumbnail', path),
+  createVideoThumbnails: (path: string) =>
+    ipcRenderer.invoke('create-video-thumbnails', path),
   getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
   contextMenu: {
     show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
