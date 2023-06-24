@@ -4,6 +4,7 @@ import {
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectIsSidebarHidden,
+  selectSelected,
   selectViewMode,
 } from 'store/window'
 import { openContextMenu } from 'utils/contextMenu'
@@ -13,6 +14,7 @@ export const useContextMenu = () => {
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
+  const selected = useAppSelector(selectSelected)
   const viewMode = useAppSelector(selectViewMode)
 
   const open = () => openContextMenu()
@@ -21,50 +23,90 @@ export const useContextMenu = () => {
     openContextMenu([
       {
         id: directory ? 'openDirectory' : 'open',
-        value: path,
+        params: { path },
       },
       {
         id: 'revealInFinder',
-        value: path,
+        params: { path },
       },
       { id: 'separator' },
       {
         id: 'copyPath',
-        value: path,
+        params: { path },
       },
       { id: 'separator' },
       ...(directory
         ? [
             {
               id: 'toggleFavorite',
-              value: { path, favorite: isFavorite(path) },
+              params: { path, favorite: isFavorite(path) },
             },
           ]
         : []),
       { id: 'separator' },
       {
         id: 'moveToTrash',
-        value: path,
+        params: { path },
       },
     ])
 
+  const openEntryOnContents = (path: string, directory: boolean) => {
+    const paths = selected.includes(path) ? selected : [path]
+    return openContextMenu([
+      ...(paths.length === 1
+        ? [
+            {
+              id: directory ? 'openDirectory' : 'open',
+              params: { path },
+            },
+            {
+              id: 'revealInFinder',
+              params: { path },
+            },
+            { id: 'separator' },
+            {
+              id: 'copyPath',
+              params: { path },
+            },
+            { id: 'separator' },
+            ...(directory
+              ? [
+                  {
+                    id: 'toggleFavorite',
+                    params: { path, favorite: isFavorite(path) },
+                  },
+                ]
+              : []),
+          ]
+        : []),
+      { id: 'separator' },
+      {
+        id: 'moveToTrash',
+        params: { paths },
+      },
+    ])
+  }
+
   const openMore = () =>
     openContextMenu([
-      { id: 'newFolder', value: currentDirectory },
-      { id: 'revealInFinder', value: currentDirectory },
+      { id: 'newFolder', params: { path: currentDirectory } },
+      { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
-      { id: 'asList', value: viewMode === 'list' },
-      { id: 'asThumbnail', value: viewMode === 'thumbnail' },
+      { id: 'asList', params: { checked: viewMode === 'list' } },
+      { id: 'asThumbnail', params: { checked: viewMode === 'thumbnail' } },
       { id: 'separator' },
-      { id: 'toggleNavigator', value: isSidebarHidden('primary') },
-      { id: 'toggleInspector', value: isSidebarHidden('secondary') },
+      { id: 'toggleNavigator', params: { hidden: isSidebarHidden('primary') } },
+      {
+        id: 'toggleInspector',
+        params: { hidden: isSidebarHidden('secondary') },
+      },
       { id: 'separator' },
       {
         id: 'sortBy',
-        value: currentSortOption.orderBy,
+        params: { orderBy: currentSortOption.orderBy },
       },
       { id: 'settings' },
     ])
 
-  return { open, openEntry, openMore }
+  return { open, openEntry, openEntryOnContents, openMore }
 }

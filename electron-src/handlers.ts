@@ -12,6 +12,7 @@ import {
   getMetadata,
 } from './utils/ffmpeg'
 import {
+  createDirectory,
   getDetailedEntries,
   getEntries,
   getEntryHierarchy,
@@ -41,8 +42,8 @@ const registerHandlers = () => {
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path)
   )
-  ipcMain.handle('trash-item', (_event: IpcMainInvokeEvent, path: string) =>
-    shell.trashItem(path)
+  ipcMain.handle('trash-items', (_event: IpcMainInvokeEvent, paths: string[]) =>
+    Promise.all(paths.map((path) => shell.trashItem(path)))
   )
 
   ipcMain.handle(
@@ -66,6 +67,10 @@ const registerHandlers = () => {
   )
   ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
     getMetadata(path)
+  )
+  ipcMain.handle(
+    'create-directory',
+    (_event: IpcMainInvokeEvent, path: string) => createDirectory(path)
   )
 }
 

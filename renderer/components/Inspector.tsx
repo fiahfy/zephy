@@ -215,7 +215,7 @@ const Inspector = () => {
           >
             Preview
           </Typography>
-          <ImageList cols={1} gap={1} sx={{ my: 0 }}>
+          <ImageList cols={1} gap={1} sx={{ my: 0, userSelect: 'none' }}>
             {state.loading && (
               <ImageListItem>
                 <MessageBox>Loading...</MessageBox>
@@ -240,7 +240,10 @@ const Inspector = () => {
                           <img
                             loading="lazy"
                             src={fileUrl(entry.thumbnail)}
-                            style={{ minHeight: 128 }}
+                            style={{
+                              aspectRatio: '16 / 9',
+                              objectFit: 'contain',
+                            }}
                           />
                           <ImageListItemBar subtitle={entry.name} />
                         </ImageListItem>
@@ -261,7 +264,10 @@ const Inspector = () => {
                           <img
                             loading="lazy"
                             src={fileUrl(thumbnail)}
-                            style={{ minHeight: 128 }}
+                            style={{
+                              aspectRatio: '16 / 9',
+                              objectFit: 'contain',
+                            }}
                           />
                           <ImageListItemBar
                             subtitle={formatTime(
@@ -328,13 +334,14 @@ const Inspector = () => {
             >
               {content.name}
             </Typography>
-            {!state.loading &&
-              (state.type === 'video' || state.type === 'file') && (
-                <EntryInformationTable
-                  content={content}
-                  metadata={state.metadata}
-                />
-              )}
+            {!state.loading && (
+              <EntryInformationTable
+                content={content}
+                metadata={
+                  state.type === 'directory' ? undefined : state.metadata
+                }
+              />
+            )}
           </Box>
         </>
       )}

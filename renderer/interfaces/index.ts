@@ -12,39 +12,21 @@ export interface IElectronAPI {
   getWindowId: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
   openPath: (path: string) => Promise<void>
-  trashItem: (path: string) => Promise<void>
+  trashItems: (paths: string[]) => Promise<void>
   getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
   getEntries: (path: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
   getMetadata: (path: string) => Promise<Metadata>
+  createDirectory: (path: string) => Promise<DetailedEntry>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribe: (callback: (eventName: string, params: any) => void) => () => void
   contextMenu: {
     show: (
       params: ContextMenuParams,
       options: ContextMenuOption[]
     ) => Promise<void>
-  }
-  subscription: {
-    entry: (
-      callback: (
-        path: string,
-        operation:
-          | 'move'
-          | 'moveToTrash'
-          | 'newFolder'
-          | 'addToFavorites'
-          | 'removeFromFavorites'
-      ) => void
-    ) => () => void
-    fullscreen: (callback: (fullscreen: boolean) => void) => () => void
-    search: (callback: () => void) => () => void
-    settings: (callback: () => void) => () => void
-    sidebarHidden: (
-      callback: (variant: 'primary' | 'secondary', hidden: boolean) => void
-    ) => () => void
-    sort: (callback: (orderBy: keyof Content) => void) => () => void
-    viewMode: (callback: (viewMode: 'list' | 'thumbnail') => void) => () => void
   }
 }
 
@@ -57,7 +39,7 @@ export type ContextMenuParams = {
 export type ContextMenuOption = {
   id: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value?: any
+  params?: any
 }
 
 export type Settings = {

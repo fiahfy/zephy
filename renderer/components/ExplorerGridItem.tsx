@@ -49,7 +49,7 @@ const ExplorerGridItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { openEntry } = useContextMenu()
+  const { openEntryOnContents } = useContextMenu()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -104,11 +104,15 @@ const ExplorerGridItem = (props: Props) => {
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
-      onContextMenu={openEntry(content.path, content.type === 'directory')}
+      onContextMenu={openEntryOnContents(
+        content.path,
+        content.type === 'directory'
+      )}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',
         height: '100%!important',
+        userSelect: 'none',
         width: '100%',
         '&:hover': {
           '.overlay': {
@@ -151,7 +155,6 @@ const ExplorerGridItem = (props: Props) => {
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
-            userSelect: 'none',
           }}
         >
           <Typography variant="caption">{message}</Typography>
@@ -169,7 +172,6 @@ const ExplorerGridItem = (props: Props) => {
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              userSelect: 'none',
             }}
           >
             <NoOutlineRating

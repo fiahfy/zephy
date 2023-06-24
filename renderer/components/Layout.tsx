@@ -12,10 +12,11 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
 import {
   back,
+  changeDirectory,
   forward,
-  move,
-  moveToSettings,
+  goToSettings,
   moveToTrash,
+  newFolder,
   selectCurrentPathname,
   setSidebarHidden,
   setViewMode,
@@ -43,37 +44,28 @@ const Layout = (props: Props) => {
   }, [currentPathname, router])
 
   useEffect(() => {
-    const unsubscribeEntry = window.electronAPI.subscription.entry(
-      (path, operation) => {
-        switch (operation) {
-          case 'move':
-            return dispatch(move(path))
-          case 'moveToTrash':
-            return dispatch(moveToTrash(path))
-          case 'newFolder':
-            // TODO: Implement
-            return
-          case 'addToFavorites':
-            return dispatch(add(path))
-          case 'removeFromFavorites':
-            return dispatch(remove(path))
-        }
+    const unsubscribe = window.electronAPI.subscribe((eventName, params) => {
+      switch (eventName) {
+        case 'changeDirectory':
+          return dispatch(changeDirectory(params.path))
+        case 'moveToTrash':
+          return dispatch(moveToTrash(params.paths))
+        case 'newFolder':
+          return dispatch(newFolder(params.path))
+        case 'addToFavorites':
+          return dispatch(add(params.path))
+        case 'removeFromFavorites':
+          return dispatch(remove(params.path))
+        case 'goToSettings':
+          return dispatch(goToSettings())
+        case 'sort':
+          return dispatch(sort(params.orderBy))
+        case 'changeViewMode':
+          return dispatch(setViewMode(params.viewMode))
+        case 'changeSidebarHidden':
+          return dispatch(setSidebarHidden(params.variant, params.hidden))
       }
-    )
-    const unsubscribeSettings = window.electronAPI.subscription.settings(() =>
-      dispatch(moveToSettings())
-    )
-    const unsubscribeSidebarHidden =
-      window.electronAPI.subscription.sidebarHidden(
-        (variant: 'primary' | 'secondary', hidden: boolean) =>
-          dispatch(setSidebarHidden(variant, hidden))
-      )
-    const unsubscribeSort = window.electronAPI.subscription.sort((orderBy) =>
-      dispatch(sort(orderBy))
-    )
-    const unsubscribeViewMode = window.electronAPI.subscription.viewMode(
-      (viewMode) => dispatch(setViewMode(viewMode))
-    )
+    })
 
     const handleMouseDown = (e: globalThis.MouseEvent) => {
       switch (e.button) {
@@ -87,11 +79,7 @@ const Layout = (props: Props) => {
 
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
-      unsubscribeEntry()
-      unsubscribeSettings()
-      unsubscribeSidebarHidden()
-      unsubscribeSort()
-      unsubscribeViewMode()
+      unsubscribe()
     }
   }, [dispatch])
 

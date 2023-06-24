@@ -219,6 +219,24 @@ export const windowSlice = createSlice({
         },
       }
     },
+    add(
+      state,
+      action: PayloadAction<{ windowId: number; entry: DetailedEntry }>
+    ) {
+      const { windowId, entry } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          entries: [...windowState.entries, entry],
+        },
+      }
+    },
     select(state, action: PayloadAction<{ windowId: number; path: string }>) {
       const { windowId, path } = action.payload
       const windowState = state[windowId]
@@ -231,6 +249,46 @@ export const windowSlice = createSlice({
           ...defaultState,
           ...windowState,
           selected: [path],
+        },
+      }
+    },
+    multiSelect(
+      state,
+      action: PayloadAction<{ windowId: number; path: string }>
+    ) {
+      const { windowId, path } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      const selected = windowState.selected.includes(path)
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          selected: selected
+            ? windowState.selected.filter((p) => p !== path)
+            : [...windowState.selected, path],
+        },
+      }
+    },
+    rangeSelect(
+      state,
+      action: PayloadAction<{ windowId: number; paths: string[] }>
+    ) {
+      const { windowId, paths } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      const selected = windowState.selected.filter((p) => !paths.includes(p))
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          selected: [...selected, ...paths],
         },
       }
     },
@@ -269,7 +327,10 @@ export const windowSlice = createSlice({
         },
       }
     },
-    move(state, action: PayloadAction<{ windowId: number; path: string }>) {
+    changeDirectory(
+      state,
+      action: PayloadAction<{ windowId: number; path: string }>
+    ) {
       const { windowId, path } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
@@ -300,14 +361,16 @@ export const windowSlice = createSlice({
     },
     moveToTrash(
       state,
-      action: PayloadAction<{ windowId: number; path: string }>
+      action: PayloadAction<{ windowId: number; paths: string[] }>
     ) {
-      const { windowId, path } = action.payload
+      const { windowId, paths } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
         return state
       }
-      const entries = windowState.entries.filter((entry) => entry.path !== path)
+      const entries = windowState.entries.filter(
+        (entry) => !paths.includes(entry.path)
+      )
       return {
         ...state,
         [windowId]: {
@@ -614,6 +677,38 @@ export const select =
     dispatch(select({ windowId, path }))
   }
 
+export const multiSelect =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { multiSelect } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    dispatch(multiSelect({ windowId, path }))
+  }
+
+export const rangeSelect =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { rangeSelect } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    const contents = selectContents(getState())
+    const selected = selectSelected(getState())
+    const paths = contents.map((content) => content.path)
+    const prevSelected = selected[selected.length - 1]
+    let newPaths
+    if (prevSelected) {
+      const index = paths.indexOf(path)
+      const prevIndex = paths.indexOf(prevSelected)
+      newPaths =
+        prevIndex < index
+          ? paths.slice(prevIndex, index + 1)
+          : paths.slice(index, prevIndex + 1)
+    } else {
+      const index = paths.indexOf(path)
+      newPaths = paths.slice(0, index + 1)
+    }
+    dispatch(rangeSelect({ windowId, paths: newPaths }))
+  }
+
 export const unselectAll = (): AppThunk => async (dispatch, getState) => {
   const { unselectAll } = windowSlice.actions
   const windowId = selectWindowId(getState())
@@ -632,31 +727,41 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
-export const move =
+export const changeDirectory =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
-    const { move } = windowSlice.actions
+    const { changeDirectory } = windowSlice.actions
     const windowId = selectWindowId(getState())
-    dispatch(move({ windowId, path }))
+    dispatch(changeDirectory({ windowId, path }))
   }
 
 export const moveToTrash =
-  (path: string): AppThunk =>
+  (paths: string[]): AppThunk =>
   async (dispatch, getState) => {
     const { moveToTrash } = windowSlice.actions
     const windowId = selectWindowId(getState())
-    await window.electronAPI.trashItem(path)
-    dispatch(moveToTrash({ windowId, path }))
+    await window.electronAPI.trashItems(paths)
+    dispatch(moveToTrash({ windowId, paths }))
   }
 
-export const moveToHome = (): AppThunk => async (dispatch) => {
+export const goHome = (): AppThunk => async (dispatch) => {
   const homePath = await window.electronAPI.getHomePath()
-  return dispatch(move(homePath))
+  return dispatch(changeDirectory(homePath))
 }
 
-export const moveToSettings = (): AppThunk => async (dispatch) => {
-  dispatch(move('zephy://settings'))
+export const goToSettings = (): AppThunk => async (dispatch) => {
+  dispatch(changeDirectory('zephy://settings'))
 }
+
+export const newFolder =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { add, select } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    const entry = await window.electronAPI.createDirectory(path)
+    dispatch(add({ windowId, entry }))
+    dispatch(select({ windowId, path: entry.path }))
+  }
 
 export const scroll =
   (scrollTop: number): AppThunk =>

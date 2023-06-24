@@ -27,7 +27,7 @@ const registerApplicationMenu = (createWindow: () => void) => {
               {
                 label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
-                click: () => send('subscription-settings'),
+                click: () => send('subscribe', 'goToSettings'),
               },
               { type: 'separator' },
               { role: 'services' },

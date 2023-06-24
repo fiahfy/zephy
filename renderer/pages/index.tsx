@@ -1,12 +1,14 @@
 import { Box } from '@mui/material'
-import { createElement } from 'react'
+import { MouseEvent, createElement } from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
-  move,
+  changeDirectory,
+  multiSelect,
+  rangeSelect,
   scroll,
   select,
   selectContents,
@@ -36,12 +38,22 @@ const IndexPage = () => {
     orderBy: keyof Content
   }) => dispatch(sort(sortOption.orderBy, sortOption.order))
 
-  const handleClickContent = (content: Content) =>
-    dispatch(select(content.path))
+  const handleClickContent = (
+    e: MouseEvent<HTMLDivElement>,
+    content: Content
+  ) => {
+    if (e.shiftKey) {
+      dispatch(rangeSelect(content.path))
+    } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+      dispatch(multiSelect(content.path))
+    } else {
+      dispatch(select(content.path))
+    }
+  }
 
   const handleDoubleClickContent = async (content: Content) =>
     content.type === 'directory'
-      ? dispatch(move(content.path))
+      ? dispatch(changeDirectory(content.path))
       : await window.electronAPI.openPath(content.path)
 
   const handleFocusContent = (content: Content) =>
@@ -53,7 +65,7 @@ const IndexPage = () => {
       return
     }
     if (content.type === 'directory') {
-      dispatch(move(content.path))
+      dispatch(changeDirectory(content.path))
     } else {
       await window.electronAPI.openPath(content.path)
     }

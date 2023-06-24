@@ -11,7 +11,7 @@ import Icon from 'components/Icon'
 import { useContextMenu } from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'
-import { move } from 'store/window'
+import { changeDirectory } from 'store/window'
 
 const FavoriteTable = () => {
   const favorites = useAppSelector(selectFavorites)
@@ -40,7 +40,7 @@ const FavoriteTable = () => {
 
   const handleBlur = () => setSelected([])
 
-  const handleClick = (path: string) => dispatch(move(path))
+  const handleClick = (path: string) => dispatch(changeDirectory(path))
 
   const handleFocus = (path: string) => setSelected([path])
 

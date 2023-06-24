@@ -17,7 +17,7 @@ export type ContextMenuParams = {
 export type ContextMenuOption = {
   id: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value?: any
+  params?: any
 }
 
 const registerContextMenu = () => {
@@ -52,7 +52,7 @@ const registerContextMenu = () => {
         },
         search: {
           accelerator: 'CommandOrControl+F',
-          click: () => send('subscription-search'),
+          click: () => send('subscribe', 'search'),
           label: `Search for “${params.selectionText.trim()}”`,
           visible: params.selectionText.trim().length > 0,
         },
@@ -64,48 +64,46 @@ const registerContextMenu = () => {
         ) => MenuItemConstructorOptions
       } = {
         separator: () => defaultActions.separator,
-        open: (option) => ({
-          click: () => shell.openPath(option.value),
+        open: ({ params }) => ({
+          click: () => shell.openPath(params.path),
           label: 'Open',
         }),
-        openDirectory: (option) => ({
-          click: () => send('subscription-entry', option.value, 'move'),
+        openDirectory: ({ params }) => ({
+          click: () =>
+            send('subscribe', 'changeDirectory', { path: params.path }),
           label: 'Open',
         }),
-        revealInFinder: (option) => ({
-          click: () => shell.showItemInFolder(option.value),
+        revealInFinder: ({ params }) => ({
+          click: () => shell.showItemInFolder(params.path),
           label: 'Reveal in Finder',
         }),
-        newFolder: (option) => ({
-          click: async () =>
-            send('subscription-entry', option.value, 'newFolder'),
+        newFolder: ({ params }) => ({
+          click: () => send('subscribe', 'newFolder', { path: params.path }),
           label: 'New Folder',
         }),
-        copyPath: (option) => ({
-          click: () => clipboard.writeText(option.value),
+        copyPath: ({ params }) => ({
+          click: () => clipboard.writeText(params.path),
           label: 'Copy Path',
         }),
-        moveToTrash: (option) => ({
-          click: async () =>
-            send('subscription-entry', option.value, 'moveToTrash'),
+        moveToTrash: ({ params }) => ({
+          click: () =>
+            send('subscribe', 'moveToTrash', { paths: params.paths }),
           label: 'Move to Trash',
         }),
-        toggleFavorite: (option) => ({
+        toggleFavorite: ({ params }) => ({
           click: () =>
             send(
-              'subscription-entry',
-              option.value.path,
-              option.value.favorite ? 'removeFromFavorites' : 'addToFavorites'
+              'subscribe',
+              params.favorite ? 'removeFromFavorites' : 'addToFavorites',
+              { path: params.path }
             ),
-          label: option.value.favorite
-            ? 'Remove from Favorites'
-            : 'Add to Favorites',
+          label: params.favorite ? 'Remove from Favorites' : 'Add to Favorites',
         }),
         settings: () => ({
-          click: () => send('subscription-settings'),
+          click: () => send('subscribe', 'goToSettings'),
           label: 'Settings',
         }),
-        sortBy: (option) => ({
+        sortBy: ({ params }) => ({
           label: 'Sort By',
           submenu: [
             { label: 'Name', key: 'name' },
@@ -116,32 +114,40 @@ const registerContextMenu = () => {
             { label: 'Rating', key: 'rating' },
           ].map((menu) => ({
             ...menu,
-            checked: menu.key === option.value,
-            click: () => send('subscription-sort', menu.key),
+            checked: menu.key === params.orderBy,
+            click: () => send('subscribe', 'sort', { orderBy: menu.key }),
             type: 'checkbox',
           })),
         }),
-        asList: (option) => ({
+        asList: ({ params }) => ({
           label: 'as List',
-          checked: option.value,
-          click: () => send('subscription-view-mode', 'list'),
+          checked: params.checked,
+          click: () =>
+            send('subscribe', 'changeViewMode', { viewMode: 'list' }),
           type: 'checkbox',
         }),
-        asThumbnail: (option) => ({
+        asThumbnail: ({ params }) => ({
           label: 'as Thumbnail',
-          checked: option.value,
-          click: () => send('subscription-view-mode', 'thumbnail'),
+          checked: params.checked,
+          click: () =>
+            send('subscribe', 'changeViewMode', { viewMode: 'thumbnail' }),
           type: 'checkbox',
         }),
-        toggleNavigator: (option) => ({
-          label: option.value ? 'Show Navigator' : 'Hide Navigator',
+        toggleNavigator: ({ params }) => ({
+          label: params.hidden ? 'Show Navigator' : 'Hide Navigator',
           click: () =>
-            send('subscription-sidebar-hidden', 'primary', !option.value),
+            send('subscribe', 'changeSidebarHidden', {
+              variant: 'primary',
+              hidden: !params.hidden,
+            }),
         }),
-        toggleInspector: (option) => ({
-          label: option.value ? 'Show Inspector' : 'Hide Inspector',
+        toggleInspector: ({ params }) => ({
+          label: params.hidden ? 'Show Inspector' : 'Hide Inspector',
           click: () =>
-            send('subscription-inspector-hidden', 'secondary', !option.value),
+            send('subscribe', 'changeSidebarHidden', {
+              variant: 'secondary',
+              hidden: !params.hidden,
+            }),
         }),
       }
 

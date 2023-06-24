@@ -30,10 +30,9 @@ const createWindow = (state: State) => {
   }
 
   browserWindow.on('resize', () => {
-    browserWindow.webContents.send(
-      'subscription-fullscreen',
-      browserWindow.isFullScreen()
-    )
+    browserWindow.webContents.send('subscribe', 'changeFullscreen', {
+      fullscreen: browserWindow.isFullScreen(),
+    })
   })
 
   return browserWindow

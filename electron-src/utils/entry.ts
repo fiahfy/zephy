@@ -1,7 +1,7 @@
 import { Dirent, Stats, promises } from 'fs'
-import { join, sep } from 'path'
+import { basename, join, sep } from 'path'
 
-const { readdir, stat } = promises
+const { mkdir, readdir, stat } = promises
 
 type File = {
   name: string
@@ -32,10 +32,28 @@ const getEntryType = (obj: Dirent | Stats) => {
   }
 }
 
+export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
+  const dirents = await readdir(directoryPath, { withFileTypes: true })
+  return dirents.reduce((carry, dirent) => {
+    const type = getEntryType(dirent)
+    if (type === 'other') {
+      return carry
+    }
+    return [
+      ...carry,
+      {
+        name: dirent.name.normalize('NFC'),
+        path: join(directoryPath, dirent.name),
+        type,
+      },
+    ]
+  }, [] as Entry[])
+}
+
 export const getDetailedEntries = async (
-  path: string
+  directoryPath: string
 ): Promise<DetailedEntry[]> => {
-  const entries = await getEntries(path)
+  const entries = await getEntries(directoryPath)
   return await Promise.all(
     entries.map(async (entry) => {
       const stats = await stat(entry.path)
@@ -50,22 +68,21 @@ export const getDetailedEntries = async (
   )
 }
 
-export const getEntries = async (path: string): Promise<Entry[]> => {
-  const dirents = await readdir(path, { withFileTypes: true })
-  return dirents.reduce((carry, dirent) => {
-    const type = getEntryType(dirent)
-    if (type === 'other') {
-      return carry
-    }
-    return [
-      ...carry,
-      {
-        name: dirent.name.normalize('NFC'),
-        path: join(path, dirent.name),
-        type,
-      },
-    ]
-  }, [] as Entry[])
+const getDetailedEntry = async (path: string): Promise<DetailedEntry> => {
+  const stats = await stat(path)
+  const type = getEntryType(stats)
+  if (type === 'other') {
+    throw new Error('Invalid entry type')
+  }
+  return {
+    name: basename(path).normalize('NFC'),
+    path,
+    type,
+    dateCreated: stats.birthtimeMs,
+    dateModified: stats.mtimeMs,
+    dateLastOpened: stats.atimeMs,
+    size: stats.size,
+  }
 }
 
 export const getEntryHierarchy = async (path: string) => {
@@ -115,4 +132,46 @@ export const getEntryHierarchy = async (path: string) => {
   }, Promise.resolve(entry))
 
   return entry.children?.[0]
+}
+
+const findMissingNumber = (arr: number[]) => {
+  const sortedArr = arr.sort((a, b) => a - b)
+  let missingNumber = 1
+
+  for (const num of sortedArr) {
+    if (num === missingNumber) {
+      missingNumber++
+    } else if (num > missingNumber) {
+      break
+    }
+  }
+
+  return missingNumber
+}
+
+const generateNewDirectoryName = async (directoryPath: string) => {
+  const basename = 'untitled folder'
+  const entries = await getEntries(directoryPath)
+  const numbers = entries.reduce((carry, entry) => {
+    if (entry.type !== 'directory') {
+      return carry
+    }
+    if (entry.name === basename) {
+      return [...carry, 1]
+    }
+    const match = entry.name.match(/^untitled folder ([1-9]\d*)$/)
+    if (match) {
+      return [...carry, Number(match[1])]
+    }
+    return carry
+  }, [] as number[])
+  const missingNumber = findMissingNumber(numbers)
+  return missingNumber === 1 ? basename : `${basename} ${missingNumber}`
+}
+
+export const createDirectory = async (directoryPath: string) => {
+  const directoryName = await generateNewDirectoryName(directoryPath)
+  const path = join(directoryPath, directoryName)
+  await mkdir(path)
+  return await getDetailedEntry(path)
 }

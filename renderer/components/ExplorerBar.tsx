@@ -35,10 +35,10 @@ import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
 import {
   back,
+  changeDirectory,
   forward,
+  goHome,
   load,
-  move,
-  moveToHome,
   searchQuery,
   selectCanBack,
   selectCanForward,
@@ -71,10 +71,13 @@ const ExplorerBar = () => {
   )
 
   useEffect(() => {
-    const unsubscribe = window.electronAPI.subscription.search(() => {
-      search(document.getSelection()?.toString() ?? '')
-      ref.current && ref.current?.focus()
+    const unsubscribe = window.electronAPI.subscribe((eventName) => {
+      if (eventName === 'search') {
+        search(document.getSelection()?.toString() ?? '')
+        ref.current && ref.current?.focus()
+      }
     })
+
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if (
         e.key === 'f' &&
@@ -107,7 +110,7 @@ const ExplorerBar = () => {
 
   useEffect(() => {
     if (!currentDirectory) {
-      dispatch(moveToHome())
+      dispatch(goHome())
     }
   }, [currentDirectory, dispatch])
 
@@ -118,7 +121,7 @@ const ExplorerBar = () => {
 
   const handleClickUpward = async () => {
     const dirPath = await window.electronAPI.dirname(directory)
-    dispatch(move(dirPath))
+    dispatch(changeDirectory(dirPath))
   }
 
   const handleClickRefresh = async () => {
@@ -147,7 +150,7 @@ const ExplorerBar = () => {
 
   const handleKeyDownDirectory = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
-      dispatch(move(directory))
+      dispatch(changeDirectory(directory))
     }
   }
 

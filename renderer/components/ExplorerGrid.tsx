@@ -1,7 +1,7 @@
 import { Box, LinearProgress } from '@mui/material'
 import {
-  FocusEvent,
   KeyboardEvent,
+  MouseEvent,
   useEffect,
   useMemo,
   useRef,
@@ -19,7 +19,7 @@ type Props = {
   contentSelected: (content: Content) => boolean
   contents: Content[]
   loading: boolean
-  onClickContent: (content: Content) => void
+  onClickContent: (e: MouseEvent<HTMLDivElement>, content: Content) => void
   onDoubleClickContent: (content: Content) => void
   onFocusContent: (content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
@@ -89,6 +89,17 @@ const ExplorerGrid = (props: Props) => {
     [contents, size]
   )
 
+  const focus = (row: number, column: number) => {
+    const el = ref.current?.querySelector<HTMLDivElement>(
+      `[data-grid-row="${row}"][data-grid-column="${column}"]`
+    )
+    const content = chunks[row - 1]?.[column - 1]
+    if (el && content) {
+      el.focus()
+      onFocusContent(content)
+    }
+  }
+
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const row = Number(document.activeElement?.getAttribute('data-grid-row'))
     const column = Number(
@@ -100,51 +111,16 @@ const ExplorerGrid = (props: Props) => {
           onKeyDownEnter(e)
         }
         return
-      case 'ArrowUp': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row - 1}"][data-grid-column="${column}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowDown': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row + 1}"][data-grid-column="${column}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowLeft': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row}"][data-grid-column="${column - 1}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowRight': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[data-grid-row="${row}"][data-grid-column="${column + 1}"]`
-        )
-        el && el.focus()
-        break
-      }
+      case 'ArrowUp':
+        return focus(row - 1, column)
+      case 'ArrowDown':
+        return focus(row + 1, column)
+      case 'ArrowLeft':
+        return focus(row, column - 1)
+      case 'ArrowRight':
+        return focus(row, column + 1)
     }
   }
-
-  const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
-    const rowIndex = Number(e.target.getAttribute('data-grid-row')) - 1
-    const columnIndex = Number(e.target.getAttribute('data-grid-column')) - 1
-    if (rowIndex < 0 || columnIndex < 0) {
-      return
-    }
-    const content = chunks[rowIndex]?.[columnIndex]
-    content && onFocusContent(content)
-  }
-
-  const handleContentClick = (content: Content) => onClickContent(content)
-
-  const handleContentDoubleClick = (content: Content) =>
-    onDoubleClickContent(content)
 
   const cellRenderer = ({
     columnIndex,
@@ -159,8 +135,8 @@ const ExplorerGrid = (props: Props) => {
           <ExplorerGridItem
             columnIndex={columnIndex}
             content={content}
-            onClick={() => handleContentClick(content)}
-            onDoubleClick={() => handleContentDoubleClick(content)}
+            onClick={(e) => onClickContent(e, content)}
+            onDoubleClick={() => onDoubleClickContent(content)}
             rowIndex={rowIndex}
             selected={contentSelected(content)}
           />
@@ -170,12 +146,7 @@ const ExplorerGrid = (props: Props) => {
   }
 
   return (
-    <Box
-      onFocus={handleFocus}
-      onKeyDown={handleKeyDown}
-      ref={ref}
-      sx={{ height: '100%' }}
-    >
+    <Box onKeyDown={handleKeyDown} ref={ref} sx={{ height: '100%' }}>
       <AutoSizer>
         {({ height, width }) => (
           <Grid

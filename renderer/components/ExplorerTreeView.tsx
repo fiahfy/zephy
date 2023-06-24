@@ -8,7 +8,11 @@ import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { move, selectCurrentDirectory, selectIndexPage } from 'store/window'
+import {
+  changeDirectory,
+  selectCurrentDirectory,
+  selectIndexPage,
+} from 'store/window'
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
@@ -60,7 +64,7 @@ const ExplorerTreeView = () => {
     }
     const entry = entryMap[nodeIds]
     if (entry && entry.type === 'directory') {
-      dispatch(move(nodeIds))
+      dispatch(changeDirectory(nodeIds))
     }
   }
 

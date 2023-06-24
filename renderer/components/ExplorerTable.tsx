@@ -7,8 +7,8 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import {
-  FocusEvent,
   KeyboardEvent,
+  MouseEvent,
   useCallback,
   useEffect,
   useRef,
@@ -76,7 +76,7 @@ type Props = {
   contents: Content[]
   loading: boolean
   onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
-  onClickContent: (content: Content) => void
+  onClickContent: (e: MouseEvent<HTMLDivElement>, content: Content) => void
   onDoubleClickContent: (content: Content) => void
   onFocusContent: (content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
@@ -103,7 +103,7 @@ const ExplorerTable = (props: Props) => {
   const getRating = useAppSelector(selectGetRating)
   const dispatch = useAppDispatch()
 
-  const { openEntry } = useContextMenu()
+  const { openEntryOnContents } = useContextMenu()
   const previousLoading = usePrevious(loading)
 
   const ref = useRef<HTMLDivElement>(null)
@@ -142,6 +142,17 @@ const ExplorerTable = (props: Props) => {
     return widths.map((width) => (width === undefined ? flexibleWidth : width))
   }, [])
 
+  const focus = (row: number) => {
+    const el = ref.current?.querySelector<HTMLDivElement>(
+      `[aria-rowindex="${row}"]`
+    )
+    const content = contents[row - 1]
+    if (el && content) {
+      el.focus()
+      onFocusContent(content)
+    }
+  }
+
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const row = Number(document.activeElement?.getAttribute('aria-rowindex'))
     switch (e.key) {
@@ -149,35 +160,16 @@ const ExplorerTable = (props: Props) => {
         if (!e.nativeEvent.isComposing) {
           onKeyDownEnter(e)
         }
-        break
-      case 'ArrowUp': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[aria-rowindex="${row - 1}"]`
-        )
-        el && el.focus()
-        break
-      }
-      case 'ArrowDown': {
-        const el = ref.current?.querySelector<HTMLDivElement>(
-          `[aria-rowindex="${row + 1}"]`
-        )
-        el && el.focus()
-        break
-      }
+        return
+      case 'ArrowUp':
+        return focus(row - 1)
+      case 'ArrowDown':
+        return focus(row + 1)
     }
-  }
-
-  const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
-    const index = Number(e.target.getAttribute('aria-rowindex')) - 1
-    if (index < 0) {
-      return
-    }
-    const content = contents[index]
-    content && onFocusContent(content)
   }
 
   const handleRowClick = (info: RowMouseEventHandlerParams) =>
-    onClickContent(info.rowData)
+    onClickContent(info.event, info.rowData)
 
   const handleRowDoubleClick = (info: RowMouseEventHandlerParams) =>
     onDoubleClickContent(info.rowData)
@@ -231,7 +223,10 @@ const ExplorerTable = (props: Props) => {
       <TableCell
         align={align}
         component="div"
-        onContextMenu={openEntry(rowData.path, rowData.type === 'directory')}
+        onContextMenu={openEntryOnContents(
+          rowData.path,
+          rowData.type === 'directory'
+        )}
         sx={{
           alignItems: 'center',
           borderBottom: 'none',
@@ -240,6 +235,7 @@ const ExplorerTable = (props: Props) => {
           height: rowHeight,
           px: 1,
           py: 0,
+          userSelect: 'none',
         }}
         title={dataKey === 'name' ? rowData.name : undefined}
       >
@@ -281,7 +277,6 @@ const ExplorerTable = (props: Props) => {
 
   return (
     <Box
-      onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       ref={ref}
       sx={{
