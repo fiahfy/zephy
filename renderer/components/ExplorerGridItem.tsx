@@ -179,6 +179,7 @@ const ExplorerGridItem = (props: Props) => {
               onChange={(_e, value) =>
                 appDispatch(rate({ path: content.path, rating: value ?? 0 }))
               }
+              onClick={(e) => e.stopPropagation()}
               precision={0.5}
               size="small"
               sx={{ my: 0.25 }}
@@ -223,6 +224,7 @@ const ExplorerGridItem = (props: Props) => {
         className="overlay"
         sx={{
           height: '100%',
+          left: 0,
           pointerEvents: 'none',
           position: 'absolute',
           top: 0,

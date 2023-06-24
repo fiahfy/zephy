@@ -9,57 +9,82 @@ import {
 import { Content, Metadata } from 'interfaces'
 import { formatDate, formatFileSize, formatTime } from 'utils/entry'
 
+const getTotalFileSize = (contents: Content[]) =>
+  contents
+    .filter((content) => content.type === 'file')
+    .reduce((carry, content) => carry + content.size, 0)
+
+const formatDateRange = (
+  contents: Content[],
+  dateProperty: 'dateCreated' | 'dateModified' | 'dateLastOpened'
+) => {
+  const content = contents[0]
+  if (!content) {
+    return
+  }
+  if (contents.length > 1) {
+    const dates = contents.map((content) => content[dateProperty])
+    const minDate = Math.min(...dates)
+    const maxDate = Math.max(...dates)
+    return minDate === maxDate
+      ? formatDate(minDate)
+      : `${formatDate(minDate)} - ${formatDate(maxDate)}`
+  } else {
+    return formatDate(content[dateProperty])
+  }
+}
+
 type Props = {
-  content: Content
+  contents: Content[]
   metadata?: Metadata
 }
 const EntryInformationTable = (props: Props) => {
-  const { content, metadata } = props
+  const { contents, metadata } = props
 
-  const rows = content
-    ? [
-        ...(content.type === 'file'
-          ? [
-              {
-                label: 'Size',
-                value: formatFileSize(content.size),
-              },
-            ]
-          : []),
-        {
-          label: 'Date Created',
-          value: formatDate(content.dateCreated),
-        },
-        {
-          label: 'Date Modified',
-          value: formatDate(content.dateModified),
-        },
-        {
-          label: 'Date Last Opened',
-          value: formatDate(content.dateLastOpened),
-        },
-        ...(metadata
-          ? [
-              ...(metadata.height && metadata.width
-                ? [
-                    {
-                      label: 'Dimensions',
-                      value: `${metadata.width}x${metadata.height}`,
-                    },
-                  ]
-                : []),
-              ...(metadata.duration
-                ? [
-                    {
-                      label: 'Duration',
-                      value: formatTime(metadata.duration),
-                    },
-                  ]
-                : []),
-            ]
-          : []),
-      ]
-    : []
+  const fileSize = getTotalFileSize(contents)
+
+  const rows = [
+    ...(fileSize
+      ? [
+          {
+            label: 'Size',
+            value: formatFileSize(fileSize),
+          },
+        ]
+      : []),
+    {
+      label: 'Date Created',
+      value: formatDateRange(contents, 'dateCreated'),
+    },
+    {
+      label: 'Date Modified',
+      value: formatDateRange(contents, 'dateModified'),
+    },
+    {
+      label: 'Date Last Opened',
+      value: formatDateRange(contents, 'dateLastOpened'),
+    },
+    ...(metadata
+      ? [
+          ...(metadata.height && metadata.width
+            ? [
+                {
+                  label: 'Dimensions',
+                  value: `${metadata.width}x${metadata.height}`,
+                },
+              ]
+            : []),
+          ...(metadata.duration
+            ? [
+                {
+                  label: 'Duration',
+                  value: formatTime(metadata.duration),
+                },
+              ]
+            : []),
+        ]
+      : []),
+  ]
 
   return (
     <Table size="small" sx={{ userSelect: 'none' }}>

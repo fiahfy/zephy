@@ -44,7 +44,7 @@ type State =
     }
   | {
       loading: false
-      type: 'file'
+      type: 'other'
       metadata?: Metadata
       thumbnail?: string
     }
@@ -63,7 +63,7 @@ type Action =
             thumbnails: string[]
           }
         | {
-            type: 'file'
+            type: 'other'
             metadata?: Metadata
             thumbnail?: string
           }
@@ -99,12 +99,14 @@ const MessageBox = (props: { children: ReactNode }) => {
 }
 
 const Inspector = () => {
-  const [content] = useAppSelector(selectSelectedContents)
+  const contents = useAppSelector(selectSelectedContents)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const { openEntry } = useContextMenu()
 
   const [state, dispatch] = useReducer(reducer, { loading: true })
+
+  const content = contents[0]
 
   useEffect(() => {
     let unmounted = false
@@ -114,65 +116,52 @@ const Inspector = () => {
         return
       }
       dispatch({ type: 'loading' })
-      if (content.type === 'directory') {
-        let entries: Entry[] = []
-        try {
-          entries = await window.electronAPI.getEntries(content.path)
-        } catch (e) {
-          // noop
+      const payload = await (async () => {
+        if (contents.length > 1) {
+          return { type: 'other' as const }
+        } else if (content.type === 'directory') {
+          let entries: Entry[] = []
+          try {
+            entries = await window.electronAPI.getEntries(content.path)
+          } catch (e) {
+            // noop
+          }
+          entries = entries.filter(
+            (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+          )
+          const paths = entries.map((entry) => entry.path)
+          const thumbnails = await getThumbnails(paths)
+          const newEntries = entries.reduce((carry, entry, i) => {
+            const thumbnail = thumbnails[i]
+            return thumbnail ? [...carry, { ...entry, thumbnail }] : carry
+          }, [] as EntryWithThumbnail[])
+          return { type: 'directory' as const, entries: newEntries }
+        } else if (isVideoFile(content.path)) {
+          const [metadata, thumbnails] = await Promise.all([
+            getMetadata(content.path),
+            getVideoThumbnails(content.path),
+          ])
+          return { type: 'video' as const, metadata, thumbnails }
+        } else if (isMediaFile(content.path)) {
+          const [metadata, thumbnail] = await Promise.all([
+            getMetadata(content.path),
+            getThumbnail(content.path),
+          ])
+          return { type: 'other' as const, metadata, thumbnail }
+        } else {
+          return { type: 'other' as const }
         }
-        entries = entries.filter(
-          (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
-        )
-        const paths = entries.map((entry) => entry.path)
-        const thumbnails = await getThumbnails(paths)
-        const newEntries = entries.reduce((carry, entry, i) => {
-          const thumbnail = thumbnails[i]
-          return thumbnail ? [...carry, { ...entry, thumbnail }] : carry
-        }, [] as EntryWithThumbnail[])
-        if (unmounted) {
-          return
-        }
-        if (unmounted) {
-          return
-        }
-        dispatch({
-          type: 'loaded',
-          payload: { type: 'directory', entries: newEntries },
-        })
-      } else if (isVideoFile(content.path)) {
-        const [metadata, thumbnails] = await Promise.all([
-          getMetadata(content.path),
-          getVideoThumbnails(content.path),
-        ])
-        if (unmounted) {
-          return
-        }
-        dispatch({
-          type: 'loaded',
-          payload: { type: 'video', metadata, thumbnails },
-        })
-      } else if (isMediaFile(content.path)) {
-        const [metadata, thumbnail] = await Promise.all([
-          getMetadata(content.path),
-          getThumbnail(content.path),
-        ])
-        if (unmounted) {
-          return
-        }
-        dispatch({
-          type: 'loaded',
-          payload: { type: 'file', metadata, thumbnail },
-        })
-      } else {
-        dispatch({ type: 'loaded', payload: { type: 'file' } })
+      })()
+      if (unmounted) {
+        return
       }
+      dispatch({ type: 'loaded', payload })
     })()
 
     return () => {
       unmounted = true
     }
-  }, [content, shouldShowHiddenFiles])
+  }, [content, contents.length, shouldShowHiddenFiles])
 
   const handleDoubleClick = async (entry: Entry) =>
     await window.electronAPI.openPath(entry.path)
@@ -233,6 +222,12 @@ const Inspector = () => {
                           onDoubleClick={() => handleDoubleClick(entry)}
                           sx={{
                             cursor: 'pointer',
+                            '&:hover': {
+                              '.overlay': {
+                                backgroundColor: (theme) =>
+                                  theme.palette.action.hover,
+                              },
+                            },
                           }}
                           tabIndex={0}
                         >
@@ -246,6 +241,17 @@ const Inspector = () => {
                             }}
                           />
                           <ImageListItemBar subtitle={entry.name} />
+                          <Box
+                            className="overlay"
+                            sx={{
+                              height: '100%',
+                              left: 0,
+                              pointerEvents: 'none',
+                              position: 'absolute',
+                              top: 0,
+                              width: '100%',
+                            }}
+                          />
                         </ImageListItem>
                       ))
                     ) : (
@@ -288,7 +294,7 @@ const Inspector = () => {
                     )}
                   </>
                 )}
-                {state.type === 'file' && (
+                {state.type === 'other' && (
                   <>
                     {state.thumbnail ? (
                       <ImageListItem>
@@ -332,11 +338,11 @@ const Inspector = () => {
               }}
               variant="caption"
             >
-              {content.name}
+              {contents.length > 1 ? `${contents.length} items` : content.name}
             </Typography>
             {!state.loading && (
               <EntryInformationTable
-                content={content}
+                contents={contents}
                 metadata={
                   state.type === 'directory' ? undefined : state.metadata
                 }

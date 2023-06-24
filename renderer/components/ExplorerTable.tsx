@@ -254,6 +254,7 @@ const ExplorerTable = (props: Props) => {
                 onChange={(_e, value) =>
                   dispatch(rate({ path: rowData.path, rating: value ?? 0 }))
                 }
+                onClick={(e) => e.stopPropagation()}
                 precision={0.5}
                 size="small"
                 value={getRating(rowData.path)}
