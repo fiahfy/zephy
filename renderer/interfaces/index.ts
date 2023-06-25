@@ -8,26 +8,24 @@ export interface IElectronAPI {
   basename: (path: string) => Promise<string>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
-  getHomePath: () => Promise<string>
-  getWindowId: () => Promise<number | undefined>
-  isFullscreen: () => Promise<boolean>
-  openPath: (path: string) => Promise<void>
-  trashItems: (paths: string[]) => Promise<void>
   getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
   getEntries: (path: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
+  getHomePath: () => Promise<string>
+  getMetadata: (path: string) => Promise<Metadata>
+  getWindowId: () => Promise<number | undefined>
+  isFullscreen: () => Promise<boolean>
+  createDirectory: (path: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
-  getMetadata: (path: string) => Promise<Metadata>
-  createDirectory: (path: string) => Promise<DetailedEntry>
+  openPath: (path: string) => Promise<void>
+  showContextMenu: (
+    params: ContextMenuParams,
+    options: ContextMenuOption[]
+  ) => Promise<void>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscribe: (callback: (eventName: string, params: any) => void) => () => void
-  contextMenu: {
-    show: (
-      params: ContextMenuParams,
-      options: ContextMenuOption[]
-    ) => Promise<void>
-  }
+  trashItems: (paths: string[]) => Promise<void>
 }
 
 export type ContextMenuParams = {

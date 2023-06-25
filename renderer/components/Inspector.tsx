@@ -9,21 +9,21 @@ import fileUrl from 'file-url'
 import { ReactNode, useEffect, useReducer, useRef } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
+import { useContextMenu } from 'hooks/useContextMenu'
 import { Entry, Metadata } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { selectSelectedContents } from 'store/window'
 import {
+  createThumbnailIfNeeded,
+  createThumbnailsIfNeeded,
+  createVideoThumbnails,
   formatTime,
   getMetadata,
-  getThumbnail,
-  getThumbnails,
-  getVideoThumbnails,
   isHiddenFile,
   isMediaFile,
   isVideoFile,
-} from 'utils/entry'
-import { useContextMenu } from 'hooks/useContextMenu'
+} from 'utils/file'
 
 type EntryWithThumbnail = Entry & { thumbnail: string }
 
@@ -102,7 +102,7 @@ const Inspector = () => {
   const contents = useAppSelector(selectSelectedContents)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
-  const { openEntry } = useContextMenu()
+  const { createEntryMenuHandler } = useContextMenu()
 
   const [state, dispatch] = useReducer(reducer, { loading: true })
   const ref = useRef<HTMLDivElement>(null)
@@ -136,7 +136,7 @@ const Inspector = () => {
             (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
           )
           const paths = entries.map((entry) => entry.path)
-          const thumbnails = await getThumbnails(paths)
+          const thumbnails = await createThumbnailsIfNeeded(paths)
           const newEntries = entries.reduce((carry, entry, i) => {
             const thumbnail = thumbnails[i]
             return thumbnail ? [...carry, { ...entry, thumbnail }] : carry
@@ -145,13 +145,13 @@ const Inspector = () => {
         } else if (isVideoFile(content.path)) {
           const [metadata, thumbnails] = await Promise.all([
             getMetadata(content.path),
-            getVideoThumbnails(content.path),
+            createVideoThumbnails(content.path),
           ])
           return { type: 'video' as const, metadata, thumbnails }
         } else if (isMediaFile(content.path)) {
           const [metadata, thumbnail] = await Promise.all([
             getMetadata(content.path),
-            getThumbnail(content.path),
+            createThumbnailIfNeeded(content.path),
           ])
           return { type: 'other' as const, metadata, thumbnail }
         } else {
@@ -226,7 +226,10 @@ const Inspector = () => {
                       state.entries.map((entry) => (
                         <ImageListItem
                           key={entry.path}
-                          onContextMenu={openEntry(entry.path, false)}
+                          onContextMenu={createEntryMenuHandler(
+                            entry.path,
+                            false
+                          )}
                           onDoubleClick={() => handleDoubleClick(entry)}
                           sx={{
                             cursor: 'pointer',

@@ -16,7 +16,7 @@ import {
   getDetailedEntries,
   getEntries,
   getEntryHierarchy,
-} from './utils/entry'
+} from './utils/file'
 
 const registerHandlers = () => {
   ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
@@ -57,6 +57,13 @@ const registerHandlers = () => {
     'get-entry-hierarchy',
     (_event: IpcMainInvokeEvent, path: string) => getEntryHierarchy(path)
   )
+  ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
+    getMetadata(path)
+  )
+  ipcMain.handle(
+    'create-directory',
+    (_event: IpcMainInvokeEvent, path: string) => createDirectory(path)
+  )
   ipcMain.handle(
     'create-thumbnail',
     (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path)
@@ -64,13 +71,6 @@ const registerHandlers = () => {
   ipcMain.handle(
     'create-video-thumbnails',
     (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path)
-  )
-  ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
-    getMetadata(path)
-  )
-  ipcMain.handle(
-    'create-directory',
-    (_event: IpcMainInvokeEvent, path: string) => createDirectory(path)
   )
 }
 

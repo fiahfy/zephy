@@ -10,7 +10,7 @@ import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { getThumbnail, isHiddenFile } from 'utils/entry'
+import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
@@ -49,7 +49,7 @@ const ExplorerGridItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { openEntryOnContents } = useContextMenu()
+  const { createContentMenuHandler } = useContextMenu()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -65,7 +65,7 @@ const ExplorerGridItem = (props: Props) => {
 
       const payload = await (async () => {
         if (content.type === 'file') {
-          const thumbnail = await getThumbnail(content.path)
+          const thumbnail = await createThumbnailIfNeeded(content.path)
           return { paths: [content.path], thumbnail }
         }
 
@@ -78,7 +78,7 @@ const ExplorerGridItem = (props: Props) => {
         const paths = entries
           .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
           .map((entry) => entry.path)
-        const thumbnail = await getThumbnail(paths)
+        const thumbnail = await createThumbnailIfNeeded(paths)
         return { paths, thumbnail }
       })()
 
@@ -105,7 +105,7 @@ const ExplorerGridItem = (props: Props) => {
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
-      onContextMenu={openEntryOnContents(
+      onContextMenu={createContentMenuHandler(
         content.path,
         content.type === 'directory'
       )}

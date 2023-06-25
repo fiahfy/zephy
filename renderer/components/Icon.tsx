@@ -1,4 +1,3 @@
-import { blue, green, grey, indigo, red } from '@mui/material/colors'
 import {
   AudioFile as AudioFileIcon,
   Folder as FolderIcon,
@@ -8,6 +7,7 @@ import {
   Star as StarIcon,
   VideoFile as VideoFileIcon,
 } from '@mui/icons-material'
+import { blue, green, grey, indigo, red } from '@mui/material/colors'
 import { useMemo } from 'react'
 
 type Props = {

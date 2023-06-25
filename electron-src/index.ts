@@ -3,10 +3,10 @@ import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
 import { join } from 'path'
-import registerApplicationMenu from './application-menu'
-import registerContextMenu from './context-menu'
+import registerApplicationMenu from './applicationMenu'
+import registerContextMenu from './contextMenu'
 import registerHandlers from './handlers'
-import createWindowStateManager from './window-state'
+import createWindowStateManager from './windowState'
 
 const createWindow = (state: State) => {
   const browserWindow = new BrowserWindow({

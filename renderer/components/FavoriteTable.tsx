@@ -17,7 +17,7 @@ const FavoriteTable = () => {
   const favorites = useAppSelector(selectFavorites)
   const dispatch = useAppDispatch()
 
-  const { openEntry } = useContextMenu()
+  const { createEntryMenuHandler } = useContextMenu()
 
   const [selected, setSelected] = useState<string[]>([])
   const [items, setItems] = useState<{ name: string; path: string }[]>([])
@@ -53,7 +53,7 @@ const FavoriteTable = () => {
             key={item.path}
             onBlur={() => handleBlur()}
             onClick={() => handleClick(item.path)}
-            onContextMenu={openEntry(item.path, true)}
+            onContextMenu={createEntryMenuHandler(item.path, true)}
             onFocus={() => handleFocus(item.path)}
             selected={selected.includes(item.path)}
             sx={{

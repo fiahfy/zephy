@@ -7,7 +7,7 @@ import {
 } from '@mui/material'
 
 import { Content, Metadata } from 'interfaces'
-import { formatDate, formatFileSize, formatTime } from 'utils/entry'
+import { formatDate, formatFileSize, formatTime } from 'utils/file'
 
 const getTotalFileSize = (contents: Content[]) =>
   contents

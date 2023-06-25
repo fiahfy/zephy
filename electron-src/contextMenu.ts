@@ -22,7 +22,7 @@ export type ContextMenuOption = {
 
 const registerContextMenu = () => {
   ipcMain.handle(
-    'context-menu-show',
+    'show-context-menu',
     (
       event: IpcMainInvokeEvent,
       params: ContextMenuParams,

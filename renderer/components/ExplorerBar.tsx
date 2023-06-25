@@ -1,13 +1,4 @@
 import {
-  AppBar,
-  Autocomplete,
-  Box,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Toolbar,
-} from '@mui/material'
-import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   ArrowUpward as ArrowUpwardIcon,
@@ -17,6 +8,15 @@ import {
   Refresh as RefreshIcon,
   Search as SearchIcon,
 } from '@mui/icons-material'
+import {
+  AppBar,
+  Autocomplete,
+  Box,
+  Divider,
+  IconButton,
+  InputAdornment,
+  Toolbar,
+} from '@mui/material'
 import {
   ChangeEvent,
   KeyboardEvent,
@@ -56,7 +56,7 @@ const ExplorerBar = () => {
   const queryHistories = useAppSelector(selectQueryHistories)
   const dispatch = useAppDispatch()
 
-  const { openMore } = useContextMenu()
+  const { createMoreMenuHandler } = useContextMenu()
 
   const [directory, setDirectory] = useState('')
   const [queryInput, setQueryInput] = useState('')
@@ -301,7 +301,7 @@ const ExplorerBar = () => {
         </Box>
         <IconButton
           color="inherit"
-          onClick={openMore()}
+          onClick={createMoreMenuHandler()}
           size="small"
           title="Settings"
         >

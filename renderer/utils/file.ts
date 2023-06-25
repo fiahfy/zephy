@@ -26,7 +26,7 @@ export const isAudioFile = (path: string) => detectFileType(path) === 'audio'
 export const isMediaFile = (path: string) =>
   isImageFile(path) || isVideoFile(path) || isAudioFile(path)
 
-export const getThumbnail = async (paths: string | string[]) => {
+export const createThumbnailIfNeeded = async (paths: string | string[]) => {
   const path = Array.isArray(paths)
     ? paths.filter((path) => isImageFile(path) || isVideoFile(path))[0]
     : paths
@@ -46,10 +46,10 @@ export const getThumbnail = async (paths: string | string[]) => {
   }
 }
 
-export const getThumbnails = (paths: string[]) =>
-  Promise.all(paths.map(getThumbnail))
+export const createThumbnailsIfNeeded = (paths: string[]) =>
+  Promise.all(paths.map(createThumbnailIfNeeded))
 
-export const getVideoThumbnails = async (path: string) => {
+export const createVideoThumbnails = async (path: string) => {
   try {
     return await window.electronAPI.createVideoThumbnails(path)
   } catch (e) {

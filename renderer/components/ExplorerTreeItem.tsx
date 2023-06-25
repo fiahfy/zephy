@@ -7,7 +7,7 @@ import { useContextMenu } from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { isHiddenFile } from 'utils/entry'
+import { isHiddenFile } from 'utils/file'
 
 const max = 100
 
@@ -20,7 +20,7 @@ const ExplorerTreeItem = (props: Props) => {
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
-  const { openEntry } = useContextMenu()
+  const { createEntryMenuHandler } = useContextMenu()
 
   const over =
     (entry.type === 'directory' ? entry.children ?? [] : []).length - max
@@ -28,7 +28,10 @@ const ExplorerTreeItem = (props: Props) => {
   return (
     <EntryTreeItem
       LabelProps={{
-        onContextMenu: openEntry(entry.path, entry.type === 'directory'),
+        onContextMenu: createEntryMenuHandler(
+          entry.path,
+          entry.type === 'directory'
+        ),
       }}
       icon={<EntryIcon entry={entry} size="small" />}
       label={entry.name}

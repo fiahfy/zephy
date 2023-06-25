@@ -1,3 +1,6 @@
+import { MouseEvent } from 'react'
+
+import { ContextMenuOption } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import {
@@ -7,7 +10,24 @@ import {
   selectSelected,
   selectViewMode,
 } from 'store/window'
-import { openContextMenu } from 'utils/contextMenu'
+
+const createMenuHandler = (options?: ContextMenuOption[]) => {
+  return async (e: MouseEvent<HTMLElement>) => {
+    e.preventDefault()
+
+    const isEditable =
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
+        ? !e.target.readOnly
+        : false
+    const selectionText = window.getSelection()?.toString() ?? ''
+    const { clientX: x, clientY: y } = e
+
+    const params = { isEditable, selectionText, x, y }
+
+    await window.electronAPI.showContextMenu(params, options ?? [])
+  }
+}
 
 export const useContextMenu = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
@@ -17,10 +37,10 @@ export const useContextMenu = () => {
   const selected = useAppSelector(selectSelected)
   const viewMode = useAppSelector(selectViewMode)
 
-  const open = () => openContextMenu()
+  const createDefaultMenuHandler = () => createMenuHandler()
 
-  const openEntry = (path: string, directory: boolean) =>
-    openContextMenu([
+  const createEntryMenuHandler = (path: string, directory: boolean) =>
+    createMenuHandler([
       {
         id: directory ? 'openDirectory' : 'open',
         params: { path },
@@ -50,9 +70,9 @@ export const useContextMenu = () => {
       },
     ])
 
-  const openEntryOnContents = (path: string, directory: boolean) => {
+  const createContentMenuHandler = (path: string, directory: boolean) => {
     const paths = selected.includes(path) ? selected : [path]
-    return openContextMenu([
+    return createMenuHandler([
       ...(paths.length === 1
         ? [
             {
@@ -87,8 +107,8 @@ export const useContextMenu = () => {
     ])
   }
 
-  const openMore = () =>
-    openContextMenu([
+  const createMoreMenuHandler = () =>
+    createMenuHandler([
       { id: 'newFolder', params: { path: currentDirectory } },
       { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
@@ -108,5 +128,10 @@ export const useContextMenu = () => {
       { id: 'settings' },
     ])
 
-  return { open, openEntry, openEntryOnContents, openMore }
+  return {
+    createContentMenuHandler,
+    createDefaultMenuHandler,
+    createEntryMenuHandler,
+    createMoreMenuHandler,
+  }
 }

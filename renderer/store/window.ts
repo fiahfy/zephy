@@ -6,7 +6,7 @@ import { add } from 'store/queryHistory'
 import { selectGetRating } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { selectWindowId } from 'store/windowId'
-import { isHiddenFile } from 'utils/entry'
+import { isHiddenFile } from 'utils/file'
 
 type History = {
   directory: string

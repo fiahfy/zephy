@@ -1,5 +1,6 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
 import { ReactNode } from 'react'
+
 import { Content } from 'interfaces'
 import { defaultOrders } from 'store/window'
 

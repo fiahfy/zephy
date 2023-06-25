@@ -33,7 +33,7 @@ const Layout = (props: Props) => {
   const currentPathname = useAppSelector(selectCurrentPathname)
   const dispatch = useAppDispatch()
 
-  const { open } = useContextMenu()
+  const { createDefaultMenuHandler } = useContextMenu()
 
   const router = useRouter()
 
@@ -85,7 +85,7 @@ const Layout = (props: Props) => {
 
   return (
     <Box
-      onContextMenu={open()}
+      onContextMenu={createDefaultMenuHandler()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}

@@ -1,11 +1,12 @@
 import { TableCell, TableCellProps, Typography } from '@mui/material'
+
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import { useContextMenu } from 'hooks/useContextMenu'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate, selectGetRating } from 'store/rating'
-import { formatDate, formatFileSize } from 'utils/entry'
+import { formatDate, formatFileSize } from 'utils/file'
 
 type Key = keyof Content
 
@@ -22,13 +23,13 @@ const ExplorerTableCell = (props: Props) => {
   const getRating = useAppSelector(selectGetRating)
   const dispatch = useAppDispatch()
 
-  const { openEntryOnContents } = useContextMenu()
+  const { createContentMenuHandler } = useContextMenu()
 
   return (
     <TableCell
       align={align}
       component="div"
-      onContextMenu={openEntryOnContents(
+      onContextMenu={createContentMenuHandler(
         content.path,
         content.type === 'directory'
       )}
