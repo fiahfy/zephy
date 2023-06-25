@@ -255,12 +255,9 @@ const Inspector = () => {
                           <Box
                             className="overlay"
                             sx={{
-                              height: '100%',
-                              left: 0,
+                              inset: 0,
                               pointerEvents: 'none',
                               position: 'absolute',
-                              top: 0,
-                              width: '100%',
                             }}
                           />
                         </ImageListItem>

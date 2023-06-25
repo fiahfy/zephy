@@ -6,6 +6,9 @@
 
 export interface IElectronAPI {
   basename: (path: string) => Promise<string>
+  createDirectory: (path: string) => Promise<DetailedEntry>
+  createThumbnail: (path: string) => Promise<string>
+  createVideoThumbnails: (path: string) => Promise<string[]>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
   getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
@@ -15,9 +18,6 @@ export interface IElectronAPI {
   getMetadata: (path: string) => Promise<Metadata>
   getWindowId: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
-  createDirectory: (path: string) => Promise<DetailedEntry>
-  createThumbnail: (path: string) => Promise<string>
-  createVideoThumbnails: (path: string) => Promise<string[]>
   openPath: (path: string) => Promise<void>
   showContextMenu: (
     params: ContextMenuParams,

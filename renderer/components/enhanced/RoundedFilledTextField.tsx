@@ -7,11 +7,26 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
   theme.unstable_sx({
     '.MuiFilledInput-root': {
       borderRadius: 4,
-      '::after': {
+      '&.Mui-focused': {
+        '&:after': {
+          opacity: 1,
+        },
+      },
+      '&:before': {
         display: 'none',
       },
-      '::before': {
-        display: 'none',
+      '&:after': {
+        border: (theme) =>
+          `${theme.spacing(0.25)} solid ${theme.palette.primary.main}`,
+        borderRadius: 4,
+        content: '""',
+        inset: 0,
+        opacity: 0,
+        pointerEvents: 'none',
+        position: 'absolute',
+        transform: 'unset',
+        transition: (theme) =>
+          `opacity ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeOut}}`,
       },
       '.MuiFilledInput-input': {
         py: 0.5,

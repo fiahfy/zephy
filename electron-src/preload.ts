@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   showContextMenu: (params: ContextMenuParams, options: ContextMenuOption[]) =>
-    ipcRenderer.invoke('show- context-menu', params, options),
+    ipcRenderer.invoke('show-context-menu', params, options),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscribe: (callback: (eventName: string, params: any) => void) => {
     const handler = (
