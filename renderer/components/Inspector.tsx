@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@mui/material'
 import fileUrl from 'file-url'
-import { ReactNode, useEffect, useReducer } from 'react'
+import { ReactNode, useEffect, useReducer, useRef } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
 import { Entry, Metadata } from 'interfaces'
@@ -105,17 +105,23 @@ const Inspector = () => {
   const { openEntry } = useContextMenu()
 
   const [state, dispatch] = useReducer(reducer, { loading: true })
+  const ref = useRef<HTMLDivElement>(null)
 
   const content = contents[0]
 
   useEffect(() => {
+    if (!content) {
+      return
+    }
+    if (ref.current) {
+      ref.current.scrollTop = 0
+    }
+
     let unmounted = false
 
     ;(async () => {
-      if (!content) {
-        return
-      }
       dispatch({ type: 'loading' })
+
       const payload = await (async () => {
         if (contents.length > 1) {
           return { type: 'other' as const }
@@ -152,6 +158,7 @@ const Inspector = () => {
           return { type: 'other' as const }
         }
       })()
+
       if (unmounted) {
         return
       }
@@ -168,6 +175,7 @@ const Inspector = () => {
 
   return (
     <Box
+      ref={ref}
       sx={{
         height: '100%',
         overflowX: 'hidden',

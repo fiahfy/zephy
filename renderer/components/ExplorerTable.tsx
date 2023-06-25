@@ -1,10 +1,4 @@
-import {
-  Box,
-  LinearProgress,
-  TableCell,
-  TableSortLabel,
-  Typography,
-} from '@mui/material'
+import { Box, LinearProgress } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import {
   KeyboardEvent,
@@ -22,15 +16,10 @@ import {
   TableHeaderProps,
 } from 'react-virtualized'
 
-import EntryIcon from 'components/EntryIcon'
-import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import { useContextMenu } from 'hooks/useContextMenu'
+import ExplorerTableCell from 'components/ExplorerTableCell'
+import ExplorerTableHeaderCell from 'components/ExplorerTableHeaderCell'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { rate, selectGetRating } from 'store/rating'
-import { defaultOrders } from 'store/window'
-import { formatDate, formatFileSize } from 'utils/entry'
 
 const headerHeight = 32
 const rowHeight = 20
@@ -100,10 +89,6 @@ const ExplorerTable = (props: Props) => {
     sortOption,
   } = props
 
-  const getRating = useAppSelector(selectGetRating)
-  const dispatch = useAppDispatch()
-
-  const { openEntryOnContents } = useContextMenu()
   const previousLoading = usePrevious(loading)
 
   const ref = useRef<HTMLDivElement>(null)
@@ -174,105 +159,25 @@ const ExplorerTable = (props: Props) => {
   const handleRowDoubleClick = (info: RowMouseEventHandlerParams) =>
     onDoubleClickContent(info.rowData)
 
-  const headerRenderer = ({ dataKey, label }: TableHeaderProps) => {
-    return (
-      <TableCell
-        component="div"
-        sortDirection={
-          sortOption.orderBy === dataKey ? sortOption.order : false
-        }
-        sx={{
-          alignItems: 'center',
-          borderBottom: 'none',
-          display: 'flex',
-          height: headerHeight,
-          px: 1,
-          py: 0,
-        }}
-        variant="head"
-      >
-        <TableSortLabel
-          active={sortOption.orderBy === dataKey}
-          direction={sortOption.orderBy === dataKey ? sortOption.order : 'asc'}
-          onClick={() => {
-            const defaultOrder =
-              defaultOrders[dataKey as keyof typeof defaultOrders] ?? 'asc'
-            const reverseSign =
-              sortOption.orderBy === dataKey &&
-              sortOption.order === defaultOrder
-                ? -1
-                : 1
-            const defaultSign = defaultOrder === 'asc' ? 1 : -1
-            onChangeSortOption({
-              order: defaultSign * reverseSign === 1 ? 'asc' : 'desc',
-              orderBy: dataKey as Key,
-            })
-          }}
-        >
-          <Typography noWrap variant="caption">
-            {label}
-          </Typography>
-        </TableSortLabel>
-      </TableCell>
-    )
-  }
+  const headerRenderer = ({ dataKey, label }: TableHeaderProps) => (
+    <ExplorerTableHeaderCell
+      dataKey={dataKey as Key}
+      height={headerHeight}
+      label={label}
+      onChangeSortOption={onChangeSortOption}
+      sortOption={sortOption}
+    />
+  )
 
   const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
     const align = columns.find((column) => column.key === dataKey)?.align
     return (
-      <TableCell
+      <ExplorerTableCell
         align={align}
-        component="div"
-        onContextMenu={openEntryOnContents(
-          rowData.path,
-          rowData.type === 'directory'
-        )}
-        sx={{
-          alignItems: 'center',
-          borderBottom: 'none',
-          display: 'flex',
-          gap: 1,
-          height: rowHeight,
-          px: 1,
-          py: 0,
-          userSelect: 'none',
-        }}
-        title={dataKey === 'name' ? rowData.name : undefined}
-      >
-        {
-          {
-            name: (
-              <>
-                <EntryIcon entry={rowData} size="small" />
-                <Typography noWrap variant="caption">
-                  {rowData.name}
-                </Typography>
-              </>
-            ),
-            rating: (
-              <NoOutlineRating
-                onChange={(_e, value) =>
-                  dispatch(rate({ path: rowData.path, rating: value ?? 0 }))
-                }
-                onClick={(e) => e.stopPropagation()}
-                precision={0.5}
-                size="small"
-                value={getRating(rowData.path)}
-              />
-            ),
-            size: rowData.type === 'file' && (
-              <Typography noWrap variant="caption">
-                {formatFileSize(rowData.size)}{' '}
-              </Typography>
-            ),
-            dateModified: (
-              <Typography noWrap variant="caption">
-                {formatDate(rowData.dateModified)}
-              </Typography>
-            ),
-          }[dataKey]
-        }
-      </TableCell>
+        content={rowData}
+        dataKey={dataKey as Key}
+        height={rowHeight}
+      />
     )
   }
 

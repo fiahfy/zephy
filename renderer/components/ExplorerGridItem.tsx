@@ -63,28 +63,29 @@ const ExplorerGridItem = (props: Props) => {
     ;(async () => {
       dispatch({ type: 'loading' })
 
-      if (content.type === 'file') {
-        const thumbnail = await getThumbnail(content.path)
-        return dispatch({
-          type: 'loaded',
-          payload: { paths: [content.path], thumbnail },
-        })
-      }
+      const payload = await (async () => {
+        if (content.type === 'file') {
+          const thumbnail = await getThumbnail(content.path)
+          return { paths: [content.path], thumbnail }
+        }
 
-      let entries: Entry[] = []
-      try {
-        entries = await window.electronAPI.getEntries(content.path)
-      } catch (e) {
-        // noop
-      }
+        let entries: Entry[] = []
+        try {
+          entries = await window.electronAPI.getEntries(content.path)
+        } catch (e) {
+          // noop
+        }
+        const paths = entries
+          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+          .map((entry) => entry.path)
+        const thumbnail = await getThumbnail(paths)
+        return { paths, thumbnail }
+      })()
+
       if (unmounted) {
         return
       }
-      const paths = entries
-        .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
-        .map((entry) => entry.path)
-      const thumbnail = await getThumbnail(paths)
-      return dispatch({ type: 'loaded', payload: { paths, thumbnail } })
+      dispatch({ type: 'loaded', payload })
     })()
 
     return () => {
