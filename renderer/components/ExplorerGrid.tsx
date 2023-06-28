@@ -74,7 +74,7 @@ const ExplorerGrid = (props: Props) => {
     }
   }, [loading, previousLoading, scrollTop])
 
-  const size = useMemo(
+  const columns = useMemo(
     () => Math.ceil(wrapperWidth / rowHeight) || 1,
     [wrapperWidth]
   )
@@ -83,10 +83,10 @@ const ExplorerGrid = (props: Props) => {
     () =>
       contents.reduce(
         (carry, _, i) =>
-          i % size ? carry : [...carry, contents.slice(i, i + size)],
+          i % columns ? carry : [...carry, contents.slice(i, i + columns)],
         [] as Content[][]
       ),
-    [contents, size]
+    [columns, contents]
   )
 
   const focus = (row: number, column: number) => {
@@ -151,8 +151,8 @@ const ExplorerGrid = (props: Props) => {
         {({ height, width }) => (
           <Grid
             cellRenderer={cellRenderer}
-            columnCount={size}
-            columnWidth={wrapperWidth / size}
+            columnCount={columns}
+            columnWidth={wrapperWidth / columns}
             height={height}
             rowCount={chunks.length}
             rowHeight={rowHeight}

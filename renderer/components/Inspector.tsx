@@ -9,7 +9,7 @@ import fileUrl from 'file-url'
 import { ReactNode, useEffect, useReducer, useRef } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
-import { useContextMenu } from 'hooks/useContextMenu'
+import useContextMenu from 'hooks/useContextMenu'
 import { Entry, Metadata } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'

@@ -2,7 +2,7 @@ import { TextField, TextFieldProps } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 const RoundedFilledTextField = styled((props: TextFieldProps) => (
-  <TextField {...props} variant="filled" />
+  <TextField {...props} hiddenLabel size="small" variant="filled" />
 ))(({ theme }) =>
   theme.unstable_sx({
     '.MuiFilledInput-root': {
@@ -16,8 +16,7 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
         display: 'none',
       },
       '&:after': {
-        border: (theme) =>
-          `${theme.spacing(0.25)} solid ${theme.palette.primary.main}`,
+        border: `${theme.spacing(0.25)} solid ${theme.palette.primary.main}`,
         borderRadius: 4,
         content: '""',
         inset: 0,
@@ -25,8 +24,7 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
         pointerEvents: 'none',
         position: 'absolute',
         transform: 'unset',
-        transition: (theme) =>
-          `opacity ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeOut}}`,
+        transition: `opacity ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeOut}}`,
       },
       '.MuiFilledInput-input': {
         py: 0.5,

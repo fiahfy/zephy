@@ -29,7 +29,7 @@ import {
 
 import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
-import { useContextMenu } from 'hooks/useContextMenu'
+import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
@@ -240,10 +240,8 @@ const ExplorerBar = () => {
                 ),
               }}
               fullWidth
-              hiddenLabel
               onChange={handleChangeDirectory}
               onKeyDown={handleKeyDownDirectory}
-              size="small"
               spellCheck={false}
               sx={{ mr: 0.5 }}
               value={directory}
@@ -279,7 +277,6 @@ const ExplorerBar = () => {
                     ),
                   }}
                   fullWidth
-                  hiddenLabel
                   inputRef={ref}
                   placeholder="Search..."
                 />

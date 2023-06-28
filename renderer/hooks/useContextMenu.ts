@@ -29,7 +29,7 @@ const createMenuHandler = (options?: ContextMenuOption[]) => {
   }
 }
 
-export const useContextMenu = () => {
+const useContextMenu = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const isFavorite = useAppSelector(selectIsFavorite)
@@ -135,3 +135,5 @@ export const useContextMenu = () => {
     createMoreMenuHandler,
   }
 }
+
+export default useContextMenu

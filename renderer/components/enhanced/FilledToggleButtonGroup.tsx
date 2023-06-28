@@ -1,4 +1,4 @@
-import { Theme, ToggleButtonGroup } from '@mui/material'
+import { ToggleButtonGroup } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 const FilledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) =>
@@ -9,10 +9,10 @@ const FilledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) =>
         border: 0,
       },
       '&:not(:first-of-type)': {
-        borderRadius: (theme: Theme) => `${theme.shape.borderRadius}px`,
+        borderRadius: `${theme.shape.borderRadius}px`,
       },
       '&:first-of-type': {
-        borderRadius: (theme: Theme) => `${theme.shape.borderRadius}px`,
+        borderRadius: `${theme.shape.borderRadius}px`,
         mr: 0.5,
       },
     },

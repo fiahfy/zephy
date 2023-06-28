@@ -7,7 +7,7 @@ import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
-import { useContextMenu } from 'hooks/useContextMenu'
+import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { add, remove } from 'store/favorite'
 import {

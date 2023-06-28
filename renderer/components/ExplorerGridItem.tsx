@@ -5,7 +5,7 @@ import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import { useContextMenu } from 'hooks/useContextMenu'
+import useContextMenu from 'hooks/useContextMenu'
 import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate } from 'store/rating'

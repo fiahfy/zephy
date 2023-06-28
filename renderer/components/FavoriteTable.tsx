@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import Icon from 'components/Icon'
-import { useContextMenu } from 'hooks/useContextMenu'
+import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'
 import { changeDirectory } from 'store/window'
