@@ -28,10 +28,7 @@ const ExplorerTreeItem = (props: Props) => {
   return (
     <EntryTreeItem
       LabelProps={{
-        onContextMenu: createEntryMenuHandler(
-          entry.path,
-          entry.type === 'directory'
-        ),
+        onContextMenu: createEntryMenuHandler(entry),
       }}
       icon={<EntryIcon entry={entry} size="small" />}
       label={entry.name}

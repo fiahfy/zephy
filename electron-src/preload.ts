@@ -2,7 +2,6 @@ import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  basename: (path: string) => ipcRenderer.invoke('basename', path),
   createDirectory: (path: string) =>
     ipcRenderer.invoke('create-directory', path),
   createThumbnail: (path: string) =>
@@ -13,6 +12,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
   getDetailedEntries: (path: string) =>
     ipcRenderer.invoke('get-detailed-entries', path),
+  getDetailedEntriesForPaths: (paths: string[]) =>
+    ipcRenderer.invoke('get-detailed-entries-for-paths', paths),
   getEntries: (path: string) => ipcRenderer.invoke('get-entries', path),
   getEntryHierarchy: (path: string) =>
     ipcRenderer.invoke('get-entry-hierarchy', path),
@@ -21,6 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getWindowId: () => ipcRenderer.invoke('get-window-id'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
+  renameEntry: (path: string, newName: string) =>
+    ipcRenderer.invoke('rename-entry', path, newName),
   showContextMenu: (params: ContextMenuParams, options: ContextMenuOption[]) =>
     ipcRenderer.invoke('show-context-menu', params, options),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

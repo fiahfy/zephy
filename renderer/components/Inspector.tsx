@@ -226,10 +226,7 @@ const Inspector = () => {
                       state.entries.map((entry) => (
                         <ImageListItem
                           key={entry.path}
-                          onContextMenu={createEntryMenuHandler(
-                            entry.path,
-                            false
-                          )}
+                          onContextMenu={createEntryMenuHandler(entry)}
                           onDoubleClick={() => handleDoubleClick(entry)}
                           sx={{
                             cursor: 'pointer',

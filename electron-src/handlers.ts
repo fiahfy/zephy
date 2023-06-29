@@ -14,14 +14,13 @@ import {
 import {
   createDirectory,
   getDetailedEntries,
+  getDetailedEntriesForPaths,
   getEntries,
   getEntryHierarchy,
+  renameEntry,
 } from './utils/file'
 
 const registerHandlers = () => {
-  ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
-    basename(path)
-  )
   ipcMain.handle('darwin', () => process.platform === 'darwin')
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path)
@@ -48,10 +47,18 @@ const registerHandlers = () => {
 
   ipcMain.handle(
     'get-detailed-entries',
-    (_event: IpcMainInvokeEvent, path: string) => getDetailedEntries(path)
+    (_event: IpcMainInvokeEvent, directoryPath: string) =>
+      getDetailedEntries(directoryPath)
   )
-  ipcMain.handle('get-entries', (_event: IpcMainInvokeEvent, path: string) =>
-    getEntries(path)
+  ipcMain.handle(
+    'get-detailed-entries-for-paths',
+    (_event: IpcMainInvokeEvent, paths: string[]) =>
+      getDetailedEntriesForPaths(paths)
+  )
+  ipcMain.handle(
+    'get-entries',
+    (_event: IpcMainInvokeEvent, directoryPath: string) =>
+      getEntries(directoryPath)
   )
   ipcMain.handle(
     'get-entry-hierarchy',
@@ -62,7 +69,8 @@ const registerHandlers = () => {
   )
   ipcMain.handle(
     'create-directory',
-    (_event: IpcMainInvokeEvent, path: string) => createDirectory(path)
+    (_event: IpcMainInvokeEvent, directoryPath: string) =>
+      createDirectory(directoryPath)
   )
   ipcMain.handle(
     'create-thumbnail',
@@ -71,6 +79,11 @@ const registerHandlers = () => {
   ipcMain.handle(
     'create-video-thumbnails',
     (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path)
+  )
+  ipcMain.handle(
+    'rename-entry',
+    (_event: IpcMainInvokeEvent, path: string, newName: string) =>
+      renameEntry(path, newName)
   )
 }
 

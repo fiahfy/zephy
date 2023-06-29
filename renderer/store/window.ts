@@ -359,6 +359,32 @@ export const windowSlice = createSlice({
         },
       }
     },
+    rename(
+      state,
+      action: PayloadAction<{
+        windowId: number
+        path: string
+        entry: DetailedEntry
+      }>
+    ) {
+      const { windowId, path, entry } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      const entries = [
+        ...windowState.entries.filter((entry) => entry.path !== path),
+        entry,
+      ]
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          entries,
+        },
+      }
+    },
     moveToTrash(
       state,
       action: PayloadAction<{ windowId: number; paths: string[] }>
@@ -567,17 +593,21 @@ export const selectContents = createSelector(
   selectGetRating,
   (entries, query, currentSortOption, shouldShowHiddenFiles, getRating) => {
     const comparator = (a: Content, b: Content) => {
-      let result = 0
       const aValue = a[currentSortOption.orderBy]
       const bValue = b[currentSortOption.orderBy]
-      if (aValue !== undefined && bValue !== undefined) {
-        if (aValue > bValue) {
-          result = 1
-        } else if (aValue < bValue) {
-          result = -1
-        }
+      let result = 0
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        result = aValue.localeCompare(bValue)
       } else {
-        result = 0
+        if (aValue !== undefined && bValue !== undefined) {
+          if (aValue > bValue) {
+            result = 1
+          } else if (aValue < bValue) {
+            result = -1
+          }
+        } else {
+          result = 0
+        }
       }
       const orderSign = currentSortOption.order === 'desc' ? -1 : 1
       return orderSign * result
@@ -733,6 +763,15 @@ export const changeDirectory =
     const { changeDirectory } = windowSlice.actions
     const windowId = selectWindowId(getState())
     dispatch(changeDirectory({ windowId, path }))
+  }
+
+export const rename =
+  (path: string, newName: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { rename } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    const entry = await window.electronAPI.renameEntry(path, newName)
+    dispatch(rename({ windowId, path, entry }))
   }
 
 export const moveToTrash =

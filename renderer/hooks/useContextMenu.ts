@@ -1,6 +1,6 @@
 import { MouseEvent } from 'react'
 
-import { ContextMenuOption } from 'interfaces'
+import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import {
@@ -39,8 +39,10 @@ const useContextMenu = () => {
 
   const createDefaultMenuHandler = () => createMenuHandler()
 
-  const createEntryMenuHandler = (path: string, directory: boolean) =>
-    createMenuHandler([
+  const createEntryMenuHandler = (entry: Entry) => {
+    const directory = entry.type === 'directory'
+    const path = entry.path
+    return createMenuHandler([
       {
         id: directory ? 'openDirectory' : 'open',
         params: { path },
@@ -66,11 +68,14 @@ const useContextMenu = () => {
       { id: 'separator' },
       {
         id: 'moveToTrash',
-        params: { path },
+        params: { paths: [path] },
       },
     ])
+  }
 
-  const createContentMenuHandler = (path: string, directory: boolean) => {
+  const createContentMenuHandler = (entry: Entry) => {
+    const directory = entry.type === 'directory'
+    const path = entry.path
     const paths = selected.includes(path) ? selected : [path]
     return createMenuHandler([
       ...(paths.length === 1
@@ -97,9 +102,13 @@ const useContextMenu = () => {
                   },
                 ]
               : []),
+            { id: 'separator' },
+            {
+              id: 'rename',
+              params: { path },
+            },
           ]
         : []),
-      { id: 'separator' },
       {
         id: 'moveToTrash',
         params: { paths },

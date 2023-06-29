@@ -1,5 +1,12 @@
 import { TableCell, TableCellProps, Typography } from '@mui/material'
-import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import DenseOutlineTextField from 'components/enhanced/DenseOutlineTextField'
@@ -9,7 +16,7 @@ import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate, selectGetRating } from 'store/rating'
-import { selectSelected } from 'store/window'
+import { rename, select, selectSelected } from 'store/window'
 import { formatDate, formatFileSize } from 'utils/file'
 
 type Key = keyof Content
@@ -52,8 +59,22 @@ const ExplorerTableCell = (props: Props) => {
   )
 
   const [editing, setEditing] = useState(false)
-  const [nameInput, setNameInput] = useState(content.name)
+  const [nameInput, setNameInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setNameInput(content.name)
+  }, [content.name])
+
+  useEffect(() => {
+    const unsubscribe = window.electronAPI.subscribe((eventName, params) => {
+      if (eventName === 'rename' && content.path === params.path) {
+        dispatch(select(content.path))
+        setEditing(true)
+      }
+    })
+    return () => unsubscribe()
+  }, [content.path, dispatch])
 
   useEffect(() => {
     const el = ref.current
@@ -68,11 +89,23 @@ const ExplorerTableCell = (props: Props) => {
     }
   }, [content.name, editing])
 
-  const handleBlur = () => setEditing(false)
+  const handleBlur = () => {
+    setEditing(false)
+    if (nameInput !== content.name) {
+      dispatch(rename(content.path, nameInput))
+    }
+  }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setNameInput(value)
+  }
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setNameInput(content.name)
+      setEditing(false)
+    }
   }
 
   return (
@@ -80,10 +113,7 @@ const ExplorerTableCell = (props: Props) => {
       align={align}
       component="div"
       onClick={handleClick}
-      onContextMenu={createContentMenuHandler(
-        content.path,
-        content.type === 'directory'
-      )}
+      onContextMenu={createContentMenuHandler(content)}
       onDoubleClick={handleDoubleClick}
       sx={{
         alignItems: 'center',
@@ -105,6 +135,7 @@ const ExplorerTableCell = (props: Props) => {
               inputRef={ref}
               onBlur={handleBlur}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               sx={{ flexGrow: 1, ml: -0.5 }}
               value={nameInput}
             />

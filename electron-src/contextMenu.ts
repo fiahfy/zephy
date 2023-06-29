@@ -85,6 +85,10 @@ const registerContextMenu = () => {
           click: () => clipboard.writeText(params.path),
           label: 'Copy Path',
         }),
+        rename: ({ params }) => ({
+          click: () => send('subscribe', 'rename', { path: params.path }),
+          label: 'Rename...',
+        }),
         moveToTrash: ({ params }) => ({
           click: () =>
             send('subscribe', 'moveToTrash', { paths: params.paths }),

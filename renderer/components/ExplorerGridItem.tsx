@@ -105,10 +105,7 @@ const ExplorerGridItem = (props: Props) => {
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
-      onContextMenu={createContentMenuHandler(
-        content.path,
-        content.type === 'directory'
-      )}
+      onContextMenu={createContentMenuHandler(content)}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',

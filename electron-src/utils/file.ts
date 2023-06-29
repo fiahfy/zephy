@@ -1,7 +1,7 @@
 import { Dirent, Stats, promises } from 'fs'
-import { basename, join, sep } from 'path'
+import { basename, dirname, join, sep } from 'path'
 
-const { mkdir, readdir, stat } = promises
+const { mkdir, readdir, rename, stat } = promises
 
 type File = {
   name: string
@@ -50,24 +50,6 @@ export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
   }, [] as Entry[])
 }
 
-export const getDetailedEntries = async (
-  directoryPath: string
-): Promise<DetailedEntry[]> => {
-  const entries = await getEntries(directoryPath)
-  return await Promise.all(
-    entries.map(async (entry) => {
-      const stats = await stat(entry.path)
-      return {
-        ...entry,
-        dateCreated: stats.birthtimeMs,
-        dateModified: stats.mtimeMs,
-        dateLastOpened: stats.atimeMs,
-        size: stats.size,
-      }
-    })
-  )
-}
-
 const getDetailedEntry = async (path: string): Promise<DetailedEntry> => {
   const stats = await stat(path)
   const type = getEntryType(stats)
@@ -85,7 +67,29 @@ const getDetailedEntry = async (path: string): Promise<DetailedEntry> => {
   }
 }
 
-export const getEntryHierarchy = async (path: string) => {
+export const getDetailedEntriesForPaths = async (
+  paths: string[]
+): Promise<DetailedEntry[]> => {
+  const results = await Promise.allSettled(
+    paths.map((path) => getDetailedEntry(path))
+  )
+  return results.reduce(
+    (carry, result) =>
+      result.status === 'fulfilled' ? [...carry, result.value] : carry,
+    [] as DetailedEntry[]
+  )
+}
+
+export const getDetailedEntries = async (
+  directoryPath: string
+): Promise<DetailedEntry[]> => {
+  const entries = await getEntries(directoryPath)
+  return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
+}
+
+export const getEntryHierarchy = async (
+  path: string
+): Promise<Entry | undefined> => {
   const dirnames = path.split(sep)
 
   let rootPath = dirnames[0]
@@ -169,9 +173,20 @@ const generateNewDirectoryName = async (directoryPath: string) => {
   return missingNumber === 1 ? basename : `${basename} ${missingNumber}`
 }
 
-export const createDirectory = async (directoryPath: string) => {
+export const createDirectory = async (
+  directoryPath: string
+): Promise<DetailedEntry> => {
   const directoryName = await generateNewDirectoryName(directoryPath)
   const path = join(directoryPath, directoryName)
   await mkdir(path)
   return await getDetailedEntry(path)
+}
+
+export const renameEntry = async (
+  path: string,
+  newName: string
+): Promise<DetailedEntry> => {
+  const newPath = join(dirname(path), newName)
+  await rename(path, newPath)
+  return await getDetailedEntry(newPath)
 }

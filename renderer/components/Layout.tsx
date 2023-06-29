@@ -49,6 +49,7 @@ const Layout = (props: Props) => {
         case 'changeDirectory':
           return dispatch(changeDirectory(params.path))
         case 'moveToTrash':
+          console.log(params)
           return dispatch(moveToTrash(params.paths))
         case 'newFolder':
           return dispatch(newFolder(params.path))
@@ -66,8 +67,11 @@ const Layout = (props: Props) => {
           return dispatch(setSidebarHidden(params.variant, params.hidden))
       }
     })
+    return () => unsubscribe()
+  }, [dispatch])
 
-    const handleMouseDown = (e: globalThis.MouseEvent) => {
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
       switch (e.button) {
         case 3:
           return dispatch(back())
@@ -76,11 +80,7 @@ const Layout = (props: Props) => {
       }
     }
     document.addEventListener('mousedown', handleMouseDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDown)
-      unsubscribe()
-    }
+    return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [dispatch])
 
   return (

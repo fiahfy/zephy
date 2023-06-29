@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import {
   ChangeEvent,
-  KeyboardEvent,
+  KeyboardEvent as ReactKeyboardEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -74,26 +74,25 @@ const ExplorerBar = () => {
     const unsubscribe = window.electronAPI.subscribe((eventName) => {
       if (eventName === 'search') {
         search(document.getSelection()?.toString() ?? '')
-        ref.current && ref.current?.focus()
+        ref.current?.focus()
       }
     })
+    return () => unsubscribe()
+  }, [dispatch, search])
 
-    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.key === 'f' &&
         ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))
       ) {
         search(document.getSelection()?.toString() ?? '')
-        ref.current && ref.current?.focus()
+        ref.current?.focus()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      unsubscribe()
-    }
-  }, [dispatch, search])
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [search])
 
   useEffect(() => {
     ;(async () => {
@@ -148,13 +147,13 @@ const ExplorerBar = () => {
   const handleInputChangeQuery = (_e: SyntheticEvent, value: string) =>
     value ? setQueryInput(value) : search(value)
 
-  const handleKeyDownDirectory = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownDirectory = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
       dispatch(changeDirectory(directory))
     }
   }
 
-  const handleKeyDownQuery = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownQuery = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       search(queryInput)
     }

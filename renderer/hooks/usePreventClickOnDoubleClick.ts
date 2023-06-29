@@ -5,10 +5,10 @@ const usePreventClickOnDoubleClick = <T>(
   onClick: MouseEventHandler<T>,
   onDoubleClick: MouseEventHandler<T>
 ) => {
-  const timer = useRef(-1)
+  const timer = useRef<number>()
 
   useEffect(() => {
-    return () => clearTimeout(timer.current)
+    return () => window.clearTimeout(timer.current)
   }, [])
 
   const handleClick = (e: MouseEvent<T>) => {
@@ -17,7 +17,7 @@ const usePreventClickOnDoubleClick = <T>(
   }
 
   const handleDoubleClick = (e: MouseEvent<T>) => {
-    clearTimeout(timer.current)
+    window.clearTimeout(timer.current)
     onDoubleClick(e)
   }
 

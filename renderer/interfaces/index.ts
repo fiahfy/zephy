@@ -5,13 +5,13 @@
 // import User from 'path/to/interfaces';
 
 export interface IElectronAPI {
-  basename: (path: string) => Promise<string>
   createDirectory: (path: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
   getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
+  getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getEntries: (path: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
   getHomePath: () => Promise<string>
@@ -19,6 +19,7 @@ export interface IElectronAPI {
   getWindowId: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
   openPath: (path: string) => Promise<void>
+  renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   showContextMenu: (
     params: ContextMenuParams,
     options: ContextMenuOption[]
