@@ -40,5 +40,37 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('subscribe', handler)
   },
   trashItems: (paths: string[]) => ipcRenderer.invoke('trash-items', paths),
-  watch: (directoryPath: string) => ipcRenderer.invoke('watch', directoryPath),
+  watchDirectory: (
+    path: string,
+    callback: (eventType: string, path: string) => void
+  ) => {
+    ipcRenderer.removeAllListeners('watch-directory')
+    ipcRenderer.on(
+      'watch-directory',
+      (_event: IpcRendererEvent, eventType: string, path: string) =>
+        callback(eventType, path)
+    )
+    ipcRenderer.invoke('watch-directory', path)
+  },
+  watchDirectoryHierarchy: (
+    paths: string[],
+    callback: (
+      eventType: string,
+      directoryPath: string,
+      filePath: string
+    ) => void
+  ) => {
+    ipcRenderer.removeAllListeners('watch-directory-hierarchy')
+    ipcRenderer.on(
+      'watch-directory-hierarchy',
+      (
+        _event: IpcRendererEvent,
+        eventType: string,
+        directoryPath: string,
+        filePath: string
+      ) => callback(eventType, directoryPath, filePath)
+    )
+    ipcRenderer.invoke('watch-directory-hierarchy', paths)
+  },
+  parsePath: (path: string) => ipcRenderer.invoke('parse-path', path),
 })

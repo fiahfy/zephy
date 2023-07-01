@@ -93,14 +93,9 @@ export const getDetailedEntries = async (
 export const getEntryHierarchy = async (
   path: string
 ): Promise<Entry | undefined> => {
-  const dirnames = path.split(sep)
+  const dirnames = parsePath(path)
 
-  let rootPath = dirnames[0]
-  // for darwin
-  if (!rootPath) {
-    rootPath = sep
-  }
-  dirnames[0] = rootPath
+  const rootPath = dirnames[0] ?? ''
 
   let entry: Directory = {
     children: [
@@ -116,16 +111,18 @@ export const getEntryHierarchy = async (
     type: 'directory',
   }
 
-  entry = await dirnames.reduce(async (e, _dirname, i) => {
-    const entry = await e
+  entry = await dirnames.reduce(async (_e, _dirname, i) => {
+    const e = await _e
     const targetEntry = dirnames
       .slice(0, i + 1)
       .reduce(
-        (carry: Entry | undefined, dirname) =>
-          carry?.type === 'directory'
-            ? carry.children?.find((entry) => entry.name === dirname)
+        (carry, dirname) =>
+          carry && carry.children
+            ? (carry.children.find(
+                (entry) => entry.type === 'directory' && entry.name === dirname
+              ) as Directory)
             : undefined,
-        entry
+        e as Directory | undefined
       )
     if (
       targetEntry &&
@@ -135,7 +132,7 @@ export const getEntryHierarchy = async (
       const path = dirnames.slice(0, i + 1).join(sep)
       targetEntry.children = await getEntries(path)
     }
-    return entry
+    return e
   }, Promise.resolve(entry))
 
   return entry.children?.[0]
@@ -198,12 +195,14 @@ export const createWatcher = () => {
   let watcher: FSWatcher | undefined
 
   const watch = async (
-    directoryPath: string,
+    directoryPaths: string | string[],
     callback: (eventType: 'create' | 'delete', path: string) => void
   ) => {
-    watcher && watcher.close()
+    if (watcher) {
+      await watcher.close()
+    }
     watcher = chokidar
-      .watch(directoryPath, { depth: 0, ignoreInitial: true })
+      .watch(directoryPaths, { depth: 0, ignoreInitial: true })
       .on('add', (path) => callback('create', path))
       .on('addDir', (path) => callback('create', path))
       .on('unlink', (path) => callback('delete', path))
@@ -211,4 +210,15 @@ export const createWatcher = () => {
   }
 
   return { watch }
+}
+
+export const parsePath = (path: string) => {
+  const dirnames = path.split(sep)
+  let rootPath = dirnames[0]
+  // for darwin
+  if (!rootPath) {
+    rootPath = sep
+  }
+  dirnames[0] = rootPath
+  return dirnames
 }

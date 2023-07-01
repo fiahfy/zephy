@@ -4,8 +4,6 @@ import { useAppDispatch } from 'store'
 import { add, remove } from 'store/favorite'
 import {
   changeDirectory,
-  createEntry,
-  deleteEntry,
   goToSettings,
   moveToTrash,
   newFolder,
@@ -38,10 +36,6 @@ const useSubscription = () => {
           return dispatch(setViewMode(params.viewMode))
         case 'changeSidebarHidden':
           return dispatch(setSidebarHidden(params.variant, params.hidden))
-        case 'createEntry':
-          return dispatch(createEntry(params.path))
-        case 'deleteEntry':
-          return dispatch(deleteEntry(params.path))
       }
     })
     return () => unsubscribe()

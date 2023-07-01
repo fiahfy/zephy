@@ -1,4 +1,4 @@
-import { basename, dirname } from 'path'
+import { dirname } from 'path'
 import {
   BrowserWindow,
   IpcMainInvokeEvent,
@@ -19,10 +19,12 @@ import {
   getDetailedEntry,
   getEntries,
   getEntryHierarchy,
+  parsePath,
   renameEntry,
 } from './utils/file'
 
-const watcher = createWatcher()
+const directoryWatcher = createWatcher()
+const directoryHierarchyWatcher = createWatcher()
 
 const registerHandlers = () => {
   ipcMain.handle('darwin', () => process.platform === 'darwin')
@@ -93,14 +95,25 @@ const registerHandlers = () => {
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName)
   )
-  ipcMain.handle('watch', (event: IpcMainInvokeEvent, directoryPath: string) =>
-    watcher.watch(directoryPath, (eventType, path) =>
-      event.sender.send(
-        'subscribe',
-        eventType === 'create' ? 'createEntry' : 'deleteEntry',
-        { path }
-      )
+  ipcMain.handle('watch-directory', (event: IpcMainInvokeEvent, path: string) =>
+    directoryWatcher.watch(path, (eventType, path) =>
+      event.sender.send('watch-directory', eventType, path)
     )
+  )
+  ipcMain.handle(
+    'watch-directory-hierarchy',
+    (event: IpcMainInvokeEvent, paths: string[]) =>
+      directoryHierarchyWatcher.watch(paths, (eventType, path) =>
+        event.sender.send(
+          'watch-directory-hierarchy',
+          eventType,
+          dirname(path),
+          path
+        )
+      )
+  )
+  ipcMain.handle('parse-path', (event: IpcMainInvokeEvent, path: string) =>
+    parsePath(path)
   )
 }
 

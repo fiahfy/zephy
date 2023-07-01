@@ -248,7 +248,14 @@ const Inspector = () => {
                               objectFit: 'contain',
                             }}
                           />
-                          <ImageListItemBar subtitle={entry.name} />
+                          <ImageListItemBar
+                            subtitle={entry.name}
+                            sx={{
+                              '.MuiImageListItemBar-titleWrap': {
+                                p: 1,
+                              },
+                            }}
+                          />
                           <Box
                             className="overlay"
                             sx={{
@@ -285,6 +292,9 @@ const Inspector = () => {
                               ((state.metadata?.duration ?? 0) / 10) * (i + 1)
                             )}
                             sx={{
+                              '.MuiImageListItemBar-titleWrap': {
+                                p: 1,
+                              },
                               '.MuiImageListItemBar-subtitle': {
                                 textAlign: 'center',
                               },

@@ -23,7 +23,8 @@ const ExplorerTreeItem = (props: Props) => {
   const { createEntryMenuHandler } = useContextMenu()
 
   const over =
-    (entry.type === 'directory' ? entry.children ?? [] : []).length - max
+    (entry.type === 'directory' && entry.children ? entry.children : [])
+      .length - max
 
   return (
     <EntryTreeItem
@@ -42,6 +43,7 @@ const ExplorerTreeItem = (props: Props) => {
               .filter(
                 (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
               )
+              .sort((a, b) => a.name.localeCompare(b.name))
               .slice(0, max)
               .map((entry) => (
                 <ExplorerTreeItem entry={entry} key={entry.path} />

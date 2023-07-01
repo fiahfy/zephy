@@ -28,7 +28,19 @@ export interface IElectronAPI {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscribe: (callback: (eventName: string, params: any) => void) => () => void
   trashItems: (paths: string[]) => Promise<void>
-  watch: (directoryPath: string) => Promise<void>
+  watchDirectory: (
+    path: string,
+    callback: (eventType: string, path: string) => void
+  ) => Promise<void>
+  watchDirectoryHierarchy: (
+    paths: string[],
+    callback: (
+      eventType: string,
+      directoryPath: string,
+      filePath: string
+    ) => void
+  ) => Promise<void>
+  parsePath: (path: string) => Promise<string[]>
 }
 
 export type ContextMenuParams = {

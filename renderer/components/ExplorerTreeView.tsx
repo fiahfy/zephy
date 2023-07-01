@@ -21,7 +21,19 @@ const ExplorerTreeView = () => {
 
   const [expanded, setExpanded] = useState<string[]>([])
   const [selected, setSelected] = useState<string[]>([])
-  const [entries, setEntries] = useState<Entry[]>([])
+  const [root, setRoot] = useState<Entry>()
+
+  const getLoadedDirectories = (entry: Entry) => {
+    const reducer = (carry: string[], entry: Entry): string[] => {
+      if (entry.type === 'directory' && entry.children) {
+        return [entry.path, ...entry.children.reduce(reducer, carry)]
+      }
+      return carry
+    }
+    return [entry].reduce(reducer, [])
+  }
+
+  const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
 
   useEffect(() => {
     ;(async () => {
@@ -29,20 +41,53 @@ const ExplorerTreeView = () => {
         return
       }
       const entry = await window.electronAPI.getEntryHierarchy(currentDirectory)
-      const reducer = (carry: string[], entry: Entry): string[] => {
-        if (entry.type !== 'directory' || !entry.children) {
-          return carry
-        }
-        return [entry.path, ...entry.children.reduce(reducer, carry)]
-      }
-      const expanded = [entry].reduce(reducer, [])
+      const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setSelected([currentDirectory])
-      setEntries([entry])
+      setRoot(entry)
     })()
   }, [currentDirectory, indexPage])
 
+  useEffect(() => {
+    window.electronAPI.watchDirectoryHierarchy(
+      loaded,
+      async (eventType, directoryPath, filePath) => {
+        const entry =
+          eventType === 'create'
+            ? await window.electronAPI.getDetailedEntry(filePath)
+            : undefined
+        const mapper = (e: Entry): Entry => {
+          if (e.type === 'directory') {
+            if (e.path === directoryPath && e.children) {
+              let children = e.children.filter(
+                (entry) => entry.path !== filePath
+              )
+              if (entry) {
+                children = [...e.children, entry]
+              }
+              return {
+                ...e,
+                children,
+              }
+            }
+            if (e.children) {
+              return {
+                ...e,
+                children: e.children.map(mapper),
+              }
+            }
+          }
+          return e
+        }
+        setRoot((root) => (root ? mapper(root) : root))
+      }
+    )
+  }, [loaded])
+
   const entryMap = useMemo(() => {
+    if (!root) {
+      return {}
+    }
     const reducer = (
       carry: { [path: string]: Entry },
       entry: Entry
@@ -55,8 +100,8 @@ const ExplorerTreeView = () => {
         ),
       }
     }
-    return entries.reduce(reducer, {})
-  }, [entries])
+    return [root].reduce(reducer, {})
+  }, [root])
 
   const handleSelect = (_event: SyntheticEvent, nodeIds: string[] | string) => {
     if (Array.isArray(nodeIds)) {
@@ -98,7 +143,7 @@ const ExplorerTreeView = () => {
       }
       return e
     }
-    setEntries((prevEntries) => prevEntries.map(mapper))
+    setRoot((root) => (root ? mapper(root) : root))
   }
 
   return (
@@ -115,9 +160,7 @@ const ExplorerTreeView = () => {
         },
       }}
     >
-      {entries.map((entry) => (
-        <ExplorerTreeItem entry={entry} key={entry.path} />
-      ))}
+      {root && <ExplorerTreeItem entry={root} key={root.path} />}
     </TreeView>
   )
 }
