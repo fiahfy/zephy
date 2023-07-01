@@ -17,7 +17,7 @@ import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate, selectGetRating } from 'store/rating'
 import { rename, select, selectSelected } from 'store/window'
-import { formatDate, formatFileSize } from 'utils/file'
+import { formatDate, formatFileSize } from 'utils/formatter'
 
 type Key = keyof Content
 

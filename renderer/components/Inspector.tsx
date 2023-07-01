@@ -18,12 +18,12 @@ import {
   createThumbnailIfNeeded,
   createThumbnailsIfNeeded,
   createVideoThumbnails,
-  formatTime,
   getMetadata,
   isHiddenFile,
   isMediaFile,
   isVideoFile,
 } from 'utils/file'
+import { formatTime } from 'utils/formatter'
 
 type EntryWithThumbnail = Entry & { thumbnail: string }
 
