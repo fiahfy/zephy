@@ -2,19 +2,22 @@ import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  createDirectory: (path: string) =>
-    ipcRenderer.invoke('create-directory', path),
+  createDirectory: (directoryPath: string) =>
+    ipcRenderer.invoke('create-directory', directoryPath),
   createThumbnail: (path: string) =>
     ipcRenderer.invoke('create-thumbnail', path),
   createVideoThumbnails: (path: string) =>
     ipcRenderer.invoke('create-video-thumbnails', path),
   darwin: () => ipcRenderer.invoke('darwin'),
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
-  getDetailedEntries: (path: string) =>
-    ipcRenderer.invoke('get-detailed-entries', path),
+  getDetailedEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('get-detailed-entries', directoryPath),
   getDetailedEntriesForPaths: (paths: string[]) =>
     ipcRenderer.invoke('get-detailed-entries-for-paths', paths),
-  getEntries: (path: string) => ipcRenderer.invoke('get-entries', path),
+  getDetailedEntry: (path: string) =>
+    ipcRenderer.invoke('get-detailed-entry', path),
+  getEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('get-entries', directoryPath),
   getEntryHierarchy: (path: string) =>
     ipcRenderer.invoke('get-entry-hierarchy', path),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
@@ -37,4 +40,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('subscribe', handler)
   },
   trashItems: (paths: string[]) => ipcRenderer.invoke('trash-items', paths),
+  watch: (directoryPath: string) => ipcRenderer.invoke('watch', directoryPath),
 })

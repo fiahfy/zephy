@@ -221,19 +221,45 @@ export const windowSlice = createSlice({
     },
     add(
       state,
-      action: PayloadAction<{ windowId: number; entry: DetailedEntry }>
+      action: PayloadAction<{ windowId: number; entries: DetailedEntry[] }>
     ) {
-      const { windowId, entry } = action.payload
+      const { windowId, entries } = action.payload
       const windowState = state[windowId]
       if (!windowState) {
         return state
       }
+      const paths = entries.map((entry) => entry.path)
+      const newEntries = [
+        ...windowState.entries.filter((entry) => !paths.includes(entry.path)),
+        ...entries,
+      ]
       return {
         ...state,
         [windowId]: {
           ...defaultState,
           ...windowState,
-          entries: [...windowState.entries, entry],
+          entries: newEntries,
+        },
+      }
+    },
+    remove(
+      state,
+      action: PayloadAction<{ windowId: number; paths: string[] }>
+    ) {
+      const { windowId, paths } = action.payload
+      const windowState = state[windowId]
+      if (!windowState) {
+        return state
+      }
+      const entries = windowState.entries.filter(
+        (entry) => !paths.includes(entry.path)
+      )
+      return {
+        ...state,
+        [windowId]: {
+          ...defaultState,
+          ...windowState,
+          entries,
         },
       }
     },
@@ -356,53 +382,6 @@ export const windowSlice = createSlice({
             histories,
             index,
           },
-        },
-      }
-    },
-    rename(
-      state,
-      action: PayloadAction<{
-        windowId: number
-        path: string
-        entry: DetailedEntry
-      }>
-    ) {
-      const { windowId, path, entry } = action.payload
-      const windowState = state[windowId]
-      if (!windowState) {
-        return state
-      }
-      const entries = [
-        ...windowState.entries.filter((entry) => entry.path !== path),
-        entry,
-      ]
-      return {
-        ...state,
-        [windowId]: {
-          ...defaultState,
-          ...windowState,
-          entries,
-        },
-      }
-    },
-    moveToTrash(
-      state,
-      action: PayloadAction<{ windowId: number; paths: string[] }>
-    ) {
-      const { windowId, paths } = action.payload
-      const windowState = state[windowId]
-      if (!windowState) {
-        return state
-      }
-      const entries = windowState.entries.filter(
-        (entry) => !paths.includes(entry.path)
-      )
-      return {
-        ...state,
-        [windowId]: {
-          ...defaultState,
-          ...windowState,
-          entries,
         },
       }
     },
@@ -765,24 +744,6 @@ export const changeDirectory =
     dispatch(changeDirectory({ windowId, path }))
   }
 
-export const rename =
-  (path: string, newName: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { rename } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    const entry = await window.electronAPI.renameEntry(path, newName)
-    dispatch(rename({ windowId, path, entry }))
-  }
-
-export const moveToTrash =
-  (paths: string[]): AppThunk =>
-  async (dispatch, getState) => {
-    const { moveToTrash } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    await window.electronAPI.trashItems(paths)
-    dispatch(moveToTrash({ windowId, paths }))
-  }
-
 export const goHome = (): AppThunk => async (dispatch) => {
   const homePath = await window.electronAPI.getHomePath()
   return dispatch(changeDirectory(homePath))
@@ -798,8 +759,44 @@ export const newFolder =
     const { add, select } = windowSlice.actions
     const windowId = selectWindowId(getState())
     const entry = await window.electronAPI.createDirectory(path)
-    dispatch(add({ windowId, entry }))
+    dispatch(add({ windowId, entries: [entry] }))
     dispatch(select({ windowId, path: entry.path }))
+  }
+
+export const moveToTrash =
+  (paths: string[]): AppThunk =>
+  async (dispatch, getState) => {
+    const { remove } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    await window.electronAPI.trashItems(paths)
+    dispatch(remove({ windowId, paths }))
+  }
+
+export const rename =
+  (path: string, newName: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { add, remove } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    const entry = await window.electronAPI.renameEntry(path, newName)
+    dispatch(remove({ windowId, paths: [path] }))
+    dispatch(add({ windowId, entries: [entry] }))
+  }
+
+export const createEntry =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { add } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    const entry = await window.electronAPI.getDetailedEntry(path)
+    dispatch(add({ windowId, entries: [entry] }))
+  }
+
+export const deleteEntry =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { remove } = windowSlice.actions
+    const windowId = selectWindowId(getState())
+    dispatch(remove({ windowId, paths: [path] }))
   }
 
 export const scroll =

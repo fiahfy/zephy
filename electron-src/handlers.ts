@@ -13,12 +13,16 @@ import {
 } from './utils/ffmpeg'
 import {
   createDirectory,
+  createWatcher,
   getDetailedEntries,
   getDetailedEntriesForPaths,
+  getDetailedEntry,
   getEntries,
   getEntryHierarchy,
   renameEntry,
 } from './utils/file'
+
+const watcher = createWatcher()
 
 const registerHandlers = () => {
   ipcMain.handle('darwin', () => process.platform === 'darwin')
@@ -56,6 +60,10 @@ const registerHandlers = () => {
       getDetailedEntriesForPaths(paths)
   )
   ipcMain.handle(
+    'get-detailed-entry',
+    (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path)
+  )
+  ipcMain.handle(
     'get-entries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getEntries(directoryPath)
@@ -84,6 +92,15 @@ const registerHandlers = () => {
     'rename-entry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName)
+  )
+  ipcMain.handle('watch', (event: IpcMainInvokeEvent, directoryPath: string) =>
+    watcher.watch(directoryPath, (eventType, path) =>
+      event.sender.send(
+        'subscribe',
+        eventType === 'create' ? 'createEntry' : 'deleteEntry',
+        { path }
+      )
+    )
   )
 }
 

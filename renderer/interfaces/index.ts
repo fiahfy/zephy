@@ -5,14 +5,15 @@
 // import User from 'path/to/interfaces';
 
 export interface IElectronAPI {
-  createDirectory: (path: string) => Promise<DetailedEntry>
+  createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
   darwin: () => Promise<boolean>
   dirname: (path: string) => Promise<string>
-  getDetailedEntries: (path: string) => Promise<DetailedEntry[]>
+  getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
-  getEntries: (path: string) => Promise<Entry[]>
+  getDetailedEntry: (path: string) => Promise<DetailedEntry>
+  getEntries: (directoryPath: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
   getHomePath: () => Promise<string>
   getMetadata: (path: string) => Promise<Metadata>
@@ -27,6 +28,7 @@ export interface IElectronAPI {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscribe: (callback: (eventName: string, params: any) => void) => () => void
   trashItems: (paths: string[]) => Promise<void>
+  watch: (directoryPath: string) => Promise<void>
 }
 
 export type ContextMenuParams = {

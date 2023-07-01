@@ -32,21 +32,15 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    preventSelection(event)
-  }
+  ) => preventSelection(event)
 
   const handleExpansionClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    handleExpansion(event)
-  }
+  ) => handleExpansion(event)
 
   const handleSelectionClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    handleSelection(event)
-  }
+  ) => handleSelection(event)
 
   return (
     <Box

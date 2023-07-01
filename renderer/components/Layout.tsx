@@ -10,6 +10,7 @@ import useContextMenu from 'hooks/useContextMenu'
 import useDocumentHandler from 'hooks/useDocumentHandler'
 import useRedirect from 'hooks/useRedirect'
 import useSubscription from 'hooks/useSubscription'
+import useWatcher from 'hooks/useWatcher'
 
 type Props = {
   children: ReactNode
@@ -22,6 +23,7 @@ const Layout = (props: Props) => {
   useDocumentHandler()
   useRedirect()
   useSubscription()
+  useWatcher()
 
   return (
     <Box

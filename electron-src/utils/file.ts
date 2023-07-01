@@ -1,3 +1,4 @@
+import chokidar, { FSWatcher } from 'chokidar'
 import { Dirent, Stats, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
 
@@ -50,7 +51,9 @@ export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
   }, [] as Entry[])
 }
 
-const getDetailedEntry = async (path: string): Promise<DetailedEntry> => {
+export const getDetailedEntry = async (
+  path: string
+): Promise<DetailedEntry> => {
   const stats = await stat(path)
   const type = getEntryType(stats)
   if (type === 'other') {
@@ -189,4 +192,23 @@ export const renameEntry = async (
   const newPath = join(dirname(path), newName)
   await rename(path, newPath)
   return await getDetailedEntry(newPath)
+}
+
+export const createWatcher = () => {
+  let watcher: FSWatcher | undefined
+
+  const watch = async (
+    directoryPath: string,
+    callback: (eventType: 'create' | 'delete', path: string) => void
+  ) => {
+    watcher && watcher.close()
+    watcher = chokidar
+      .watch(directoryPath, { depth: 0, ignoreInitial: true })
+      .on('add', (path) => callback('create', path))
+      .on('addDir', (path) => callback('create', path))
+      .on('unlink', (path) => callback('delete', path))
+      .on('unlinkDir', (path) => callback('delete', path))
+  }
+
+  return { watch }
 }
