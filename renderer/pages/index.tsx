@@ -33,7 +33,8 @@ const IndexPage = () => {
   const viewMode = useAppSelector(selectViewMode)
   const dispatch = useAppDispatch()
 
-  const { createContentMenuHandler } = useContextMenu()
+  const { createContentMenuHandler, createDirectoryMenuHandler } =
+    useContextMenu()
 
   const [focused, setFocused] = useState<string>()
 
@@ -97,7 +98,11 @@ const IndexPage = () => {
   }
 
   return (
-    <Box onClick={handleClick} sx={{ height: '100%' }}>
+    <Box
+      onClick={handleClick}
+      onContextMenu={createDirectoryMenuHandler()}
+      sx={{ height: '100%' }}
+    >
       {createElement(viewMode === 'list' ? ExplorerTable : ExplorerGrid, {
         contentFocused: isContentFocused,
         contentSelected: isContentSelected,

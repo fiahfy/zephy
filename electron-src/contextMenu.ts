@@ -110,32 +110,31 @@ const registerContextMenu = () => {
         sortBy: ({ params }) => ({
           label: 'Sort By',
           submenu: [
-            { label: 'Name', key: 'name' },
-            { label: 'Date Last Opened', key: 'dateLastOpened' },
-            { label: 'Date Modified', key: 'dateModified' },
-            { label: 'Date Created', key: 'dateCreated' },
-            { label: 'Size', key: 'size' },
-            { label: 'Rating', key: 'rating' },
+            { label: 'Name', orderBy: 'name' },
+            { label: 'Date Last Opened', orderBy: 'dateLastOpened' },
+            { label: 'Date Modified', orderBy: 'dateModified' },
+            { label: 'Date Created', orderBy: 'dateCreated' },
+            { label: 'Size', orderBy: 'size' },
+            { label: 'Rating', orderBy: 'rating' },
           ].map((menu) => ({
             ...menu,
-            checked: menu.key === params.orderBy,
-            click: () => send('subscribe', 'sort', { orderBy: menu.key }),
+            checked: menu.orderBy === params.orderBy,
+            click: () => send('subscribe', 'sort', { orderBy: menu.orderBy }),
             type: 'checkbox',
           })),
         }),
-        asList: ({ params }) => ({
-          label: 'as List',
-          checked: params.checked,
-          click: () =>
-            send('subscribe', 'changeViewMode', { viewMode: 'list' }),
-          type: 'checkbox',
-        }),
-        asThumbnail: ({ params }) => ({
-          label: 'as Thumbnail',
-          checked: params.checked,
-          click: () =>
-            send('subscribe', 'changeViewMode', { viewMode: 'thumbnail' }),
-          type: 'checkbox',
+        view: ({ params }) => ({
+          label: 'View',
+          submenu: [
+            { label: 'as List', viewMode: 'list' },
+            { label: 'as Thumbnail', viewMode: 'thumbnail' },
+          ].map((menu) => ({
+            ...menu,
+            checked: menu.viewMode === params.viewMode,
+            click: () =>
+              send('subscribe', 'changeViewMode', { viewMode: menu.viewMode }),
+            type: 'checkbox',
+          })),
         }),
         toggleNavigator: ({ params }) => ({
           label: params.hidden ? 'Show Navigator' : 'Hide Navigator',

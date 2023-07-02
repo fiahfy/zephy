@@ -116,13 +116,30 @@ const useContextMenu = () => {
     ])
   }
 
+  const createDirectoryMenuHandler = () =>
+    createMenuHandler([
+      { id: 'newFolder', params: { path: currentDirectory } },
+      { id: 'revealInFinder', params: { path: currentDirectory } },
+      { id: 'separator' },
+      { id: 'view', params: { viewMode } },
+      { id: 'separator' },
+      {
+        id: 'sortBy',
+        params: { orderBy: currentSortOption.orderBy },
+      },
+    ])
+
   const createMoreMenuHandler = () =>
     createMenuHandler([
       { id: 'newFolder', params: { path: currentDirectory } },
       { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
-      { id: 'asList', params: { checked: viewMode === 'list' } },
-      { id: 'asThumbnail', params: { checked: viewMode === 'thumbnail' } },
+      { id: 'view', params: { viewMode } },
+      { id: 'separator' },
+      {
+        id: 'sortBy',
+        params: { orderBy: currentSortOption.orderBy },
+      },
       { id: 'separator' },
       { id: 'toggleNavigator', params: { hidden: isSidebarHidden('primary') } },
       {
@@ -130,16 +147,13 @@ const useContextMenu = () => {
         params: { hidden: isSidebarHidden('secondary') },
       },
       { id: 'separator' },
-      {
-        id: 'sortBy',
-        params: { orderBy: currentSortOption.orderBy },
-      },
       { id: 'settings' },
     ])
 
   return {
     createContentMenuHandler,
     createDefaultMenuHandler,
+    createDirectoryMenuHandler,
     createEntryMenuHandler,
     createMoreMenuHandler,
   }
