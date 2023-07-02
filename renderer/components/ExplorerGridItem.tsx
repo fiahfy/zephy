@@ -1,7 +1,7 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import fileUrl from 'file-url'
-import { FocusEvent, MouseEvent, useEffect, useMemo, useReducer } from 'react'
+import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
+import clsx from 'clsx'
 
 type State = { loading: boolean; paths: string[]; thumbnail?: string }
 
@@ -35,6 +36,7 @@ const reducer = (_state: State, action: Action) => {
 type Props = {
   columnIndex: number
   content: Content
+  focused: boolean
   onClick: (e: MouseEvent) => void
   onContextMenu: (e: MouseEvent) => void
   onDoubleClick: (e: MouseEvent) => void
@@ -46,6 +48,7 @@ const ExplorerGridItem = (props: Props) => {
   const {
     columnIndex,
     content,
+    focused,
     onClick,
     onContextMenu,
     onDoubleClick,
@@ -104,133 +107,135 @@ const ExplorerGridItem = (props: Props) => {
   )
 
   return (
-    <ImageListItem
-      className={selected ? 'selected' : undefined}
-      component="div"
-      data-grid-column={columnIndex + 1}
-      data-grid-row={rowIndex + 1}
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      onDoubleClick={onDoubleClick}
-      sx={{
-        cursor: 'pointer',
-        height: '100%!important',
-        userSelect: 'none',
-        width: '100%',
-        '&:hover': {
-          '.overlay': {
-            backgroundColor: (theme) => theme.palette.action.hover,
-          },
-        },
-        '&.selected': {
-          '.overlay': {
-            backgroundColor: (theme) =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.selectedOpacity
-              ),
-          },
+    <>
+      <ImageListItem
+        className={clsx({ focused, selected })}
+        component="div"
+        data-grid-column={columnIndex + 1}
+        data-grid-row={rowIndex + 1}
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onDoubleClick={onDoubleClick}
+        sx={{
+          cursor: 'pointer',
+          height: '100%!important',
+          userSelect: 'none',
+          width: '100%',
           '&:hover': {
+            '.overlay': {
+              backgroundColor: (theme) => theme.palette.action.hover,
+            },
+          },
+          '&.selected': {
             '.overlay': {
               backgroundColor: (theme) =>
                 alpha(
                   theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity +
-                    theme.palette.action.hoverOpacity
+                  theme.palette.action.selectedOpacity
                 ),
             },
+            '&:hover': {
+              '.overlay': {
+                backgroundColor: (theme) =>
+                  alpha(
+                    theme.palette.primary.main,
+                    theme.palette.action.selectedOpacity +
+                      theme.palette.action.hoverOpacity
+                  ),
+              },
+            },
           },
-        },
-      }}
-    >
-      {thumbnail ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          loading="lazy"
-          src={fileUrl(thumbnail)}
-          style={{ objectPosition: 'center top' }}
-        />
-      ) : (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="caption">{message}</Typography>
-        </Box>
-      )}
-      <ImageListItemBar
-        actionIcon={
-          <Box mt={-3} mx={1}>
-            <EntryIcon entry={content} size="small" />
-          </Box>
-        }
-        actionPosition="left"
-        subtitle={
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}
-          >
-            <NoOutlineRating
-              color="primary"
-              onChange={(_e, value) =>
-                appDispatch(rate({ path: content.path, rating: value ?? 0 }))
-              }
-              onClick={(e) => e.stopPropagation()}
-              precision={0.5}
-              size="small"
-              sx={{ my: 0.25 }}
-              value={content.rating}
-            />
-            {!loading && content.type === 'directory' && (
-              <Typography ml={1} noWrap variant="caption">
-                {paths.length} items
-              </Typography>
-            )}
-          </Box>
-        }
-        sx={{ '.MuiImageListItemBar-titleWrap': { p: 0, pb: 1, pr: 1 } }}
-        title={
+        }}
+      >
+        {thumbnail ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            loading="lazy"
+            src={fileUrl(thumbnail)}
+            style={{ objectPosition: 'center top' }}
+          />
+        ) : (
           <Box
             sx={{
               alignItems: 'center',
               display: 'flex',
-              height: (theme) => theme.spacing(5),
+              height: '100%',
+              justifyContent: 'center',
             }}
           >
-            <Typography
-              sx={{
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2,
-                display: '-webkit-box',
-                lineHeight: 1.4,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'initial',
-                wordBreak: 'break-all',
-              }}
-              title={content.name}
-              variant="caption"
-            >
-              {content.name}
-            </Typography>
+            <Typography variant="caption">{message}</Typography>
           </Box>
-        }
-      />
-      <Box
-        className="overlay"
-        sx={{
-          inset: 0,
-          pointerEvents: 'none',
-          position: 'absolute',
-        }}
-      />
-    </ImageListItem>
+        )}
+        <ImageListItemBar
+          actionIcon={
+            <Box mt={-3} mx={1}>
+              <EntryIcon entry={content} size="small" />
+            </Box>
+          }
+          actionPosition="left"
+          subtitle={
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <NoOutlineRating
+                color="primary"
+                onChange={(_e, value) =>
+                  appDispatch(rate({ path: content.path, rating: value ?? 0 }))
+                }
+                onClick={(e) => e.stopPropagation()}
+                precision={0.5}
+                size="small"
+                sx={{ my: 0.25 }}
+                value={content.rating}
+              />
+              {!loading && content.type === 'directory' && (
+                <Typography ml={1} noWrap variant="caption">
+                  {paths.length} items
+                </Typography>
+              )}
+            </Box>
+          }
+          sx={{ '.MuiImageListItemBar-titleWrap': { p: 0, pb: 1, pr: 1 } }}
+          title={
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+                height: (theme) => theme.spacing(5),
+              }}
+            >
+              <Typography
+                sx={{
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 2,
+                  display: '-webkit-box',
+                  lineHeight: 1.4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'initial',
+                  wordBreak: 'break-all',
+                }}
+                title={content.name}
+                variant="caption"
+              >
+                {content.name}
+              </Typography>
+            </Box>
+          }
+        />
+        <Box
+          className="overlay"
+          sx={{
+            inset: 0,
+            pointerEvents: 'none',
+            position: 'absolute',
+          }}
+        />
+      </ImageListItem>
+    </>
   )
 }
 

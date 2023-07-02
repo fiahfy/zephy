@@ -14,12 +14,14 @@ import {
   Table,
   TableCellProps,
   TableHeaderProps,
+  TableRowProps,
 } from 'react-virtualized'
 
 import ExplorerTableCell from 'components/ExplorerTableCell'
 import ExplorerTableHeaderCell from 'components/ExplorerTableHeaderCell'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
+import clsx from 'clsx'
 
 const headerHeight = 32
 const rowHeight = 20
@@ -61,8 +63,10 @@ const columns: ColumnType[] = [
 ]
 
 type Props = {
+  contentFocused: (content: Content) => boolean
   contentSelected: (content: Content) => boolean
   contents: Content[]
+  focused: string | undefined
   loading: boolean
   onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
   onClickContent: (e: MouseEvent, content: Content) => void
@@ -77,8 +81,10 @@ type Props = {
 
 const ExplorerTable = (props: Props) => {
   const {
+    contentFocused,
     contentSelected,
     contents,
+    focused,
     loading,
     onChangeSortOption,
     onClickContent,
@@ -114,6 +120,18 @@ const ExplorerTable = (props: Props) => {
     }
   }, [loading, previousLoading, scrollTop])
 
+  useEffect(() => {
+    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    if (!el) {
+      return
+    }
+    const focusedEl = el.querySelector('.ReactVirtualized__Table__row.focused')
+    if (!focusedEl) {
+      return
+    }
+    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [focused])
+
   const getWidths = useCallback((wrapperWidth: number) => {
     const widths = columns.map((column) => column.width)
     const flexibleNum = widths.filter((width) => width === undefined).length
@@ -129,15 +147,18 @@ const ExplorerTable = (props: Props) => {
     return widths.map((width) => (width === undefined ? flexibleWidth : width))
   }, [])
 
-  const focus = (e: KeyboardEvent, row: number) => {
-    const content = contents[row - 1]
+  const focus = (e: KeyboardEvent, row: number, focused: boolean) => {
+    const content = contents[row - 1] ?? (focused ? undefined : contents[0])
     if (content) {
       onKeyDownArrow(e, content)
     }
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    const row = Number(document.activeElement?.getAttribute('aria-rowindex'))
+    const el = ref.current?.querySelector(
+      '.ReactVirtualized__Table__row.focused'
+    )
+    const row = Number(el?.getAttribute('aria-rowindex'))
     switch (e.key) {
       case 'Enter':
         if (!e.nativeEvent.isComposing) {
@@ -145,9 +166,9 @@ const ExplorerTable = (props: Props) => {
         }
         return
       case 'ArrowUp':
-        return focus(e, row - 1)
+        return focus(e, row - 1, !!el)
       case 'ArrowDown':
-        return focus(e, row + 1)
+        return focus(e, row + 1, !!el)
     }
   }
 
@@ -169,6 +190,68 @@ const ExplorerTable = (props: Props) => {
       sortOption={sortOption}
     />
   )
+
+  // @see https://github.com/bvaughn/react-virtualized/blob/master/source/Table/defaultRowRenderer.js
+  const rowRenderer = ({
+    className,
+    columns,
+    index,
+    key,
+    onRowClick,
+    onRowDoubleClick,
+    onRowMouseOut,
+    onRowMouseOver,
+    onRowRightClick,
+    rowData,
+    style,
+  }: TableRowProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a11yProps: any = { 'aria-rowindex': index + 1 }
+
+    if (
+      onRowClick ||
+      onRowDoubleClick ||
+      onRowMouseOut ||
+      onRowMouseOver ||
+      onRowRightClick
+    ) {
+      a11yProps['aria-label'] = 'row'
+      // a11yProps.tabIndex = 0
+
+      if (onRowClick) {
+        a11yProps.onClick = (event: MouseEvent) =>
+          onRowClick({ event, index, rowData })
+      }
+      if (onRowDoubleClick) {
+        a11yProps.onDoubleClick = (event: MouseEvent) =>
+          onRowDoubleClick({ event, index, rowData })
+      }
+      if (onRowMouseOut) {
+        a11yProps.onMouseOut = (event: MouseEvent) =>
+          onRowMouseOut({ event, index, rowData })
+      }
+      if (onRowMouseOver) {
+        a11yProps.onMouseOver = (event: MouseEvent) =>
+          onRowMouseOver({ event, index, rowData })
+      }
+      if (onRowRightClick) {
+        a11yProps.onContextMenu = (event: MouseEvent) =>
+          onRowRightClick({ event, index, rowData })
+      }
+    }
+
+    return (
+      <div
+        {...a11yProps}
+        className={className}
+        key={key}
+        role="row"
+        style={style}
+      >
+        {columns}
+      </div>
+    )
+  }
 
   const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
     const align = columns.find((column) => column.key === dataKey)?.align
@@ -194,25 +277,33 @@ const ExplorerTable = (props: Props) => {
             overflow: 'hidden',
           },
         },
-        '.ReactVirtualized__Table__row': {
-          cursor: 'pointer',
-          display: 'flex',
-          '&:hover': {
-            backgroundColor: (theme) => theme.palette.action.hover,
+        '.ReactVirtualized__Grid': {
+          outline: 'none',
+          '&:focus-visible': {
+            '.ReactVirtualized__Table__row.focused': {
+              outline: '-webkit-focus-ring-color auto 1px',
+            },
           },
-          '&.selected': {
-            backgroundColor: (theme) =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.selectedOpacity
-              ),
+          '.ReactVirtualized__Table__row': {
+            cursor: 'pointer',
+            display: 'flex',
             '&:hover': {
+              backgroundColor: (theme) => theme.palette.action.hover,
+            },
+            '&.selected': {
               backgroundColor: (theme) =>
                 alpha(
                   theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity +
-                    theme.palette.action.hoverOpacity
+                  theme.palette.action.selectedOpacity
                 ),
+              '&:hover': {
+                backgroundColor: (theme) =>
+                  alpha(
+                    theme.palette.primary.main,
+                    theme.palette.action.selectedOpacity +
+                      theme.palette.action.hoverOpacity
+                  ),
+              },
             },
           },
         },
@@ -232,12 +323,17 @@ const ExplorerTable = (props: Props) => {
               rowClassName={({ index }) => {
                 // @see https://github.com/bvaughn/react-virtualized/issues/1357
                 const content = contents[index]
-                return content && contentSelected(content) ? 'selected' : ''
+                return content
+                  ? clsx({
+                      focused: contentFocused(content),
+                      selected: contentSelected(content),
+                    })
+                  : ''
               }}
               rowCount={contents.length}
               rowGetter={({ index }) => contents[index]}
               rowHeight={rowHeight}
-              tabIndex={null}
+              rowRenderer={rowRenderer}
               width={width}
             >
               {columns.map(({ key, label }, index) => (

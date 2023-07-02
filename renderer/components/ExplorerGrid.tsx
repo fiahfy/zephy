@@ -1,6 +1,5 @@
 import { Box, LinearProgress } from '@mui/material'
 import {
-  FocusEvent,
   KeyboardEvent,
   MouseEvent,
   useEffect,
@@ -17,8 +16,10 @@ import { Content } from 'interfaces'
 const rowHeight = 256
 
 type Props = {
+  contentFocused: (content: Content) => boolean
   contentSelected: (content: Content) => boolean
   contents: Content[]
+  focused: string | undefined
   loading: boolean
   onClickContent: (e: MouseEvent, content: Content) => void
   onContextMenuContent: (e: MouseEvent, content: Content) => void
@@ -31,8 +32,10 @@ type Props = {
 
 const ExplorerGrid = (props: Props) => {
   const {
+    contentFocused,
     contentSelected,
     contents,
+    focused,
     loading,
     onClickContent,
     onContextMenuContent,
@@ -77,6 +80,18 @@ const ExplorerGrid = (props: Props) => {
     }
   }, [loading, previousLoading, scrollTop])
 
+  useEffect(() => {
+    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    if (!el) {
+      return
+    }
+    const focusedEl = el.querySelector('.focused')
+    if (!focusedEl) {
+      return
+    }
+    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [focused])
+
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / rowHeight) || 1,
     [wrapperWidth]
@@ -92,18 +107,23 @@ const ExplorerGrid = (props: Props) => {
     [columns, contents]
   )
 
-  const focus = (e: KeyboardEvent, row: number, column: number) => {
-    const content = chunks[row - 1]?.[column - 1]
+  const focus = (
+    e: KeyboardEvent,
+    row: number,
+    column: number,
+    focused: boolean
+  ) => {
+    const content =
+      chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])
     if (content) {
       onKeyDownArrow(e, content)
     }
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    const row = Number(document.activeElement?.getAttribute('data-grid-row'))
-    const column = Number(
-      document.activeElement?.getAttribute('data-grid-column')
-    )
+    const el = ref.current?.querySelector('.focused')
+    const row = Number(el?.getAttribute('data-grid-row'))
+    const column = Number(el?.getAttribute('data-grid-column'))
     switch (e.key) {
       case 'Enter':
         if (!e.nativeEvent.isComposing) {
@@ -111,13 +131,13 @@ const ExplorerGrid = (props: Props) => {
         }
         return
       case 'ArrowUp':
-        return focus(e, row - 1, column)
+        return focus(e, row - 1, column, !!el)
       case 'ArrowDown':
-        return focus(e, row + 1, column)
+        return focus(e, row + 1, column, !!el)
       case 'ArrowLeft':
-        return focus(e, row, column - 1)
+        return focus(e, row, column - 1, !!el)
       case 'ArrowRight':
-        return focus(e, row, column + 1)
+        return focus(e, row, column + 1, !!el)
     }
   }
 
@@ -134,6 +154,7 @@ const ExplorerGrid = (props: Props) => {
           <ExplorerGridItem
             columnIndex={columnIndex}
             content={content}
+            focused={contentFocused(content)}
             onClick={(e) => onClickContent(e, content)}
             onContextMenu={(e) => onContextMenuContent(e, content)}
             onDoubleClick={(e) => onDoubleClickContent(e, content)}
@@ -146,7 +167,16 @@ const ExplorerGrid = (props: Props) => {
   }
 
   return (
-    <Box onKeyDown={handleKeyDown} ref={ref} sx={{ height: '100%' }}>
+    <Box
+      onKeyDown={handleKeyDown}
+      ref={ref}
+      sx={{
+        height: '100%',
+        '.ReactVirtualized__Grid:focus-visible .focused': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
+      }}
+    >
       <AutoSizer>
         {({ height, width }) => (
           <Grid
@@ -157,9 +187,9 @@ const ExplorerGrid = (props: Props) => {
             rowCount={chunks.length}
             rowHeight={rowHeight}
             style={{
+              outline: 'none',
               overflowY: 'scroll',
             }}
-            tabIndex={null}
             width={width}
           />
         )}

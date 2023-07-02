@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { KeyboardEvent, MouseEvent, createElement } from 'react'
+import { KeyboardEvent, MouseEvent, createElement, useState } from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
@@ -35,7 +35,14 @@ const IndexPage = () => {
 
   const { createContentMenuHandler } = useContextMenu()
 
-  const handleClick = () => dispatch(unselectAll())
+  const [focused, setFocused] = useState<string>()
+
+  const handleClick = () => {
+    dispatch(unselectAll())
+    setFocused(undefined)
+  }
+
+  const isContentFocused = (content: Content) => content.path === focused
 
   const isContentSelected = (content: Content) => isSelected(content.path)
 
@@ -53,6 +60,7 @@ const IndexPage = () => {
     } else {
       dispatch(select(content.path))
     }
+    setFocused(content.path)
   }
 
   const handleContextMenuContent = (e: MouseEvent, content: Content) =>
@@ -66,6 +74,7 @@ const IndexPage = () => {
   const handleKeyDownArrow = (e: KeyboardEvent, content: Content) => {
     e.preventDefault()
     dispatch(select(content.path))
+    setFocused(content.path)
   }
 
   const handleKeyDownEnter = async (e: KeyboardEvent) => {
@@ -90,8 +99,10 @@ const IndexPage = () => {
   return (
     <Box onClick={handleClick} sx={{ height: '100%' }}>
       {createElement(viewMode === 'list' ? ExplorerTable : ExplorerGrid, {
+        contentFocused: isContentFocused,
         contentSelected: isContentSelected,
         contents,
+        focused,
         loading,
         onChangeSortOption: handleChangeSortOption,
         onClickContent: handleClickContent,
