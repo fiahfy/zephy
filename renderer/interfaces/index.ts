@@ -40,7 +40,6 @@ export interface IElectronAPI {
       filePath: string
     ) => void
   ) => Promise<void>
-  parsePath: (path: string) => Promise<string[]>
 }
 
 export type ContextMenuParams = {

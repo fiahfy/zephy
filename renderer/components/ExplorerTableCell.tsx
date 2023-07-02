@@ -11,7 +11,6 @@ import {
 import EntryIcon from 'components/EntryIcon'
 import DenseOutlineTextField from 'components/enhanced/DenseOutlineTextField'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import useContextMenu from 'hooks/useContextMenu'
 import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
@@ -35,9 +34,8 @@ const ExplorerTableCell = (props: Props) => {
   const getRating = useAppSelector(selectGetRating)
   const dispatch = useAppDispatch()
 
-  const { createContentMenuHandler } = useContextMenu()
   const { handleClick, handleDoubleClick } = usePreventClickOnDoubleClick(
-    (e: MouseEvent<HTMLTableCellElement>) => {
+    (e: MouseEvent) => {
       if (editing) {
         return e.stopPropagation()
       }
@@ -51,7 +49,7 @@ const ExplorerTableCell = (props: Props) => {
         setEditing(true)
       }
     },
-    (e: MouseEvent<HTMLTableCellElement>) => {
+    (e: MouseEvent) => {
       if (editing) {
         return e.stopPropagation()
       }
@@ -101,7 +99,8 @@ const ExplorerTableCell = (props: Props) => {
     setNameInput(value)
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    e.stopPropagation()
     if (e.key === 'Escape') {
       setNameInput(content.name)
       setEditing(false)
@@ -113,7 +112,6 @@ const ExplorerTableCell = (props: Props) => {
       align={align}
       component="div"
       onClick={handleClick}
-      onContextMenu={createContentMenuHandler(content)}
       onDoubleClick={handleDoubleClick}
       sx={{
         alignItems: 'center',

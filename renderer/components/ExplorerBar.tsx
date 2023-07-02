@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import {
   ChangeEvent,
-  KeyboardEvent as ReactKeyboardEvent,
+  KeyboardEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -81,7 +81,7 @@ const ExplorerBar = () => {
   }, [dispatch, search])
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if (
         e.key === 'f' &&
         ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))
@@ -147,13 +147,13 @@ const ExplorerBar = () => {
   const handleInputChangeQuery = (_e: SyntheticEvent, value: string) =>
     value ? setQueryInput(value) : search(value)
 
-  const handleKeyDownDirectory = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownDirectory = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
       dispatch(changeDirectory(directory))
     }
   }
 
-  const handleKeyDownQuery = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDownQuery = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       search(queryInput)
     }

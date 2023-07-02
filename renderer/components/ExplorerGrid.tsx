@@ -1,5 +1,6 @@
 import { Box, LinearProgress } from '@mui/material'
 import {
+  FocusEvent,
   KeyboardEvent,
   MouseEvent,
   useEffect,
@@ -19,10 +20,11 @@ type Props = {
   contentSelected: (content: Content) => boolean
   contents: Content[]
   loading: boolean
-  onClickContent: (e: MouseEvent<HTMLDivElement>, content: Content) => void
-  onDoubleClickContent: (content: Content) => void
-  onFocusContent: (content: Content) => void
-  onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
+  onClickContent: (e: MouseEvent, content: Content) => void
+  onContextMenuContent: (e: MouseEvent, content: Content) => void
+  onDoubleClickContent: (e: MouseEvent, content: Content) => void
+  onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
+  onKeyDownEnter: (e: KeyboardEvent) => void
   onScroll: (e: Event) => void
   scrollTop: number
 }
@@ -33,14 +35,15 @@ const ExplorerGrid = (props: Props) => {
     contents,
     loading,
     onClickContent,
+    onContextMenuContent,
     onDoubleClickContent,
-    onFocusContent,
+    onKeyDownArrow,
     onKeyDownEnter,
     onScroll,
     scrollTop,
   } = props
 
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
   const [wrapperWidth, setWrapperWidth] = useState(0)
   const previousLoading = usePrevious(loading)
 
@@ -89,18 +92,14 @@ const ExplorerGrid = (props: Props) => {
     [columns, contents]
   )
 
-  const focus = (row: number, column: number) => {
-    const el = ref.current?.querySelector<HTMLDivElement>(
-      `[data-grid-row="${row}"][data-grid-column="${column}"]`
-    )
+  const focus = (e: KeyboardEvent, row: number, column: number) => {
     const content = chunks[row - 1]?.[column - 1]
-    if (el && content) {
-      el.focus()
-      onFocusContent(content)
+    if (content) {
+      onKeyDownArrow(e, content)
     }
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     const row = Number(document.activeElement?.getAttribute('data-grid-row'))
     const column = Number(
       document.activeElement?.getAttribute('data-grid-column')
@@ -112,13 +111,13 @@ const ExplorerGrid = (props: Props) => {
         }
         return
       case 'ArrowUp':
-        return focus(row - 1, column)
+        return focus(e, row - 1, column)
       case 'ArrowDown':
-        return focus(row + 1, column)
+        return focus(e, row + 1, column)
       case 'ArrowLeft':
-        return focus(row, column - 1)
+        return focus(e, row, column - 1)
       case 'ArrowRight':
-        return focus(row, column + 1)
+        return focus(e, row, column + 1)
     }
   }
 
@@ -136,7 +135,8 @@ const ExplorerGrid = (props: Props) => {
             columnIndex={columnIndex}
             content={content}
             onClick={(e) => onClickContent(e, content)}
-            onDoubleClick={() => onDoubleClickContent(content)}
+            onContextMenu={(e) => onContextMenuContent(e, content)}
+            onDoubleClick={(e) => onDoubleClickContent(e, content)}
             rowIndex={rowIndex}
             selected={contentSelected(content)}
           />
@@ -159,6 +159,7 @@ const ExplorerGrid = (props: Props) => {
             style={{
               overflowY: 'scroll',
             }}
+            tabIndex={null}
             width={width}
           />
         )}

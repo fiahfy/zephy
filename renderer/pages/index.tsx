@@ -1,8 +1,9 @@
 import { Box } from '@mui/material'
-import { MouseEvent, createElement } from 'react'
+import { KeyboardEvent, MouseEvent, createElement } from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
+import useContextMenu from 'hooks/useContextMenu'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
@@ -19,6 +20,7 @@ import {
   selectSelectedContents,
   selectViewMode,
   sort,
+  unselectAll,
 } from 'store/window'
 
 const IndexPage = () => {
@@ -31,6 +33,10 @@ const IndexPage = () => {
   const viewMode = useAppSelector(selectViewMode)
   const dispatch = useAppDispatch()
 
+  const { createContentMenuHandler } = useContextMenu()
+
+  const handleClick = () => dispatch(unselectAll())
+
   const isContentSelected = (content: Content) => isSelected(content.path)
 
   const handleChangeSortOption = (sortOption: {
@@ -38,10 +44,8 @@ const IndexPage = () => {
     orderBy: keyof Content
   }) => dispatch(sort(sortOption.orderBy, sortOption.order))
 
-  const handleClickContent = (
-    e: MouseEvent<HTMLDivElement>,
-    content: Content
-  ) => {
+  const handleClickContent = (e: MouseEvent, content: Content) => {
+    e.stopPropagation()
     if (e.shiftKey) {
       dispatch(rangeSelect(content.path))
     } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
@@ -51,15 +55,21 @@ const IndexPage = () => {
     }
   }
 
-  const handleDoubleClickContent = async (content: Content) =>
+  const handleContextMenuContent = (e: MouseEvent, content: Content) =>
+    createContentMenuHandler(content)(e)
+
+  const handleDoubleClickContent = async (_e: MouseEvent, content: Content) =>
     content.type === 'directory'
       ? dispatch(changeDirectory(content.path))
       : await window.electronAPI.openPath(content.path)
 
-  const handleFocusContent = (content: Content) =>
+  const handleKeyDownArrow = (e: KeyboardEvent, content: Content) => {
+    e.preventDefault()
     dispatch(select(content.path))
+  }
 
-  const handleKeyDownEnter = async () => {
+  const handleKeyDownEnter = async (e: KeyboardEvent) => {
+    e.preventDefault()
     const content = selectedContents[0]
     if (!content) {
       return
@@ -78,15 +88,16 @@ const IndexPage = () => {
   }
 
   return (
-    <Box sx={{ height: '100%' }}>
+    <Box onClick={handleClick} sx={{ height: '100%' }}>
       {createElement(viewMode === 'list' ? ExplorerTable : ExplorerGrid, {
         contentSelected: isContentSelected,
         contents,
         loading,
         onChangeSortOption: handleChangeSortOption,
         onClickContent: handleClickContent,
+        onContextMenuContent: handleContextMenuContent,
         onDoubleClickContent: handleDoubleClickContent,
-        onFocusContent: handleFocusContent,
+        onKeyDownArrow: handleKeyDownArrow,
         onKeyDownEnter: handleKeyDownEnter,
         onScroll: handleScroll,
         scrollTop: currentScrollTop,

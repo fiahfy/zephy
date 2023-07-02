@@ -105,7 +105,7 @@ const Inspector = () => {
   const { createEntryMenuHandler } = useContextMenu()
 
   const [state, dispatch] = useReducer(reducer, { loading: true })
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
 
   const content = contents[0]
 

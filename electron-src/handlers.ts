@@ -19,7 +19,6 @@ import {
   getDetailedEntry,
   getEntries,
   getEntryHierarchy,
-  parsePath,
   renameEntry,
 } from './utils/file'
 
@@ -111,9 +110,6 @@ const registerHandlers = () => {
           path
         )
       )
-  )
-  ipcMain.handle('parse-path', (event: IpcMainInvokeEvent, path: string) =>
-    parsePath(path)
   )
 }
 

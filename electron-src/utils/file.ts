@@ -90,6 +90,17 @@ export const getDetailedEntries = async (
   return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
 }
 
+const parsePath = (path: string) => {
+  const dirnames = path.split(sep)
+  let rootPath = dirnames[0]
+  // for darwin
+  if (!rootPath) {
+    rootPath = sep
+  }
+  dirnames[0] = rootPath
+  return dirnames
+}
+
 export const getEntryHierarchy = async (
   path: string
 ): Promise<Entry | undefined> => {
@@ -210,15 +221,4 @@ export const createWatcher = () => {
   }
 
   return { watch }
-}
-
-export const parsePath = (path: string) => {
-  const dirnames = path.split(sep)
-  let rootPath = dirnames[0]
-  // for darwin
-  if (!rootPath) {
-    rootPath = sep
-  }
-  dirnames[0] = rootPath
-  return dirnames
 }

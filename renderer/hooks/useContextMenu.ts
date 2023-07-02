@@ -12,7 +12,7 @@ import {
 } from 'store/window'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
-  return async (e: MouseEvent<HTMLElement>) => {
+  return async (e: MouseEvent) => {
     e.preventDefault()
 
     const isEditable =

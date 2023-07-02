@@ -1,11 +1,10 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import fileUrl from 'file-url'
-import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
+import { FocusEvent, MouseEvent, useEffect, useMemo, useReducer } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/enhanced/NoOutlineRating'
-import useContextMenu from 'hooks/useContextMenu'
 import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { rate } from 'store/rating'
@@ -36,20 +35,26 @@ const reducer = (_state: State, action: Action) => {
 type Props = {
   columnIndex: number
   content: Content
-  onClick: (e: MouseEvent<HTMLDivElement>) => void
-  onDoubleClick: (e: MouseEvent<HTMLDivElement>) => void
+  onClick: (e: MouseEvent) => void
+  onContextMenu: (e: MouseEvent) => void
+  onDoubleClick: (e: MouseEvent) => void
   rowIndex: number
   selected: boolean
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const { columnIndex, content, onClick, onDoubleClick, rowIndex, selected } =
-    props
+  const {
+    columnIndex,
+    content,
+    onClick,
+    onContextMenu,
+    onDoubleClick,
+    rowIndex,
+    selected,
+  } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
-
-  const { createContentMenuHandler } = useContextMenu()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -105,7 +110,7 @@ const ExplorerGridItem = (props: Props) => {
       data-grid-column={columnIndex + 1}
       data-grid-row={rowIndex + 1}
       onClick={onClick}
-      onContextMenu={createContentMenuHandler(content)}
+      onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
       sx={{
         cursor: 'pointer',
@@ -137,7 +142,6 @@ const ExplorerGridItem = (props: Props) => {
           },
         },
       }}
-      tabIndex={0}
     >
       {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element

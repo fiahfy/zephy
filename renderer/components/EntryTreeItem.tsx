@@ -2,7 +2,7 @@ import { Box, BoxProps, Typography } from '@mui/material'
 import { TreeItem, TreeItemContentProps, TreeItemProps } from '@mui/lab'
 import { useTreeItem } from '@mui/lab/TreeItem'
 import clsx from 'clsx'
-import { ReactNode, Ref, forwardRef } from 'react'
+import { MouseEvent, ReactNode, forwardRef } from 'react'
 
 const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,
@@ -30,17 +30,11 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
 
   const icon = iconProp || expansionIcon || displayIcon
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => preventSelection(event)
+  const handleMouseDown = (event: MouseEvent) => preventSelection(event)
 
-  const handleExpansionClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => handleExpansion(event)
+  const handleExpansionClick = (event: MouseEvent) => handleExpansion(event)
 
-  const handleSelectionClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => handleSelection(event)
+  const handleSelectionClick = (event: MouseEvent) => handleSelection(event)
 
   return (
     <Box
@@ -51,7 +45,7 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
         [classes.disabled]: disabled,
       })}
       onMouseDown={handleMouseDown}
-      ref={ref as Ref<HTMLDivElement>}
+      ref={ref}
       sx={{ height: 20 }}
     >
       <Box className={classes.iconContainer} onClick={handleExpansionClick}>

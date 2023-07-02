@@ -65,10 +65,11 @@ type Props = {
   contents: Content[]
   loading: boolean
   onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
-  onClickContent: (e: MouseEvent<HTMLDivElement>, content: Content) => void
-  onDoubleClickContent: (content: Content) => void
-  onFocusContent: (content: Content) => void
-  onKeyDownEnter: (e: KeyboardEvent<HTMLDivElement>) => void
+  onClickContent: (e: MouseEvent, content: Content) => void
+  onContextMenuContent: (e: MouseEvent, content: Content) => void
+  onDoubleClickContent: (e: MouseEvent, content: Content) => void
+  onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
+  onKeyDownEnter: (e: KeyboardEvent) => void
   onScroll: (e: Event) => void
   scrollTop: number
   sortOption: { order: Order; orderBy: Key }
@@ -81,8 +82,9 @@ const ExplorerTable = (props: Props) => {
     loading,
     onChangeSortOption,
     onClickContent,
+    onContextMenuContent,
     onDoubleClickContent,
-    onFocusContent,
+    onKeyDownArrow,
     onKeyDownEnter,
     onScroll,
     scrollTop,
@@ -91,7 +93,7 @@ const ExplorerTable = (props: Props) => {
 
   const previousLoading = usePrevious(loading)
 
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const el = ref.current?.querySelector('.ReactVirtualized__Grid')
@@ -127,18 +129,14 @@ const ExplorerTable = (props: Props) => {
     return widths.map((width) => (width === undefined ? flexibleWidth : width))
   }, [])
 
-  const focus = (row: number) => {
-    const el = ref.current?.querySelector<HTMLDivElement>(
-      `[aria-rowindex="${row}"]`
-    )
+  const focus = (e: KeyboardEvent, row: number) => {
     const content = contents[row - 1]
-    if (el && content) {
-      el.focus()
-      onFocusContent(content)
+    if (content) {
+      onKeyDownArrow(e, content)
     }
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     const row = Number(document.activeElement?.getAttribute('aria-rowindex'))
     switch (e.key) {
       case 'Enter':
@@ -147,9 +145,9 @@ const ExplorerTable = (props: Props) => {
         }
         return
       case 'ArrowUp':
-        return focus(row - 1)
+        return focus(e, row - 1)
       case 'ArrowDown':
-        return focus(row + 1)
+        return focus(e, row + 1)
     }
   }
 
@@ -157,7 +155,10 @@ const ExplorerTable = (props: Props) => {
     onClickContent(info.event, info.rowData)
 
   const handleRowDoubleClick = (info: RowMouseEventHandlerParams) =>
-    onDoubleClickContent(info.rowData)
+    onDoubleClickContent(info.event, info.rowData)
+
+  const handleRowRightClick = (info: RowMouseEventHandlerParams) =>
+    onContextMenuContent(info.event, info.rowData)
 
   const headerRenderer = ({ dataKey, label }: TableHeaderProps) => (
     <ExplorerTableHeaderCell
@@ -227,6 +228,7 @@ const ExplorerTable = (props: Props) => {
               height={height}
               onRowClick={handleRowClick}
               onRowDoubleClick={handleRowDoubleClick}
+              onRowRightClick={handleRowRightClick}
               rowClassName={({ index }) => {
                 // @see https://github.com/bvaughn/react-virtualized/issues/1357
                 const content = contents[index]
@@ -235,6 +237,7 @@ const ExplorerTable = (props: Props) => {
               rowCount={contents.length}
               rowGetter={({ index }) => contents[index]}
               rowHeight={rowHeight}
+              tabIndex={null}
               width={width}
             >
               {columns.map(({ key, label }, index) => (

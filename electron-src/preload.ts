@@ -72,5 +72,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
     )
     ipcRenderer.invoke('watch-directory-hierarchy', paths)
   },
-  parsePath: (path: string) => ipcRenderer.invoke('parse-path', path),
 })
