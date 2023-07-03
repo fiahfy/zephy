@@ -1,10 +1,10 @@
 import { BrowserWindow, app } from 'electron'
-import windowStateKeeper, { Options, State } from 'electron-window-state'
+import windowStateKeeper, { State } from 'electron-window-state'
 import fs from 'fs'
 import path from 'path'
 
 const windowStateManager = (
-  baseCreateWindow: (state: State) => BrowserWindow
+  windowCreator: (state: State) => (params?: { path: string }) => BrowserWindow
 ) => {
   const file = path.join(app.getPath('userData'), 'window-state.json')
 
@@ -45,18 +45,17 @@ const windowStateManager = (
     }
   }
 
-  const createWindow = (options: Options = {}) => {
+  const createWindow = (params?: { path: string }) => {
     const windows = BrowserWindow.getAllWindows()
     const index = windows.length
 
     const windowState = windowStateKeeper({
-      ...options,
       file: getFile(index),
     })
-    const browserWindow = baseCreateWindow({
+    const browserWindow = windowCreator({
       ...windowState,
       ...getNewWindowOptions(),
-    })
+    })(params)
     windowState.manage(browserWindow)
   }
 
@@ -64,7 +63,7 @@ const windowStateManager = (
     const windowState = windowStateKeeper({
       file: getFile(index),
     })
-    const browserWindow = baseCreateWindow(windowState)
+    const browserWindow = windowCreator(windowState)()
     windowState.manage(browserWindow)
   }
 

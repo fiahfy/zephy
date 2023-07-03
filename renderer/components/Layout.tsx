@@ -1,5 +1,5 @@
 import { Box, Toolbar } from '@mui/material'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
@@ -8,9 +8,10 @@ import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import useContextMenu from 'hooks/useContextMenu'
 import useDocumentHandler from 'hooks/useDocumentHandler'
-import useRedirect from 'hooks/useRedirect'
 import useSubscription from 'hooks/useSubscription'
 import useWatcher from 'hooks/useWatcher'
+import { useAppDispatch, useAppSelector } from 'store'
+import { goHome, selectCurrentDirectory } from 'store/window'
 
 type Props = {
   children: ReactNode
@@ -19,11 +20,19 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
+  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const dispatch = useAppDispatch()
+
   const { createDefaultMenuHandler } = useContextMenu()
   useDocumentHandler()
-  useRedirect()
   useSubscription()
   useWatcher()
+
+  useEffect(() => {
+    if (!currentDirectory) {
+      dispatch(goHome())
+    }
+  }, [currentDirectory, dispatch])
 
   return (
     <Box

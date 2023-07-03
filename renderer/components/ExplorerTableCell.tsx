@@ -64,6 +64,7 @@ const ExplorerTableCell = (props: Props) => {
     setNameInput(content.name)
   }, [content.name])
 
+  // TODO: MaxListenersExceededWarning
   useEffect(() => {
     const unsubscribe = window.electronAPI.subscribe((eventName, params) => {
       if (eventName === 'rename' && content.path === params.path) {

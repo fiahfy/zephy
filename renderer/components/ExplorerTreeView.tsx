@@ -11,12 +11,12 @@ import { useAppDispatch, useAppSelector } from 'store'
 import {
   changeDirectory,
   selectCurrentDirectory,
-  selectIndexPage,
+  selectExplorable,
 } from 'store/window'
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const indexPage = useAppSelector(selectIndexPage)
+  const explorable = useAppSelector(selectExplorable)
   const dispatch = useAppDispatch()
 
   const [expanded, setExpanded] = useState<string[]>([])
@@ -37,7 +37,7 @@ const ExplorerTreeView = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (!indexPage) {
+      if (!explorable) {
         return
       }
       const entry = await window.electronAPI.getEntryHierarchy(currentDirectory)
@@ -46,7 +46,7 @@ const ExplorerTreeView = () => {
       setSelected([currentDirectory])
       setRoot(entry)
     })()
-  }, [currentDirectory, indexPage])
+  }, [currentDirectory, explorable])
 
   useEffect(() => {
     window.electronAPI.watchDirectoryHierarchy(

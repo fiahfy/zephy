@@ -18,7 +18,7 @@ import {
   setShouldShowHiddenFiles,
 } from 'store/settings'
 
-const SettingsPage = () => {
+const Settings = () => {
   const darkMode = useAppSelector(selectDarkMode)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const dispatch = useAppDispatch()
@@ -78,4 +78,4 @@ const SettingsPage = () => {
   )
 }
 
-export default SettingsPage
+export default Settings

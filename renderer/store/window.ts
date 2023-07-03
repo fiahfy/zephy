@@ -520,26 +520,10 @@ export const selectCurrentScrollTop = createSelector(
   (currentHistory) => currentHistory.scrollTop
 )
 
-export const selectCurrentPathname = createSelector(
+export const selectExplorable = createSelector(
   selectCurrentDirectory,
-  (currentDirectory) => {
-    switch (currentDirectory) {
-      case 'zephy://settings':
-        return '/settings'
-      default:
-        return '/'
-    }
-  }
-)
-
-export const selectIndexPage = createSelector(
-  selectCurrentPathname,
-  (currentPathname) => currentPathname === '/'
-)
-
-export const selectSettingsPage = createSelector(
-  selectCurrentPathname,
-  (currentPathname) => currentPathname === '/settings'
+  (currentDirectory) =>
+    currentDirectory && !currentDirectory.startsWith('zephy://')
 )
 
 export const selectCanBack = createSelector(
@@ -662,13 +646,14 @@ export const searchQuery =
 
 export const load = (): AppThunk => async (dispatch, getState) => {
   const { loading, loaded } = windowSlice.actions
-  const windowId = selectWindowId(getState())
-  const currentDirectory = selectCurrentDirectory(getState())
-  if (!currentDirectory) {
+  const explorable = selectExplorable(getState())
+  if (!explorable) {
     return
   }
+  const windowId = selectWindowId(getState())
   dispatch(loading({ windowId }))
   try {
+    const currentDirectory = selectCurrentDirectory(getState())
     const entries = await window.electronAPI.getDetailedEntries(
       currentDirectory
     )

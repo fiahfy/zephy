@@ -37,13 +37,12 @@ import {
   back,
   changeDirectory,
   forward,
-  goHome,
   load,
   searchQuery,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-  selectIndexPage,
+  selectExplorable,
   unselectAll,
 } from 'store/window'
 
@@ -51,7 +50,7 @@ const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const indexPage = useAppSelector(selectIndexPage)
+  const explorable = useAppSelector(selectExplorable)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const queryHistories = useAppSelector(selectQueryHistories)
   const dispatch = useAppDispatch()
@@ -95,22 +94,9 @@ const ExplorerBar = () => {
   }, [search])
 
   useEffect(() => {
-    ;(async () => {
-      if (!currentDirectory) {
-        return
-      }
-      setDirectory(currentDirectory)
-      dispatch(unselectAll())
-      if (indexPage) {
-        dispatch(load())
-      }
-    })()
-  }, [currentDirectory, dispatch, indexPage])
-
-  useEffect(() => {
-    if (!currentDirectory) {
-      dispatch(goHome())
-    }
+    setDirectory(currentDirectory)
+    dispatch(load())
+    dispatch(unselectAll())
   }, [currentDirectory, dispatch])
 
   // click handlers
@@ -189,7 +175,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
-          disabled={!indexPage}
+          disabled={!explorable}
           onClick={handleClickUpward}
           size="small"
           sx={{ mr: 0.5 }}
@@ -199,7 +185,7 @@ const ExplorerBar = () => {
         </IconButton>
         <IconButton
           color="inherit"
-          disabled={!indexPage}
+          disabled={!explorable}
           onClick={handleClickRefresh}
           size="small"
           title="Refresh"
@@ -214,7 +200,7 @@ const ExplorerBar = () => {
                   <InputAdornment position="end">
                     <IconButton
                       color="inherit"
-                      disabled={!indexPage}
+                      disabled={!explorable}
                       onClick={handleClickFavorite}
                       size="small"
                     >
@@ -229,7 +215,7 @@ const ExplorerBar = () => {
                   <InputAdornment position="start">
                     <IconButton
                       color="inherit"
-                      disabled={!indexPage}
+                      disabled={!explorable}
                       onClick={handleClickFolder}
                       size="small"
                     >

@@ -3,49 +3,57 @@ import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
 import { join } from 'path'
+import { URL } from 'url'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
 import registerHandlers from './handlers'
 import createWindowStateManager from './windowState'
 
-const createWindow = (state: State) => {
-  const browserWindow = new BrowserWindow({
-    ...state,
-    titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
-    webPreferences: {
-      preload: join(__dirname, 'preload.js'),
-      webSecurity: !isDev,
-    },
-  })
-
-  if (isDev) {
-    browserWindow.loadURL('http://localhost:8000/')
-    browserWindow.on('ready-to-show', () => {
-      browserWindow.webContents.openDevTools()
+const windowCreator = (state: State) => {
+  return (params?: { path: string }) => {
+    const browserWindow = new BrowserWindow({
+      ...state,
+      titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
+      webPreferences: {
+        preload: join(__dirname, 'preload.js'),
+        webSecurity: !isDev,
+      },
     })
-  } else {
-    const pathname = join(__dirname, '../renderer/out/index.html')
-    const url = `file://${pathname}`
-    browserWindow.loadURL(url)
+
+    const url = new URL(
+      isDev
+        ? 'http://localhost:8000/'
+        : `file://${join(__dirname, '../renderer/out/index.html')}`
+    )
+    if (params) {
+      url.searchParams.set('path', params.path)
+    }
+    browserWindow.loadURL(url.href)
+
+    if (isDev) {
+      browserWindow.on('ready-to-show', () => {
+        browserWindow.webContents.openDevTools()
+      })
+    }
+
+    browserWindow.on('resize', () => {
+      browserWindow.webContents.send('subscribe', 'changeFullscreen', {
+        fullscreen: browserWindow.isFullScreen(),
+      })
+    })
+
+    return browserWindow
   }
-
-  browserWindow.on('resize', () => {
-    browserWindow.webContents.send('subscribe', 'changeFullscreen', {
-      fullscreen: browserWindow.isFullScreen(),
-    })
-  })
-
-  return browserWindow
 }
 
 app.whenReady().then(async () => {
   await prepareNext('./renderer')
 
-  const windowStateManager = createWindowStateManager(createWindow)
+  const windowStateManager = createWindowStateManager(windowCreator)
   windowStateManager.restore()
 
   registerApplicationMenu(windowStateManager.create)
-  registerContextMenu()
+  registerContextMenu(windowStateManager.create)
   registerHandlers()
 
   // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333

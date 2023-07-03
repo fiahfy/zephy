@@ -11,7 +11,9 @@ const send = (channel: string, ...args: unknown[]) => {
   activeWindow?.webContents.send(channel, ...args)
 }
 
-const registerApplicationMenu = (createWindow: () => void) => {
+const registerApplicationMenu = (
+  createWindow: (params?: { path: string }) => void
+) => {
   const isMac = process.platform === 'darwin'
 
   // @see https://www.electronjs.org/docs/latest/api/menu#examples
