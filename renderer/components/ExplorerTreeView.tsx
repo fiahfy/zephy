@@ -24,11 +24,11 @@ const ExplorerTreeView = () => {
   const [root, setRoot] = useState<Entry>()
 
   const getLoadedDirectories = (entry: Entry) => {
-    const reducer = (carry: string[], entry: Entry): string[] => {
+    const reducer = (acc: string[], entry: Entry): string[] => {
       if (entry.type === 'directory' && entry.children) {
-        return [entry.path, ...entry.children.reduce(reducer, carry)]
+        return [entry.path, ...entry.children.reduce(reducer, acc)]
       }
-      return carry
+      return acc
     }
     return [entry].reduce(reducer, [])
   }
@@ -89,14 +89,14 @@ const ExplorerTreeView = () => {
       return {}
     }
     const reducer = (
-      carry: { [path: string]: Entry },
+      acc: { [path: string]: Entry },
       entry: Entry
     ): { [path: string]: Entry } => {
       return {
         [entry.path]: entry,
         ...(entry.type === 'directory' ? entry.children ?? [] : []).reduce(
           reducer,
-          carry
+          acc
         ),
       }
     }

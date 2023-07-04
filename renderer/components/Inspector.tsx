@@ -137,9 +137,9 @@ const Inspector = () => {
           )
           const paths = entries.map((entry) => entry.path)
           const thumbnails = await createThumbnailsIfNeeded(paths)
-          const newEntries = entries.reduce((carry, entry, i) => {
+          const newEntries = entries.reduce((acc, entry, i) => {
             const thumbnail = thumbnails[i]
-            return thumbnail ? [...carry, { ...entry, thumbnail }] : carry
+            return thumbnail ? [...acc, { ...entry, thumbnail }] : acc
           }, [] as EntryWithThumbnail[])
           return { type: 'directory' as const, entries: newEntries }
         } else if (isVideoFile(content.path)) {

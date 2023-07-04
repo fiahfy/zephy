@@ -100,8 +100,8 @@ const ExplorerGrid = (props: Props) => {
   const chunks = useMemo(
     () =>
       contents.reduce(
-        (carry, _, i) =>
-          i % columns ? carry : [...carry, contents.slice(i, i + columns)],
+        (acc, _, i) =>
+          i % columns ? acc : [...acc, contents.slice(i, i + columns)],
         [] as Content[][]
       ),
     [columns, contents]

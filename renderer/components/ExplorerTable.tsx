@@ -139,7 +139,7 @@ const ExplorerTable = (props: Props) => {
       return widths
     }
     const sumWidth = widths.reduce<number>(
-      (carry, width) => carry + (width ?? 0),
+      (acc, width) => acc + (width ?? 0),
       0
     )
     // 10px is custom scrollbar width

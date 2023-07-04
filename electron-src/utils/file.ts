@@ -35,13 +35,13 @@ const getEntryType = (obj: Dirent | Stats) => {
 
 export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
   const dirents = await readdir(directoryPath, { withFileTypes: true })
-  return dirents.reduce((carry, dirent) => {
+  return dirents.reduce((acc, dirent) => {
     const type = getEntryType(dirent)
     if (type === 'other') {
-      return carry
+      return acc
     }
     return [
-      ...carry,
+      ...acc,
       {
         name: dirent.name.normalize('NFC'),
         path: join(directoryPath, dirent.name),
@@ -77,8 +77,8 @@ export const getDetailedEntriesForPaths = async (
     paths.map((path) => getDetailedEntry(path))
   )
   return results.reduce(
-    (carry, result) =>
-      result.status === 'fulfilled' ? [...carry, result.value] : carry,
+    (acc, result) =>
+      result.status === 'fulfilled' ? [...acc, result.value] : acc,
     [] as DetailedEntry[]
   )
 }
@@ -127,9 +127,9 @@ export const getEntryHierarchy = async (
     const targetEntry = dirnames
       .slice(0, i + 1)
       .reduce(
-        (carry, dirname) =>
-          carry && carry.children
-            ? (carry.children.find(
+        (acc, dirname) =>
+          acc && acc.children
+            ? (acc.children.find(
                 (entry) => entry.type === 'directory' && entry.name === dirname
               ) as Directory)
             : undefined,
@@ -167,18 +167,18 @@ const findMissingNumber = (arr: number[]) => {
 const generateNewDirectoryName = async (directoryPath: string) => {
   const basename = 'untitled folder'
   const entries = await getEntries(directoryPath)
-  const numbers = entries.reduce((carry, entry) => {
+  const numbers = entries.reduce((acc, entry) => {
     if (entry.type !== 'directory') {
-      return carry
+      return acc
     }
     if (entry.name === basename) {
-      return [...carry, 1]
+      return [...acc, 1]
     }
     const match = entry.name.match(/^untitled folder ([1-9]\d*)$/)
     if (match) {
-      return [...carry, Number(match[1])]
+      return [...acc, Number(match[1])]
     }
-    return carry
+    return acc
   }, [] as number[])
   const missingNumber = findMissingNumber(numbers)
   return missingNumber === 1 ? basename : `${basename} ${missingNumber}`

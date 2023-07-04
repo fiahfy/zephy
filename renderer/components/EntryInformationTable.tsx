@@ -12,7 +12,7 @@ import { formatDate, formatFileSize, formatTime } from 'utils/formatter'
 const getTotalFileSize = (contents: Content[]) =>
   contents
     .filter((content) => content.type === 'file')
-    .reduce((carry, content) => carry + content.size, 0)
+    .reduce((acc, content) => acc + content.size, 0)
 
 const formatDateRange = (
   contents: Content[],

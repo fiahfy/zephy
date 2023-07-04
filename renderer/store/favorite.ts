@@ -36,10 +36,7 @@ export default favoriteSlice.reducer
 export const selectFavorite = (state: AppState) => state.favorite
 
 export const selectFavorites = createSelector(selectFavorite, (favorite) =>
-  Object.keys(favorite).reduce(
-    (carry, path) => [...carry, path],
-    [] as string[]
-  )
+  Object.keys(favorite).reduce((acc, path) => [...acc, path], [] as string[])
 )
 
 export const selectIsFavorite = createSelector(
