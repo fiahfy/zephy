@@ -7,8 +7,8 @@ type State = number
 
 const initialState: State = 0
 
-export const windowIdSlice = createSlice({
-  name: 'window',
+export const windowIndexSlice = createSlice({
+  name: 'windowIndex',
   initialState,
   reducers: {
     set(_state, action: PayloadAction<State>) {
@@ -17,17 +17,17 @@ export const windowIdSlice = createSlice({
   },
 })
 
-export const { set } = windowIdSlice.actions
+export const { set } = windowIndexSlice.actions
 
-export default windowIdSlice.reducer
+export default windowIndexSlice.reducer
 
-export const selectWindowId = (state: AppState) => state.windowId
+export const selectWindowIndex = (state: AppState) => state.windowIndex
 
 export const load = (): AppThunk => async (dispatch) => {
-  const windowId = await window.electronAPI.getWindowId()
-  if (!windowId) {
+  const windowIndex = await window.electronAPI.getWindowIndex()
+  if (!windowIndex) {
     return
   }
-  dispatch(set(windowId))
-  dispatch(initialize(windowId))
+  dispatch(set(windowIndex))
+  dispatch(initialize(windowIndex))
 }

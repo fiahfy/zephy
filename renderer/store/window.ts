@@ -5,7 +5,7 @@ import { AppState, AppThunk } from 'store'
 import { add } from 'store/queryHistory'
 import { selectGetRating } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { selectWindowId } from 'store/windowId'
+import { selectWindowIndex } from 'store/windowIndex'
 import { isHiddenFile } from 'utils/file'
 
 type History = {
@@ -47,7 +47,7 @@ type WindowState = {
 }
 
 type State = {
-  [windowId: number]: WindowState
+  [windowIndex: number]: WindowState
 }
 
 export const defaultOrders = {
@@ -82,7 +82,7 @@ const defaultState: WindowState = {
   viewMode: 'list',
 }
 
-const initialState: State = { [0]: defaultState }
+const initialState: State = {}
 
 export const windowSlice = createSlice({
   name: 'window',
@@ -90,16 +90,16 @@ export const windowSlice = createSlice({
   reducers: {
     setQuery(
       state,
-      action: PayloadAction<{ windowId: number; query: string }>
+      action: PayloadAction<{ windowIndex: number; query: string }>
     ) {
-      const { windowId, query } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, query } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           query,
@@ -109,18 +109,18 @@ export const windowSlice = createSlice({
     setViewMode(
       state,
       action: PayloadAction<{
-        windowId: number
+        windowIndex: number
         viewMode: WindowState['viewMode']
       }>
     ) {
-      const { windowId, viewMode } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, viewMode } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           viewMode,
@@ -130,19 +130,19 @@ export const windowSlice = createSlice({
     setSidebarHidden(
       state,
       action: PayloadAction<{
-        windowId: number
+        windowIndex: number
         variant: 'primary' | 'secondary'
         hidden: boolean
       }>
     ) {
-      const { windowId, variant, hidden } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, variant, hidden } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           sidebar: {
@@ -158,19 +158,19 @@ export const windowSlice = createSlice({
     setSidebarWidth(
       state,
       action: PayloadAction<{
-        windowId: number
+        windowIndex: number
         variant: 'primary' | 'secondary'
         width: number
       }>
     ) {
-      const { windowId, variant, width } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, variant, width } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           sidebar: {
@@ -185,16 +185,16 @@ export const windowSlice = createSlice({
     },
     loaded(
       state,
-      action: PayloadAction<{ windowId: number; entries: DetailedEntry[] }>
+      action: PayloadAction<{ windowIndex: number; entries: DetailedEntry[] }>
     ) {
-      const { windowId, entries } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, entries } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           entries,
@@ -203,15 +203,15 @@ export const windowSlice = createSlice({
         },
       }
     },
-    loading(state, action: PayloadAction<{ windowId: number }>) {
-      const { windowId } = action.payload
-      const windowState = state[windowId]
+    loading(state, action: PayloadAction<{ windowIndex: number }>) {
+      const { windowIndex } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           entries: [],
@@ -221,10 +221,10 @@ export const windowSlice = createSlice({
     },
     add(
       state,
-      action: PayloadAction<{ windowId: number; entries: DetailedEntry[] }>
+      action: PayloadAction<{ windowIndex: number; entries: DetailedEntry[] }>
     ) {
-      const { windowId, entries } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, entries } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -235,7 +235,7 @@ export const windowSlice = createSlice({
       ]
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           entries: newEntries,
@@ -244,10 +244,10 @@ export const windowSlice = createSlice({
     },
     remove(
       state,
-      action: PayloadAction<{ windowId: number; paths: string[] }>
+      action: PayloadAction<{ windowIndex: number; paths: string[] }>
     ) {
-      const { windowId, paths } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, paths } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -256,22 +256,25 @@ export const windowSlice = createSlice({
       )
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           entries,
         },
       }
     },
-    select(state, action: PayloadAction<{ windowId: number; path: string }>) {
-      const { windowId, path } = action.payload
-      const windowState = state[windowId]
+    select(
+      state,
+      action: PayloadAction<{ windowIndex: number; path: string }>
+    ) {
+      const { windowIndex, path } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           selected: [path],
@@ -280,17 +283,17 @@ export const windowSlice = createSlice({
     },
     multiSelect(
       state,
-      action: PayloadAction<{ windowId: number; path: string }>
+      action: PayloadAction<{ windowIndex: number; path: string }>
     ) {
-      const { windowId, path } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, path } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       const selected = windowState.selected.includes(path)
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           selected: selected
@@ -301,41 +304,41 @@ export const windowSlice = createSlice({
     },
     rangeSelect(
       state,
-      action: PayloadAction<{ windowId: number; paths: string[] }>
+      action: PayloadAction<{ windowIndex: number; paths: string[] }>
     ) {
-      const { windowId, paths } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, paths } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       const selected = windowState.selected.filter((p) => !paths.includes(p))
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           selected: [...selected, ...paths],
         },
       }
     },
-    unselectAll(state, action: PayloadAction<{ windowId: number }>) {
-      const { windowId } = action.payload
-      const windowState = state[windowId]
+    unselectAll(state, action: PayloadAction<{ windowIndex: number }>) {
+      const { windowIndex } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           selected: [],
         },
       }
     },
-    go(state, action: PayloadAction<{ windowId: number; offset: number }>) {
-      const { windowId, offset } = action.payload
-      const windowState = state[windowId]
+    go(state, action: PayloadAction<{ windowIndex: number; offset: number }>) {
+      const { windowIndex, offset } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -346,7 +349,7 @@ export const windowSlice = createSlice({
       }
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           history: { ...windowState.history, index },
@@ -355,10 +358,10 @@ export const windowSlice = createSlice({
     },
     changeDirectory(
       state,
-      action: PayloadAction<{ windowId: number; path: string }>
+      action: PayloadAction<{ windowIndex: number; path: string }>
     ) {
-      const { windowId, path } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, path } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -374,7 +377,7 @@ export const windowSlice = createSlice({
       ]
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           history: {
@@ -387,10 +390,10 @@ export const windowSlice = createSlice({
     },
     scroll(
       state,
-      action: PayloadAction<{ windowId: number; scrollTop: number }>
+      action: PayloadAction<{ windowIndex: number; scrollTop: number }>
     ) {
-      const { windowId, scrollTop } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, scrollTop } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -399,7 +402,7 @@ export const windowSlice = createSlice({
       )
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           history: {
@@ -412,14 +415,14 @@ export const windowSlice = createSlice({
     sort(
       state,
       action: PayloadAction<{
-        windowId: number
+        windowIndex: number
         path: string
         orderBy: SortOption['orderBy']
         order?: SortOption['order']
       }>
     ) {
-      const { windowId, path, orderBy, order } = action.payload
-      const windowState = state[windowId]
+      const { windowIndex, path, orderBy, order } = action.payload
+      const windowState = state[windowIndex]
       if (!windowState) {
         return state
       }
@@ -428,7 +431,7 @@ export const windowSlice = createSlice({
         : defaultOrders[orderBy as keyof typeof defaultOrders]
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
           ...windowState,
           sorting: {
@@ -442,12 +445,12 @@ export const windowSlice = createSlice({
       }
     },
     initialize(state, action: PayloadAction<number>) {
-      const windowId = action.payload
+      const windowIndex = action.payload
       return {
         ...state,
-        [windowId]: {
+        [windowIndex]: {
           ...defaultState,
-          ...(state[windowId] ?? {}),
+          ...(state[windowIndex] ?? {}),
         },
       }
     },
@@ -462,7 +465,7 @@ export const { initialize, replace } = windowSlice.actions
 export default windowSlice.reducer
 
 export const selectWindow = (state: AppState) => {
-  const windowState = state.window[state.windowId]
+  const windowState = state.window[state.windowIndex]
   if (!windowState) {
     throw new Error('window state is not found')
   }
@@ -615,32 +618,32 @@ export const setViewMode =
   (viewMode: WindowState['viewMode']): AppThunk =>
   async (dispatch, getState) => {
     const { setViewMode } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setViewMode({ windowId, viewMode }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(setViewMode({ windowIndex, viewMode }))
   }
 
 export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarHidden } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setSidebarHidden({ windowId, variant, hidden }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(setSidebarHidden({ windowIndex, variant, hidden }))
   }
 
 export const setSidebarWidth =
   (variant: 'primary' | 'secondary', width: number): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarWidth } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setSidebarWidth({ windowId, variant, width }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(setSidebarWidth({ windowIndex, variant, width }))
   }
 
 export const searchQuery =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(setQuery({ windowId, query }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(setQuery({ windowIndex, query }))
     dispatch(add(query))
   }
 
@@ -650,16 +653,16 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   if (!explorable) {
     return
   }
-  const windowId = selectWindowId(getState())
-  dispatch(loading({ windowId }))
+  const windowIndex = selectWindowIndex(getState())
+  dispatch(loading({ windowIndex }))
   try {
     const currentDirectory = selectCurrentDirectory(getState())
     const entries = await window.electronAPI.getDetailedEntries(
       currentDirectory
     )
-    dispatch(loaded({ windowId, entries }))
+    dispatch(loaded({ windowIndex, entries }))
   } catch (e) {
-    dispatch(loaded({ windowId, entries: [] }))
+    dispatch(loaded({ windowIndex, entries: [] }))
   }
 }
 
@@ -667,23 +670,23 @@ export const select =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { select } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(select({ windowId, path }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(select({ windowIndex, path }))
   }
 
 export const multiSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { multiSelect } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(multiSelect({ windowId, path }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(multiSelect({ windowIndex, path }))
   }
 
 export const rangeSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { rangeSelect } = windowSlice.actions
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     const contents = selectContents(getState())
     const selected = selectSelected(getState())
     const paths = contents.map((content) => content.path)
@@ -700,21 +703,21 @@ export const rangeSelect =
       const index = paths.indexOf(path)
       newPaths = paths.slice(0, index + 1)
     }
-    dispatch(rangeSelect({ windowId, paths: newPaths }))
+    dispatch(rangeSelect({ windowIndex, paths: newPaths }))
   }
 
 export const unselectAll = (): AppThunk => async (dispatch, getState) => {
   const { unselectAll } = windowSlice.actions
-  const windowId = selectWindowId(getState())
-  dispatch(unselectAll({ windowId }))
+  const windowIndex = selectWindowIndex(getState())
+  dispatch(unselectAll({ windowIndex }))
 }
 
 export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const { go } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(go({ windowId, offset }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(go({ windowIndex, offset }))
   }
 
 export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
@@ -725,8 +728,8 @@ export const changeDirectory =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { changeDirectory } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(changeDirectory({ windowId, path }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(changeDirectory({ windowIndex, path }))
   }
 
 export const goHome = (): AppThunk => async (dispatch) => {
@@ -742,61 +745,61 @@ export const newFolder =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { add, select } = windowSlice.actions
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     const entry = await window.electronAPI.createDirectory(path)
-    dispatch(add({ windowId, entries: [entry] }))
-    dispatch(select({ windowId, path: entry.path }))
+    dispatch(add({ windowIndex, entries: [entry] }))
+    dispatch(select({ windowIndex, path: entry.path }))
   }
 
 export const moveToTrash =
   (paths: string[]): AppThunk =>
   async (dispatch, getState) => {
     const { remove } = windowSlice.actions
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     await window.electronAPI.trashItems(paths)
-    dispatch(remove({ windowId, paths }))
+    dispatch(remove({ windowIndex, paths }))
   }
 
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
     const { add, remove } = windowSlice.actions
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
-    dispatch(remove({ windowId, paths: [path] }))
-    dispatch(add({ windowId, entries: [entry] }))
+    dispatch(remove({ windowIndex, paths: [path] }))
+    dispatch(add({ windowIndex, entries: [entry] }))
   }
 
 export const createEntry =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { add } = windowSlice.actions
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     const entry = await window.electronAPI.getDetailedEntry(path)
-    dispatch(add({ windowId, entries: [entry] }))
+    dispatch(add({ windowIndex, entries: [entry] }))
   }
 
 export const deleteEntry =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { remove } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(remove({ windowId, paths: [path] }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(remove({ windowIndex, paths: [path] }))
   }
 
 export const scroll =
   (scrollTop: number): AppThunk =>
   async (dispatch, getState) => {
     const { scroll } = windowSlice.actions
-    const windowId = selectWindowId(getState())
-    dispatch(scroll({ windowId, scrollTop }))
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(scroll({ windowIndex, scrollTop }))
   }
 
 export const sort =
   (orderBy: SortOption['orderBy'], order?: SortOption['order']): AppThunk =>
   async (dispatch, getState) => {
-    const windowId = selectWindowId(getState())
+    const windowIndex = selectWindowIndex(getState())
     const currentDirectory = selectCurrentDirectory(getState())
     const { sort } = windowSlice.actions
-    dispatch(sort({ windowId, path: currentDirectory, orderBy, order }))
+    dispatch(sort({ windowIndex, path: currentDirectory, orderBy, order }))
   }

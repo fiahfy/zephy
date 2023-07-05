@@ -1,4 +1,4 @@
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import windowStateKeeper, { State } from 'electron-window-state'
 import fs from 'fs'
 import path from 'path'
@@ -6,28 +6,64 @@ import path from 'path'
 const windowStateManager = (
   windowCreator: (state: State) => (params?: { path: string }) => BrowserWindow
 ) => {
-  const file = path.join(app.getPath('userData'), 'window-state.json')
+  const savedDirectoryPath = app.getPath('userData')
+  const savedPath = path.join(savedDirectoryPath, 'window-state.json')
 
-  const getFile = (index: number) => `window-state_${index}.json`
+  const state: { windows: boolean[] } = { windows: [] }
+  const indexes: { [id: number]: number } = {}
+
+  ipcMain.handle('get-window-index', (event: IpcMainInvokeEvent) => {
+    const windowId = BrowserWindow.fromWebContents(event.sender)?.id
+    if (!windowId) {
+      return undefined
+    }
+    return indexes[windowId]
+  })
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isValidState = (state: any): state is { windows: boolean[] } =>
+    typeof state === 'object' &&
+    Array.isArray(state.windows) &&
+    state.windows.every((visible: unknown) => typeof visible === 'boolean')
 
   const restoreState = () => {
     try {
-      if (fs.existsSync(file)) {
-        const data = fs.readFileSync(file, 'utf8')
-        const state = JSON.parse(data)
-        let windowCount = Number(state.windowCount)
-        windowCount = isNaN(windowCount) ? 1 : windowCount
-        windowCount = Math.max(windowCount, 1)
-        return { windowCount }
+      const json = fs.readFileSync(savedPath, 'utf8')
+      const restored = JSON.parse(json)
+      if (isValidState(restored)) {
+        state.windows = restored.windows
       }
     } catch (e) {
       // noop
     }
-    return { windowCount: 1 }
   }
 
-  const saveState = ({ windowCount }: { windowCount: number }) => {
-    fs.writeFileSync(file, JSON.stringify({ windowCount }))
+  const saveState = () => {
+    const json = JSON.stringify(state)
+    fs.writeFileSync(savedPath, json)
+  }
+
+  const getWindowFilename = (index: number) => `window-state_${index}.json`
+
+  const newWindow = (
+    index: number,
+    params?: { path: string },
+    options?: Partial<State>
+  ) => {
+    const windowState = windowStateKeeper({
+      path: savedDirectoryPath,
+      file: getWindowFilename(index),
+    })
+    const browserWindow = windowCreator({
+      ...windowState,
+      ...(options ?? {}),
+    })(params)
+    windowState.manage(browserWindow)
+    indexes[browserWindow.id] = index
+    browserWindow.on('close', () => {
+      delete indexes[browserWindow.id]
+      state.windows[index] = false
+    })
   }
 
   const getNewWindowOptions = () => {
@@ -46,37 +82,30 @@ const windowStateManager = (
   }
 
   const createWindow = (params?: { path: string }) => {
-    const windows = BrowserWindow.getAllWindows()
-    const index = windows.length
-
-    const windowState = windowStateKeeper({
-      file: getFile(index),
-    })
-    const browserWindow = windowCreator({
-      ...windowState,
-      ...getNewWindowOptions(),
-    })(params)
-    windowState.manage(browserWindow)
-  }
-
-  const restoreWindow = (index: number) => {
-    const windowState = windowStateKeeper({
-      file: getFile(index),
-    })
-    const browserWindow = windowCreator(windowState)()
-    windowState.manage(browserWindow)
+    const index = state.windows.reduce(
+      (acc, visible, index) => (visible ? acc : Math.min(index, acc)),
+      state.windows.length
+    )
+    state.windows[index] = true
+    newWindow(index, params, getNewWindowOptions())
   }
 
   const restoreWindows = () => {
-    const { windowCount } = restoreState()
-    for (let i = 0; i < windowCount; i++) {
-      restoreWindow(i)
+    restoreState()
+    const visible = state.windows.reduce((acc, visible, index) => {
+      if (visible) {
+        newWindow(index)
+        return true
+      }
+      return acc
+    }, false)
+    if (!visible) {
+      createWindow()
     }
   }
 
   const saveWindows = () => {
-    const windows = BrowserWindow.getAllWindows()
-    saveState({ windowCount: windows.length })
+    saveState()
   }
 
   return {

@@ -17,7 +17,7 @@ export interface IElectronAPI {
   getEntryHierarchy: (path: string) => Promise<Entry>
   getHomePath: () => Promise<string>
   getMetadata: (path: string) => Promise<Metadata>
-  getWindowId: () => Promise<number | undefined>
+  getWindowIndex: () => Promise<number | undefined>
   isFullscreen: () => Promise<boolean>
   openPath: (path: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>

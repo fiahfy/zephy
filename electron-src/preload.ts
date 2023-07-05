@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('get-entry-hierarchy', path),
   getHomePath: () => ipcRenderer.invoke('get-home-path'),
   getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
-  getWindowId: () => ipcRenderer.invoke('get-window-id'),
+  getWindowIndex: () => ipcRenderer.invoke('get-window-index'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   renameEntry: (path: string, newName: string) =>

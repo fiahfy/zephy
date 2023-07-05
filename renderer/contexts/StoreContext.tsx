@@ -9,7 +9,7 @@ import { replace as replaceQueryHistory } from 'store/queryHistory'
 import { replace as replaceRating } from 'store/rating'
 import { replace as replaceSettings } from 'store/settings'
 import { replace as replaceWindow } from 'store/window'
-import { load } from 'store/windowId'
+import { load } from 'store/windowIndex'
 
 type Props = { children: ReactNode }
 

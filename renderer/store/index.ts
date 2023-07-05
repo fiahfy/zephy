@@ -22,7 +22,7 @@ import queryHistoryReducer from 'store/queryHistory'
 import ratingReducer from 'store/rating'
 import settingsReducer from 'store/settings'
 import windowReducer from 'store/window'
-import windowIdReducer from 'store/windowId'
+import windowIndexReducer from 'store/windowIndex'
 
 const reducers = combineReducers({
   favorite: favoriteReducer,
@@ -30,7 +30,7 @@ const reducers = combineReducers({
   rating: ratingReducer,
   settings: settingsReducer,
   window: windowReducer,
-  windowId: windowIdReducer,
+  windowIndex: windowIndexReducer,
 })
 
 const persistConfig = {

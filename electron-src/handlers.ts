@@ -33,11 +33,6 @@ const registerHandlers = () => {
   ipcMain.handle('get-home-path', () => app.getPath('home'))
   // window
   ipcMain.handle(
-    'get-window-id',
-    (event: IpcMainInvokeEvent) =>
-      BrowserWindow.fromWebContents(event.sender)?.id
-  )
-  ipcMain.handle(
     'is-fullscreen',
     (event: IpcMainInvokeEvent) =>
       BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
