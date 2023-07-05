@@ -728,11 +728,6 @@ export const changeDirectory =
     dispatch(changeDirectory({ windowIndex, path }))
   }
 
-export const goHome = (): AppThunk => async (dispatch) => {
-  const homePath = await window.electronAPI.getHomePath()
-  return dispatch(changeDirectory(homePath))
-}
-
 export const goToSettings = (): AppThunk => async (dispatch) => {
   dispatch(changeDirectory('zephy://settings'))
 }
@@ -806,9 +801,5 @@ export const initialize =
     const { initialize } = windowSlice.actions
     const windowIndex = selectWindowIndex(getState())
     dispatch(initialize({ windowIndex }))
-    let newPath = path
-    if (!newPath) {
-      newPath = await window.electronAPI.getHomePath()
-    }
-    dispatch(changeDirectory(newPath))
+    dispatch(changeDirectory(path))
   }

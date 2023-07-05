@@ -12,7 +12,7 @@ const send = (channel: string, ...args: unknown[]) => {
 }
 
 const registerApplicationMenu = (
-  createWindow: (params?: { directory: string }) => void
+  createWindow: (params?: { directory?: string }) => void
 ) => {
   const isMac = process.platform === 'darwin'
 
@@ -50,7 +50,7 @@ const registerApplicationMenu = (
         {
           label: 'New Window',
           accelerator: 'CmdOrCtrl+N',
-          click: () => createWindow({ directory: '' }),
+          click: () => createWindow({}),
         },
         ...[isMac ? { role: 'close' } : { role: 'quit' }],
       ],

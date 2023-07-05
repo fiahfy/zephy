@@ -10,7 +10,7 @@ import registerHandlers from './handlers'
 import createWindowStateManager from './windowState'
 
 const windowCreator = (state: State) => {
-  return (params?: { directory: string }) => {
+  return (params?: { directory?: string }) => {
     const browserWindow = new BrowserWindow({
       ...state,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
@@ -26,7 +26,8 @@ const windowCreator = (state: State) => {
         : `file://${join(__dirname, '../renderer/out/index.html')}`
     )
     if (params) {
-      url.searchParams.set('directory', params.directory)
+      const directory = params.directory ?? app.getPath('home')
+      url.searchParams.set('directory', directory)
     }
     browserWindow.loadURL(url.href)
 
@@ -52,7 +53,7 @@ app.whenReady().then(async () => {
   const windowStateManager = createWindowStateManager(windowCreator)
   const browserWindows = windowStateManager.restore()
   if (browserWindows.length === 0) {
-    windowStateManager.create({ directory: '' })
+    windowStateManager.create({})
   }
 
   registerApplicationMenu(windowStateManager.create)
@@ -72,7 +73,7 @@ app.whenReady().then(async () => {
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      windowStateManager.create({ directory: '' })
+      windowStateManager.create({})
     }
   })
 

@@ -30,7 +30,6 @@ const registerHandlers = () => {
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path)
   )
-  ipcMain.handle('get-home-path', () => app.getPath('home'))
   // window
   ipcMain.handle(
     'is-fullscreen',

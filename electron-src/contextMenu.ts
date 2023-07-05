@@ -21,7 +21,7 @@ export type ContextMenuOption = {
 }
 
 const registerContextMenu = (
-  createWindow: (params?: { directory: string }) => void
+  createWindow: (params?: { directory?: string }) => void
 ) => {
   ipcMain.handle(
     'show-context-menu',
