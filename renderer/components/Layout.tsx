@@ -1,5 +1,5 @@
 import { Box, Toolbar } from '@mui/material'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
 
 import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
@@ -10,8 +10,7 @@ import useContextMenu from 'hooks/useContextMenu'
 import useDocumentHandler from 'hooks/useDocumentHandler'
 import useSubscription from 'hooks/useSubscription'
 import useWatcher from 'hooks/useWatcher'
-import { useAppDispatch, useAppSelector } from 'store'
-import { goHome, selectCurrentDirectory } from 'store/window'
+import useWindowInitializer from 'hooks/useWindowInitializer'
 
 type Props = {
   children: ReactNode
@@ -20,19 +19,11 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const dispatch = useAppDispatch()
-
   const { createDefaultMenuHandler } = useContextMenu()
   useDocumentHandler()
   useSubscription()
   useWatcher()
-
-  useEffect(() => {
-    if (!currentDirectory) {
-      dispatch(goHome())
-    }
-  }, [currentDirectory, dispatch])
+  useWindowInitializer()
 
   return (
     <Box

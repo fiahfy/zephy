@@ -21,7 +21,7 @@ export type ContextMenuOption = {
 }
 
 const registerContextMenu = (
-  createWindow: (params?: { path: string }) => void
+  createWindow: (params?: { directory: string }) => void
 ) => {
   ipcMain.handle(
     'show-context-menu',
@@ -76,7 +76,7 @@ const registerContextMenu = (
           label: 'Open',
         }),
         openDirectoryInNewWindow: ({ params }) => ({
-          click: () => createWindow({ path: params.path }),
+          click: () => createWindow({ directory: params.path }),
           label: 'Open in New Window',
         }),
         revealInFinder: ({ params }) => ({

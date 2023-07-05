@@ -3,8 +3,8 @@ import windowStateKeeper, { State } from 'electron-window-state'
 import fs from 'fs'
 import path from 'path'
 
-const windowStateManager = (
-  windowCreator: (state: State) => (params?: { path: string }) => BrowserWindow
+const windowStateManager = <T>(
+  windowCreator: (state: State) => (params?: T) => BrowserWindow
 ) => {
   const savedDirectoryPath = app.getPath('userData')
   const savedPath = path.join(savedDirectoryPath, 'window-state.json')
@@ -45,25 +45,20 @@ const windowStateManager = (
 
   const getWindowFilename = (index: number) => `window-state_${index}.json`
 
-  const newWindow = (
-    index: number,
-    params?: { path: string },
-    options?: Partial<State>
-  ) => {
+  const openWindow = (index: number, params?: T, options?: Partial<State>) => {
     const windowState = windowStateKeeper({
       path: savedDirectoryPath,
       file: getWindowFilename(index),
     })
-    const browserWindow = windowCreator({
-      ...windowState,
-      ...(options ?? {}),
-    })(params)
+    const create = windowCreator({ ...windowState, ...(options ?? {}) })
+    const browserWindow = create(params)
     windowState.manage(browserWindow)
     indexes[browserWindow.id] = index
     browserWindow.on('close', () => {
       delete indexes[browserWindow.id]
       state.windows[index] = false
     })
+    return browserWindow
   }
 
   const getNewWindowOptions = () => {
@@ -81,27 +76,21 @@ const windowStateManager = (
     }
   }
 
-  const createWindow = (params?: { path: string }) => {
+  const createWindow = (params?: T) => {
     const index = state.windows.reduce(
       (acc, visible, index) => (visible ? acc : Math.min(index, acc)),
       state.windows.length
     )
     state.windows[index] = true
-    newWindow(index, params, getNewWindowOptions())
+    return openWindow(index, params, getNewWindowOptions())
   }
 
   const restoreWindows = () => {
     restoreState()
-    const visible = state.windows.reduce((acc, visible, index) => {
-      if (visible) {
-        newWindow(index)
-        return true
-      }
-      return acc
-    }, false)
-    if (!visible) {
-      createWindow()
-    }
+    return state.windows.reduce(
+      (acc, visible, index) => (visible ? [...acc, openWindow(index)] : acc),
+      [] as BrowserWindow[]
+    )
   }
 
   const saveWindows = () => {

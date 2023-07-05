@@ -1,4 +1,4 @@
-import { BrowserWindow, app, protocol } from 'electron'
+import { BrowserWindow, app, net, protocol } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
@@ -10,7 +10,7 @@ import registerHandlers from './handlers'
 import createWindowStateManager from './windowState'
 
 const windowCreator = (state: State) => {
-  return (params?: { path: string }) => {
+  return (params?: { directory: string }) => {
     const browserWindow = new BrowserWindow({
       ...state,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
@@ -26,7 +26,7 @@ const windowCreator = (state: State) => {
         : `file://${join(__dirname, '../renderer/out/index.html')}`
     )
     if (params) {
-      url.searchParams.set('path', params.path)
+      url.searchParams.set('directory', params.directory)
     }
     browserWindow.loadURL(url.href)
 
@@ -50,16 +50,18 @@ app.whenReady().then(async () => {
   await prepareNext('./renderer')
 
   const windowStateManager = createWindowStateManager(windowCreator)
-  windowStateManager.restore()
+  const browserWindows = windowStateManager.restore()
+  if (browserWindows.length === 0) {
+    windowStateManager.create({ directory: '' })
+  }
 
   registerApplicationMenu(windowStateManager.create)
   registerContextMenu(windowStateManager.create)
   registerHandlers()
 
   // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
-  protocol.registerFileProtocol('file', (request, callback) => {
-    const pathname = decodeURIComponent(request.url.replace('file:///', ''))
-    callback(pathname)
+  protocol.handle('file', (request) => {
+    return net.fetch(request.url)
   })
 
   app.on('window-all-closed', () => {
@@ -70,7 +72,7 @@ app.whenReady().then(async () => {
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      windowStateManager.create()
+      windowStateManager.create({ directory: '' })
     }
   })
 

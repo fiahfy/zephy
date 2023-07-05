@@ -444,13 +444,12 @@ export const windowSlice = createSlice({
         },
       }
     },
-    initialize(state, action: PayloadAction<number>) {
-      const windowIndex = action.payload
+    initialize(state, action: PayloadAction<{ windowIndex: number }>) {
+      const { windowIndex } = action.payload
       return {
         ...state,
         [windowIndex]: {
           ...defaultState,
-          ...(state[windowIndex] ?? {}),
         },
       }
     },
@@ -460,16 +459,13 @@ export const windowSlice = createSlice({
   },
 })
 
-export const { initialize, replace } = windowSlice.actions
+export const { replace } = windowSlice.actions
 
 export default windowSlice.reducer
 
 export const selectWindow = (state: AppState) => {
   const windowState = state.window[state.windowIndex]
-  if (!windowState) {
-    throw new Error('window state is not found')
-  }
-  return windowState
+  return windowState ?? defaultState
 }
 
 export const selectEntries = createSelector(
@@ -802,4 +798,17 @@ export const sort =
     const currentDirectory = selectCurrentDirectory(getState())
     const { sort } = windowSlice.actions
     dispatch(sort({ windowIndex, path: currentDirectory, orderBy, order }))
+  }
+
+export const initialize =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { initialize } = windowSlice.actions
+    const windowIndex = selectWindowIndex(getState())
+    dispatch(initialize({ windowIndex }))
+    let newPath = path
+    if (!newPath) {
+      newPath = await window.electronAPI.getHomePath()
+    }
+    dispatch(changeDirectory(newPath))
   }

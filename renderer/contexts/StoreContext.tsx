@@ -9,7 +9,7 @@ import { replace as replaceQueryHistory } from 'store/queryHistory'
 import { replace as replaceRating } from 'store/rating'
 import { replace as replaceSettings } from 'store/settings'
 import { replace as replaceWindow } from 'store/window'
-import { load } from 'store/windowIndex'
+import { initialize } from 'store/windowIndex'
 
 type Props = { children: ReactNode }
 
@@ -19,7 +19,7 @@ export const StoreProvider = (props: Props) => {
   const persistor = persistStore(store)
 
   useEffect(() => {
-    store.dispatch(load())
+    store.dispatch(initialize())
 
     const handler = (e: StorageEvent) => {
       if (e.key !== storageKey) {
