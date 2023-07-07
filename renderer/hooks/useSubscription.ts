@@ -1,15 +1,14 @@
 import { useEffect } from 'react'
 
 import { useAppDispatch } from 'store'
+import { moveToTrash, newFolder } from 'store/explorer'
 import { add, remove } from 'store/favorite'
 import {
   changeDirectory,
   goToSettings,
-  moveToTrash,
-  newFolder,
+  setCurrentOrderBy,
   setSidebarHidden,
   setViewMode,
-  sort,
 } from 'store/window'
 
 const useSubscription = () => {
@@ -31,7 +30,7 @@ const useSubscription = () => {
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'sort':
-          return dispatch(sort(params.orderBy))
+          return dispatch(setCurrentOrderBy(params.orderBy))
         case 'changeViewMode':
           return dispatch(setViewMode(params.viewMode))
         case 'changeSidebarHidden':

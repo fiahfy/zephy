@@ -24,7 +24,7 @@ export const selectWindowIndex = (state: AppState) => state.windowIndex
 
 export const initialize = (): AppThunk => async (dispatch) => {
   const windowIndex = await window.electronAPI.getWindowIndex()
-  if (windowIndex) {
+  if (windowIndex !== undefined) {
     dispatch(set(windowIndex))
   }
 }

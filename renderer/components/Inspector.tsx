@@ -12,8 +12,8 @@ import EntryInformationTable from 'components/EntryInformationTable'
 import useContextMenu from 'hooks/useContextMenu'
 import { Entry, Metadata } from 'interfaces'
 import { useAppSelector } from 'store'
+import { selectSelectedContents } from 'store/explorer'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { selectSelectedContents } from 'store/window'
 import {
   createThumbnailIfNeeded,
   createThumbnailsIfNeeded,

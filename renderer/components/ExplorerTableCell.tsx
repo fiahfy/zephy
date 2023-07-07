@@ -14,8 +14,8 @@ import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
+import { rename, select, selectSelected } from 'store/explorer'
 import { rate, selectGetRating } from 'store/rating'
-import { rename, select, selectSelected } from 'store/window'
 import { formatDate, formatFileSize } from 'utils/formatter'
 
 type Key = keyof Content

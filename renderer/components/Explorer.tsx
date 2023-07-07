@@ -7,20 +7,22 @@ import useContextMenu from 'hooks/useContextMenu'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
-  changeDirectory,
   multiSelect,
   rangeSelect,
-  scroll,
   select,
   selectContents,
-  selectCurrentScrollTop,
-  selectCurrentSortOption,
   selectIsSelected,
   selectLoading,
   selectSelectedContents,
-  selectViewMode,
-  sort,
   unselectAll,
+} from 'store/explorer'
+import {
+  changeDirectory,
+  selectCurrentScrollTop,
+  selectCurrentSortOption,
+  selectViewMode,
+  setCurrentScrollTop,
+  setCurrentSortOption,
 } from 'store/window'
 
 const Explorer = () => {
@@ -50,7 +52,7 @@ const Explorer = () => {
   const handleChangeSortOption = (sortOption: {
     order: 'asc' | 'desc'
     orderBy: keyof Content
-  }) => dispatch(sort(sortOption.orderBy, sortOption.order))
+  }) => dispatch(setCurrentSortOption(sortOption))
 
   const handleClickContent = (e: MouseEvent, content: Content) => {
     e.stopPropagation()
@@ -93,7 +95,7 @@ const Explorer = () => {
 
   const handleScroll = (e: Event) => {
     if (!loading && e.target instanceof HTMLElement) {
-      dispatch(scroll(e.target.scrollTop))
+      dispatch(setCurrentScrollTop(e.target.scrollTop))
     }
   }
 

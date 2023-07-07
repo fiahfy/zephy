@@ -2,12 +2,12 @@ import { MouseEvent } from 'react'
 
 import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
+import { selectSelected } from 'store/explorer'
 import { selectIsFavorite } from 'store/favorite'
 import {
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectIsSidebarHidden,
-  selectSelected,
   selectViewMode,
 } from 'store/window'
 

@@ -31,19 +31,17 @@ import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
 import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
+import { load, searchQuery, unselectAll } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
 import {
   back,
   changeDirectory,
   forward,
-  load,
-  searchQuery,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
   selectExplorable,
-  unselectAll,
 } from 'store/window'
 
 const ExplorerBar = () => {

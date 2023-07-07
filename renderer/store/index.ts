@@ -17,6 +17,7 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
+import explorerReducer from 'store/explorer'
 import favoriteReducer from 'store/favorite'
 import queryHistoryReducer from 'store/queryHistory'
 import ratingReducer from 'store/rating'
@@ -25,6 +26,7 @@ import windowReducer from 'store/window'
 import windowIndexReducer from 'store/windowIndex'
 
 const reducers = combineReducers({
+  explorer: explorerReducer,
   favorite: favoriteReducer,
   queryHistory: queryHistoryReducer,
   rating: ratingReducer,
