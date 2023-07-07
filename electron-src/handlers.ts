@@ -1,11 +1,5 @@
 import { dirname } from 'path'
-import {
-  BrowserWindow,
-  IpcMainInvokeEvent,
-  app,
-  ipcMain,
-  shell,
-} from 'electron'
+import { BrowserWindow, IpcMainInvokeEvent, ipcMain, shell } from 'electron'
 import {
   createThumbnail,
   createVideoThumbnails,
@@ -26,17 +20,17 @@ const directoryWatcher = createWatcher()
 const directoryHierarchyWatcher = createWatcher()
 
 const registerHandlers = () => {
+  // TODO: rename
   ipcMain.handle('darwin', () => process.platform === 'darwin')
+  // TODO: rename
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path)
   )
-  // window
   ipcMain.handle(
     'is-fullscreen',
     (event: IpcMainInvokeEvent) =>
       BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
   )
-  // shell
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path)
   )

@@ -33,11 +33,13 @@ type SortingState = {
 }
 
 type WindowState = {
+  // TODO: move
   entries: DetailedEntry[]
-  history: HistoryState
   loading: boolean
   query: string
   selected: string[]
+  //
+  history: HistoryState
   sidebar: {
     primary: SidebarState
     secondary: SidebarState

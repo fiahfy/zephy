@@ -13,6 +13,7 @@ const usePreventClickOnDoubleClick = <T>(
 
   const handleClick = (e: MouseEvent<T>) => {
     onBeforeClick(e)
+    window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => onClick(e), 300)
   }
 
