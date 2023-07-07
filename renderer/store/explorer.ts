@@ -14,6 +14,7 @@ import { isHiddenFile } from 'utils/file'
 
 type State = {
   entries: DetailedEntry[]
+  focused: string | undefined
   loading: boolean
   query: string
   selected: string[]
@@ -21,6 +22,7 @@ type State = {
 
 const initialState: State = {
   entries: [],
+  focused: undefined,
   loading: false,
   query: '',
   selected: [],
@@ -30,12 +32,12 @@ export const explorerSlice = createSlice({
   name: 'explorer',
   initialState,
   reducers: {
-    setQuery(state, action: PayloadAction<{ query: string }>) {
-      const { query } = action.payload
+    setQuery(state, action: PayloadAction<string>) {
+      const query = action.payload
       return { ...state, query }
     },
-    loaded(state, action: PayloadAction<{ entries: DetailedEntry[] }>) {
-      const { entries } = action.payload
+    loaded(state, action: PayloadAction<DetailedEntry[]>) {
+      const entries = action.payload
       return {
         ...state,
         entries,
@@ -50,8 +52,8 @@ export const explorerSlice = createSlice({
         loading: true,
       }
     },
-    add(state, action: PayloadAction<{ entries: DetailedEntry[] }>) {
-      const { entries } = action.payload
+    add(state, action: PayloadAction<DetailedEntry[]>) {
+      const entries = action.payload
       const paths = entries.map((entry) => entry.path)
       const newEntries = [
         ...state.entries.filter((entry) => !paths.includes(entry.path)),
@@ -59,19 +61,26 @@ export const explorerSlice = createSlice({
       ]
       return { ...state, entries: newEntries }
     },
-    remove(state, action: PayloadAction<{ paths: string[] }>) {
-      const { paths } = action.payload
+    remove(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
       const entries = state.entries.filter(
         (entry) => !paths.includes(entry.path)
       )
       return { ...state, entries }
     },
-    select(state, action: PayloadAction<{ path: string }>) {
-      const { path } = action.payload
+    focus(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, focused: path }
+    },
+    blur(state) {
+      return { ...state, focused: undefined }
+    },
+    select(state, action: PayloadAction<string>) {
+      const path = action.payload
       return { ...state, selected: [path] }
     },
-    multiSelect(state, action: PayloadAction<{ path: string }>) {
-      const { path } = action.payload
+    multiSelect(state, action: PayloadAction<string>) {
+      const path = action.payload
       const selected = state.selected.includes(path)
       return {
         ...state,
@@ -80,18 +89,19 @@ export const explorerSlice = createSlice({
           : [...state.selected, path],
       }
     },
-    rangeSelect(state, action: PayloadAction<{ paths: string[] }>) {
-      const { paths } = action.payload
+    rangeSelect(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
       const selected = state.selected.filter((p) => !paths.includes(p))
       return { ...state, selected: [...selected, ...paths] }
     },
-    unselectAll(state) {
+    unselect(state) {
       return { ...state, selected: [] }
     },
   },
 })
 
-export const { select, multiSelect, unselectAll } = explorerSlice.actions
+export const { focus, blur, select, multiSelect, unselect } =
+  explorerSlice.actions
 
 export default explorerSlice.reducer
 
@@ -110,6 +120,11 @@ export const selectLoading = createSelector(
 export const selectQuery = createSelector(
   selectExplorer,
   (explorer) => explorer.query
+)
+
+export const selectFocused = createSelector(
+  selectExplorer,
+  (explorer) => explorer.focused
 )
 
 export const selectSelected = createSelector(
@@ -174,7 +189,7 @@ export const searchQuery =
   (query: string): AppThunk =>
   async (dispatch) => {
     const { setQuery } = explorerSlice.actions
-    dispatch(setQuery({ query }))
+    dispatch(setQuery(query))
     dispatch(add(query))
   }
 
@@ -190,9 +205,9 @@ export const load = (): AppThunk => async (dispatch, getState) => {
     const entries = await window.electronAPI.getDetailedEntries(
       currentDirectory
     )
-    dispatch(loaded({ entries }))
+    dispatch(loaded(entries))
   } catch (e) {
-    dispatch(loaded({ entries: [] }))
+    dispatch(loaded([]))
   }
 }
 
@@ -216,7 +231,7 @@ export const rangeSelect =
       const index = paths.indexOf(path)
       newPaths = paths.slice(0, index + 1)
     }
-    dispatch(rangeSelect({ paths: newPaths }))
+    dispatch(rangeSelect(newPaths))
   }
 
 export const newFolder =
@@ -224,8 +239,8 @@ export const newFolder =
   async (dispatch) => {
     const { add, select } = explorerSlice.actions
     const entry = await window.electronAPI.createDirectory(path)
-    dispatch(add({ entries: [entry] }))
-    dispatch(select({ path: entry.path }))
+    dispatch(add([entry]))
+    dispatch(select(entry.path))
   }
 
 export const moveToTrash =
@@ -233,7 +248,7 @@ export const moveToTrash =
   async (dispatch) => {
     const { remove } = explorerSlice.actions
     await window.electronAPI.trashItems(paths)
-    dispatch(remove({ paths }))
+    dispatch(remove(paths))
   }
 
 export const rename =
@@ -241,8 +256,8 @@ export const rename =
   async (dispatch) => {
     const { add, remove } = explorerSlice.actions
     const entry = await window.electronAPI.renameEntry(path, newName)
-    dispatch(remove({ paths: [path] }))
-    dispatch(add({ entries: [entry] }))
+    dispatch(remove([path]))
+    dispatch(add([entry]))
   }
 
 export const addEntry =
@@ -250,12 +265,12 @@ export const addEntry =
   async (dispatch) => {
     const { add } = explorerSlice.actions
     const entry = await window.electronAPI.getDetailedEntry(path)
-    dispatch(add({ entries: [entry] }))
+    dispatch(add([entry]))
   }
 
 export const removeEntry =
   (path: string): AppThunk =>
   async (dispatch) => {
     const { remove } = explorerSlice.actions
-    dispatch(remove({ paths: [path] }))
+    dispatch(remove([path]))
   }

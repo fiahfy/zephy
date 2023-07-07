@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { KeyboardEvent, MouseEvent, createElement, useState } from 'react'
+import { KeyboardEvent, MouseEvent, createElement } from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
@@ -7,14 +7,17 @@ import useContextMenu from 'hooks/useContextMenu'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
+  blur,
+  focus,
   multiSelect,
   rangeSelect,
   select,
   selectContents,
+  selectFocused,
   selectIsSelected,
   selectLoading,
   selectSelectedContents,
-  unselectAll,
+  unselect,
 } from 'store/explorer'
 import {
   changeDirectory,
@@ -29,6 +32,7 @@ const Explorer = () => {
   const contents = useAppSelector(selectContents)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const focused = useAppSelector(selectFocused)
   const isSelected = useAppSelector(selectIsSelected)
   const loading = useAppSelector(selectLoading)
   const selectedContents = useAppSelector(selectSelectedContents)
@@ -38,11 +42,14 @@ const Explorer = () => {
   const { createContentMenuHandler, createDirectoryMenuHandler } =
     useContextMenu()
 
-  const [focused, setFocused] = useState<string>()
+  const open = async (content: Content) =>
+    content.type === 'directory'
+      ? dispatch(changeDirectory(content.path))
+      : await window.electronAPI.openPath(content.path)
 
   const handleClick = () => {
-    dispatch(unselectAll())
-    setFocused(undefined)
+    dispatch(unselect())
+    dispatch(blur())
   }
 
   const isContentFocused = (content: Content) => content.path === focused
@@ -63,21 +70,19 @@ const Explorer = () => {
     } else {
       dispatch(select(content.path))
     }
-    setFocused(content.path)
+    dispatch(focus(content.path))
   }
 
   const handleContextMenuContent = (e: MouseEvent, content: Content) =>
     createContentMenuHandler(content)(e)
 
-  const handleDoubleClickContent = async (_e: MouseEvent, content: Content) =>
-    content.type === 'directory'
-      ? dispatch(changeDirectory(content.path))
-      : await window.electronAPI.openPath(content.path)
+  const handleDoubleClickContent = (_e: MouseEvent, content: Content) =>
+    open(content)
 
   const handleKeyDownArrow = (e: KeyboardEvent, content: Content) => {
     e.preventDefault()
     dispatch(select(content.path))
-    setFocused(content.path)
+    dispatch(focus(content.path))
   }
 
   const handleKeyDownEnter = async (e: KeyboardEvent) => {
@@ -86,11 +91,7 @@ const Explorer = () => {
     if (!content) {
       return
     }
-    if (content.type === 'directory') {
-      dispatch(changeDirectory(content.path))
-    } else {
-      await window.electronAPI.openPath(content.path)
-    }
+    await open(content)
   }
 
   const handleScroll = (e: Event) => {

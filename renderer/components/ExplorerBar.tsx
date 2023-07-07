@@ -31,7 +31,7 @@ import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/enhanced/RoundedFilledTextField'
 import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
-import { load, searchQuery, unselectAll } from 'store/explorer'
+import { load, searchQuery, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { selectQueryHistories } from 'store/queryHistory'
 import {
@@ -94,7 +94,7 @@ const ExplorerBar = () => {
   useEffect(() => {
     setDirectory(currentDirectory)
     dispatch(load())
-    dispatch(unselectAll())
+    dispatch(unselect())
   }, [currentDirectory, dispatch])
 
   // click handlers

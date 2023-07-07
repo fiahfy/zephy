@@ -11,6 +11,8 @@ import {
   setSidebarWidth,
 } from 'store/window'
 
+const minContentWidth = 64
+
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ open }) => ({
@@ -21,8 +23,6 @@ const Drawer = styled(MuiDrawer, {
     },
   }),
 }))
-
-const minContentWidth = 64
 
 type Props = {
   children: React.ReactNode

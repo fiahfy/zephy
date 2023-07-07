@@ -38,6 +38,7 @@ type Props = {
   contents: Content[]
   metadata?: Metadata
 }
+
 const EntryInformationTable = (props: Props) => {
   const { contents, metadata } = props
 
