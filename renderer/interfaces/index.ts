@@ -8,7 +8,6 @@ export interface IElectronAPI {
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
-  darwin: () => Promise<boolean>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
@@ -17,6 +16,7 @@ export interface IElectronAPI {
   getEntryHierarchy: (path: string) => Promise<Entry>
   getMetadata: (path: string) => Promise<Metadata>
   getWindowIndex: () => Promise<number | undefined>
+  isDarwin: () => Promise<boolean>
   isFullscreen: () => Promise<boolean>
   openPath: (path: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>

@@ -20,20 +20,19 @@ const directoryWatcher = createWatcher()
 const directoryHierarchyWatcher = createWatcher()
 
 const registerHandlers = () => {
-  // TODO: rename
-  ipcMain.handle('darwin', () => process.platform === 'darwin')
   ipcMain.handle(
-    'is-fullscreen',
-    (event: IpcMainInvokeEvent) =>
-      BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
+    'create-directory',
+    (_event: IpcMainInvokeEvent, directoryPath: string) =>
+      createDirectory(directoryPath)
   )
-  ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
-    shell.openPath(path)
+  ipcMain.handle(
+    'create-thumbnail',
+    (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path)
   )
-  ipcMain.handle('trash-items', (_event: IpcMainInvokeEvent, paths: string[]) =>
-    Promise.all(paths.map((path) => shell.trashItem(path)))
+  ipcMain.handle(
+    'create-video-thumbnails',
+    (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path)
   )
-
   ipcMain.handle(
     'get-detailed-entries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
@@ -49,7 +48,7 @@ const registerHandlers = () => {
     (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path)
   )
   ipcMain.handle(
-    'getDirectoryPath',
+    'get-directory-path',
     (_event: IpcMainInvokeEvent, path: string) => dirname(path)
   )
   ipcMain.handle(
@@ -64,23 +63,22 @@ const registerHandlers = () => {
   ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
     getMetadata(path)
   )
+  ipcMain.handle('is-darwin', () => process.platform === 'darwin')
   ipcMain.handle(
-    'create-directory',
-    (_event: IpcMainInvokeEvent, directoryPath: string) =>
-      createDirectory(directoryPath)
+    'is-fullscreen',
+    (event: IpcMainInvokeEvent) =>
+      BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false
   )
-  ipcMain.handle(
-    'create-thumbnail',
-    (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path)
-  )
-  ipcMain.handle(
-    'create-video-thumbnails',
-    (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path)
+  ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
+    shell.openPath(path)
   )
   ipcMain.handle(
     'rename-entry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName)
+  )
+  ipcMain.handle('trash-items', (_event: IpcMainInvokeEvent, paths: string[]) =>
+    Promise.all(paths.map((path) => shell.trashItem(path)))
   )
   ipcMain.handle('watch-directory', (event: IpcMainInvokeEvent, path: string) =>
     directoryWatcher.watch(path, (eventType, path) =>

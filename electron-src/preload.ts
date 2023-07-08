@@ -8,7 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('create-thumbnail', path),
   createVideoThumbnails: (path: string) =>
     ipcRenderer.invoke('create-video-thumbnails', path),
-  darwin: () => ipcRenderer.invoke('darwin'),
   getDetailedEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-detailed-entries', directoryPath),
   getDetailedEntriesForPaths: (paths: string[]) =>
@@ -16,13 +15,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDetailedEntry: (path: string) =>
     ipcRenderer.invoke('get-detailed-entry', path),
   getDirectoryPath: (path: string) =>
-    ipcRenderer.invoke('getDirectoryPath', path),
+    ipcRenderer.invoke('get-directory-path', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-entries', directoryPath),
   getEntryHierarchy: (path: string) =>
     ipcRenderer.invoke('get-entry-hierarchy', path),
   getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
   getWindowIndex: () => ipcRenderer.invoke('get-window-index'),
+  isDarwin: () => ipcRenderer.invoke('is-darwin'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   renameEntry: (path: string, newName: string) =>
