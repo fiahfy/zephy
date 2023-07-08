@@ -14,7 +14,14 @@ import NoOutlineRating from 'components/enhanced/NoOutlineRating'
 import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { rename, select, selectSelected } from 'store/explorer'
+import {
+  finishEditing,
+  rename,
+  select,
+  selectIsEditing,
+  selectSelected,
+  startEditing,
+} from 'store/explorer'
 import { rate, selectGetRating } from 'store/rating'
 import { formatDate, formatFileSize } from 'utils/formatter'
 
@@ -30,9 +37,12 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, height, dataKey } = props
 
+  const isEditing = useAppSelector(selectIsEditing)
   const selected = useAppSelector(selectSelected)
   const getRating = useAppSelector(selectGetRating)
   const dispatch = useAppDispatch()
+
+  const editing = isEditing(content.path)
 
   const { handleClick, handleDoubleClick } = usePreventClickOnDoubleClick(
     (e: MouseEvent) => {
@@ -46,7 +56,7 @@ const ExplorerTableCell = (props: Props) => {
         selected.length === 1 &&
         selected[0] === content.path
       ) {
-        setEditing(true)
+        dispatch(startEditing(content.path))
       }
     },
     (e: MouseEvent) => {
@@ -56,24 +66,12 @@ const ExplorerTableCell = (props: Props) => {
     }
   )
 
-  const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setNameInput(content.name)
   }, [content.name])
-
-  // TODO: MaxListenersExceededWarning
-  useEffect(() => {
-    const unsubscribe = window.electronAPI.subscribe((eventName, params) => {
-      if (eventName === 'rename' && content.path === params.path) {
-        dispatch(select(content.path))
-        setEditing(true)
-      }
-    })
-    return () => unsubscribe()
-  }, [content.path, dispatch])
 
   useEffect(() => {
     const el = ref.current
@@ -89,7 +87,7 @@ const ExplorerTableCell = (props: Props) => {
   }, [content.name, editing])
 
   const handleBlur = () => {
-    setEditing(false)
+    dispatch(finishEditing())
     if (nameInput !== content.name) {
       dispatch(rename(content.path, nameInput))
     }
@@ -104,7 +102,7 @@ const ExplorerTableCell = (props: Props) => {
     e.stopPropagation()
     if (e.key === 'Escape') {
       setNameInput(content.name)
-      setEditing(false)
+      dispatch(finishEditing())
     }
   }
 

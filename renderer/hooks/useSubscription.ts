@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import { useAppDispatch } from 'store'
-import { moveToTrash, newFolder } from 'store/explorer'
+import { moveToTrash, newFolder, select, startEditing } from 'store/explorer'
 import { add, remove } from 'store/favorite'
 import {
   changeDirectory,
@@ -27,6 +27,10 @@ const useSubscription = () => {
           return dispatch(add(params.path))
         case 'removeFromFavorites':
           return dispatch(remove(params.path))
+        case 'rename':
+          dispatch(select(params.path))
+          dispatch(startEditing(params.path))
+          return
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'sort':

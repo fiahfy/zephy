@@ -1,4 +1,4 @@
-import { Box, Toolbar } from '@mui/material'
+import { Box, GlobalStyles, Toolbar } from '@mui/material'
 import { ReactNode } from 'react'
 
 import ExplorerBar from 'components/ExplorerBar'
@@ -30,16 +30,46 @@ const Layout = (props: Props) => {
       onContextMenu={createDefaultMenuHandler()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
-      {/* eslint-disable-next-line react/no-unknown-property */}
-      <style global jsx>{`
-        html,
-        body,
-        body > div:first-child,
-        div#__next,
-        div#__next > div {
-          height: 100%;
-        }
-      `}</style>
+      <GlobalStyles
+        styles={{
+          'html, body, #__next': {
+            height: '100%',
+          },
+          '::-webkit-scrollbar': {
+            width: 10,
+            height: 10,
+            '&-corner': {
+              backgroundColor: 'transparent',
+            },
+          },
+          '.theme-light': {
+            '& ::-webkit-scrollbar-thumb': {
+              backgroundColor: '#e0e0e0',
+              '&:hover': {
+                backgroundColor: '#d2d2d2',
+              },
+              '&:active': {
+                backgroundColor: '#bdbdbd',
+              },
+            },
+          },
+          '.theme-dark': {
+            '& ::-webkit-scrollbar-thumb': {
+              backgroundColor: '#424242',
+              '&:hover': {
+                backgroundColor: '#505050',
+              },
+              '&:active': {
+                backgroundColor: '#616161',
+              },
+            },
+          },
+          '.col-resizing *': {
+            cursor: 'col-resize',
+            userSelect: 'none',
+          },
+        }}
+      />
       <TitleBar />
       <ExplorerBar />
       <Sidebar variant="primary">

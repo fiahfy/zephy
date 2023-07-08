@@ -9,10 +9,10 @@ export interface IElectronAPI {
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
   darwin: () => Promise<boolean>
-  dirname: (path: string) => Promise<string>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
+  getDirectoryPath: (path: string) => Promise<string>
   getEntries: (directoryPath: string) => Promise<Entry[]>
   getEntryHierarchy: (path: string) => Promise<Entry>
   getMetadata: (path: string) => Promise<Metadata>

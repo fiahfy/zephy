@@ -9,7 +9,7 @@ import {
 
 const TitleBarContext = createContext<
   | {
-      shown: boolean
+      visible: boolean
     }
   | undefined
 >(undefined)
@@ -23,7 +23,7 @@ export const TitleBarProvider = (props: Props) => {
   const [darwin, setDarwin] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
 
-  const shown = useMemo(() => darwin && !fullscreen, [darwin, fullscreen])
+  const visible = useMemo(() => darwin && !fullscreen, [darwin, fullscreen])
 
   useEffect(() => {
     ;(async () => {
@@ -44,7 +44,7 @@ export const TitleBarProvider = (props: Props) => {
     return () => unsubscribe()
   }, [])
 
-  const value = { shown }
+  const value = { visible }
 
   return (
     <TitleBarContext.Provider value={value}>

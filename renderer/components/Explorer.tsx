@@ -14,6 +14,7 @@ import {
   select,
   selectContents,
   selectFocused,
+  selectIsFocused,
   selectIsSelected,
   selectLoading,
   selectSelectedContents,
@@ -33,6 +34,7 @@ const Explorer = () => {
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const focused = useAppSelector(selectFocused)
+  const isFocused = useAppSelector(selectIsFocused)
   const isSelected = useAppSelector(selectIsSelected)
   const loading = useAppSelector(selectLoading)
   const selectedContents = useAppSelector(selectSelectedContents)
@@ -52,7 +54,7 @@ const Explorer = () => {
     dispatch(blur())
   }
 
-  const isContentFocused = (content: Content) => content.path === focused
+  const isContentFocused = (content: Content) => isFocused(content.path)
 
   const isContentSelected = (content: Content) => isSelected(content.path)
 
@@ -62,6 +64,7 @@ const Explorer = () => {
   }) => dispatch(setCurrentSortOption(sortOption))
 
   const handleClickContent = (e: MouseEvent, content: Content) => {
+    // prevent handleClick
     e.stopPropagation()
     if (e.shiftKey) {
       dispatch(rangeSelect(content.path))
@@ -88,10 +91,9 @@ const Explorer = () => {
   const handleKeyDownEnter = async (e: KeyboardEvent) => {
     e.preventDefault()
     const content = selectedContents[0]
-    if (!content) {
-      return
+    if (content) {
+      await open(content)
     }
-    await open(content)
   }
 
   const handleScroll = (e: Event) => {

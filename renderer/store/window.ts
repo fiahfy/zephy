@@ -396,6 +396,12 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
+export const upward = (): AppThunk => async (dispatch, getState) => {
+  const currentDirectory = selectCurrentDirectory(getState())
+  const path = await window.electronAPI.getDirectoryPath(currentDirectory)
+  dispatch(changeDirectory(path))
+}
+
 export const changeDirectory =
   (path: string): AppThunk =>
   async (dispatch, getState) => {

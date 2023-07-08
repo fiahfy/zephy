@@ -3,11 +3,11 @@ import { AppBar, Toolbar, Typography } from '@mui/material'
 import { useTitleBar } from 'contexts/TitleBarContext'
 
 const TitleBar = () => {
-  const { shown } = useTitleBar()
+  const { visible } = useTitleBar()
 
   return (
     <>
-      {shown && (
+      {visible && (
         <AppBar
           color="default"
           component="div"

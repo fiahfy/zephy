@@ -42,6 +42,7 @@ import {
   selectCanForward,
   selectCurrentDirectory,
   selectExplorable,
+  upward,
 } from 'store/window'
 
 const ExplorerBar = () => {
@@ -102,10 +103,7 @@ const ExplorerBar = () => {
 
   const handleClickForward = () => dispatch(forward())
 
-  const handleClickUpward = async () => {
-    const dirPath = await window.electronAPI.dirname(directory)
-    dispatch(changeDirectory(dirPath))
-  }
+  const handleClickUpward = async () => dispatch(upward())
 
   const handleClickRefresh = async () => {
     setDirectory(currentDirectory)

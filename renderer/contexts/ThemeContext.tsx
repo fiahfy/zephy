@@ -23,7 +23,7 @@ export const ThemeProvider = (props: Props) => {
 
   const darkMode = useAppSelector(selectDarkMode)
 
-  const { shown } = useTitleBar()
+  const { visible } = useTitleBar()
 
   const mode = darkMode ? 'dark' : 'light'
 
@@ -44,14 +44,14 @@ export const ThemeProvider = (props: Props) => {
           MuiAppBar: {
             styleOverrides: {
               root: {
-                top: shown ? 28 : 0,
+                top: visible ? 28 : 0,
               },
             },
           },
         },
         mixins: {
           titleBar: {
-            height: shown ? 28 : 0,
+            height: visible ? 28 : 0,
           },
         },
         palette: {
@@ -67,7 +67,7 @@ export const ThemeProvider = (props: Props) => {
           // },
         },
       }),
-    [mode, shown]
+    [mode, visible]
   )
 
   const value = { theme }

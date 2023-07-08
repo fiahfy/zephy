@@ -10,7 +10,6 @@ import Layout from 'components/Layout'
 import { StoreProvider } from 'contexts/StoreContext'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { TitleBarProvider } from 'contexts/TitleBarContext'
-import 'styles.css'
 import createEmotionCache from 'utils/createEmotionCache'
 
 // Client-side cache, shared for the whole session of the user in the browser.

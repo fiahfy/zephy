@@ -9,13 +9,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   createVideoThumbnails: (path: string) =>
     ipcRenderer.invoke('create-video-thumbnails', path),
   darwin: () => ipcRenderer.invoke('darwin'),
-  dirname: (path: string) => ipcRenderer.invoke('dirname', path),
   getDetailedEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-detailed-entries', directoryPath),
   getDetailedEntriesForPaths: (paths: string[]) =>
     ipcRenderer.invoke('get-detailed-entries-for-paths', paths),
   getDetailedEntry: (path: string) =>
     ipcRenderer.invoke('get-detailed-entry', path),
+  getDirectoryPath: (path: string) =>
+    ipcRenderer.invoke('getDirectoryPath', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-entries', directoryPath),
   getEntryHierarchy: (path: string) =>

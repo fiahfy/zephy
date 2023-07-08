@@ -13,6 +13,7 @@ import {
 import { isHiddenFile } from 'utils/file'
 
 type State = {
+  editing: string | undefined
   entries: DetailedEntry[]
   focused: string | undefined
   loading: boolean
@@ -21,6 +22,7 @@ type State = {
 }
 
 const initialState: State = {
+  editing: undefined,
   entries: [],
   focused: undefined,
   loading: false,
@@ -97,15 +99,39 @@ export const explorerSlice = createSlice({
     unselect(state) {
       return { ...state, selected: [] }
     },
+    startEditing(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, editing: path }
+    },
+    finishEditing(state) {
+      return { ...state, editing: undefined }
+    },
   },
 })
 
-export const { focus, blur, select, multiSelect, unselect } =
-  explorerSlice.actions
+export const {
+  focus,
+  blur,
+  select,
+  multiSelect,
+  unselect,
+  startEditing,
+  finishEditing,
+} = explorerSlice.actions
 
 export default explorerSlice.reducer
 
 export const selectExplorer = (state: AppState) => state.explorer
+
+export const selectEditing = createSelector(
+  selectExplorer,
+  (explorer) => explorer.editing
+)
+
+export const selectIsEditing = createSelector(
+  selectEditing,
+  (editing) => (path: string) => editing === path
+)
 
 export const selectEntries = createSelector(
   selectExplorer,
@@ -125,6 +151,11 @@ export const selectQuery = createSelector(
 export const selectFocused = createSelector(
   selectExplorer,
   (explorer) => explorer.focused
+)
+
+export const selectIsFocused = createSelector(
+  selectFocused,
+  (focused) => (path: string) => focused === path
 )
 
 export const selectSelected = createSelector(

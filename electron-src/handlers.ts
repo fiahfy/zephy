@@ -22,10 +22,6 @@ const directoryHierarchyWatcher = createWatcher()
 const registerHandlers = () => {
   // TODO: rename
   ipcMain.handle('darwin', () => process.platform === 'darwin')
-  // TODO: rename
-  ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
-    dirname(path)
-  )
   ipcMain.handle(
     'is-fullscreen',
     (event: IpcMainInvokeEvent) =>
@@ -51,6 +47,10 @@ const registerHandlers = () => {
   ipcMain.handle(
     'get-detailed-entry',
     (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path)
+  )
+  ipcMain.handle(
+    'getDirectoryPath',
+    (_event: IpcMainInvokeEvent, path: string) => dirname(path)
   )
   ipcMain.handle(
     'get-entries',
