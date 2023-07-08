@@ -17,7 +17,6 @@ import { useAppDispatch, useAppSelector } from 'store'
 import {
   finishEditing,
   rename,
-  select,
   selectIsEditing,
   selectSelected,
   startEditing,
@@ -38,8 +37,8 @@ const ExplorerTableCell = (props: Props) => {
   const { align, content, height, dataKey } = props
 
   const isEditing = useAppSelector(selectIsEditing)
-  const selected = useAppSelector(selectSelected)
   const getRating = useAppSelector(selectGetRating)
+  const selected = useAppSelector(selectSelected)
   const dispatch = useAppDispatch()
 
   const editing = isEditing(content.path)

@@ -24,7 +24,7 @@ import {
   changeDirectory,
   selectCurrentScrollTop,
   selectCurrentSortOption,
-  selectViewMode,
+  selectCurrentViewMode,
   setCurrentScrollTop,
   setCurrentSortOption,
 } from 'store/window'
@@ -33,12 +33,12 @@ const Explorer = () => {
   const contents = useAppSelector(selectContents)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const currentViewMode = useAppSelector(selectCurrentViewMode)
   const focused = useAppSelector(selectFocused)
   const isFocused = useAppSelector(selectIsFocused)
   const isSelected = useAppSelector(selectIsSelected)
   const loading = useAppSelector(selectLoading)
   const selectedContents = useAppSelector(selectSelectedContents)
-  const viewMode = useAppSelector(selectViewMode)
   const dispatch = useAppDispatch()
 
   const { createContentMenuHandler, createDirectoryMenuHandler } =
@@ -108,22 +108,25 @@ const Explorer = () => {
       onContextMenu={createDirectoryMenuHandler()}
       sx={{ height: '100%' }}
     >
-      {createElement(viewMode === 'list' ? ExplorerTable : ExplorerGrid, {
-        contentFocused: isContentFocused,
-        contentSelected: isContentSelected,
-        contents,
-        focused,
-        loading,
-        onChangeSortOption: handleChangeSortOption,
-        onClickContent: handleClickContent,
-        onContextMenuContent: handleContextMenuContent,
-        onDoubleClickContent: handleDoubleClickContent,
-        onKeyDownArrow: handleKeyDownArrow,
-        onKeyDownEnter: handleKeyDownEnter,
-        onScroll: handleScroll,
-        scrollTop: currentScrollTop,
-        sortOption: currentSortOption,
-      })}
+      {createElement(
+        currentViewMode === 'list' ? ExplorerTable : ExplorerGrid,
+        {
+          contentFocused: isContentFocused,
+          contentSelected: isContentSelected,
+          contents,
+          focused,
+          loading,
+          onChangeSortOption: handleChangeSortOption,
+          onClickContent: handleClickContent,
+          onContextMenuContent: handleContextMenuContent,
+          onDoubleClickContent: handleDoubleClickContent,
+          onKeyDownArrow: handleKeyDownArrow,
+          onKeyDownEnter: handleKeyDownEnter,
+          onScroll: handleScroll,
+          scrollTop: currentScrollTop,
+          sortOption: currentSortOption,
+        }
+      )}
     </Box>
   )
 }

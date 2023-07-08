@@ -28,6 +28,12 @@ type SortingState = {
   [path: string]: SortOption
 }
 
+type ViewMode = 'list' | 'thumbnail'
+
+type ViewModeState = {
+  [path: string]: ViewMode
+}
+
 type WindowState = {
   history: HistoryState
   sidebar: {
@@ -35,7 +41,7 @@ type WindowState = {
     secondary: SidebarState
   }
   sorting: SortingState
-  viewMode: 'list' | 'thumbnail'
+  viewMode: ViewModeState
 }
 
 type State = {
@@ -67,7 +73,7 @@ const defaultState: WindowState = {
     },
   },
   sorting: {},
-  viewMode: 'list',
+  viewMode: {},
 }
 
 const initialState: State = {}
@@ -92,7 +98,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           sidebar: {
             ...windowState.sidebar,
@@ -120,7 +125,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           sidebar: {
             ...windowState.sidebar,
@@ -129,27 +133,6 @@ export const windowSlice = createSlice({
               width,
             },
           },
-        },
-      }
-    },
-    setViewMode(
-      state,
-      action: PayloadAction<{
-        windowIndex: number
-        viewMode: WindowState['viewMode']
-      }>
-    ) {
-      const { windowIndex, viewMode } = action.payload
-      const windowState = state[windowIndex]
-      if (!windowState) {
-        return state
-      }
-      return {
-        ...state,
-        [windowIndex]: {
-          ...defaultState,
-          ...windowState,
-          viewMode,
         },
       }
     },
@@ -175,7 +158,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           history: {
             ...windowState.history,
@@ -199,7 +181,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           history: { ...windowState.history, index },
         },
@@ -220,7 +201,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           history: {
             ...windowState.history,
@@ -255,7 +235,6 @@ export const windowSlice = createSlice({
       return {
         ...state,
         [windowIndex]: {
-          ...defaultState,
           ...windowState,
           sorting: {
             ...windowState.sorting,
@@ -263,6 +242,30 @@ export const windowSlice = createSlice({
               order: newOrder,
               orderBy,
             },
+          },
+        },
+      }
+    },
+    setViewMode(
+      state,
+      action: PayloadAction<{
+        windowIndex: number
+        path: string
+        viewMode: ViewMode
+      }>
+    ) {
+      const { windowIndex, path, viewMode } = action.payload
+      const windowState = state[windowIndex]
+      if (!windowState) {
+        return state
+      }
+      return {
+        ...state,
+        [windowIndex]: {
+          ...windowState,
+          viewMode: {
+            ...windowState.viewMode,
+            [path]: viewMode,
           },
         },
       }
@@ -350,6 +353,12 @@ export const selectCurrentSortOption = createSelector(
     sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
 )
 
+export const selectCurrentViewMode = createSelector(
+  selectViewMode,
+  selectCurrentDirectory,
+  (viewMode, currentDirectory) => viewMode[currentDirectory] ?? 'list'
+)
+
 export const selectIsSidebarHidden = createSelector(
   selectSidebar,
   (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden
@@ -374,14 +383,6 @@ export const setSidebarWidth =
     const { setSidebarWidth } = windowSlice.actions
     const windowIndex = selectWindowIndex(getState())
     dispatch(setSidebarWidth({ windowIndex, variant, width }))
-  }
-
-export const setViewMode =
-  (viewMode: WindowState['viewMode']): AppThunk =>
-  async (dispatch, getState) => {
-    const { setViewMode } = windowSlice.actions
-    const windowIndex = selectWindowIndex(getState())
-    dispatch(setViewMode({ windowIndex, viewMode }))
   }
 
 export const go =
@@ -425,18 +426,18 @@ export const setCurrentScrollTop =
 export const setCurrentSortOption =
   (sortOption: SortOption): AppThunk =>
   async (dispatch, getState) => {
+    const { setSortOption } = windowSlice.actions
     const windowIndex = selectWindowIndex(getState())
     const currentDirectory = selectCurrentDirectory(getState())
-    const { setSortOption } = windowSlice.actions
     dispatch(setSortOption({ windowIndex, path: currentDirectory, sortOption }))
   }
 
 export const setCurrentOrderBy =
   (orderBy: SortOption['orderBy']): AppThunk =>
   async (dispatch, getState) => {
+    const { setSortOption } = windowSlice.actions
     const windowIndex = selectWindowIndex(getState())
     const currentDirectory = selectCurrentDirectory(getState())
-    const { setSortOption } = windowSlice.actions
     dispatch(
       setSortOption({
         windowIndex,
@@ -444,6 +445,15 @@ export const setCurrentOrderBy =
         sortOption: { orderBy },
       })
     )
+  }
+
+export const setCurrentViewMode =
+  (viewMode: ViewMode): AppThunk =>
+  async (dispatch, getState) => {
+    const { setViewMode } = windowSlice.actions
+    const windowIndex = selectWindowIndex(getState())
+    const currentDirectory = selectCurrentDirectory(getState())
+    dispatch(setViewMode({ windowIndex, path: currentDirectory, viewMode }))
   }
 
 export const initialize =

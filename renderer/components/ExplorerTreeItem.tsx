@@ -26,10 +26,17 @@ const ExplorerTreeItem = (props: Props) => {
     (entry.type === 'directory' && entry.children ? entry.children : [])
       .length - max
 
+  const handleDoubleClick = async () => {
+    if (entry.type === 'file') {
+      await window.electronAPI.openPath(entry.path)
+    }
+  }
+
   return (
     <EntryTreeItem
       LabelProps={{
         onContextMenu: createEntryMenuHandler(entry),
+        onDoubleClick: handleDoubleClick,
       }}
       icon={<EntryIcon entry={entry} size="small" />}
       label={entry.name}

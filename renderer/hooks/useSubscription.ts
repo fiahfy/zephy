@@ -7,8 +7,8 @@ import {
   changeDirectory,
   goToSettings,
   setCurrentOrderBy,
+  setCurrentViewMode,
   setSidebarHidden,
-  setViewMode,
 } from 'store/window'
 
 const useSubscription = () => {
@@ -36,7 +36,7 @@ const useSubscription = () => {
         case 'sort':
           return dispatch(setCurrentOrderBy(params.orderBy))
         case 'changeViewMode':
-          return dispatch(setViewMode(params.viewMode))
+          return dispatch(setCurrentViewMode(params.viewMode))
         case 'changeSidebarHidden':
           return dispatch(setSidebarHidden(params.variant, params.hidden))
       }

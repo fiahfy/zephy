@@ -7,8 +7,8 @@ import { selectIsFavorite } from 'store/favorite'
 import {
   selectCurrentDirectory,
   selectCurrentSortOption,
+  selectCurrentViewMode,
   selectIsSidebarHidden,
-  selectViewMode,
 } from 'store/window'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
@@ -32,10 +32,10 @@ const createMenuHandler = (options?: ContextMenuOption[]) => {
 const useContextMenu = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const currentViewMode = useAppSelector(selectCurrentViewMode)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const selected = useAppSelector(selectSelected)
-  const viewMode = useAppSelector(selectViewMode)
 
   const createDefaultMenuHandler = () => createMenuHandler()
 
@@ -129,7 +129,7 @@ const useContextMenu = () => {
       { id: 'newFolder', params: { path: currentDirectory } },
       { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
-      { id: 'view', params: { viewMode } },
+      { id: 'view', params: { viewMode: currentViewMode } },
       { id: 'separator' },
       {
         id: 'sortBy',
@@ -142,7 +142,7 @@ const useContextMenu = () => {
       { id: 'newFolder', params: { path: currentDirectory } },
       { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
-      { id: 'view', params: { viewMode } },
+      { id: 'view', params: { viewMode: currentViewMode } },
       { id: 'separator' },
       {
         id: 'sortBy',
