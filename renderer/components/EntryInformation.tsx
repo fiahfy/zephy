@@ -2,17 +2,17 @@ import { Box, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
-import { Content, Metadata } from 'interfaces'
+import { DetailedEntry, Metadata } from 'interfaces'
 import { getMetadata } from 'utils/file'
 
 type Props = {
-  contents: Content[]
+  entries: DetailedEntry[]
 }
 
 const EntryInformation = (props: Props) => {
-  const { contents } = props
+  const { entries } = props
 
-  const content = contents[0]
+  const entry = entries[0]
 
   const [metadata, setMetadata] = useState<Metadata>()
 
@@ -20,13 +20,13 @@ const EntryInformation = (props: Props) => {
     let unmounted = false
 
     ;(async () => {
-      if (contents.length > 1) {
+      if (entries.length > 1) {
         return
       }
-      if (!content) {
+      if (!entry) {
         return
       }
-      const metadata = await getMetadata(content.path)
+      const metadata = await getMetadata(entry.path)
       if (unmounted) {
         return
       }
@@ -36,11 +36,11 @@ const EntryInformation = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [content, contents.length])
+  }, [entry, entries.length])
 
   return (
     <>
-      {content && (
+      {entry && (
         <Box
           sx={{
             background: (theme) => theme.palette.background.default,
@@ -64,9 +64,9 @@ const EntryInformation = (props: Props) => {
             }}
             variant="caption"
           >
-            {contents.length > 1 ? `${contents.length} items` : content.name}
+            {entries.length > 1 ? `${entries.length} items` : entry.name}
           </Typography>
-          <EntryInformationTable contents={contents} metadata={metadata} />
+          <EntryInformationTable entries={entries} metadata={metadata} />
         </Box>
       )}
     </>

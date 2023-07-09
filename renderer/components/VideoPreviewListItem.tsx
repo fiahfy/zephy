@@ -2,8 +2,8 @@ import { ImageListItem } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import PreviewMessageItem from 'components/PreviewMessageItem'
-import { Content } from 'interfaces'
+import PreviewMessageItem from 'components/MessagePreviewListItem'
+import { Entry } from 'interfaces'
 import { createVideoThumbnails } from 'utils/file'
 
 type State = {
@@ -31,13 +31,13 @@ const reducer = (_state: State, action: Action) => {
 }
 
 type Props = {
-  content: Content
+  entry: Entry
 }
 
-const PreviewVideoItem = (props: Props) => {
-  const { content } = props
+const VideoPreviewListItem = (props: Props) => {
+  const { entry } = props
 
-  const [state, dispatch] = useReducer(reducer, {
+  const [{ loading, thumbnails }, dispatch] = useReducer(reducer, {
     loading: false,
     thumbnails: [],
   })
@@ -47,7 +47,7 @@ const PreviewVideoItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnails = await createVideoThumbnails(content.path)
+      const thumbnails = await createVideoThumbnails(entry.path)
       if (unmounted) {
         return
       }
@@ -57,15 +57,16 @@ const PreviewVideoItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [content])
+  }, [entry])
 
   return (
     <>
-      {state.loading && <PreviewMessageItem message="Loading..." />}
-      {!state.loading && (
+      {loading ? (
+        <PreviewMessageItem message="Loading..." />
+      ) : (
         <>
-          {state.thumbnails.length > 0 ? (
-            state.thumbnails.map((thumbnail, i) => (
+          {thumbnails.length > 0 ? (
+            thumbnails.map((thumbnail) => (
               <ImageListItem key={thumbnail}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -87,4 +88,4 @@ const PreviewVideoItem = (props: Props) => {
   )
 }
 
-export default PreviewVideoItem
+export default VideoPreviewListItem

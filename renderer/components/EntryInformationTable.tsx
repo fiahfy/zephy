@@ -6,43 +6,43 @@ import {
   Typography,
 } from '@mui/material'
 
-import { Content, Metadata } from 'interfaces'
+import { DetailedEntry, Metadata } from 'interfaces'
 import { formatDate, formatFileSize, formatTime } from 'utils/formatter'
 
-const getTotalFileSize = (contents: Content[]) =>
-  contents
-    .filter((content) => content.type === 'file')
-    .reduce((acc, content) => acc + content.size, 0)
+const getTotalFileSize = (entries: DetailedEntry[]) =>
+  entries
+    .filter((entry) => entry.type === 'file')
+    .reduce((acc, entry) => acc + entry.size, 0)
 
 const formatDateRange = (
-  contents: Content[],
+  entries: DetailedEntry[],
   dateProperty: 'dateCreated' | 'dateModified' | 'dateLastOpened'
 ) => {
-  const content = contents[0]
-  if (!content) {
+  const entry = entries[0]
+  if (!entry) {
     return
   }
-  if (contents.length > 1) {
-    const dates = contents.map((content) => content[dateProperty])
+  if (entries.length > 1) {
+    const dates = entries.map((entry) => entry[dateProperty])
     const minDate = Math.min(...dates)
     const maxDate = Math.max(...dates)
     return minDate === maxDate
       ? formatDate(minDate)
       : `${formatDate(minDate)} - ${formatDate(maxDate)}`
   } else {
-    return formatDate(content[dateProperty])
+    return formatDate(entry[dateProperty])
   }
 }
 
 type Props = {
-  contents: Content[]
+  entries: DetailedEntry[]
   metadata?: Metadata
 }
 
 const EntryInformationTable = (props: Props) => {
-  const { contents, metadata } = props
+  const { entries, metadata } = props
 
-  const fileSize = getTotalFileSize(contents)
+  const fileSize = getTotalFileSize(entries)
 
   const rows = [
     ...(fileSize
@@ -55,15 +55,15 @@ const EntryInformationTable = (props: Props) => {
       : []),
     {
       label: 'Date Created',
-      value: formatDateRange(contents, 'dateCreated'),
+      value: formatDateRange(entries, 'dateCreated'),
     },
     {
       label: 'Date Modified',
-      value: formatDateRange(contents, 'dateModified'),
+      value: formatDateRange(entries, 'dateModified'),
     },
     {
       label: 'Date Last Opened',
-      value: formatDateRange(contents, 'dateLastOpened'),
+      value: formatDateRange(entries, 'dateLastOpened'),
     },
     ...(metadata
       ? [

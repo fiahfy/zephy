@@ -1,9 +1,10 @@
-import { Box, Typography } from '@mui/material'
+import { Box, ImageList, Typography } from '@mui/material'
 import { useEffect, useRef } from 'react'
 
-import DirectoryPreview from 'components/DirectoryPreview'
+import DirectoryPreviewList from 'components/DirectoryPreviewList'
 import EntryInformation from 'components/EntryInformation'
-import FilePreview from 'components/FilePreview'
+import FilePreviewList from 'components/FilePreviewList'
+import MessagePreviewListItem from 'components/MessagePreviewListItem'
 import { useAppSelector } from 'store'
 import { selectSelectedContents } from 'store/explorer'
 
@@ -30,20 +31,7 @@ const Inspector = () => {
         overflowY: 'auto',
       }}
     >
-      {!content && (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-            userSelect: 'none',
-          }}
-        >
-          <Typography variant="caption">No Selected</Typography>
-        </Box>
-      )}
-      {content && (
+      {content ? (
         <>
           <Typography
             paragraph
@@ -60,12 +48,33 @@ const Inspector = () => {
           >
             Preview
           </Typography>
-          {content.type === 'directory' && (
-            <DirectoryPreview content={content} />
+          {contents.length > 1 ? (
+            <ImageList cols={1}>
+              <MessagePreviewListItem message="No Preview" />
+            </ImageList>
+          ) : (
+            <>
+              {content.type === 'directory' && (
+                <DirectoryPreviewList entry={content} />
+              )}
+              {content.type === 'file' && <FilePreviewList entry={content} />}
+            </>
           )}
-          {content.type === 'file' && <FilePreview content={content} />}
-          <EntryInformation contents={contents} />
+
+          <EntryInformation entries={contents} />
         </>
+      ) : (
+        <Box
+          sx={{
+            alignItems: 'center',
+            display: 'flex',
+            height: '100%',
+            justifyContent: 'center',
+            userSelect: 'none',
+          }}
+        >
+          <Typography variant="caption">No Selected</Typography>
+        </Box>
       )}
     </Box>
   )

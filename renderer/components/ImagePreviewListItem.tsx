@@ -2,8 +2,8 @@ import { ImageListItem } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import PreviewMessageItem from 'components/PreviewMessageItem'
-import { Content } from 'interfaces'
+import PreviewMessageItem from 'components/MessagePreviewListItem'
+import { Entry } from 'interfaces'
 import { createThumbnailIfNeeded } from 'utils/file'
 
 type State = {
@@ -31,13 +31,13 @@ const reducer = (_state: State, action: Action) => {
 }
 
 type Props = {
-  content: Content
+  entry: Entry
 }
 
-const PreviewImageItem = (props: Props) => {
-  const { content } = props
+const ImagePreviewListItem = (props: Props) => {
+  const { entry } = props
 
-  const [state, dispatch] = useReducer(reducer, {
+  const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
     thumbnail: undefined,
   })
@@ -47,7 +47,7 @@ const PreviewImageItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnail = await createThumbnailIfNeeded(content.path)
+      const thumbnail = await createThumbnailIfNeeded(entry.path)
       if (unmounted) {
         return
       }
@@ -57,19 +57,20 @@ const PreviewImageItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [content])
+  }, [entry])
 
   return (
     <>
-      {state.loading && <PreviewMessageItem message="Loading..." />}
-      {!state.loading && (
+      {loading ? (
+        <PreviewMessageItem message="Loading..." />
+      ) : (
         <>
-          {state.thumbnail ? (
+          {thumbnail ? (
             <ImageListItem>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 loading="lazy"
-                src={fileUrl(state.thumbnail)}
+                src={fileUrl(thumbnail)}
                 style={{ minHeight: 128 }}
               />
             </ImageListItem>
@@ -82,4 +83,4 @@ const PreviewImageItem = (props: Props) => {
   )
 }
 
-export default PreviewImageItem
+export default ImagePreviewListItem
