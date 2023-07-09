@@ -74,7 +74,7 @@ const FavoriteTable = () => {
                 width: '100%',
               }}
             >
-              <Icon iconType="folder" size="small" />
+              <Icon iconType="folder" />
               <Typography noWrap variant="caption">
                 {entry.name}
               </Typography>

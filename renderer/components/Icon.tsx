@@ -19,11 +19,10 @@ type Props = {
     | 'star'
     | 'star-border'
     | 'video-file'
-  size?: 'small' | 'medium'
 }
 
 const Icon = (props: Props) => {
-  const { iconType, size } = props
+  const { iconType } = props
 
   const MaterialIcon = useMemo(() => {
     switch (iconType) {
@@ -63,7 +62,7 @@ const Icon = (props: Props) => {
     }
   }, [iconType])
 
-  return <MaterialIcon fontSize={size} sx={{ color }} />
+  return <MaterialIcon fontSize="small" sx={{ color }} />
 }
 
 export default Icon

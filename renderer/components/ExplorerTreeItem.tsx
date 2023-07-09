@@ -38,7 +38,7 @@ const ExplorerTreeItem = (props: Props) => {
         onContextMenu: createEntryMenuHandler(entry),
         onDoubleClick: handleDoubleClick,
       }}
-      icon={<EntryIcon entry={entry} size="small" />}
+      icon={<EntryIcon entry={entry} />}
       label={entry.name}
       nodeId={entry.path}
       title={entry.name}
@@ -57,7 +57,7 @@ const ExplorerTreeItem = (props: Props) => {
               ))}
             {over > 0 && (
               <EntryTreeItem
-                icon={<Icon iconType="insert-drive-file" size="small" />}
+                icon={<Icon iconType="insert-drive-file" />}
                 label={`Other ${over} items`}
                 nodeId={`${entry.path}<others>`}
               />

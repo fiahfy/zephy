@@ -125,7 +125,7 @@ const ExplorerTableCell = (props: Props) => {
     >
       {dataKey === 'name' && (
         <>
-          <EntryIcon entry={content} size="small" />
+          <EntryIcon entry={content} />
           {editing ? (
             <DenseOutlineTextField
               inputRef={ref}

@@ -200,10 +200,7 @@ const ExplorerBar = () => {
                       onClick={handleClickFavorite}
                       size="small"
                     >
-                      <Icon
-                        iconType={favorite ? 'star' : 'star-border'}
-                        size="small"
-                      />
+                      <Icon iconType={favorite ? 'star' : 'star-border'} />
                     </IconButton>
                   </InputAdornment>
                 ),

@@ -1,4 +1,4 @@
-import { ComponentProps, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import Icon from 'components/Icon'
 import { Entry } from 'interfaces'
@@ -13,11 +13,10 @@ const icons = {
 
 type Props = {
   entry: Entry
-  size?: ComponentProps<typeof Icon>['size']
 }
 
 const EntryIcon = (props: Props) => {
-  const { entry, size } = props
+  const { entry } = props
 
   const iconType = useMemo(() => {
     if (entry.type === 'directory') {
@@ -27,7 +26,7 @@ const EntryIcon = (props: Props) => {
     return icons[fileType]
   }, [entry.path, entry.type])
 
-  return <Icon iconType={iconType} size={size} />
+  return <Icon iconType={iconType} />
 }
 
 export default EntryIcon
