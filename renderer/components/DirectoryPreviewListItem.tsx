@@ -128,7 +128,7 @@ const DirectoryPreviewListItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box mt={1} mx={1}>
+          <Box mx={1} sx={{ display: 'flex' }}>
             <EntryIcon entry={entry} />
           </Box>
         }

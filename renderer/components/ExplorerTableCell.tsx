@@ -85,12 +85,14 @@ const ExplorerTableCell = (props: Props) => {
     }
   }, [content.name, editing])
 
-  const handleBlur = () => {
+  const finish = () => {
     dispatch(finishEditing())
     if (nameInput !== content.name) {
       dispatch(rename(content.path, nameInput))
     }
   }
+
+  const handleBlur = () => finish()
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -99,9 +101,16 @@ const ExplorerTableCell = (props: Props) => {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     e.stopPropagation()
-    if (e.key === 'Escape') {
-      setNameInput(content.name)
-      dispatch(finishEditing())
+    switch (e.key) {
+      case 'Escape':
+        setNameInput(content.name)
+        dispatch(finishEditing())
+        break
+      case 'Enter':
+        if (!e.nativeEvent.isComposing) {
+          finish()
+        }
+        break
     }
   }
 
