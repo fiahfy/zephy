@@ -3,7 +3,7 @@ import { MouseEvent, useEffect, useRef } from 'react'
 const usePreventClickOnDoubleClick = <T>(
   onBeforeClick: (e: MouseEvent, ...args: T[]) => void,
   onClick: (e: MouseEvent, ...args: T[]) => void,
-  onDoubleClick: (e: MouseEvent, ...args: T[]) => void
+  onDoubleClick: (e: MouseEvent, ...args: T[]) => void,
 ) => {
   const timer = useRef<number>()
 

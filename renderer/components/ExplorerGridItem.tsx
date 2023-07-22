@@ -96,7 +96,7 @@ const ExplorerGridItem = (props: Props) => {
           entries = await window.electronAPI.getEntries(content.path)
           return entries
             .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .map((entry) => entry.path)
         } catch (e) {
@@ -117,7 +117,7 @@ const ExplorerGridItem = (props: Props) => {
 
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No Preview'),
-    [loading]
+    [loading],
   )
 
   const draggingContents = isSelected(content.path)
@@ -148,7 +148,7 @@ const ExplorerGridItem = (props: Props) => {
             backgroundColor: (theme) =>
               alpha(
                 theme.palette.primary.main,
-                theme.palette.action.selectedOpacity
+                theme.palette.action.selectedOpacity,
               ),
           },
           '&:hover': {
@@ -157,7 +157,7 @@ const ExplorerGridItem = (props: Props) => {
                 alpha(
                   theme.palette.primary.main,
                   theme.palette.action.selectedOpacity +
-                    theme.palette.action.hoverOpacity
+                    theme.palette.action.hoverOpacity,
                 ),
             },
           },

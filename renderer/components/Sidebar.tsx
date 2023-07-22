@@ -42,7 +42,7 @@ const Sidebar = (props: Props) => {
   const hidden = isSidebarHidden(variant)
 
   const oppositeWidth = getSidebarWidth(
-    variant === 'primary' ? 'secondary' : 'primary'
+    variant === 'primary' ? 'secondary' : 'primary',
   )
 
   const handleMouseMove = useCallback(
@@ -59,7 +59,7 @@ const Sidebar = (props: Props) => {
       }
       dispatch(setSidebarHidden(variant, newWidth < minContentWidth / 2))
     },
-    [dispatch, oppositeWidth, position, variant]
+    [dispatch, oppositeWidth, position, variant],
   )
 
   const handleMouseUp = useCallback(() => {

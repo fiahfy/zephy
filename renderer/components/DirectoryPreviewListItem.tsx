@@ -69,7 +69,7 @@ const DirectoryPreviewListItem = (props: Props) => {
           const entries = await window.electronAPI.getEntries(entry.path)
           return entries
             .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .map((entry) => entry.path)
         } catch (e) {
@@ -90,7 +90,7 @@ const DirectoryPreviewListItem = (props: Props) => {
 
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No Preview'),
-    [loading]
+    [loading],
   )
 
   const handleDoubleClick = async (entry: Entry) =>

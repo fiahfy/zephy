@@ -13,7 +13,7 @@ const send = (message: any) => {
 }
 
 const registerApplicationMenu = (
-  createWindow: (params?: { directory?: string }) => void
+  createWindow: (params?: { directory?: string }) => void,
 ) => {
   const isMac = process.platform === 'darwin'
 

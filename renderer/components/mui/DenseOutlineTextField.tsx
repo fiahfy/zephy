@@ -11,7 +11,7 @@ const DenseOutlineTextField = styled((props: TextFieldProps) => (
       px: 0.5,
       py: 0,
     },
-  })
+  }),
 )
 
 export default DenseOutlineTextField

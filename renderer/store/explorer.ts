@@ -66,7 +66,7 @@ export const explorerSlice = createSlice({
     remove(state, action: PayloadAction<string[]>) {
       const paths = action.payload
       const entries = state.entries.filter(
-        (entry) => !paths.includes(entry.path)
+        (entry) => !paths.includes(entry.path),
       )
       return { ...state, entries }
     },
@@ -125,47 +125,47 @@ export const selectExplorer = (state: AppState) => state.explorer
 
 export const selectEditing = createSelector(
   selectExplorer,
-  (explorer) => explorer.editing
+  (explorer) => explorer.editing,
 )
 
 export const selectIsEditing = createSelector(
   selectEditing,
-  (editing) => (path: string) => editing === path
+  (editing) => (path: string) => editing === path,
 )
 
 export const selectEntries = createSelector(
   selectExplorer,
-  (explorer) => explorer.entries
+  (explorer) => explorer.entries,
 )
 
 export const selectLoading = createSelector(
   selectExplorer,
-  (explorer) => explorer.loading
+  (explorer) => explorer.loading,
 )
 
 export const selectQuery = createSelector(
   selectExplorer,
-  (explorer) => explorer.query
+  (explorer) => explorer.query,
 )
 
 export const selectFocused = createSelector(
   selectExplorer,
-  (explorer) => explorer.focused
+  (explorer) => explorer.focused,
 )
 
 export const selectIsFocused = createSelector(
   selectFocused,
-  (focused) => (path: string) => focused === path
+  (focused) => (path: string) => focused === path,
 )
 
 export const selectSelected = createSelector(
   selectExplorer,
-  (explorer) => explorer.selected
+  (explorer) => explorer.selected,
 )
 
 export const selectIsSelected = createSelector(
   selectSelected,
-  (selected) => (path: string) => selected.includes(path)
+  (selected) => (path: string) => selected.includes(path),
 )
 
 export const selectContents = createSelector(
@@ -199,21 +199,21 @@ export const selectContents = createSelector(
       .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
       .filter(
         (entry) =>
-          !query || entry.name.toLowerCase().includes(query.toLowerCase())
+          !query || entry.name.toLowerCase().includes(query.toLowerCase()),
       )
       .map((entry) => ({
         ...entry,
         rating: getRating(entry.path),
       }))
       .sort((a, b) => comparator(a, b))
-  }
+  },
 )
 
 export const selectSelectedContents = createSelector(
   selectContents,
   selectIsSelected,
   (contents, isSelected) =>
-    contents.filter((content) => isSelected(content.path))
+    contents.filter((content) => isSelected(content.path)),
 )
 
 export const searchQuery =
@@ -234,7 +234,7 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   try {
     const currentDirectory = selectCurrentDirectory(getState())
     const entries = await window.electronAPI.getDetailedEntries(
-      currentDirectory
+      currentDirectory,
     )
     dispatch(loaded(entries))
   } catch (e) {
@@ -303,7 +303,7 @@ export const handle =
   (
     eventType: 'create' | 'delete',
     directoryPath: string,
-    filePath: string
+    filePath: string,
   ): AppThunk =>
   async (dispatch, getState) => {
     const currentDirectory = selectCurrentDirectory(getState())

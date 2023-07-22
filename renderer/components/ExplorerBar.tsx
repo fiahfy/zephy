@@ -65,7 +65,7 @@ const ExplorerBar = () => {
       setQuery(query)
       dispatch(searchQuery(query))
     },
-    [dispatch]
+    [dispatch],
   )
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const ExplorerBar = () => {
           search(document.getSelection()?.toString() ?? '')
           ref.current?.focus()
         }
-      }
+      },
     )
     return () => removeListener()
   }, [dispatch, search])

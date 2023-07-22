@@ -100,7 +100,7 @@ const ExplorerGrid = (props: Props) => {
 
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / rowHeight) || 1,
-    [wrapperWidth]
+    [wrapperWidth],
   )
 
   const chunks = useMemo(
@@ -108,16 +108,16 @@ const ExplorerGrid = (props: Props) => {
       contents.reduce(
         (acc, _, i) =>
           i % columns ? acc : [...acc, contents.slice(i, i + columns)],
-        [] as Content[][]
+        [] as Content[][],
       ),
-    [columns, contents]
+    [columns, contents],
   )
 
   const focus = (
     e: KeyboardEvent,
     row: number,
     column: number,
-    focused: boolean
+    focused: boolean,
   ) => {
     const content =
       chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])

@@ -11,7 +11,7 @@ const { access } = promises
 // @see https://stackoverflow.com/q/63106834
 ffmpeg.setFfmpegPath(ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked'))
 ffmpeg.setFfprobePath(
-  ffprobeStatic.path.replace('app.asar', 'app.asar.unpacked')
+  ffprobeStatic.path.replace('app.asar', 'app.asar.unpacked'),
 )
 
 type Metadata = {
@@ -51,11 +51,11 @@ export const createVideoThumbnails = async (path: string) => {
     .fill(1)
     .map((_, i) => thumbnailFilename.replace('%i', String(i + 1)))
   const thumbnailPaths = thumbnailFilenames.map((filename) =>
-    join(thumbnailDir, filename)
+    join(thumbnailDir, filename),
   )
   try {
     await Promise.all(
-      thumbnailPaths.map((path) => access(path), constants.F_OK)
+      thumbnailPaths.map((path) => access(path), constants.F_OK),
     )
   } catch (e) {
     await Promise.all(
@@ -71,7 +71,7 @@ export const createVideoThumbnails = async (path: string) => {
             .on('error', (e) => reject(e))
             .on('end', () => resolve())
         })
-      })
+      }),
     )
   }
   return thumbnailPaths

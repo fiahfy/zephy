@@ -35,10 +35,10 @@ export const selectSettings = (state: AppState) => state.settings
 
 export const selectDarkMode = createSelector(
   selectSettings,
-  (settings) => settings.darkMode
+  (settings) => settings.darkMode,
 )
 
 export const selectShouldShowHiddenFiles = createSelector(
   selectSettings,
-  (settings) => settings.shouldShowHiddenFiles
+  (settings) => settings.shouldShowHiddenFiles,
 )

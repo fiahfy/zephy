@@ -20,14 +20,14 @@ export type ContextMenuOption = {
 }
 
 const registerContextMenu = (
-  createWindow: (params?: { directory?: string }) => void
+  createWindow: (params?: { directory?: string }) => void,
 ) => {
   ipcMain.handle(
     'context-menu-show',
     (
       event: IpcMainInvokeEvent,
       params: ContextMenuParams,
-      options: ContextMenuOption[]
+      options: ContextMenuOption[],
     ) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const send = (message: any) =>
@@ -62,7 +62,7 @@ const registerContextMenu = (
 
       const actionCreators: {
         [id in string]: (
-          option: ContextMenuOption
+          option: ContextMenuOption,
         ) => MenuItemConstructorOptions
       } = {
         separator: () => defaultActions.separator,
@@ -191,7 +191,7 @@ const registerContextMenu = (
       const menu = Menu.buildFromTemplate(template)
       const window = BrowserWindow.fromWebContents(event.sender)
       window && menu.popup({ window })
-    }
+    },
   )
 }
 

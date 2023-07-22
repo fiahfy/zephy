@@ -31,7 +31,7 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
         typography: 'body2',
       },
     },
-  })
+  }),
 )
 
 export default RoundedFilledTextField

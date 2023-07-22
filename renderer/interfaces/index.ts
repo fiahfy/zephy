@@ -18,7 +18,7 @@ export interface IElectronAPI {
   isDarwin: () => Promise<boolean>
   moveEntries: (
     paths: string[],
-    directoryPath: string
+    directoryPath: string,
   ) => Promise<DetailedEntry[]>
   openPath: (path: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
@@ -32,7 +32,7 @@ export interface IElectronAPI {
     addListener: (callback: (message: any) => void) => () => void
     show: (
       params: ContextMenuParams,
-      options: ContextMenuOption[]
+      options: ContextMenuOption[],
     ) => Promise<void>
   }
   fullscreen: {
@@ -45,8 +45,8 @@ export interface IElectronAPI {
       callback: (
         eventType: 'create' | 'delete',
         directoryPath: string,
-        filePath: string
-      ) => void
+        filePath: string,
+      ) => void,
     ) => Promise<void>
   }
   windowState: {

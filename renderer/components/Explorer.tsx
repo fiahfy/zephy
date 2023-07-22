@@ -87,7 +87,7 @@ const Explorer = () => {
       if (!isEditing(content.path)) {
         open(content)
       }
-    }
+    },
   )
 
   const isContentFocused = (content: Content) => isFocused(content.path)
@@ -151,7 +151,7 @@ const Explorer = () => {
           onScroll: handleScroll,
           scrollTop: currentScrollTop,
           sortOption: currentSortOption,
-        }
+        },
       )}
       {dropping && <Outline />}
     </Box>

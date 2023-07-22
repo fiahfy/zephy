@@ -65,8 +65,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
       callback: (
         eventType: 'create' | 'delete',
         directoryPath: string,
-        filePath: string
-      ) => void
+        filePath: string,
+      ) => void,
     ) => {
       ipcRenderer.removeAllListeners('watcher-notify')
       ipcRenderer.on(
@@ -75,8 +75,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
           _event: IpcRendererEvent,
           eventType: 'create' | 'delete',
           directoryPath: string,
-          filePath: string
-        ) => callback(eventType, directoryPath, filePath)
+          filePath: string,
+        ) => callback(eventType, directoryPath, filePath),
       )
       return ipcRenderer.invoke('watcher-watch', directoryPaths)
     },

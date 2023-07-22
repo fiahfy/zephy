@@ -140,7 +140,7 @@ const ExplorerTable = (props: Props) => {
     }
     const sumWidth = widths.reduce<number>(
       (acc, width) => acc + (width ?? 0),
-      0
+      0,
     )
     // 10px is custom scrollbar width
     const flexibleWidth = (wrapperWidth - sumWidth - 10) / flexibleNum
@@ -292,14 +292,14 @@ const ExplorerTable = (props: Props) => {
               backgroundColor: (theme) =>
                 alpha(
                   theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity
+                  theme.palette.action.selectedOpacity,
                 ),
               '&:hover': {
                 backgroundColor: (theme) =>
                   alpha(
                     theme.palette.primary.main,
                     theme.palette.action.selectedOpacity +
-                      theme.palette.action.hoverOpacity
+                      theme.palette.action.hoverOpacity,
                   ),
               },
             },

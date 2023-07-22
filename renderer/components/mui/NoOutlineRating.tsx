@@ -11,7 +11,7 @@ const NoOutlineRating = styled(Rating)(({ theme }) =>
     '.MuiRating-labelEmptyValueActive': {
       outline: 'none',
     },
-  })
+  }),
 )
 
 export default NoOutlineRating

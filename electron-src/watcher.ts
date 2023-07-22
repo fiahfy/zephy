@@ -11,8 +11,8 @@ const createWatcher = () => {
     callback: (
       eventType: 'create' | 'delete',
       directoryPath: string,
-      filePath: string
-    ) => void
+      filePath: string,
+    ) => void,
   ) => {
     return (path: string) => {
       const directoryPath = dirname(path)
@@ -36,8 +36,8 @@ const createWatcher = () => {
     callback: (
       eventType: 'create' | 'delete',
       directoryPath: string,
-      path: string
-    ) => void
+      path: string,
+    ) => void,
   ) => {
     await close(id)
     watchers[id] = chokidar
@@ -62,9 +62,9 @@ const createWatcher = () => {
             'watcher-notify',
             eventType,
             directoryPath,
-            filePath
-          )
-      )
+            filePath,
+          ),
+      ),
   )
 
   return { register }

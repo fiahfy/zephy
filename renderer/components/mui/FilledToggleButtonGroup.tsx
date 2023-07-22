@@ -16,7 +16,7 @@ const FilledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) =>
         mr: 0.5,
       },
     },
-  })
+  }),
 )
 
 export default FilledToggleButtonGroup

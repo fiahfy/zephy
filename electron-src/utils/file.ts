@@ -51,7 +51,7 @@ export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
 }
 
 export const getDetailedEntry = async (
-  path: string
+  path: string,
 ): Promise<DetailedEntry> => {
   const stats = await stat(path)
   const type = getEntryType(stats)
@@ -70,20 +70,20 @@ export const getDetailedEntry = async (
 }
 
 export const getDetailedEntriesForPaths = async (
-  paths: string[]
+  paths: string[],
 ): Promise<DetailedEntry[]> => {
   const results = await Promise.allSettled(
-    paths.map((path) => getDetailedEntry(path))
+    paths.map((path) => getDetailedEntry(path)),
   )
   return results.reduce(
     (acc, result) =>
       result.status === 'fulfilled' ? [...acc, result.value] : acc,
-    [] as DetailedEntry[]
+    [] as DetailedEntry[],
   )
 }
 
 export const getDetailedEntries = async (
-  directoryPath: string
+  directoryPath: string,
 ): Promise<DetailedEntry[]> => {
   const entries = await getEntries(directoryPath)
   return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
@@ -101,7 +101,7 @@ const parsePath = (path: string) => {
 }
 
 export const getEntryHierarchy = async (
-  path: string
+  path: string,
 ): Promise<Entry | undefined> => {
   const dirnames = parsePath(path)
 
@@ -129,10 +129,10 @@ export const getEntryHierarchy = async (
         (acc, dirname) =>
           acc && acc.children
             ? (acc.children.find(
-                (entry) => entry.type === 'directory' && entry.name === dirname
+                (entry) => entry.type === 'directory' && entry.name === dirname,
               ) as Directory)
             : undefined,
-        e as Directory | undefined
+        e as Directory | undefined,
       )
     if (
       targetEntry &&
@@ -184,7 +184,7 @@ const generateNewDirectoryName = async (directoryPath: string) => {
 }
 
 export const createDirectory = async (
-  directoryPath: string
+  directoryPath: string,
 ): Promise<DetailedEntry> => {
   const directoryName = await generateNewDirectoryName(directoryPath)
   const path = join(directoryPath, directoryName)
@@ -194,20 +194,20 @@ export const createDirectory = async (
 
 export const moveEntries = async (
   paths: string[],
-  directoryPath: string
+  directoryPath: string,
 ): Promise<DetailedEntry[]> => {
   return await Promise.all(
     paths.map(async (path) => {
       const newPath = join(directoryPath, basename(path))
       await rename(path, newPath)
       return await getDetailedEntry(newPath)
-    })
+    }),
   )
 }
 
 export const renameEntry = async (
   path: string,
-  newName: string
+  newName: string,
 ): Promise<DetailedEntry> => {
   const newPath = join(dirname(path), newName)
   await rename(path, newPath)

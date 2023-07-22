@@ -36,12 +36,12 @@ export default favoriteSlice.reducer
 export const selectFavorite = (state: AppState) => state.favorite
 
 export const selectFavorites = createSelector(selectFavorite, (favorite) =>
-  Object.keys(favorite).reduce((acc, path) => [...acc, path], [] as string[])
+  Object.keys(favorite).reduce((acc, path) => [...acc, path], [] as string[]),
 )
 
 export const selectIsFavorite = createSelector(
   selectFavorite,
-  (favorite) => (path: string) => favorite[path] ?? false
+  (favorite) => (path: string) => favorite[path] ?? false,
 )
 
 export const toggle =

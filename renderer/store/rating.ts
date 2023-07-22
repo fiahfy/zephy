@@ -33,5 +33,5 @@ export const selectRating = (state: AppState) => state.rating
 
 export const selectGetRating = createSelector(
   selectRating,
-  (rating) => (path: string) => rating[path] ?? 0
+  (rating) => (path: string) => rating[path] ?? 0,
 )

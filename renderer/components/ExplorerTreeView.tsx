@@ -63,7 +63,7 @@ const ExplorerTreeView = () => {
             if (e.path === directoryPath && e.children) {
               // イベントが複数回発火するため、まず該当 entry を削除し、create の場合のみ追加する
               let children = e.children.filter(
-                (entry) => entry.path !== filePath
+                (entry) => entry.path !== filePath,
               )
               if (entry) {
                 children = [...children, entry]
@@ -84,7 +84,7 @@ const ExplorerTreeView = () => {
         }
         setRoot((root) => (root ? mapper(root) : root))
       }),
-    [loaded, watch]
+    [loaded, watch],
   )
 
   const entryMap = useMemo(() => {
@@ -93,13 +93,13 @@ const ExplorerTreeView = () => {
     }
     const reducer = (
       acc: { [path: string]: Entry },
-      entry: Entry
+      entry: Entry,
     ): { [path: string]: Entry } => {
       return {
         [entry.path]: entry,
         ...(entry.type === 'directory' ? entry.children ?? [] : []).reduce(
           reducer,
-          acc
+          acc,
         ),
       }
     }
@@ -118,7 +118,7 @@ const ExplorerTreeView = () => {
 
   const handleToggle = async (_event: SyntheticEvent, nodeIds: string[]) => {
     const expandedNodeId = nodeIds.filter(
-      (nodeId) => !expanded.includes(nodeId)
+      (nodeId) => !expanded.includes(nodeId),
     )[0]
     setExpanded(nodeIds)
     if (!expandedNodeId) {

@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 
 const windowStateManager = <T>(
-  baseCreateWindow: (state: State) => BrowserWindow
+  baseCreateWindow: (state: State) => BrowserWindow,
 ) => {
   const savedDirectoryPath = app.getPath('userData')
   const savedPath = path.join(savedDirectoryPath, 'window-state.json')
@@ -52,7 +52,7 @@ const windowStateManager = <T>(
   const createWindow = (
     index: number,
     params?: T,
-    options?: Partial<State>
+    options?: Partial<State>,
   ) => {
     const windowState = windowStateKeeper({
       path: savedDirectoryPath,
@@ -89,7 +89,7 @@ const windowStateManager = <T>(
   const create = (params?: T) => {
     const index = state.reduce(
       (acc, visible, index) => (visible ? acc : Math.min(index, acc)),
-      state.length
+      state.length,
     )
     state[index] = true
     return createWindow(index, params, getNewWindowOptions())
@@ -99,7 +99,7 @@ const windowStateManager = <T>(
     restoreState()
     return state.reduce(
       (acc, visible, index) => (visible ? [...acc, createWindow(index)] : acc),
-      [] as BrowserWindow[]
+      [] as BrowserWindow[],
     )
   }
 

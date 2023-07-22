@@ -53,7 +53,7 @@ const ExplorerTreeItem = (props: Props) => {
             <>
               {entry.children
                 .filter(
-                  (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name)
+                  (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
                 )
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .slice(0, max)

@@ -20,7 +20,7 @@ const useApplicationMenuListener = () => {
           case 'changeViewMode':
             return dispatch(setCurrentViewMode(data.viewMode))
         }
-      }
+      },
     )
     return () => removeListener()
   }, [dispatch, selected])

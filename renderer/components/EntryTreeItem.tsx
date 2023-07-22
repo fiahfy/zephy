@@ -8,7 +8,7 @@ import Outline from 'components/Outline'
 
 const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,
-  ref
+  ref,
 ) {
   const {
     classes,

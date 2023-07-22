@@ -88,7 +88,7 @@ export const windowSlice = createSlice({
         windowIndex: number
         variant: 'primary' | 'secondary'
         hidden: boolean
-      }>
+      }>,
     ) {
       const { windowIndex, variant, hidden } = action.payload
       const windowState = state[windowIndex]
@@ -115,7 +115,7 @@ export const windowSlice = createSlice({
         windowIndex: number
         variant: 'primary' | 'secondary'
         width: number
-      }>
+      }>,
     ) {
       const { windowIndex, variant, width } = action.payload
       const windowState = state[windowIndex]
@@ -138,7 +138,7 @@ export const windowSlice = createSlice({
     },
     changeDirectory(
       state,
-      action: PayloadAction<{ windowIndex: number; path: string }>
+      action: PayloadAction<{ windowIndex: number; path: string }>,
     ) {
       const { windowIndex, path } = action.payload
       const windowState = state[windowIndex]
@@ -188,7 +188,7 @@ export const windowSlice = createSlice({
     },
     setCurrentScrollTop(
       state,
-      action: PayloadAction<{ windowIndex: number; scrollTop: number }>
+      action: PayloadAction<{ windowIndex: number; scrollTop: number }>,
     ) {
       const { windowIndex, scrollTop } = action.payload
       const windowState = state[windowIndex]
@@ -196,7 +196,7 @@ export const windowSlice = createSlice({
         return state
       }
       const histories = windowState.history.histories.map((history, i) =>
-        i === windowState.history.index ? { ...history, scrollTop } : history
+        i === windowState.history.index ? { ...history, scrollTop } : history,
       )
       return {
         ...state,
@@ -218,7 +218,7 @@ export const windowSlice = createSlice({
           order?: SortOption['order']
           orderBy: SortOption['orderBy']
         }
-      }>
+      }>,
     ) {
       const {
         windowIndex,
@@ -252,7 +252,7 @@ export const windowSlice = createSlice({
         windowIndex: number
         path: string
         viewMode: ViewMode
-      }>
+      }>,
     ) {
       const { windowIndex, path, viewMode } = action.payload
       const windowState = state[windowIndex]
@@ -296,77 +296,77 @@ export const selectWindow = (state: AppState) => {
 
 export const selectHistory = createSelector(
   selectWindow,
-  (window) => window.history
+  (window) => window.history,
 )
 
 export const selectSidebar = createSelector(
   selectWindow,
-  (window) => window.sidebar
+  (window) => window.sidebar,
 )
 
 export const selectSorting = createSelector(
   selectWindow,
-  (window) => window.sorting
+  (window) => window.sorting,
 )
 
 export const selectViewMode = createSelector(
   selectWindow,
-  (window) => window.viewMode
+  (window) => window.viewMode,
 )
 
 export const selectCurrentHistory = createSelector(
   selectHistory,
   (history) =>
-    history.histories[history.index] ?? { directory: '', scrollTop: 0 }
+    history.histories[history.index] ?? { directory: '', scrollTop: 0 },
 )
 
 export const selectCanBack = createSelector(
   selectHistory,
-  (history) => history.index > 0
+  (history) => history.index > 0,
 )
 
 export const selectCanForward = createSelector(
   selectHistory,
-  (history) => history.index < history.histories.length - 1
+  (history) => history.index < history.histories.length - 1,
 )
 
 export const selectCurrentDirectory = createSelector(
   selectCurrentHistory,
-  (currentHistory) => currentHistory.directory
+  (currentHistory) => currentHistory.directory,
 )
 
 export const selectCurrentScrollTop = createSelector(
   selectCurrentHistory,
-  (currentHistory) => currentHistory.scrollTop
+  (currentHistory) => currentHistory.scrollTop,
 )
 
 export const selectExplorable = createSelector(
   selectCurrentDirectory,
   (currentDirectory) =>
-    currentDirectory && !currentDirectory.startsWith('zephy://')
+    currentDirectory && !currentDirectory.startsWith('zephy://'),
 )
 
 export const selectCurrentSortOption = createSelector(
   selectSorting,
   selectCurrentDirectory,
   (sorting, currentDirectory) =>
-    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const)
+    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const),
 )
 
 export const selectCurrentViewMode = createSelector(
   selectViewMode,
   selectCurrentDirectory,
-  (viewMode, currentDirectory) => viewMode[currentDirectory] ?? 'list'
+  (viewMode, currentDirectory) => viewMode[currentDirectory] ?? 'list',
 )
 
 export const selectIsSidebarHidden = createSelector(
   selectSidebar,
-  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden,
 )
 
 export const selectGetSidebarWidth = createSelector(
   selectSidebar,
-  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width,
 )
 
 export const setSidebarHidden =
@@ -443,7 +443,7 @@ export const setCurrentOrderBy =
         windowIndex,
         path: currentDirectory,
         sortOption: { orderBy },
-      })
+      }),
     )
   }
 

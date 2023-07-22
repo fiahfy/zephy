@@ -59,14 +59,6 @@ app.whenReady().then(async () => {
     create()
   }
 
-  // TODO: fix
-  // @see https://github.com/electron/electron/issues/23757#issuecomment-640146333
-  // @see https://www.electronjs.org/ja/docs/latest/breaking-changes#%E9%9D%9E%E6%8E%A8%E5%A5%A8-protocolregisterinterceptbufferstringstreamfilehttpprotocol
-  // protocol.handle('file', (request) => {
-  //   console.log('handler called', request.url)
-  //   return net.fetch(request.url)
-  // })
-
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit()

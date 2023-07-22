@@ -18,8 +18,8 @@ const WatcherContext = createContext<
         callback: (
           eventType: 'create' | 'delete',
           directoryPath: string,
-          filePath: string
-        ) => void
+          filePath: string,
+        ) => void,
       ) => void
     }
   | undefined
@@ -39,7 +39,7 @@ export const WatcherProvider = (props: Props) => {
       () => (
         eventType: 'create' | 'delete',
         directoryPath: string,
-        filePath: string
+        filePath: string,
       ) => void
     >()
 
@@ -52,7 +52,7 @@ export const WatcherProvider = (props: Props) => {
       (eventType, directoryPath, filePath) => {
         callback?.()(eventType, directoryPath, filePath)
         dispatch(handle(eventType, directoryPath, filePath))
-      }
+      },
     )
   }, [callback, currentDirectory, directoryPaths, dispatch])
 
@@ -62,13 +62,13 @@ export const WatcherProvider = (props: Props) => {
       callback: (
         eventType: 'create' | 'delete',
         directoryPath: string,
-        filePath: string
-      ) => void
+        filePath: string,
+      ) => void,
     ) => {
       setDirectoryPaths(paths)
       setCallback(() => () => callback)
     },
-    []
+    [],
   )
 
   const value = { watch }

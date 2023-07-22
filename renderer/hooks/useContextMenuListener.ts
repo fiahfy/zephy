@@ -42,7 +42,7 @@ const useContextMenuListener = () => {
           case 'changeSidebarHidden':
             return dispatch(setSidebarHidden(data.variant, data.hidden))
         }
-      }
+      },
     )
     return () => removeListener()
   }, [dispatch])
