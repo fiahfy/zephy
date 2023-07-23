@@ -59,7 +59,7 @@
   "scripts": {
     "build": "npm run build-renderer && npm run build-electron",
     "build-electron": "tsc -p electron-src",
-    "build-renderer": "next build renderer && next export renderer",
+    "build-renderer": "next build renderer",
     "clean": "rimraf dist main renderer/out renderer/.next",
     "dev": "npm run build-electron && electron .",
     "format": "prettier -c --ignore-path .gitignore .",
@@ -68,6 +68,7 @@
     "package-dir": "npm run build && electron-builder --dir",
     "prepare": "husky install",
     "release": "npm run build && electron-builder -mlw -c.snap.publish=github",
-    "test": "npm run format && npm run lint"
+    "test": "npm run format && npm run lint && npm run type-check",
+    "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
   }
 }

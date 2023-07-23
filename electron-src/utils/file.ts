@@ -1,7 +1,7 @@
-import { Dirent, Stats, promises } from 'fs'
+import { Dirent, Stats, constants, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
 
-const { mkdir, readdir, rename, stat } = promises
+const { access, mkdir, readdir, rename, stat } = promises
 
 type File = {
   name: string
@@ -192,6 +192,15 @@ export const createDirectory = async (
   return await getDetailedEntry(path)
 }
 
+const exists = async (path: string) => {
+  try {
+    await access(path, constants.F_OK)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+
 export const moveEntries = async (
   paths: string[],
   directoryPath: string,
@@ -199,6 +208,9 @@ export const moveEntries = async (
   return await Promise.all(
     paths.map(async (path) => {
       const newPath = join(directoryPath, basename(path))
+      if (await exists(newPath)) {
+        throw new Error('File already exists')
+      }
       await rename(path, newPath)
       return await getDetailedEntry(newPath)
     }),

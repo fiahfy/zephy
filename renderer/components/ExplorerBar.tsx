@@ -16,6 +16,7 @@ import {
   IconButton,
   InputAdornment,
   Toolbar,
+  Typography,
 } from '@mui/material'
 import {
   ChangeEvent,
@@ -148,47 +149,49 @@ const ExplorerBar = () => {
       elevation={0}
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
-      <Toolbar disableGutters sx={{ minHeight: '34px!important', px: 1 }}>
-        <IconButton
-          color="inherit"
-          disabled={!canBack}
-          onClick={handleClickBack}
-          size="small"
-          sx={{ mr: 0.5 }}
-          title="Go back"
-        >
-          <ArrowBackIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          color="inherit"
-          disabled={!canForward}
-          onClick={handleClickForward}
-          size="small"
-          sx={{ mr: 0.5 }}
-          title="Go forward"
-        >
-          <ArrowForwardIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          color="inherit"
-          disabled={!explorable}
-          onClick={handleClickUpward}
-          size="small"
-          sx={{ mr: 0.5 }}
-          title="Go up"
-        >
-          <ArrowUpwardIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          color="inherit"
-          disabled={!explorable}
-          onClick={handleClickRefresh}
-          size="small"
-          title="Refresh"
-        >
-          <RefreshIcon fontSize="small" />
-        </IconButton>
-        <Box sx={{ display: 'flex', flexGrow: 1, mx: 1 }}>
+      <Toolbar
+        disableGutters
+        sx={{ gap: 1, minHeight: '34px!important', px: 1 }}
+      >
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <IconButton
+            color="inherit"
+            disabled={!canBack}
+            onClick={handleClickBack}
+            size="small"
+            title="Go back"
+          >
+            <ArrowBackIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            color="inherit"
+            disabled={!canForward}
+            onClick={handleClickForward}
+            size="small"
+            title="Go forward"
+          >
+            <ArrowForwardIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            color="inherit"
+            disabled={!explorable}
+            onClick={handleClickUpward}
+            size="small"
+            title="Go up"
+          >
+            <ArrowUpwardIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            color="inherit"
+            disabled={!explorable}
+            onClick={handleClickRefresh}
+            size="small"
+            title="Refresh"
+          >
+            <RefreshIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        <Box sx={{ display: 'flex', flexGrow: 1, gap: 1 }}>
           <Box sx={{ display: 'flex', flex: '2 1 0' }}>
             <RoundedFilledTextField
               InputProps={{
@@ -221,7 +224,6 @@ const ExplorerBar = () => {
               onChange={handleChangeDirectory}
               onKeyDown={handleKeyDownDirectory}
               spellCheck={false}
-              sx={{ mr: 0.5 }}
               value={directory}
             />
           </Box>
@@ -259,9 +261,28 @@ const ExplorerBar = () => {
                   placeholder="Search..."
                 />
               )}
+              renderOption={(props, option) => (
+                <Box
+                  {...props}
+                  component="li"
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                >
+                  <Typography noWrap sx={{ flexGrow: 1 }}>
+                    {option}
+                  </Typography>
+                  {/* <IconButton
+                    color="inherit"
+                    disabled={!explorable}
+                    onClick={handleClickRefresh}
+                    size="small"
+                    title="Refresh"
+                  >
+                    <RefreshIcon fontSize="small" />
+                  </IconButton> */}
+                </Box>
+              )}
               size="small"
               sx={{
-                ml: 0.5,
                 '.MuiFormControl-root': {
                   '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
                     {
