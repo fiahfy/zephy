@@ -2,7 +2,7 @@ import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   ArrowUpward as ArrowUpwardIcon,
-  Close as CloseIcon,
+  Delete as DeleteIcon,
   Folder as FolderIcon,
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
@@ -21,6 +21,7 @@ import {
 import {
   ChangeEvent,
   KeyboardEvent,
+  MouseEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -34,7 +35,7 @@ import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
 import { load, searchQuery, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
-import { selectQueryHistories } from 'store/queryHistory'
+import { remove, selectQueryHistories } from 'store/queryHistory'
 import {
   back,
   changeDirectory,
@@ -124,6 +125,11 @@ const ExplorerBar = () => {
     setDirectory(value)
   }
 
+  const handleClickRemove = (e: MouseEvent, query: string) => {
+    e.stopPropagation()
+    dispatch(remove(query))
+  }
+
   const handleChangeQuery = (_e: SyntheticEvent, value: string | null) =>
     search(value ?? '')
 
@@ -155,7 +161,6 @@ const ExplorerBar = () => {
       >
         <Box sx={{ display: 'flex', gap: 0.5 }}>
           <IconButton
-            color="inherit"
             disabled={!canBack}
             onClick={handleClickBack}
             size="small"
@@ -164,7 +169,6 @@ const ExplorerBar = () => {
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <IconButton
-            color="inherit"
             disabled={!canForward}
             onClick={handleClickForward}
             size="small"
@@ -173,7 +177,6 @@ const ExplorerBar = () => {
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
           <IconButton
-            color="inherit"
             disabled={!explorable}
             onClick={handleClickUpward}
             size="small"
@@ -182,7 +185,6 @@ const ExplorerBar = () => {
             <ArrowUpwardIcon fontSize="small" />
           </IconButton>
           <IconButton
-            color="inherit"
             disabled={!explorable}
             onClick={handleClickRefresh}
             size="small"
@@ -198,7 +200,6 @@ const ExplorerBar = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      color="inherit"
                       disabled={!explorable}
                       onClick={handleClickFavorite}
                       size="small"
@@ -210,7 +211,6 @@ const ExplorerBar = () => {
                 startAdornment: (
                   <InputAdornment position="start">
                     <IconButton
-                      color="inherit"
                       disabled={!explorable}
                       onClick={handleClickFolder}
                       size="small"
@@ -231,7 +231,6 @@ const ExplorerBar = () => {
             <Autocomplete
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ListboxProps={{ sx: { typography: 'body2' } } as any}
-              clearIcon={<CloseIcon fontSize="small" />}
               freeSolo
               fullWidth
               inputValue={query}
@@ -246,11 +245,7 @@ const ExplorerBar = () => {
                     ...params.InputProps,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <IconButton
-                          color="inherit"
-                          onClick={handleClickSearch}
-                          size="small"
-                        >
+                        <IconButton onClick={handleClickSearch} size="small">
                           <SearchIcon fontSize="small" />
                         </IconButton>
                       </InputAdornment>
@@ -263,22 +258,26 @@ const ExplorerBar = () => {
               )}
               renderOption={(props, option) => (
                 <Box
-                  {...props}
                   component="li"
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  sx={(theme) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    px: `${theme.spacing(1.5)}!important`,
+                    py: `${theme.spacing(0)}!important`,
+                  })}
+                  {...props}
                 >
-                  <Typography noWrap sx={{ flexGrow: 1 }}>
+                  <Typography noWrap sx={{ flexGrow: 1 }} variant="caption">
                     {option}
                   </Typography>
-                  {/* <IconButton
-                    color="inherit"
-                    disabled={!explorable}
-                    onClick={handleClickRefresh}
+                  <IconButton
+                    onClick={(e) => handleClickRemove(e, option)}
                     size="small"
-                    title="Refresh"
+                    title="Remove"
                   >
-                    <RefreshIcon fontSize="small" />
-                  </IconButton> */}
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </Box>
               )}
               size="small"
@@ -296,7 +295,6 @@ const ExplorerBar = () => {
           </Box>
         </Box>
         <IconButton
-          color="inherit"
           onClick={createMoreMenuHandler()}
           size="small"
           title="Settings"

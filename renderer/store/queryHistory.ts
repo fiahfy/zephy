@@ -22,13 +22,20 @@ export const querySlice = createSlice({
         return [...state, query]
       }
     },
+    remove(state, action: PayloadAction<string>) {
+      const query = action.payload
+      if (!query) {
+        return state
+      }
+      return state.filter((q) => q !== query)
+    },
     replace(_state, action: PayloadAction<State>) {
       return action.payload
     },
   },
 })
 
-export const { add, replace } = querySlice.actions
+export const { add, remove, replace } = querySlice.actions
 
 export default querySlice.reducer
 
