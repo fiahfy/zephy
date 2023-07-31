@@ -184,12 +184,7 @@ const ExplorerBar = () => {
           >
             <ArrowUpwardIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            disabled={!explorable}
-            onClick={handleClickRefresh}
-            size="small"
-            title="Refresh"
-          >
+          <IconButton onClick={handleClickRefresh} size="small" title="Refresh">
             <RefreshIcon fontSize="small" />
           </IconButton>
         </Box>

@@ -40,10 +40,9 @@ const ExplorerTreeView = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (!explorable) {
-        return
-      }
-      const entry = await window.electronAPI.getEntryHierarchy(currentDirectory)
+      const entry = await window.electronAPI.getEntryHierarchy(
+        explorable ? currentDirectory : undefined,
+      )
       const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setSelected([currentDirectory])

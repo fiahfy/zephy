@@ -1,3 +1,4 @@
+import { app } from 'electron'
 import { Dirent, Stats, constants, promises } from 'fs'
 import { basename, dirname, join, sep } from 'path'
 
@@ -101,9 +102,11 @@ const parsePath = (path: string) => {
 }
 
 export const getEntryHierarchy = async (
-  path: string,
+  path?: string,
 ): Promise<Entry | undefined> => {
-  const dirnames = parsePath(path)
+  const targetPath = path ?? app.getPath('home')
+
+  const dirnames = parsePath(targetPath)
 
   const rootPath = dirnames[0] ?? ''
 
@@ -137,7 +140,7 @@ export const getEntryHierarchy = async (
     if (
       targetEntry &&
       targetEntry.type === 'directory' &&
-      i < dirnames.length - 1
+      i < dirnames.length
     ) {
       const path = dirnames.slice(0, i + 1).join(sep)
       targetEntry.children = await getEntries(path)
@@ -224,6 +227,9 @@ export const renameEntry = async (
   newName: string,
 ): Promise<DetailedEntry> => {
   const newPath = join(dirname(path), newName)
+  if (await exists(newPath)) {
+    throw new Error('File already exists')
+  }
   await rename(path, newPath)
   return await getDetailedEntry(newPath)
 }

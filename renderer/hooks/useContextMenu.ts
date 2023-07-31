@@ -125,7 +125,6 @@ const useContextMenu = () => {
   const createCurrentDirectoryMenuHandler = () =>
     createMenuHandler([
       { id: 'newFolder', params: { path: currentDirectory } },
-      { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
       { id: 'view', params: { viewMode: currentViewMode } },
       { id: 'separator' },
@@ -138,7 +137,6 @@ const useContextMenu = () => {
   const createMoreMenuHandler = () =>
     createMenuHandler([
       { id: 'newFolder', params: { path: currentDirectory } },
-      { id: 'revealInFinder', params: { path: currentDirectory } },
       { id: 'separator' },
       { id: 'view', params: { viewMode: currentViewMode } },
       { id: 'separator' },

@@ -13,7 +13,7 @@ export interface IElectronAPI {
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
   getDirectoryPath: (path: string) => Promise<string>
   getEntries: (directoryPath: string) => Promise<Entry[]>
-  getEntryHierarchy: (path: string) => Promise<Entry>
+  getEntryHierarchy: (path?: string) => Promise<Entry>
   getMetadata: (path: string) => Promise<Metadata>
   isDarwin: () => Promise<boolean>
   moveEntries: (

@@ -55,7 +55,7 @@ const registerHandlers = () => {
   )
   ipcMain.handle(
     'get-entry-hierarchy',
-    (_event: IpcMainInvokeEvent, path: string) => getEntryHierarchy(path),
+    (_event: IpcMainInvokeEvent, path?: string) => getEntryHierarchy(path),
   )
   ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
     getMetadata(path),

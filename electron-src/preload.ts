@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('get-directory-path', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-entries', directoryPath),
-  getEntryHierarchy: (path: string) =>
+  getEntryHierarchy: (path?: string) =>
     ipcRenderer.invoke('get-entry-hierarchy', path),
   getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
   isDarwin: () => ipcRenderer.invoke('is-darwin'),
