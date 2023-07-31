@@ -5,7 +5,7 @@ import { useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from 'components/EntryIcon'
 import Outline from 'components/Outline'
 import useContextMenu from 'hooks/useContextMenu'
-import useFileDnd from 'hooks/useFileDnd'
+import useDnd from 'hooks/useDnd'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { changeDirectory } from 'store/window'
@@ -47,7 +47,7 @@ const DirectoryPreviewListItem = (props: Props) => {
   const appDispatch = useAppDispatch()
 
   const { createEntryMenuHandler } = useContextMenu()
-  const { createDroppableProps, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -112,6 +112,7 @@ const DirectoryPreviewListItem = (props: Props) => {
         },
       }}
       tabIndex={0}
+      {...createDraggableProps(entry)}
       {...createDroppableProps(entry)}
     >
       {thumbnail ? (

@@ -5,7 +5,7 @@ import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
 import Outline from 'components/Outline'
 import useContextMenu from 'hooks/useContextMenu'
-import useFileDnd from 'hooks/useFileDnd'
+import useDnd from 'hooks/useDnd'
 import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
@@ -49,7 +49,7 @@ const Explorer = () => {
 
   const { createContentMenuHandler, createCurrentDirectoryMenuHandler } =
     useContextMenu()
-  const { createCurrentDirectoryDroppableProps, dropping } = useFileDnd()
+  const { createCurrentDirectoryDroppableProps, dropping } = useDnd()
 
   const open = async (content: Content) =>
     content.type === 'directory'

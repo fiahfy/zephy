@@ -4,7 +4,7 @@ import EntryIcon from 'components/EntryIcon'
 import EntryTreeItem from 'components/EntryTreeItem'
 import Icon from 'components/Icon'
 import useContextMenu from 'hooks/useContextMenu'
-import useFileDnd from 'hooks/useFileDnd'
+import useDnd from 'hooks/useDnd'
 import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
@@ -22,7 +22,7 @@ const ExplorerTreeItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const { createEntryMenuHandler } = useContextMenu()
-  const { createDroppableProps, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
   const over =
     (entry.type === 'directory' && entry.children ? entry.children : [])
@@ -45,6 +45,7 @@ const ExplorerTreeItem = (props: Props) => {
       nodeId={entry.path}
       outlined={dropping}
       title={entry.name}
+      {...createDraggableProps(entry)}
       {...createDroppableProps(entry)}
     >
       {entry.type === 'directory' && (

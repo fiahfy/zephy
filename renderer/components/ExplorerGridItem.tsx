@@ -8,7 +8,7 @@ import NoOutlineRating from 'components/mui/NoOutlineRating'
 import EntryIcon from 'components/EntryIcon'
 import ExplorerNameTextField from 'components/ExplorerNameTextField'
 import Outline from 'components/Outline'
-import useFileDnd from 'hooks/useFileDnd'
+import useDnd from 'hooks/useDnd'
 import { Content, Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
@@ -72,7 +72,7 @@ const ExplorerGridItem = (props: Props) => {
 
   const editing = isEditing(content.path)
 
-  const { createDraggableProps, createDroppableProps, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,

@@ -4,7 +4,7 @@ import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/mui/NoOutlineRating'
 import ExplorerNameTextField from 'components/ExplorerNameTextField'
 import Outline from 'components/Outline'
-import useFileDnd from 'hooks/useFileDnd'
+import useDnd from 'hooks/useDnd'
 import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
@@ -34,7 +34,7 @@ const ExplorerTableCell = (props: Props) => {
 
   const editing = isEditing(content.path)
 
-  const { createDraggableProps, createDroppableProps, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
   const draggingContents = editing
     ? undefined

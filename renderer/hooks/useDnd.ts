@@ -7,27 +7,13 @@ import { selectCurrentDirectory } from 'store/window'
 
 const mime = 'application/zephy.path-list'
 
-const useFileDnd = () => {
+const useDnd = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const dispatch = useAppDispatch()
 
   const [enterCount, setEnterCount] = useState(0)
 
-  const createDraggableProps = (entries?: Entry[]) => {
-    if (!entries) {
-      return {}
-    }
-    return {
-      draggable: true,
-      onDragStart: (e: DragEvent) => {
-        // TODO: native drag drop
-        // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
-        // e.preventDefault()
-        e.dataTransfer.setData(mime, JSON.stringify(entries.map((e) => e.path)))
-        e.dataTransfer.effectAllowed = 'move'
-      },
-    }
-  }
+  const dropping = enterCount > 0
 
   const getPaths = (e: DragEvent) => {
     try {
@@ -38,6 +24,30 @@ const useFileDnd = () => {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return Array.from(e.dataTransfer.files).map((file) => (file as any).path)
+  }
+
+  const setPaths = (e: DragEvent, paths: string[]) =>
+    e.dataTransfer.setData(mime, JSON.stringify(paths))
+
+  const createDraggableProps = (entries?: Entry | Entry[]) => {
+    if (!entries) {
+      return {}
+    }
+    const es = Array.isArray(entries) ? entries : [entries]
+    return {
+      draggable: true,
+      onDragStart: (e: DragEvent) => {
+        // TODO: native drag drop
+        // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
+        // e.preventDefault()
+        e.stopPropagation()
+        e.dataTransfer.effectAllowed = 'move'
+        setPaths(
+          e,
+          es.map((e) => e.path),
+        )
+      },
+    }
   }
 
   const getDroppableProps = (path: string) => {
@@ -73,8 +83,6 @@ const useFileDnd = () => {
   const createCurrentDirectoryDroppableProps = () =>
     getDroppableProps(currentDirectory)
 
-  const dropping = enterCount > 0
-
   return {
     createCurrentDirectoryDroppableProps,
     createDraggableProps,
@@ -83,4 +91,4 @@ const useFileDnd = () => {
   }
 }
 
-export default useFileDnd
+export default useDnd

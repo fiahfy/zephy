@@ -90,6 +90,8 @@ const EntryTreeItem = (props: Props) => {
           {outlined && <Outline />}
         </Box>
       }
+      // @see https://github.com/mui/material-ui/issues/29518#issuecomment-1601920296
+      onFocusCapture={(e) => e.stopPropagation()}
       sx={{
         position: 'relative',
         '.MuiTreeItem-label': { position: 'static!important' },
