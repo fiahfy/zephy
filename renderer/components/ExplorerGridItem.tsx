@@ -72,7 +72,7 @@ const ExplorerGridItem = (props: Props) => {
 
   const editing = isEditing(content.path)
 
-  const { createDraggableAttrs, createDroppableAttrs, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useFileDnd()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -120,7 +120,9 @@ const ExplorerGridItem = (props: Props) => {
     [loading],
   )
 
-  const draggingContents = isSelected(content.path)
+  const draggingContents = editing
+    ? undefined
+    : isSelected(content.path)
     ? selectedContents
     : [content]
 
@@ -163,8 +165,8 @@ const ExplorerGridItem = (props: Props) => {
           },
         },
       }}
-      {...createDraggableAttrs(draggingContents)}
-      {...createDroppableAttrs(content)}
+      {...createDraggableProps(draggingContents)}
+      {...createDroppableProps(content)}
     >
       {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element

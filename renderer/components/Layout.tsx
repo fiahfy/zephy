@@ -8,9 +8,9 @@ import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
 import useApplicationMenuListener from 'hooks/useApplicationMenuListener'
 import useContextMenu from 'hooks/useContextMenu'
-import useContextMenuSubscription from 'hooks/useContextMenuListener'
+import useContextMenuListener from 'hooks/useContextMenuListener'
 import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
-import useWindowInitializer from 'hooks/useWindowInitializer'
+import useWindow from 'hooks/useWindow'
 
 type Props = {
   children: ReactNode
@@ -20,14 +20,14 @@ const Layout = (props: Props) => {
   const { children } = props
 
   useApplicationMenuListener()
-  const { createDefaultMenuHandler } = useContextMenu()
-  useContextMenuSubscription()
+  const { createMenuHandler } = useContextMenu()
+  useContextMenuListener()
   useDocumentEventHandler()
-  useWindowInitializer()
+  useWindow()
 
   return (
     <Box
-      onContextMenu={createDefaultMenuHandler()}
+      onContextMenu={createMenuHandler()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       <GlobalStyles

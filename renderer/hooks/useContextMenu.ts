@@ -37,8 +37,6 @@ const useContextMenu = () => {
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const selected = useAppSelector(selectSelected)
 
-  const createDefaultMenuHandler = () => createMenuHandler()
-
   const createEntryMenuHandler = (entry: Entry) => {
     const directory = entry.type === 'directory'
     const path = entry.path
@@ -124,7 +122,7 @@ const useContextMenu = () => {
     ])
   }
 
-  const createDirectoryMenuHandler = () =>
+  const createCurrentDirectoryMenuHandler = () =>
     createMenuHandler([
       { id: 'newFolder', params: { path: currentDirectory } },
       { id: 'revealInFinder', params: { path: currentDirectory } },
@@ -160,9 +158,9 @@ const useContextMenu = () => {
 
   return {
     createContentMenuHandler,
-    createDefaultMenuHandler,
-    createDirectoryMenuHandler,
+    createCurrentDirectoryMenuHandler,
     createEntryMenuHandler,
+    createMenuHandler,
     createMoreMenuHandler,
   }
 }

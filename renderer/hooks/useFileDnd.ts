@@ -13,7 +13,10 @@ const useFileDnd = () => {
 
   const [enterCount, setEnterCount] = useState(0)
 
-  const createDraggableAttrs = (entries: Entry[]) => {
+  const createDraggableProps = (entries?: Entry[]) => {
+    if (!entries) {
+      return {}
+    }
     return {
       draggable: true,
       onDragStart: (e: DragEvent) => {
@@ -37,7 +40,7 @@ const useFileDnd = () => {
     return Array.from(e.dataTransfer.files).map((file) => (file as any).path)
   }
 
-  const getDroppableAttrs = (path: string) => {
+  const getDroppableProps = (path: string) => {
     return {
       onDragEnter: (e: DragEvent) => {
         e.preventDefault()
@@ -64,18 +67,18 @@ const useFileDnd = () => {
     }
   }
 
-  const createDroppableAttrs = (entry: Entry) =>
-    entry.type === 'directory' ? getDroppableAttrs(entry.path) : {}
+  const createDroppableProps = (entry: Entry) =>
+    entry.type === 'directory' ? getDroppableProps(entry.path) : {}
 
-  const createDirectoryDroppableAttrs = () =>
-    getDroppableAttrs(currentDirectory)
+  const createCurrentDirectoryDroppableProps = () =>
+    getDroppableProps(currentDirectory)
 
   const dropping = enterCount > 0
 
   return {
-    createDirectoryDroppableAttrs,
-    createDraggableAttrs,
-    createDroppableAttrs,
+    createCurrentDirectoryDroppableProps,
+    createDraggableProps,
+    createDroppableProps,
     dropping,
   }
 }

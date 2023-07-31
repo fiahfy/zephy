@@ -22,7 +22,7 @@ const ExplorerTreeItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const { createEntryMenuHandler } = useContextMenu()
-  const { createDroppableAttrs, dropping } = useFileDnd()
+  const { createDroppableProps, dropping } = useFileDnd()
 
   const over =
     (entry.type === 'directory' && entry.children ? entry.children : [])
@@ -45,7 +45,7 @@ const ExplorerTreeItem = (props: Props) => {
       nodeId={entry.path}
       outlined={dropping}
       title={entry.name}
-      {...createDroppableAttrs(entry)}
+      {...createDroppableProps(entry)}
     >
       {entry.type === 'directory' && (
         <>

@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useAppDispatch } from 'store'
 import { initialize } from 'store/window'
 
-const useWindowInitializer = () => {
+const useWindow = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -17,4 +17,4 @@ const useWindowInitializer = () => {
   }, [dispatch])
 }
 
-export default useWindowInitializer
+export default useWindow

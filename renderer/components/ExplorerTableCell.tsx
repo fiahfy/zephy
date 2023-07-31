@@ -34,9 +34,11 @@ const ExplorerTableCell = (props: Props) => {
 
   const editing = isEditing(content.path)
 
-  const { createDraggableAttrs, createDroppableAttrs, dropping } = useFileDnd()
+  const { createDraggableProps, createDroppableProps, dropping } = useFileDnd()
 
-  const draggingContents = isSelected(content.path)
+  const draggingContents = editing
+    ? undefined
+    : isSelected(content.path)
     ? selectedContents
     : [content]
 
@@ -56,8 +58,12 @@ const ExplorerTableCell = (props: Props) => {
         userSelect: 'none',
       }}
       title={dataKey === 'name' ? content.name : undefined}
-      {...createDraggableAttrs(draggingContents)}
-      {...createDroppableAttrs(content)}
+      {...(dataKey === 'name'
+        ? {
+            ...createDraggableProps(draggingContents),
+            ...createDroppableProps(content),
+          }
+        : {})}
     >
       {dataKey === 'name' && (
         <>

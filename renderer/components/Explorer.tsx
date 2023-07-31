@@ -47,9 +47,9 @@ const Explorer = () => {
   const selectedContents = useAppSelector(selectSelectedContents)
   const dispatch = useAppDispatch()
 
-  const { createContentMenuHandler, createDirectoryMenuHandler } =
+  const { createContentMenuHandler, createCurrentDirectoryMenuHandler } =
     useContextMenu()
-  const { createDirectoryDroppableAttrs, dropping } = useFileDnd()
+  const { createCurrentDirectoryDroppableProps, dropping } = useFileDnd()
 
   const open = async (content: Content) =>
     content.type === 'directory'
@@ -130,9 +130,9 @@ const Explorer = () => {
   return (
     <Box
       onClick={handleClick}
-      onContextMenu={createDirectoryMenuHandler()}
+      onContextMenu={createCurrentDirectoryMenuHandler()}
       sx={{ height: '100%', position: 'relative' }}
-      {...createDirectoryDroppableAttrs()}
+      {...createCurrentDirectoryDroppableProps()}
     >
       {createElement(
         currentViewMode === 'list' ? ExplorerTable : ExplorerGrid,
