@@ -66,7 +66,7 @@ export const getDetailedEntry = async (
     dateCreated: stats.birthtimeMs,
     dateModified: stats.mtimeMs,
     dateLastOpened: stats.atimeMs,
-    size: stats.size,
+    size: type === 'directory' ? 0 : stats.size,
   }
 }
 

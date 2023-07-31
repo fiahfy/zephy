@@ -2,26 +2,34 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 
 import { AppState, AppThunk } from 'store'
 
-type State = {
-  [path: string]: boolean
+type Favorite = {
+  path: string
 }
 
-const initialState: State = {}
+type State = {
+  favorites: Favorite[]
+}
+
+const initialState: State = { favorites: [] }
 
 export const favoriteSlice = createSlice({
   name: 'favorite',
   initialState,
   reducers: {
     add(state, action: PayloadAction<string>) {
-      return {
-        ...state,
-        [action.payload]: true,
-      }
+      const favorites = [
+        ...state.favorites.filter(
+          (favorite) => favorite.path !== action.payload,
+        ),
+        { path: action.payload },
+      ]
+      return { ...state, favorites }
     },
     remove(state, action: PayloadAction<string>) {
-      const newState = { ...state }
-      delete newState[action.payload]
-      return newState
+      const favorites = state.favorites.filter(
+        (favorite) => favorite.path !== action.payload,
+      )
+      return { ...state, favorites }
     },
     replace(_state, action: PayloadAction<State>) {
       return action.payload
@@ -35,14 +43,18 @@ export default favoriteSlice.reducer
 
 export const selectFavorite = (state: AppState) => state.favorite
 
-export const selectFavorites = createSelector(selectFavorite, (favorite) =>
-  Object.keys(favorite).reduce((acc, path) => [...acc, path], [] as string[]),
+export const selectFavorites = createSelector(
+  selectFavorite,
+  (favorite) => favorite.favorites,
 )
 
-export const selectIsFavorite = createSelector(
-  selectFavorite,
-  (favorite) => (path: string) => favorite[path] ?? false,
-)
+export const selectIsFavorite = createSelector(selectFavorites, (favorites) => {
+  const hash = favorites.reduce(
+    (acc, favorite) => ({ ...acc, [favorite.path]: true }),
+    {} as { [path: string]: boolean },
+  )
+  return (path: string) => hash[path] ?? false
+})
 
 export const toggle =
   (path: string): AppThunk =>

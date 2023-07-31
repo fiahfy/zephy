@@ -3,10 +3,10 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { AppState } from 'store'
 
 type State = {
-  [path: string]: number
+  ratings: { [path: string]: number }
 }
 
-const initialState: State = {}
+const initialState: State = { ratings: {} }
 
 export const ratingSlice = createSlice({
   name: 'rating',
@@ -14,10 +14,11 @@ export const ratingSlice = createSlice({
   reducers: {
     rate(state, action: PayloadAction<{ path: string; rating: number }>) {
       const { path, rating } = action.payload
-      return {
-        ...state,
+      const ratings = {
+        ...state.ratings,
         [path]: rating,
       }
+      return { ...state, ratings }
     },
     replace(_state, action: PayloadAction<State>) {
       return action.payload
@@ -31,7 +32,12 @@ export default ratingSlice.reducer
 
 export const selectRating = (state: AppState) => state.rating
 
-export const selectGetRating = createSelector(
+export const selectRatings = createSelector(
   selectRating,
-  (rating) => (path: string) => rating[path] ?? 0,
+  (rating) => rating.ratings,
+)
+
+export const selectGetRating = createSelector(
+  selectRatings,
+  (ratings) => (path: string) => ratings[path] ?? 0,
 )

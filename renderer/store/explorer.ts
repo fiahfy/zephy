@@ -70,6 +70,13 @@ export const explorerSlice = createSlice({
       )
       return { ...state, entries }
     },
+    startEditing(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, editing: path }
+    },
+    finishEditing(state) {
+      return { ...state, editing: undefined }
+    },
     focus(state, action: PayloadAction<string>) {
       const path = action.payload
       return { ...state, focused: path }
@@ -84,27 +91,20 @@ export const explorerSlice = createSlice({
     multiSelect(state, action: PayloadAction<string>) {
       const path = action.payload
       const selected = state.selected.includes(path)
-      return {
-        ...state,
-        selected: selected
-          ? state.selected.filter((p) => p !== path)
-          : [...state.selected, path],
-      }
+        ? state.selected.filter((p) => p !== path)
+        : [...state.selected, path]
+      return { ...state, selected }
     },
     rangeSelect(state, action: PayloadAction<string[]>) {
       const paths = action.payload
-      const selected = state.selected.filter((p) => !paths.includes(p))
-      return { ...state, selected: [...selected, ...paths] }
+      const selected = [
+        ...state.selected.filter((p) => !paths.includes(p)),
+        ...paths,
+      ]
+      return { ...state, selected }
     },
     unselect(state) {
       return { ...state, selected: [] }
-    },
-    startEditing(state, action: PayloadAction<string>) {
-      const path = action.payload
-      return { ...state, editing: path }
-    },
-    finishEditing(state) {
-      return { ...state, editing: undefined }
     },
   },
 })
@@ -123,16 +123,6 @@ export default explorerSlice.reducer
 
 export const selectExplorer = (state: AppState) => state.explorer
 
-export const selectEditing = createSelector(
-  selectExplorer,
-  (explorer) => explorer.editing,
-)
-
-export const selectIsEditing = createSelector(
-  selectEditing,
-  (editing) => (path: string) => editing === path,
-)
-
 export const selectEntries = createSelector(
   selectExplorer,
   (explorer) => explorer.entries,
@@ -146,6 +136,16 @@ export const selectLoading = createSelector(
 export const selectQuery = createSelector(
   selectExplorer,
   (explorer) => explorer.query,
+)
+
+export const selectEditing = createSelector(
+  selectExplorer,
+  (explorer) => explorer.editing,
+)
+
+export const selectIsEditing = createSelector(
+  selectEditing,
+  (editing) => (path: string) => editing === path,
 )
 
 export const selectFocused = createSelector(
