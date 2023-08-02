@@ -1,5 +1,6 @@
 import {
   AudioFile as AudioFileIcon,
+  Description as DescriptionIcon,
   Folder as FolderIcon,
   Image as ImageIcon,
   InsertDriveFile as InsertDriveFileIcon,
@@ -8,11 +9,46 @@ import {
   VideoFile as VideoFileIcon,
 } from '@mui/icons-material'
 import { blue, green, grey, indigo, red } from '@mui/material/colors'
-import { useMemo } from 'react'
+
+const icons = {
+  'audio-file': {
+    Component: AudioFileIcon,
+    color: green['300'],
+  },
+  description: {
+    Component: DescriptionIcon,
+    color: grey['500'],
+  },
+  folder: {
+    Component: FolderIcon,
+    color: blue['300'],
+  },
+  image: {
+    Component: ImageIcon,
+    color: indigo['300'],
+  },
+  'insert-drive-file': {
+    Component: InsertDriveFileIcon,
+    color: grey['500'],
+  },
+  star: {
+    Component: StarIcon,
+    color: '#faaf00',
+  },
+  'star-border': {
+    Component: StarBorderIcon,
+    color: undefined,
+  },
+  'video-file': {
+    Component: VideoFileIcon,
+    color: red['300'],
+  },
+}
 
 type Props = {
   iconType:
     | 'audio-file'
+    | 'description'
     | 'folder'
     | 'image'
     | 'insert-drive-file'
@@ -24,45 +60,9 @@ type Props = {
 const Icon = (props: Props) => {
   const { iconType } = props
 
-  const MaterialIcon = useMemo(() => {
-    switch (iconType) {
-      case 'audio-file':
-        return AudioFileIcon
-      case 'folder':
-        return FolderIcon
-      case 'image':
-        return ImageIcon
-      case 'insert-drive-file':
-        return InsertDriveFileIcon
-      case 'star':
-        return StarIcon
-      case 'star-border':
-        return StarBorderIcon
-      case 'video-file':
-        return VideoFileIcon
-    }
-  }, [iconType])
+  const { Component, color } = icons[iconType]
 
-  const color = useMemo(() => {
-    switch (iconType) {
-      case 'audio-file':
-        return green['300']
-      case 'folder':
-        return blue['300']
-      case 'image':
-        return indigo['300']
-      case 'insert-drive-file':
-        return grey['500']
-      case 'star':
-        return '#faaf00'
-      case 'star-border':
-        return undefined
-      case 'video-file':
-        return red['300']
-    }
-  }, [iconType])
-
-  return <MaterialIcon fontSize="small" sx={{ color }} />
+  return <Component fontSize="small" sx={{ color }} />
 }
 
 export default Icon

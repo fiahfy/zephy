@@ -14,6 +14,8 @@ export const detectFileType = (path: string) => {
       return 'video'
     case mimeType.startsWith('audio/'):
       return 'audio'
+    case mimeType.startsWith('text/'):
+      return 'text'
     default:
       return 'unknown'
   }

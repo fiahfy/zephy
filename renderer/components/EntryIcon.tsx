@@ -4,9 +4,10 @@ import Icon from 'components/Icon'
 import { Entry } from 'interfaces'
 import { detectFileType } from 'utils/file'
 
-const icons = {
+const iconTypes = {
   audio: 'audio-file',
   image: 'image',
+  text: 'description',
   unknown: 'insert-drive-file',
   video: 'video-file',
 } as const
@@ -23,7 +24,7 @@ const EntryIcon = (props: Props) => {
       return 'folder'
     }
     const fileType = detectFileType(entry.path)
-    return icons[fileType]
+    return iconTypes[fileType]
   }, [entry.path, entry.type])
 
   return <Icon iconType={iconType} />
