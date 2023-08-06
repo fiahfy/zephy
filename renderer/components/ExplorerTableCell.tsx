@@ -1,4 +1,5 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
+import { useMemo } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/mui/NoOutlineRating'
@@ -36,11 +37,15 @@ const ExplorerTableCell = (props: Props) => {
 
   const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
-  const draggingContents = editing
-    ? undefined
-    : isSelected(content.path)
-    ? selectedContents
-    : [content]
+  const draggingContents = useMemo(
+    () =>
+      editing
+        ? undefined
+        : isSelected(content.path)
+        ? selectedContents
+        : [content],
+    [content, editing, isSelected, selectedContents],
+  )
 
   return (
     <TableCell
@@ -86,7 +91,7 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </>
       )}
-      {dataKey === 'rating' && (
+      {/* {dataKey === 'rating' && (
         <NoOutlineRating
           onChange={(_e, value) =>
             dispatch(rate({ path: content.path, rating: value ?? 0 }))
@@ -96,7 +101,7 @@ const ExplorerTableCell = (props: Props) => {
           size="small"
           value={content.rating}
         />
-      )}
+      )} */}
       {dataKey === 'size' && content.type === 'file' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}{' '}

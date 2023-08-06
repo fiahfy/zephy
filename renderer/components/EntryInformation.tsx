@@ -59,6 +59,7 @@ const EntryInformation = (props: Props) => {
             paragraph
             sx={{
               mb: 0,
+              overflowWrap: 'break-word',
               px: 1,
               userSelect: 'none',
             }}

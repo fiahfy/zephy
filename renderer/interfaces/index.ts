@@ -26,6 +26,7 @@ export interface IElectronAPI {
   applicationMenu: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => () => void
+    select: (paths: string[]) => Promise<void>
   }
   contextMenu: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

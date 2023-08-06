@@ -2,6 +2,7 @@ import { Box, LinearProgress } from '@mui/material'
 import {
   KeyboardEvent,
   MouseEvent,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -113,64 +114,70 @@ const ExplorerGrid = (props: Props) => {
     [columns, contents],
   )
 
-  const focus = (
-    e: KeyboardEvent,
-    row: number,
-    column: number,
-    focused: boolean,
-  ) => {
-    const content =
-      chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])
-    if (content) {
-      onKeyDownArrow(e, content)
-    }
-  }
+  const focus = useCallback(
+    (e: KeyboardEvent, row: number, column: number, focused: boolean) => {
+      const content =
+        chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])
+      if (content) {
+        onKeyDownArrow(e, content)
+      }
+    },
+    [chunks, onKeyDownArrow],
+  )
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    const el = ref.current?.querySelector('.focused')
-    const row = Number(el?.getAttribute('data-grid-row'))
-    const column = Number(el?.getAttribute('data-grid-column'))
-    switch (e.key) {
-      case 'Enter':
-        if (!e.nativeEvent.isComposing) {
-          onKeyDownEnter(e)
-        }
-        return
-      case 'ArrowUp':
-        return focus(e, row - 1, column, !!el)
-      case 'ArrowDown':
-        return focus(e, row + 1, column, !!el)
-      case 'ArrowLeft':
-        return focus(e, row, column - 1, !!el)
-      case 'ArrowRight':
-        return focus(e, row, column + 1, !!el)
-    }
-  }
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const el = ref.current?.querySelector('.focused')
+      const row = Number(el?.getAttribute('data-grid-row'))
+      const column = Number(el?.getAttribute('data-grid-column'))
+      switch (e.key) {
+        case 'Enter':
+          if (!e.nativeEvent.isComposing) {
+            onKeyDownEnter(e)
+          }
+          return
+        case 'ArrowUp':
+          return focus(e, row - 1, column, !!el)
+        case 'ArrowDown':
+          return focus(e, row + 1, column, !!el)
+        case 'ArrowLeft':
+          return focus(e, row, column - 1, !!el)
+        case 'ArrowRight':
+          return focus(e, row, column + 1, !!el)
+      }
+    },
+    [focus, onKeyDownEnter],
+  )
 
-  const cellRenderer = ({
-    columnIndex,
-    key,
-    rowIndex,
-    style,
-  }: GridCellProps) => {
-    const content = chunks[rowIndex]?.[columnIndex]
-    return (
-      content && (
-        <Box key={key} style={style} sx={{ p: 0.0625 }}>
-          <ExplorerGridItem
-            columnIndex={columnIndex}
-            content={content}
-            focused={contentFocused(content)}
-            onClick={(e) => onClickContent(e, content)}
-            onContextMenu={(e) => onContextMenuContent(e, content)}
-            onDoubleClick={(e) => onDoubleClickContent(e, content)}
-            rowIndex={rowIndex}
-            selected={contentSelected(content)}
-          />
-        </Box>
+  const cellRenderer = useCallback(
+    ({ columnIndex, key, rowIndex, style }: GridCellProps) => {
+      const content = chunks[rowIndex]?.[columnIndex]
+      return (
+        content && (
+          <Box key={key} style={style} sx={{ p: 0.0625 }}>
+            <ExplorerGridItem
+              columnIndex={columnIndex}
+              content={content}
+              focused={contentFocused(content)}
+              onClick={(e) => onClickContent(e, content)}
+              onContextMenu={(e) => onContextMenuContent(e, content)}
+              onDoubleClick={(e) => onDoubleClickContent(e, content)}
+              rowIndex={rowIndex}
+              selected={contentSelected(content)}
+            />
+          </Box>
+        )
       )
-    )
-  }
+    },
+    [
+      chunks,
+      contentFocused,
+      contentSelected,
+      onClickContent,
+      onContextMenuContent,
+      onDoubleClickContent,
+    ],
+  )
 
   return (
     <Box

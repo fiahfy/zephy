@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { KeyboardEvent, MouseEvent, createElement } from 'react'
+import { KeyboardEvent, MouseEvent, createElement, useCallback } from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
@@ -51,10 +51,13 @@ const Explorer = () => {
     useContextMenu()
   const { createCurrentDirectoryDroppableProps, dropping } = useDnd()
 
-  const open = async (content: Content) =>
-    content.type === 'directory'
-      ? dispatch(changeDirectory(content.path))
-      : await window.electronAPI.openPath(content.path)
+  const open = useCallback(
+    async (content: Content) =>
+      content.type === 'directory'
+        ? dispatch(changeDirectory(content.path))
+        : await window.electronAPI.openPath(content.path),
+    [dispatch],
+  )
 
   const {
     handleClick: handleClickContent,
@@ -90,42 +93,60 @@ const Explorer = () => {
     },
   )
 
-  const isContentFocused = (content: Content) => isFocused(content.path)
+  const isContentFocused = useCallback(
+    (content: Content) => isFocused(content.path),
+    [isFocused],
+  )
 
-  const isContentSelected = (content: Content) => isSelected(content.path)
+  const isContentSelected = useCallback(
+    (content: Content) => isSelected(content.path),
+    [isSelected],
+  )
 
-  const handleChangeSortOption = (sortOption: {
-    order: 'asc' | 'desc'
-    orderBy: keyof Content
-  }) => dispatch(setCurrentSortOption(sortOption))
+  const handleChangeSortOption = useCallback(
+    (sortOption: { order: 'asc' | 'desc'; orderBy: keyof Content }) =>
+      dispatch(setCurrentSortOption(sortOption)),
+    [dispatch],
+  )
 
-  const handleContextMenuContent = (e: MouseEvent, content: Content) =>
-    createContentMenuHandler(content)(e)
+  const handleContextMenuContent = useCallback(
+    (e: MouseEvent, content: Content) => createContentMenuHandler(content)(e),
+    [createContentMenuHandler],
+  )
 
-  const handleKeyDownArrow = (e: KeyboardEvent, content: Content) => {
-    e.preventDefault()
-    dispatch(select(content.path))
-    dispatch(focus(content.path))
-  }
+  const handleKeyDownArrow = useCallback(
+    (e: KeyboardEvent, content: Content) => {
+      e.preventDefault()
+      dispatch(select(content.path))
+      dispatch(focus(content.path))
+    },
+    [dispatch],
+  )
 
-  const handleKeyDownEnter = async (e: KeyboardEvent) => {
-    e.preventDefault()
-    const content = selectedContents[0]
-    if (content) {
-      await open(content)
-    }
-  }
+  const handleKeyDownEnter = useCallback(
+    async (e: KeyboardEvent) => {
+      e.preventDefault()
+      const content = selectedContents[0]
+      if (content) {
+        await open(content)
+      }
+    },
+    [open, selectedContents],
+  )
 
-  const handleScroll = (e: Event) => {
-    if (!loading && e.target instanceof HTMLElement) {
-      dispatch(setCurrentScrollTop(e.target.scrollTop))
-    }
-  }
+  const handleScroll = useCallback(
+    (e: Event) => {
+      if (!loading && e.target instanceof HTMLElement) {
+        dispatch(setCurrentScrollTop(e.target.scrollTop))
+      }
+    },
+    [dispatch, loading],
+  )
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     dispatch(unselect())
     dispatch(blur())
-  }
+  }, [dispatch])
 
   return (
     <Box

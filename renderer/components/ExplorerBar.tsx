@@ -71,10 +71,10 @@ const ExplorerBar = () => {
   )
 
   useEffect(() => {
-    const removeListener = window.electronAPI.contextMenu.addListener(
-      (eventName) => {
-        if (eventName === 'search') {
-          search(document.getSelection()?.toString() ?? '')
+    const removeListener = window.electronAPI.applicationMenu.addListener(
+      (message) => {
+        const { type } = message
+        if (type === 'find') {
           ref.current?.focus()
         }
       },
@@ -83,18 +83,17 @@ const ExplorerBar = () => {
   }, [dispatch, search])
 
   useEffect(() => {
-    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
-      if (
-        e.key === 'f' &&
-        ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))
-      ) {
-        search(document.getSelection()?.toString() ?? '')
-        ref.current?.focus()
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [search])
+    const removeListener = window.electronAPI.contextMenu.addListener(
+      (message) => {
+        const { type } = message
+        if (type === 'search') {
+          search(document.getSelection()?.toString() ?? '')
+          ref.current?.focus()
+        }
+      },
+    )
+    return () => removeListener()
+  }, [dispatch, search])
 
   useEffect(() => {
     setDirectory(currentDirectory)

@@ -84,40 +84,15 @@ export const explorerSlice = createSlice({
     blur(state) {
       return { ...state, focused: undefined }
     },
-    select(state, action: PayloadAction<string>) {
-      const path = action.payload
-      return { ...state, selected: [path] }
-    },
-    multiSelect(state, action: PayloadAction<string>) {
-      const path = action.payload
-      const selected = state.selected.includes(path)
-        ? state.selected.filter((p) => p !== path)
-        : [...state.selected, path]
+    setSelected(state, action: PayloadAction<string[]>) {
+      const selected = action.payload
       return { ...state, selected }
-    },
-    rangeSelect(state, action: PayloadAction<string[]>) {
-      const paths = action.payload
-      const selected = [
-        ...state.selected.filter((p) => !paths.includes(p)),
-        ...paths,
-      ]
-      return { ...state, selected }
-    },
-    unselect(state) {
-      return { ...state, selected: [] }
     },
   },
 })
 
-export const {
-  focus,
-  blur,
-  select,
-  multiSelect,
-  unselect,
-  startEditing,
-  finishEditing,
-} = explorerSlice.actions
+export const { focus, blur, startEditing, finishEditing } =
+  explorerSlice.actions
 
 export default explorerSlice.reducer
 
@@ -242,15 +217,38 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   }
 }
 
+export const setSelected =
+  (paths: string[]): AppThunk =>
+  async (dispatch) => {
+    const { setSelected } = explorerSlice.actions
+    // await window.electronAPI.applicationMenu.select(paths)
+    dispatch(setSelected(paths))
+  }
+
+export const select =
+  (path: string): AppThunk =>
+  async (dispatch) => {
+    dispatch(setSelected([path]))
+  }
+
+export const multiSelect =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const selected = selectSelected(getState())
+    const newSelected = selected.includes(path)
+      ? selected.filter((p) => p !== path)
+      : [...selected, path]
+    dispatch(setSelected(newSelected))
+  }
+
 export const rangeSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
-    const { rangeSelect } = explorerSlice.actions
     const contents = selectContents(getState())
     const selected = selectSelected(getState())
     const paths = contents.map((content) => content.path)
     const prevSelected = selected[selected.length - 1]
-    let newPaths
+    let newPaths: string[]
     if (prevSelected) {
       const index = paths.indexOf(path)
       const prevIndex = paths.indexOf(prevSelected)
@@ -262,13 +260,21 @@ export const rangeSelect =
       const index = paths.indexOf(path)
       newPaths = paths.slice(0, index + 1)
     }
-    dispatch(rangeSelect(newPaths))
+    const newSelected = [
+      ...selected.filter((p) => !newPaths.includes(p)),
+      ...newPaths,
+    ]
+    dispatch(setSelected(newSelected))
   }
+
+export const unselect = (): AppThunk => async (dispatch) => {
+  dispatch(setSelected([]))
+}
 
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
-    const { add, select } = explorerSlice.actions
+    const { add } = explorerSlice.actions
     const entry = await window.electronAPI.createDirectory(directoryPath)
     dispatch(add([entry]))
     dispatch(select(entry.path))

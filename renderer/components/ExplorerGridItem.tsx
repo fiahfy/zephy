@@ -120,11 +120,15 @@ const ExplorerGridItem = (props: Props) => {
     [loading],
   )
 
-  const draggingContents = editing
-    ? undefined
-    : isSelected(content.path)
-    ? selectedContents
-    : [content]
+  const draggingContents = useMemo(
+    () =>
+      editing
+        ? undefined
+        : isSelected(content.path)
+        ? selectedContents
+        : [content],
+    [content, editing, isSelected, selectedContents],
+  )
 
   return (
     <ImageListItem

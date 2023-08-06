@@ -147,111 +147,132 @@ const ExplorerTable = (props: Props) => {
     return widths.map((width) => (width === undefined ? flexibleWidth : width))
   }, [])
 
-  const focus = (e: KeyboardEvent, row: number, focused: boolean) => {
-    const content = contents[row - 1] ?? (focused ? undefined : contents[0])
-    if (content) {
-      onKeyDownArrow(e, content)
-    }
-  }
+  const focus = useCallback(
+    (e: KeyboardEvent, row: number, focused: boolean) => {
+      const content = contents[row - 1] ?? (focused ? undefined : contents[0])
+      if (content) {
+        onKeyDownArrow(e, content)
+      }
+    },
+    [contents, onKeyDownArrow],
+  )
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    const el = ref.current?.querySelector('.focused')
-    const row = Number(el?.getAttribute('aria-rowindex'))
-    switch (e.key) {
-      case 'Enter':
-        if (!e.nativeEvent.isComposing) {
-          onKeyDownEnter(e)
-        }
-        return
-      case 'ArrowUp':
-        return focus(e, row - 1, !!el)
-      case 'ArrowDown':
-        return focus(e, row + 1, !!el)
-    }
-  }
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const el = ref.current?.querySelector('.focused')
+      const row = Number(el?.getAttribute('aria-rowindex'))
+      switch (e.key) {
+        case 'Enter':
+          if (!e.nativeEvent.isComposing) {
+            onKeyDownEnter(e)
+          }
+          return
+        case 'ArrowUp':
+          return focus(e, row - 1, !!el)
+        case 'ArrowDown':
+          return focus(e, row + 1, !!el)
+      }
+    },
+    [focus, onKeyDownEnter],
+  )
 
-  const handleRowClick = (info: RowMouseEventHandlerParams) =>
-    onClickContent(info.event, info.rowData)
+  const handleRowClick = useCallback(
+    (info: RowMouseEventHandlerParams) =>
+      onClickContent(info.event, info.rowData),
+    [onClickContent],
+  )
 
-  const handleRowDoubleClick = (info: RowMouseEventHandlerParams) =>
-    onDoubleClickContent(info.event, info.rowData)
+  const handleRowDoubleClick = useCallback(
+    (info: RowMouseEventHandlerParams) =>
+      onDoubleClickContent(info.event, info.rowData),
+    [onDoubleClickContent],
+  )
 
-  const handleRowRightClick = (info: RowMouseEventHandlerParams) =>
-    onContextMenuContent(info.event, info.rowData)
+  const handleRowRightClick = useCallback(
+    (info: RowMouseEventHandlerParams) =>
+      onContextMenuContent(info.event, info.rowData),
+    [onContextMenuContent],
+  )
 
-  const headerRenderer = ({ dataKey, label }: TableHeaderProps) => (
-    <ExplorerTableHeaderCell
-      dataKey={dataKey as Key}
-      height={headerHeight}
-      label={label}
-      onChangeSortOption={onChangeSortOption}
-      sortOption={sortOption}
-    />
+  const headerRenderer = useCallback(
+    ({ dataKey, label }: TableHeaderProps) => (
+      <ExplorerTableHeaderCell
+        dataKey={dataKey as Key}
+        height={headerHeight}
+        label={label}
+        onChangeSortOption={onChangeSortOption}
+        sortOption={sortOption}
+      />
+    ),
+    [onChangeSortOption, sortOption],
   )
 
   // @see https://github.com/bvaughn/react-virtualized/blob/master/source/Table/defaultRowRenderer.js
-  const rowRenderer = ({
-    className,
-    columns,
-    index,
-    key,
-    onRowClick,
-    onRowDoubleClick,
-    onRowMouseOut,
-    onRowMouseOver,
-    onRowRightClick,
-    rowData,
-    style,
-  }: TableRowProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a11yProps: any = { 'aria-rowindex': index + 1 }
+  const rowRenderer = useCallback(
+    ({
+      className,
+      columns,
+      index,
+      key,
+      onRowClick,
+      onRowDoubleClick,
+      onRowMouseOut,
+      onRowMouseOver,
+      onRowRightClick,
+      rowData,
+      style,
+    }: TableRowProps) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const a11yProps: any = { 'aria-rowindex': index + 1 }
 
-    if (
-      onRowClick ||
-      onRowDoubleClick ||
-      onRowMouseOut ||
-      onRowMouseOver ||
-      onRowRightClick
-    ) {
-      a11yProps['aria-label'] = 'row'
-      // a11yProps.tabIndex = 0
+      if (
+        onRowClick ||
+        onRowDoubleClick ||
+        onRowMouseOut ||
+        onRowMouseOver ||
+        onRowRightClick
+      ) {
+        a11yProps['aria-label'] = 'row'
+        // a11yProps.tabIndex = 0
 
-      if (onRowClick) {
-        a11yProps.onClick = (event: MouseEvent) =>
-          onRowClick({ event, index, rowData })
+        if (onRowClick) {
+          a11yProps.onClick = (event: MouseEvent) =>
+            onRowClick({ event, index, rowData })
+        }
+        if (onRowDoubleClick) {
+          a11yProps.onDoubleClick = (event: MouseEvent) =>
+            onRowDoubleClick({ event, index, rowData })
+        }
+        if (onRowMouseOut) {
+          a11yProps.onMouseOut = (event: MouseEvent) =>
+            onRowMouseOut({ event, index, rowData })
+        }
+        if (onRowMouseOver) {
+          a11yProps.onMouseOver = (event: MouseEvent) =>
+            onRowMouseOver({ event, index, rowData })
+        }
+        if (onRowRightClick) {
+          a11yProps.onContextMenu = (event: MouseEvent) =>
+            onRowRightClick({ event, index, rowData })
+        }
       }
-      if (onRowDoubleClick) {
-        a11yProps.onDoubleClick = (event: MouseEvent) =>
-          onRowDoubleClick({ event, index, rowData })
-      }
-      if (onRowMouseOut) {
-        a11yProps.onMouseOut = (event: MouseEvent) =>
-          onRowMouseOut({ event, index, rowData })
-      }
-      if (onRowMouseOver) {
-        a11yProps.onMouseOver = (event: MouseEvent) =>
-          onRowMouseOver({ event, index, rowData })
-      }
-      if (onRowRightClick) {
-        a11yProps.onContextMenu = (event: MouseEvent) =>
-          onRowRightClick({ event, index, rowData })
-      }
-    }
 
-    return (
-      <div
-        {...a11yProps}
-        className={className}
-        key={key}
-        role="row"
-        style={style}
-      >
-        {columns}
-      </div>
-    )
-  }
+      return (
+        <div
+          {...a11yProps}
+          className={className}
+          key={key}
+          role="row"
+          style={style}
+        >
+          {columns}
+        </div>
+      )
+    },
+    [],
+  )
 
-  const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
+  const cellRenderer = useCallback(({ dataKey, rowData }: TableCellProps) => {
     const align = columns.find((column) => column.key === dataKey)?.align
     return (
       <ExplorerTableCell
@@ -261,7 +282,7 @@ const ExplorerTable = (props: Props) => {
         height={rowHeight}
       />
     )
-  }
+  }, [])
 
   return (
     <Box

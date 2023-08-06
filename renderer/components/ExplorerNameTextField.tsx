@@ -1,4 +1,11 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import DenseOutlineTextField from 'components/mui/DenseOutlineTextField'
 import { Content } from 'interfaces'
@@ -31,33 +38,36 @@ const ExplorerNameTextField = (props: Props) => {
     }
   }, [content.name])
 
-  const finish = () => {
+  const finish = useCallback(() => {
     dispatch(finishEditing())
     if (name !== content.name) {
       dispatch(rename(content.path, name))
     }
-  }
+  }, [content.name, content.path, dispatch, name])
 
-  const handleBlur = () => finish()
+  const handleBlur = useCallback(() => finish(), [finish])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setName(value)
-  }
+  }, [])
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    e.stopPropagation()
-    switch (e.key) {
-      case 'Escape':
-        dispatch(finishEditing())
-        break
-      case 'Enter':
-        if (!e.nativeEvent.isComposing) {
-          finish()
-        }
-        break
-    }
-  }
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      e.stopPropagation()
+      switch (e.key) {
+        case 'Escape':
+          dispatch(finishEditing())
+          break
+        case 'Enter':
+          if (!e.nativeEvent.isComposing) {
+            finish()
+          }
+          break
+      }
+    },
+    [dispatch, finish],
+  )
 
   return (
     <DenseOutlineTextField

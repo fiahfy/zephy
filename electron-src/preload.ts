@@ -37,6 +37,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('application-menu-send', handler)
       return () => ipcRenderer.removeListener('application-menu-send', handler)
     },
+    select: (paths: string[]) =>
+      ipcRenderer.invoke('application-menu-select', paths),
   },
   contextMenu: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

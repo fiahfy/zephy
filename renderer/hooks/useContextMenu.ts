@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react'
+import { MouseEvent, useCallback } from 'react'
 
 import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
@@ -37,122 +37,142 @@ const useContextMenu = () => {
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const selected = useAppSelector(selectSelected)
 
-  const createEntryMenuHandler = (entry: Entry) => {
-    const directory = entry.type === 'directory'
-    const path = entry.path
-    return createMenuHandler([
-      {
-        id: directory ? 'openDirectory' : 'open',
-        params: { path },
-      },
-      {
-        id: 'revealInFinder',
-        params: { path },
-      },
-      { id: 'separator' },
-      {
-        id: 'copyPath',
-        params: { path },
-      },
-      { id: 'separator' },
-      ...(directory
-        ? [
-            {
-              id: 'toggleFavorite',
-              params: { path, favorite: isFavorite(path) },
-            },
-          ]
-        : []),
-      { id: 'separator' },
-      {
-        id: 'moveToTrash',
-        params: { paths: [path] },
-      },
-    ])
-  }
+  const createEntryMenuHandler = useCallback(
+    (entry: Entry) => {
+      const directory = entry.type === 'directory'
+      const path = entry.path
+      return createMenuHandler([
+        {
+          id: directory ? 'openDirectory' : 'open',
+          params: { path },
+        },
+        {
+          id: 'revealInFinder',
+          params: { path },
+        },
+        { id: 'separator' },
+        {
+          id: 'copyPath',
+          params: { path },
+        },
+        { id: 'separator' },
+        ...(directory
+          ? [
+              {
+                id: 'toggleFavorite',
+                params: { path, favorite: isFavorite(path) },
+              },
+            ]
+          : []),
+        { id: 'separator' },
+        {
+          id: 'moveToTrash',
+          params: { paths: [path] },
+        },
+      ])
+    },
+    [isFavorite],
+  )
 
-  const createContentMenuHandler = (entry: Entry) => {
-    const directory = entry.type === 'directory'
-    const path = entry.path
-    const paths = selected.includes(path) ? selected : [path]
-    return createMenuHandler([
-      ...(paths.length === 1
-        ? [
-            {
-              id: directory ? 'openDirectory' : 'open',
-              params: { path },
-            },
-            ...(directory
-              ? [
-                  {
-                    id: 'openDirectoryInNewWindow',
-                    params: { path },
-                  },
-                ]
-              : []),
-            {
-              id: 'revealInFinder',
-              params: { path },
-            },
-            { id: 'separator' },
-            {
-              id: 'copyPath',
-              params: { path },
-            },
-            { id: 'separator' },
-            ...(directory
-              ? [
-                  {
-                    id: 'toggleFavorite',
-                    params: { path, favorite: isFavorite(path) },
-                  },
-                ]
-              : []),
-            { id: 'separator' },
-            {
-              id: 'rename',
-              params: { path },
-            },
-          ]
-        : []),
-      {
-        id: 'moveToTrash',
-        params: { paths },
-      },
-    ])
-  }
+  const createContentMenuHandler = useCallback(
+    (entry: Entry) => {
+      const directory = entry.type === 'directory'
+      const path = entry.path
+      const paths = selected.includes(path) ? selected : [path]
+      return createMenuHandler([
+        ...(paths.length === 1
+          ? [
+              {
+                id: directory ? 'openDirectory' : 'open',
+                params: { path },
+              },
+              ...(directory
+                ? [
+                    {
+                      id: 'openDirectoryInNewWindow',
+                      params: { path },
+                    },
+                  ]
+                : []),
+              {
+                id: 'revealInFinder',
+                params: { path },
+              },
+              { id: 'separator' },
+              {
+                id: 'copyPath',
+                params: { path },
+              },
+              { id: 'separator' },
+              ...(directory
+                ? [
+                    {
+                      id: 'toggleFavorite',
+                      params: { path, favorite: isFavorite(path) },
+                    },
+                  ]
+                : []),
+              { id: 'separator' },
+              {
+                id: 'rename',
+                params: { path },
+              },
+            ]
+          : []),
+        {
+          id: 'moveToTrash',
+          params: { paths },
+        },
+      ])
+    },
+    [isFavorite, selected],
+  )
 
-  const createCurrentDirectoryMenuHandler = () =>
-    createMenuHandler([
-      { id: 'newFolder', params: { path: currentDirectory } },
-      { id: 'separator' },
-      { id: 'view', params: { viewMode: currentViewMode } },
-      { id: 'separator' },
-      {
-        id: 'sortBy',
-        params: { orderBy: currentSortOption.orderBy },
-      },
-    ])
+  const createCurrentDirectoryMenuHandler = useCallback(
+    () =>
+      createMenuHandler([
+        { id: 'newFolder', params: { path: currentDirectory } },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+      ]),
+    [currentDirectory, currentSortOption.orderBy, currentViewMode],
+  )
 
-  const createMoreMenuHandler = () =>
-    createMenuHandler([
-      { id: 'newFolder', params: { path: currentDirectory } },
-      { id: 'separator' },
-      { id: 'view', params: { viewMode: currentViewMode } },
-      { id: 'separator' },
-      {
-        id: 'sortBy',
-        params: { orderBy: currentSortOption.orderBy },
-      },
-      { id: 'separator' },
-      { id: 'toggleNavigator', params: { hidden: isSidebarHidden('primary') } },
-      {
-        id: 'toggleInspector',
-        params: { hidden: isSidebarHidden('secondary') },
-      },
-      { id: 'separator' },
-      { id: 'settings' },
-    ])
+  const createMoreMenuHandler = useCallback(
+    () =>
+      createMenuHandler([
+        { id: 'newFolder', params: { path: currentDirectory } },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+        { id: 'separator' },
+        {
+          id: 'toggleNavigator',
+          params: { hidden: isSidebarHidden('primary') },
+        },
+        {
+          id: 'toggleInspector',
+          params: { hidden: isSidebarHidden('secondary') },
+        },
+        { id: 'separator' },
+        { id: 'settings' },
+      ]),
+    [
+      currentDirectory,
+      currentSortOption.orderBy,
+      currentViewMode,
+      isSidebarHidden,
+    ],
+  )
 
   return {
     createContentMenuHandler,

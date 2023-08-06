@@ -96,6 +96,7 @@ const registerContextMenu = (
           label: 'Rename...',
         }),
         moveToTrash: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+Backspace',
           click: () =>
             send({ type: 'moveToTrash', data: { paths: params.paths } }),
           label: 'Move to Trash',
@@ -166,6 +167,7 @@ const registerContextMenu = (
             }),
         }),
         settings: () => ({
+          accelerator: 'CmdOrCtrl+,',
           click: () => send({ type: 'goToSettings' }),
           label: 'Settings',
         }),
