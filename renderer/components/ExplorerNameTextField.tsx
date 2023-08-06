@@ -8,6 +8,7 @@ import {
 } from 'react'
 
 import DenseOutlineTextField from 'components/mui/DenseOutlineTextField'
+import useContextMenu from 'hooks/useContextMenu'
 import { Content } from 'interfaces'
 import { useAppDispatch } from 'store'
 import { finishEditing, rename } from 'store/explorer'
@@ -20,6 +21,8 @@ const ExplorerNameTextField = (props: Props) => {
   const { content } = props
 
   const dispatch = useAppDispatch()
+
+  const { createMenuHandler } = useContextMenu()
 
   const [name, setName] = useState(content.name)
   const ref = useRef<HTMLInputElement>(null)
@@ -75,6 +78,7 @@ const ExplorerNameTextField = (props: Props) => {
       inputRef={ref}
       onBlur={handleBlur}
       onChange={handleChange}
+      onContextMenu={createMenuHandler()}
       onKeyDown={handleKeyDown}
       spellCheck={false}
       sx={{ '.MuiInputBase-root': { color: 'inherit' } }}

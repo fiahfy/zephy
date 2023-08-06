@@ -30,9 +30,9 @@ const registerApplicationMenu = (
               { role: 'about' },
               { type: 'separator' },
               {
-                label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
                 click: () => send({ type: 'goToSettings' }),
+                label: 'Preferences...',
               },
               { type: 'separator' },
               { role: 'services' },
@@ -51,23 +51,23 @@ const registerApplicationMenu = (
       label: 'File',
       submenu: [
         {
-          label: 'New Window',
           accelerator: 'CmdOrCtrl+N',
           click: () => createWindow({}),
+          label: 'New Window',
         },
         ...[isMac ? { role: 'close' } : { role: 'quit' }],
         { type: 'separator' },
         {
-          label: 'Move to Trash',
           accelerator: 'CmdOrCtrl+Backspace',
           enabled: false,
           id: 'moveToTrash',
+          label: 'Move to Trash',
         },
         { type: 'separator' },
         {
-          label: 'Find',
           accelerator: 'CmdOrCtrl+F',
           click: () => send({ type: 'find' }),
+          label: 'Find',
         },
       ],
     } as MenuItemConstructorOptions,
@@ -78,9 +78,9 @@ const registerApplicationMenu = (
         { role: 'undo' },
         { role: 'redo' },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
+        { id: 'cut', role: 'cut' },
+        { id: 'copy', role: 'copy' },
+        { id: 'paste', role: 'paste' },
         ...(isMac
           ? [
               { role: 'pasteAndMatchStyle' },
@@ -100,16 +100,16 @@ const registerApplicationMenu = (
       label: 'View',
       submenu: [
         {
-          label: 'as List',
           accelerator: 'CmdOrCtrl+1',
           click: () =>
             send({ type: 'changeViewMode', data: { viewMode: 'list' } }),
+          label: 'as List',
         },
         {
-          label: 'as Thumbnail',
           accelerator: 'CmdOrCtrl+2',
           click: () =>
             send({ type: 'changeViewMode', data: { viewMode: 'thumbnail' } }),
+          label: 'as Thumbnail',
         },
         { type: 'separator' },
         { role: 'reload' },
@@ -160,11 +160,32 @@ const registerApplicationMenu = (
       if (!menu) {
         return
       }
-      const item = menu.getMenuItemById('moveToTrash')
-      if (item) {
-        item.enabled = paths.length > 0
-        item.click = () => send({ type: 'moveToTrash', data: { paths } })
-      }
+
+      const itemIds = ['cut', 'copy', 'paste', 'moveToTrash']
+      itemIds.forEach((id) => {
+        const item = menu.getMenuItemById(id)
+        if (!item) {
+          return
+        }
+        switch (id) {
+          case 'cut':
+            break
+          // TODO: Implement
+          case 'copy':
+            // item.role = paths.length > 0 ? undefined : 'copy'
+            // item.click =
+            //   paths.length > 0
+            //     ? () => send({ type: 'copy', data: { paths } })
+            //     : undefined
+            break
+          case 'paste':
+            break
+          case 'moveToTrash':
+            item.enabled = paths.length > 0
+            item.click = () => send({ type: 'moveToTrash', data: { paths } })
+            break
+        }
+      })
     },
   )
 }

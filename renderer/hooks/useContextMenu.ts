@@ -13,6 +13,7 @@ import {
 const createMenuHandler = (options?: ContextMenuOption[]) => {
   return async (e: MouseEvent) => {
     e.preventDefault()
+    e.stopPropagation()
 
     const isEditable =
       e.target instanceof HTMLInputElement ||
@@ -122,6 +123,10 @@ const useContextMenu = () => {
           id: 'moveToTrash',
           params: { paths },
         },
+        { id: 'separator' },
+        { id: 'cut', params: { paths } },
+        { id: 'copy', params: { paths } },
+        { id: 'paste' },
       ])
     },
     [isFavorite],

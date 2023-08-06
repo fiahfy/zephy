@@ -35,13 +35,17 @@ const registerContextMenu = (
 
       const defaultActions = {
         separator: { type: 'separator' as const },
-        cut: params.isEditable && { role: 'cut' },
+        cut: params.isEditable && {
+          accelerator: 'CmdOrCtrl+X',
+          role: 'cut' as const,
+        },
         copy: (params.isEditable || params.selectionText.length > 0) && {
-          role: 'copy',
+          accelerator: 'CmdOrCtrl+C',
+          role: 'copy' as const,
         },
         paste: params.isEditable && {
-          role: 'paste',
-          visible: params.isEditable,
+          accelerator: 'CmdOrCtrl+V',
+          role: 'paste' as const,
         },
         inspectElement: {
           label: 'Inspect Element',
@@ -52,11 +56,10 @@ const registerContextMenu = (
             }
           },
         },
-        search: {
+        search: params.selectionText.trim().length > 0 && {
           accelerator: 'CommandOrControl+F',
           click: () => send({ type: 'search' }),
           label: `Search for “${params.selectionText.trim()}”`,
-          visible: params.selectionText.trim().length > 0,
         },
       }
 
@@ -100,6 +103,22 @@ const registerContextMenu = (
           click: () =>
             send({ type: 'moveToTrash', data: { paths: params.paths } }),
           label: 'Move to Trash',
+        }),
+        // TODO: Implement
+        cut: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+X',
+          click: () => send({ type: 'cut', data: { paths: params.paths } }),
+          label: 'Cut',
+        }),
+        copy: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+C',
+          click: () => send({ type: 'copy', data: { paths: params.paths } }),
+          label: 'Copy',
+        }),
+        paste: () => ({
+          accelerator: 'CmdOrCtrl+V',
+          click: () => send({ type: 'paste' }),
+          label: 'Paste',
         }),
         toggleFavorite: ({ params }) => ({
           click: () =>
