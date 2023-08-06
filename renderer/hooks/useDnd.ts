@@ -37,7 +37,7 @@ const useDnd = () => {
     return {
       draggable: true,
       onDragStart: (e: DragEvent) => {
-        // TODO: native drag drop
+        // TODO: native drag and drop
         // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
         // e.preventDefault()
         e.stopPropagation()

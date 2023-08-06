@@ -50,6 +50,14 @@ export const WatcherProvider = (props: Props) => {
     window.electronAPI.watcher.watch(
       paths,
       (eventType, directoryPath, filePath) => {
+        // TODO: check
+        console.log(`[${new Date().toLocaleString()}]`, {
+          currentDirectory,
+          directoryPaths,
+          eventType,
+          directoryPath,
+          filePath,
+        })
         callback?.()(eventType, directoryPath, filePath)
         dispatch(handle(eventType, directoryPath, filePath))
       },

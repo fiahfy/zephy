@@ -14,8 +14,6 @@
 ## TODOs
 
 - [ ] New Folder
-- [ ] Rename Item
-- [ ] Move Item
 - [ ] Copy Item
 - [ ] Sort Favorites
 - [ ] Rating List
