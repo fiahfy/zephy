@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
 
-import { useAppDispatch, useAppSelector } from 'store'
-import { moveToTrash, selectSelected } from 'store/explorer'
+import { useAppDispatch } from 'store'
+import { moveToTrash } from 'store/explorer'
 import { goToSettings, setCurrentViewMode } from 'store/window'
 
 const useApplicationMenuListener = () => {
-  const selected = useAppSelector(selectSelected)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -14,7 +13,7 @@ const useApplicationMenuListener = () => {
         const { type, data } = message
         switch (type) {
           case 'moveToTrash':
-            return dispatch(moveToTrash(selected))
+            return dispatch(moveToTrash(data.paths))
           case 'goToSettings':
             return dispatch(goToSettings())
           case 'changeViewMode':
@@ -23,7 +22,7 @@ const useApplicationMenuListener = () => {
       },
     )
     return () => removeListener()
-  }, [dispatch, selected])
+  }, [dispatch])
 }
 
 export default useApplicationMenuListener

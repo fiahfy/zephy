@@ -221,8 +221,9 @@ export const setSelected =
   (paths: string[]): AppThunk =>
   async (dispatch) => {
     const { setSelected } = explorerSlice.actions
-    // await window.electronAPI.applicationMenu.select(paths)
     dispatch(setSelected(paths))
+    // update application menu after dispatch, because it is little bit slow
+    await window.electronAPI.applicationMenu.select(paths)
   }
 
 export const select =

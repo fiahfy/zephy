@@ -110,8 +110,9 @@ const Explorer = () => {
   )
 
   const handleContextMenuContent = useCallback(
-    (e: MouseEvent, content: Content) => createContentMenuHandler(content)(e),
-    [createContentMenuHandler],
+    (e: MouseEvent, content: Content) =>
+      createContentMenuHandler(content, selectedContents)(e),
+    [createContentMenuHandler, selectedContents],
   )
 
   const handleKeyDownArrow = useCallback(

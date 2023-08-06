@@ -2,7 +2,6 @@ import { MouseEvent, useCallback } from 'react'
 
 import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
-import { selectSelected } from 'store/explorer'
 import { selectIsFavorite } from 'store/favorite'
 import {
   selectCurrentDirectory,
@@ -35,7 +34,6 @@ const useContextMenu = () => {
   const currentViewMode = useAppSelector(selectCurrentViewMode)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
-  const selected = useAppSelector(selectSelected)
 
   const createEntryMenuHandler = useCallback(
     (entry: Entry) => {
@@ -75,10 +73,11 @@ const useContextMenu = () => {
   )
 
   const createContentMenuHandler = useCallback(
-    (entry: Entry) => {
+    (entry: Entry, selectedEntries: Entry[]) => {
       const directory = entry.type === 'directory'
       const path = entry.path
-      const paths = selected.includes(path) ? selected : [path]
+      const selectedPaths = selectedEntries.map((e) => e.path)
+      const paths = selectedPaths.includes(path) ? selectedPaths : [path]
       return createMenuHandler([
         ...(paths.length === 1
           ? [
@@ -125,7 +124,7 @@ const useContextMenu = () => {
         },
       ])
     },
-    [isFavorite, selected],
+    [isFavorite],
   )
 
   const createCurrentDirectoryMenuHandler = useCallback(
