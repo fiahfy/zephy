@@ -1,4 +1,5 @@
 import { CircularProgress } from '@mui/material'
+import { useCallback, useMemo } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import EntryTreeItem from 'components/EntryTreeItem'
@@ -24,15 +25,18 @@ const ExplorerTreeItem = (props: Props) => {
   const { createEntryMenuHandler } = useContextMenu()
   const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
-  const over =
-    (entry.type === 'directory' && entry.children ? entry.children : [])
-      .length - max
+  const over = useMemo(
+    () =>
+      (entry.type === 'directory' && entry.children ? entry.children : [])
+        .length - max,
+    [entry],
+  )
 
-  const handleDoubleClick = async () => {
+  const handleDoubleClick = useCallback(async () => {
     if (entry.type === 'file') {
       await window.electronAPI.openPath(entry.path)
     }
-  }
+  }, [entry.path, entry.type])
 
   return (
     <EntryTreeItem

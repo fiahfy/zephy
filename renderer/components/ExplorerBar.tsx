@@ -101,51 +101,76 @@ const ExplorerBar = () => {
     dispatch(unselect())
   }, [currentDirectory, dispatch])
 
-  const handleClickBack = () => dispatch(back())
+  const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 
-  const handleClickForward = () => dispatch(forward())
+  const handleClickForward = useCallback(() => dispatch(forward()), [dispatch])
 
-  const handleClickUpward = async () => dispatch(upward())
+  const handleClickUpward = useCallback(
+    async () => dispatch(upward()),
+    [dispatch],
+  )
 
-  const handleClickRefresh = async () => {
+  const handleClickRefresh = useCallback(async () => {
     setDirectory(currentDirectory)
     dispatch(load())
-  }
+  }, [currentDirectory, dispatch])
 
-  const handleClickFolder = async () =>
-    await window.electronAPI.openPath(currentDirectory)
+  const handleClickFolder = useCallback(
+    async () => await window.electronAPI.openPath(currentDirectory),
+    [currentDirectory],
+  )
 
-  const handleClickFavorite = () => dispatch(toggle(currentDirectory))
+  const handleClickFavorite = useCallback(
+    () => dispatch(toggle(currentDirectory)),
+    [currentDirectory, dispatch],
+  )
 
-  const handleClickSearch = () => search(query)
+  const handleClickSearch = useCallback(() => search(query), [query, search])
 
-  const handleChangeDirectory = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value
-    setDirectory(value)
-  }
+  const handleChangeDirectory = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.value
+      setDirectory(value)
+    },
+    [],
+  )
 
-  const handleClickRemove = (e: MouseEvent, query: string) => {
-    e.stopPropagation()
-    dispatch(remove(query))
-  }
+  const handleClickRemove = useCallback(
+    (e: MouseEvent, query: string) => {
+      e.stopPropagation()
+      dispatch(remove(query))
+    },
+    [dispatch],
+  )
 
-  const handleChangeQuery = (_e: SyntheticEvent, value: string | null) =>
-    search(value ?? '')
+  const handleChangeQuery = useCallback(
+    (_e: SyntheticEvent, value: string | null) => search(value ?? ''),
+    [search],
+  )
 
-  const handleInputChangeQuery = (_e: SyntheticEvent, value: string) =>
-    value ? setQuery(value) : search(value)
+  const handleInputChangeQuery = useCallback(
+    (_e: SyntheticEvent, value: string) =>
+      value ? setQuery(value) : search(value),
+    [search],
+  )
 
-  const handleKeyDownDirectory = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
-      dispatch(changeDirectory(directory))
-    }
-  }
+  const handleKeyDownDirectory = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
+        dispatch(changeDirectory(directory))
+      }
+    },
+    [directory, dispatch],
+  )
 
-  const handleKeyDownQuery = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-      search(query)
-    }
-  }
+  const handleKeyDownQuery = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+        search(query)
+      }
+    },
+    [query, search],
+  )
 
   return (
     <AppBar

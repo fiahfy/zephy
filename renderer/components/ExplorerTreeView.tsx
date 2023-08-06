@@ -3,7 +3,13 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
 import { TreeView } from '@mui/lab'
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { useWatcher } from 'contexts/WatcherContext'
@@ -26,7 +32,7 @@ const ExplorerTreeView = () => {
   const [selected, setSelected] = useState<string[]>([])
   const [root, setRoot] = useState<Entry>()
 
-  const getLoadedDirectories = (entry: Entry) => {
+  const getLoadedDirectories = useCallback((entry: Entry) => {
     const reducer = (acc: string[], entry: Entry): string[] => {
       if (entry.type === 'directory' && entry.children) {
         return [entry.path, ...entry.children.reduce(reducer, acc)]
@@ -34,9 +40,12 @@ const ExplorerTreeView = () => {
       return acc
     }
     return [entry].reduce(reducer, [])
-  }
+  }, [])
 
-  const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
+  const loaded = useMemo(
+    () => (root ? getLoadedDirectories(root) : []),
+    [getLoadedDirectories, root],
+  )
 
   useEffect(() => {
     ;(async () => {
@@ -48,7 +57,7 @@ const ExplorerTreeView = () => {
       setSelected([currentDirectory])
       setRoot(entry)
     })()
-  }, [currentDirectory, explorable])
+  }, [currentDirectory, explorable, getLoadedDirectories])
 
   useEffect(
     () =>
@@ -105,48 +114,54 @@ const ExplorerTreeView = () => {
     return [root].reduce(reducer, {})
   }, [root])
 
-  const handleSelect = (_event: SyntheticEvent, nodeIds: string[] | string) => {
-    if (Array.isArray(nodeIds)) {
-      return
-    }
-    const entry = entryMap[nodeIds]
-    if (entry && entry.type === 'directory') {
-      dispatch(changeDirectory(nodeIds))
-    }
-  }
-
-  const handleToggle = async (_event: SyntheticEvent, nodeIds: string[]) => {
-    const expandedNodeId = nodeIds.filter(
-      (nodeId) => !expanded.includes(nodeId),
-    )[0]
-    setExpanded(nodeIds)
-    if (!expandedNodeId) {
-      return
-    }
-    const entry = entryMap[expandedNodeId]
-    if (!entry || entry.type !== 'directory' || entry.children) {
-      return
-    }
-    const children = await window.electronAPI.getEntries(entry.path)
-    const mapper = (e: Entry): Entry => {
-      if (e.type === 'directory') {
-        if (e.path === entry.path) {
-          return {
-            ...e,
-            children,
-          }
-        }
-        if (e.children) {
-          return {
-            ...e,
-            children: e.children.map(mapper),
-          }
-        }
+  const handleSelect = useCallback(
+    (_event: SyntheticEvent, nodeIds: string[] | string) => {
+      if (Array.isArray(nodeIds)) {
+        return
       }
-      return e
-    }
-    setRoot((root) => (root ? mapper(root) : root))
-  }
+      const entry = entryMap[nodeIds]
+      if (entry && entry.type === 'directory') {
+        dispatch(changeDirectory(nodeIds))
+      }
+    },
+    [dispatch, entryMap],
+  )
+
+  const handleToggle = useCallback(
+    async (_event: SyntheticEvent, nodeIds: string[]) => {
+      const expandedNodeId = nodeIds.filter(
+        (nodeId) => !expanded.includes(nodeId),
+      )[0]
+      setExpanded(nodeIds)
+      if (!expandedNodeId) {
+        return
+      }
+      const entry = entryMap[expandedNodeId]
+      if (!entry || entry.type !== 'directory' || entry.children) {
+        return
+      }
+      const children = await window.electronAPI.getEntries(entry.path)
+      const mapper = (e: Entry): Entry => {
+        if (e.type === 'directory') {
+          if (e.path === entry.path) {
+            return {
+              ...e,
+              children,
+            }
+          }
+          if (e.children) {
+            return {
+              ...e,
+              children: e.children.map(mapper),
+            }
+          }
+        }
+        return e
+      }
+      setRoot((root) => (root ? mapper(root) : root))
+    },
+    [entryMap, expanded],
+  )
 
   return (
     <TreeView

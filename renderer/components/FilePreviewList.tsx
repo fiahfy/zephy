@@ -1,4 +1,5 @@
 import { ImageList } from '@mui/material'
+import { useMemo } from 'react'
 
 import ImagePreviewListItem from 'components/ImagePreviewListItem'
 import MessagePreviewListItem from 'components/MessagePreviewListItem'
@@ -13,7 +14,7 @@ type Props = {
 const FilePreviewList = (props: Props) => {
   const { entry } = props
 
-  const fileType = detectFileType(entry.path)
+  const fileType = useMemo(() => detectFileType(entry.path), [entry.path])
 
   return (
     <ImageList cols={1} gap={1} sx={{ m: 0 }}>

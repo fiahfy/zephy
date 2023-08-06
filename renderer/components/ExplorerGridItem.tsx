@@ -2,7 +2,14 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import fileUrl from 'file-url'
-import { MouseEvent, useEffect, useMemo, useReducer } from 'react'
+import {
+  MouseEvent,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react'
 
 import NoOutlineRating from 'components/mui/NoOutlineRating'
 import EntryIcon from 'components/EntryIcon'
@@ -70,8 +77,6 @@ const ExplorerGridItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const editing = isEditing(content.path)
-
   const { createDraggableProps, createDroppableProps, dropping } = useDnd()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
@@ -79,6 +84,11 @@ const ExplorerGridItem = (props: Props) => {
     paths: [],
     thumbnail: undefined,
   })
+
+  const editing = useMemo(
+    () => isEditing(content.path),
+    [content.path, isEditing],
+  )
 
   useEffect(() => {
     let unmounted = false
@@ -128,6 +138,12 @@ const ExplorerGridItem = (props: Props) => {
         ? selectedContents
         : [content],
     [content, editing, isSelected, selectedContents],
+  )
+
+  const handleChangeRating = useCallback(
+    (_e: SyntheticEvent, value: number | null) =>
+      appDispatch(rate({ path: content.path, rating: value ?? 0 })),
+    [appDispatch, content.path],
   )
 
   return (
@@ -207,9 +223,7 @@ const ExplorerGridItem = (props: Props) => {
           >
             <NoOutlineRating
               color="primary"
-              onChange={(_e, value) =>
-                appDispatch(rate({ path: content.path, rating: value ?? 0 }))
-              }
+              onChange={handleChangeRating}
               onClick={(e) => e.stopPropagation()}
               precision={0.5}
               size="small"

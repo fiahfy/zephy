@@ -1,7 +1,7 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { styled } from '@mui/material/styles'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useAppDispatch, useAppSelector } from 'store'
 import {
@@ -32,17 +32,27 @@ type Props = {
 const Sidebar = (props: Props) => {
   const { children, variant } = props
 
-  const position = variant === 'primary' ? 'left' : 'right'
-
   const getSidebarWidth = useAppSelector(selectGetSidebarWidth)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const dispatch = useAppDispatch()
 
-  const width = getSidebarWidth(variant)
-  const hidden = isSidebarHidden(variant)
+  const position = useMemo(
+    () => (variant === 'primary' ? 'left' : 'right'),
+    [variant],
+  )
 
-  const oppositeWidth = getSidebarWidth(
-    variant === 'primary' ? 'secondary' : 'primary',
+  const width = useMemo(
+    () => getSidebarWidth(variant),
+    [getSidebarWidth, variant],
+  )
+  const hidden = useMemo(
+    () => isSidebarHidden(variant),
+    [isSidebarHidden, variant],
+  )
+
+  const oppositeWidth = useMemo(
+    () => getSidebarWidth(variant === 'primary' ? 'secondary' : 'primary'),
+    [getSidebarWidth, variant],
   )
 
   const handleMouseMove = useCallback(
@@ -82,36 +92,40 @@ const Sidebar = (props: Props) => {
       style={{ width }}
       variant="permanent"
     >
-      <Toolbar
-        sx={{
-          flexShrink: 0,
-          minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
-        }}
-      />
-      <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
-      <Box
-        sx={{
-          flexGrow: 1,
-          overflow: 'auto',
-          [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
-            theme.spacing(0.625),
-        }}
-      >
-        {children}
-      </Box>
-      <Box
-        onMouseDown={handleMouseDown}
-        sx={{
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'light' ? grey[100] : grey[900],
-          bottom: 0,
-          cursor: 'col-resize',
-          position: 'absolute',
-          top: 0,
-          width: (theme) => theme.spacing(0.625),
-          [position === 'left' ? 'right' : 'left']: 0,
-        }}
-      />
+      {!hidden && (
+        <>
+          <Toolbar
+            sx={{
+              flexShrink: 0,
+              minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
+            }}
+          />
+          <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflow: 'auto',
+              [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
+                theme.spacing(0.625),
+            }}
+          >
+            {children}
+          </Box>
+          <Box
+            onMouseDown={handleMouseDown}
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light' ? grey[100] : grey[900],
+              bottom: 0,
+              cursor: 'col-resize',
+              position: 'absolute',
+              top: 0,
+              width: (theme) => theme.spacing(0.625),
+              [position === 'left' ? 'right' : 'left']: 0,
+            }}
+          />
+        </>
+      )}
     </Drawer>
   )
 }

@@ -1,5 +1,5 @@
 import { Box, ImageList, Typography } from '@mui/material'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import DirectoryPreviewList from 'components/DirectoryPreviewList'
 import EntryInformation from 'components/EntryInformation'
@@ -13,7 +13,7 @@ const Inspector = () => {
 
   const ref = useRef<HTMLElement>(null)
 
-  const content = contents[0]
+  const content = useMemo(() => contents[0], [contents])
 
   useEffect(() => {
     const el = ref.current

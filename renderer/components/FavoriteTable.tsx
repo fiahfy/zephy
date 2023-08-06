@@ -5,7 +5,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Icon from 'components/Icon'
 import useContextMenu from 'hooks/useContextMenu'
@@ -33,11 +33,14 @@ const FavoriteTable = () => {
     })()
   }, [favorites])
 
-  const handleBlur = () => setSelected([])
+  const handleBlur = useCallback(() => setSelected([]), [])
 
-  const handleClick = (path: string) => dispatch(changeDirectory(path))
+  const handleClick = useCallback(
+    (path: string) => dispatch(changeDirectory(path)),
+    [dispatch],
+  )
 
-  const handleFocus = (path: string) => setSelected([path])
+  const handleFocus = useCallback((path: string) => setSelected([path]), [])
 
   return (
     <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>

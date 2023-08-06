@@ -1,6 +1,6 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import fileUrl from 'file-url'
-import { useEffect, useMemo, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import Outline from 'components/Outline'
@@ -93,10 +93,13 @@ const DirectoryPreviewListItem = (props: Props) => {
     [loading],
   )
 
-  const handleDoubleClick = async (entry: Entry) =>
-    entry.type === 'directory'
-      ? appDispatch(changeDirectory(entry.path))
-      : await window.electronAPI.openPath(entry.path)
+  const handleDoubleClick = useCallback(
+    async (entry: Entry) =>
+      entry.type === 'directory'
+        ? appDispatch(changeDirectory(entry.path))
+        : await window.electronAPI.openPath(entry.path),
+    [appDispatch],
+  )
 
   return (
     <ImageListItem

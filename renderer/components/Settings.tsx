@@ -8,7 +8,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, useCallback } from 'react'
 
 import { useAppDispatch, useAppSelector } from 'store'
 import {
@@ -23,15 +23,21 @@ const Settings = () => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const dispatch = useAppDispatch()
 
-  const handleChangeDarkMode = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.checked
-    dispatch(setDarkMode(value))
-  }
+  const handleChangeDarkMode = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.checked
+      dispatch(setDarkMode(value))
+    },
+    [dispatch],
+  )
 
-  const handleShouldShowHiddenFiles = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.checked
-    dispatch(setShouldShowHiddenFiles(value))
-  }
+  const handleShouldShowHiddenFiles = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.checked
+      dispatch(setShouldShowHiddenFiles(value))
+    },
+    [dispatch],
+  )
 
   return (
     <>

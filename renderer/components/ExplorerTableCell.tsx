@@ -1,5 +1,5 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
-import { useMemo } from 'react'
+import { MouseEvent, SyntheticEvent, useCallback, useMemo } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/mui/NoOutlineRating'
@@ -33,9 +33,12 @@ const ExplorerTableCell = (props: Props) => {
   const selectedContents = useAppSelector(selectSelectedContents)
   const dispatch = useAppDispatch()
 
-  const editing = isEditing(content.path)
-
   const { createDraggableProps, createDroppableProps, dropping } = useDnd()
+
+  const editing = useMemo(
+    () => isEditing(content.path),
+    [content.path, isEditing],
+  )
 
   const draggingContents = useMemo(
     () =>
@@ -45,6 +48,17 @@ const ExplorerTableCell = (props: Props) => {
         ? selectedContents
         : [content],
     [content, editing, isSelected, selectedContents],
+  )
+
+  const handleChangeRating = useCallback(
+    (_e: SyntheticEvent, value: number | null) =>
+      dispatch(rate({ path: content.path, rating: value ?? 0 })),
+    [content.path, dispatch],
+  )
+
+  const handleClickRating = useCallback(
+    (e: MouseEvent) => e.stopPropagation(),
+    [],
   )
 
   return (
@@ -91,20 +105,19 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </>
       )}
-      {/* {dataKey === 'rating' && (
+      {/* TODO: slow rendering */}
+      {dataKey === 'rating' && (
         <NoOutlineRating
-          onChange={(_e, value) =>
-            dispatch(rate({ path: content.path, rating: value ?? 0 }))
-          }
-          onClick={(e) => e.stopPropagation()}
+          onChange={handleChangeRating}
+          onClick={handleClickRating}
           precision={0.5}
           size="small"
           value={content.rating}
         />
-      )} */}
+      )}
       {dataKey === 'size' && content.type === 'file' && (
         <Typography noWrap variant="caption">
-          {formatFileSize(content.size)}{' '}
+          {formatFileSize(content.size)}
         </Typography>
       )}
       {dataKey === 'dateModified' && (

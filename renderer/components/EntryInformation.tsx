@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
 import { DetailedEntry, Metadata } from 'interfaces'
@@ -12,9 +12,9 @@ type Props = {
 const EntryInformation = (props: Props) => {
   const { entries } = props
 
-  const entry = entries[0]
-
   const [metadata, setMetadata] = useState<Metadata>()
+
+  const entry = useMemo(() => entries[0], [entries])
 
   useEffect(() => {
     let unmounted = false
