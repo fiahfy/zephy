@@ -1,9 +1,9 @@
 import { MouseEvent, useCallback, useEffect, useRef } from 'react'
 
 const usePreventClickOnDoubleClick = <T>(
-  onBeforeClick: (e: MouseEvent, ...args: T[]) => void,
-  onClick: (e: MouseEvent, ...args: T[]) => void,
-  onDoubleClick: (e: MouseEvent, ...args: T[]) => void,
+  beforeClickCallback: (e: MouseEvent, ...args: T[]) => void,
+  clickCallback: (e: MouseEvent, ...args: T[]) => void,
+  doubleClickCallback: (e: MouseEvent, ...args: T[]) => void,
 ) => {
   const timer = useRef<number>()
 
@@ -11,24 +11,24 @@ const usePreventClickOnDoubleClick = <T>(
     return () => window.clearTimeout(timer.current)
   }, [])
 
-  const handleClick = useCallback(
+  const onClick = useCallback(
     (e: MouseEvent, ...args: T[]) => {
-      onBeforeClick(e, ...args)
+      beforeClickCallback(e, ...args)
       window.clearTimeout(timer.current)
-      timer.current = window.setTimeout(() => onClick(e, ...args), 300)
+      timer.current = window.setTimeout(() => clickCallback(e, ...args), 300)
     },
-    [onBeforeClick, onClick],
+    [beforeClickCallback, clickCallback],
   )
 
-  const handleDoubleClick = useCallback(
+  const onDoubleClick = useCallback(
     (e: MouseEvent, ...args: T[]) => {
       window.clearTimeout(timer.current)
-      onDoubleClick(e, ...args)
+      doubleClickCallback(e, ...args)
     },
-    [onDoubleClick],
+    [doubleClickCallback],
   )
 
-  return { handleClick, handleDoubleClick }
+  return { onClick, onDoubleClick }
 }
 
 export default usePreventClickOnDoubleClick

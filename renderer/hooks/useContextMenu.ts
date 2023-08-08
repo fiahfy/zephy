@@ -4,9 +4,11 @@ import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
 import {
+  selectBackHistories,
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectCurrentViewMode,
+  selectForwardHistories,
   selectIsSidebarHidden,
 } from 'store/window'
 
@@ -30,9 +32,11 @@ const createMenuHandler = (options?: ContextMenuOption[]) => {
 }
 
 const useContextMenu = () => {
+  const backHistories = useAppSelector(selectBackHistories)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
+  const forwardHistories = useAppSelector(selectForwardHistories)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
 
@@ -178,10 +182,34 @@ const useContextMenu = () => {
     ],
   )
 
+  const createBackHistoryMenuHandler = useCallback(
+    () =>
+      createMenuHandler(
+        backHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: { offset: -(i + 1), path: history.directory },
+        })),
+      ),
+    [backHistories],
+  )
+
+  const createForwardHistoryMenuHandler = useCallback(
+    () =>
+      createMenuHandler(
+        forwardHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: { offset: i + 1, path: history.directory },
+        })),
+      ),
+    [forwardHistories],
+  )
+
   return {
+    createBackHistoryMenuHandler,
     createContentMenuHandler,
     createCurrentDirectoryMenuHandler,
     createEntryMenuHandler,
+    createForwardHistoryMenuHandler,
     createMenuHandler,
     createMoreMenuHandler,
   }

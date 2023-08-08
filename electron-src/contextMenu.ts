@@ -7,6 +7,7 @@ import {
   ipcMain,
   shell,
 } from 'electron'
+import { basename } from 'path'
 
 export type ContextMenuParams = {
   isEditable: boolean
@@ -129,6 +130,10 @@ const registerContextMenu = (
               },
             }),
           label: params.favorite ? 'Remove from Favorites' : 'Add to Favorites',
+        }),
+        go: ({ params }) => ({
+          click: () => send({ type: 'go', data: { offset: params.offset } }),
+          label: basename(params.path),
         }),
         view: ({ params }) => ({
           label: 'View',

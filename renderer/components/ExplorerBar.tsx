@@ -32,6 +32,7 @@ import {
 import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/mui/RoundedFilledTextField'
 import useContextMenu from 'hooks/useContextMenu'
+import useLongPress from 'hooks/useLongPress'
 import { useAppDispatch, useAppSelector } from 'store'
 import { load, searchQuery, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
@@ -56,7 +57,14 @@ const ExplorerBar = () => {
   const queryHistories = useAppSelector(selectQueryHistories)
   const dispatch = useAppDispatch()
 
-  const { createMoreMenuHandler } = useContextMenu()
+  const {
+    createBackHistoryMenuHandler,
+    createForwardHistoryMenuHandler,
+    createMoreMenuHandler,
+  } = useContextMenu()
+
+  const bindBack = useLongPress(createBackHistoryMenuHandler())
+  const bindForward = useLongPress(createForwardHistoryMenuHandler())
 
   const [directory, setDirectory] = useState('')
   const [query, setQuery] = useState('')
@@ -187,16 +195,20 @@ const ExplorerBar = () => {
           <IconButton
             disabled={!canBack}
             onClick={handleClickBack}
+            onContextMenu={createBackHistoryMenuHandler()}
             size="small"
             title="Go back"
+            {...bindBack}
           >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <IconButton
             disabled={!canForward}
             onClick={handleClickForward}
+            onContextMenu={createForwardHistoryMenuHandler()}
             size="small"
             title="Go forward"
+            {...bindForward}
           >
             <ArrowForwardIcon fontSize="small" />
           </IconButton>

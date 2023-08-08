@@ -5,6 +5,7 @@ import { moveToTrash, newFolder, select, startEditing } from 'store/explorer'
 import { add, remove } from 'store/favorite'
 import {
   changeDirectory,
+  go,
   goToSettings,
   setCurrentOrderBy,
   setCurrentViewMode,
@@ -33,6 +34,8 @@ const useContextMenuListener = () => {
             return dispatch(moveToTrash(data.paths))
           case 'changeDirectory':
             return dispatch(changeDirectory(data.path))
+          case 'go':
+            return dispatch(go(data.offset))
           case 'goToSettings':
             return dispatch(goToSettings())
           case 'sort':

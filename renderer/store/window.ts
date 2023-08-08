@@ -330,6 +330,14 @@ export const selectCanForward = createSelector(
   (history) => history.index < history.histories.length - 1,
 )
 
+export const selectBackHistories = createSelector(selectHistory, (history) =>
+  history.histories.slice(0, history.index).reverse(),
+)
+
+export const selectForwardHistories = createSelector(selectHistory, (history) =>
+  history.histories.slice(history.index + 1),
+)
+
 export const selectCurrentDirectory = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.directory,

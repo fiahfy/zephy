@@ -60,8 +60,8 @@ const Explorer = () => {
   )
 
   const {
-    handleClick: handleClickContent,
-    handleDoubleClick: handleDoubleClickContent,
+    onClick: handleClickContent,
+    onDoubleClick: handleDoubleClickContent,
   } = usePreventClickOnDoubleClick(
     (e: MouseEvent, content: Content) => {
       // prevent container event
