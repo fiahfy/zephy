@@ -49,7 +49,7 @@ const Explorer = () => {
 
   const { createContentMenuHandler, createCurrentDirectoryMenuHandler } =
     useContextMenu()
-  const { createCurrentDirectoryDroppableProps, dropping } = useDnd()
+  const { createCurrentDirectoryDroppableBinder, dropping } = useDnd()
 
   const open = useCallback(
     async (content: Content) =>
@@ -154,7 +154,7 @@ const Explorer = () => {
       onClick={handleClick}
       onContextMenu={createCurrentDirectoryMenuHandler()}
       sx={{ height: '100%', position: 'relative' }}
-      {...createCurrentDirectoryDroppableProps()}
+      {...createCurrentDirectoryDroppableBinder()}
     >
       {createElement(
         currentViewMode === 'list' ? ExplorerTable : ExplorerGrid,

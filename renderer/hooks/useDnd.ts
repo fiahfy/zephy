@@ -29,7 +29,7 @@ const useDnd = () => {
 
   const dropping = useMemo(() => enterCount > 0, [enterCount])
 
-  const createDraggableProps = useCallback((entries?: Entry | Entry[]) => {
+  const createDraggableBinder = useCallback((entries?: Entry | Entry[]) => {
     if (!entries) {
       return {}
     }
@@ -50,7 +50,7 @@ const useDnd = () => {
     }
   }, [])
 
-  const getDroppableProps = useCallback(
+  const getDroppableBinder = useCallback(
     (path: string) => {
       return {
         onDragEnter: (e: DragEvent) => {
@@ -80,21 +80,21 @@ const useDnd = () => {
     [dispatch],
   )
 
-  const createDroppableProps = useCallback(
+  const createDroppableBinder = useCallback(
     (entry: Entry) =>
-      entry.type === 'directory' ? getDroppableProps(entry.path) : {},
-    [getDroppableProps],
+      entry.type === 'directory' ? getDroppableBinder(entry.path) : {},
+    [getDroppableBinder],
   )
 
-  const createCurrentDirectoryDroppableProps = useCallback(
-    () => getDroppableProps(currentDirectory),
-    [currentDirectory, getDroppableProps],
+  const createCurrentDirectoryDroppableBinder = useCallback(
+    () => getDroppableBinder(currentDirectory),
+    [currentDirectory, getDroppableBinder],
   )
 
   return {
-    createCurrentDirectoryDroppableProps,
-    createDraggableProps,
-    createDroppableProps,
+    createCurrentDirectoryDroppableBinder,
+    createDraggableBinder,
+    createDroppableBinder,
     dropping,
   }
 }

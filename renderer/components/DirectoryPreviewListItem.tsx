@@ -47,7 +47,7 @@ const DirectoryPreviewListItem = (props: Props) => {
   const appDispatch = useAppDispatch()
 
   const { createEntryMenuHandler } = useContextMenu()
-  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -115,8 +115,8 @@ const DirectoryPreviewListItem = (props: Props) => {
         },
       }}
       tabIndex={0}
-      {...createDraggableProps(entry)}
-      {...createDroppableProps(entry)}
+      {...createDraggableBinder(entry)}
+      {...createDroppableBinder(entry)}
     >
       {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element

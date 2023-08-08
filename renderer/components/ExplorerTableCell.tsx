@@ -33,7 +33,7 @@ const ExplorerTableCell = (props: Props) => {
   const selectedContents = useAppSelector(selectSelectedContents)
   const dispatch = useAppDispatch()
 
-  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
   const editing = useMemo(
     () => isEditing(content.path),
@@ -79,8 +79,8 @@ const ExplorerTableCell = (props: Props) => {
       title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'
         ? {
-            ...createDraggableProps(draggingContents),
-            ...createDroppableProps(content),
+            ...createDraggableBinder(draggingContents),
+            ...createDroppableBinder(content),
           }
         : {})}
     >

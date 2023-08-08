@@ -77,7 +77,7 @@ const ExplorerGridItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { createDraggableProps, createDroppableProps, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
   const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -185,8 +185,8 @@ const ExplorerGridItem = (props: Props) => {
           },
         },
       }}
-      {...createDraggableProps(draggingContents)}
-      {...createDroppableProps(content)}
+      {...createDraggableBinder(draggingContents)}
+      {...createDroppableBinder(content)}
     >
       {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element
