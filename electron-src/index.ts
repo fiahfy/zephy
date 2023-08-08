@@ -8,7 +8,7 @@ import registerContextMenu from './contextMenu'
 import createFullscreenManager from './fullscreen'
 import registerHandlers from './handlers'
 import createWatcher from './watcher'
-import createWindowStateManager from './windowState'
+import createWindowManager from './window'
 
 app.whenReady().then(async () => {
   await prepareNext('./renderer')
@@ -43,18 +43,18 @@ app.whenReady().then(async () => {
     return browserWindow
   }
 
-  const windowStateManager = createWindowStateManager(createWindow)
+  const windowManager = createWindowManager(createWindow)
 
   const create = (params?: { directory?: string }) => {
     const directory = params?.directory ?? app.getPath('home')
-    windowStateManager.create({ directory })
+    windowManager.create({ directory })
   }
 
   registerApplicationMenu(create)
   registerContextMenu(create)
   registerHandlers()
 
-  const browserWindows = windowStateManager.restore()
+  const browserWindows = windowManager.restore()
   if (browserWindows.length === 0) {
     create()
   }
@@ -72,6 +72,6 @@ app.whenReady().then(async () => {
   })
 
   app.on('before-quit', () => {
-    windowStateManager.save()
+    windowManager.save()
   })
 })

@@ -3,51 +3,47 @@ import windowStateKeeper, { State } from 'electron-window-state'
 import fs from 'fs'
 import path from 'path'
 
-const windowStateManager = <T>(
+const windowManager = <T>(
   baseCreateWindow: (state: State) => BrowserWindow,
 ) => {
   const savedDirectoryPath = app.getPath('userData')
   const savedPath = path.join(savedDirectoryPath, 'window-state.json')
 
-  let state: boolean[] = []
+  let visibilities: boolean[] = []
 
-  const infos: { [id: number]: { index: number; params?: T } } = {}
+  const details: { [id: number]: { index: number; params?: T } } = {}
 
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
-  ipcMain.handle('window-state-get-index', (event: IpcMainInvokeEvent) => {
+  ipcMain.handle('window-get-details', (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
-    return windowId ? infos[windowId]?.index : undefined
-  })
-  ipcMain.handle('window-state-get-params', (event: IpcMainInvokeEvent) => {
-    const windowId = getWindowId(event)
-    return windowId ? infos[windowId]?.params : undefined
+    return windowId ? details[windowId] : undefined
   })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isValidState = (state: any): state is boolean[] =>
-    Array.isArray(state) &&
-    state.every((visible: unknown) => typeof visible === 'boolean')
+  const isVisibilities = (visibilities: any): visibilities is boolean[] =>
+    Array.isArray(visibilities) &&
+    visibilities.every((visible: unknown) => typeof visible === 'boolean')
 
-  const restoreState = () => {
+  const restoreVisibilities = () => {
     try {
       const json = fs.readFileSync(savedPath, 'utf8')
       const restored = JSON.parse(json)
-      if (isValidState(restored)) {
-        state = restored
+      if (isVisibilities(restored)) {
+        visibilities = restored
       }
     } catch (e) {
       // noop
     }
   }
 
-  const saveState = () => {
-    const json = JSON.stringify(state)
+  const saveVisibilities = () => {
+    const json = JSON.stringify(visibilities)
     fs.writeFileSync(savedPath, json)
   }
 
-  const getWindowFilename = (index: number) => `window-state_${index}.json`
+  const getWindowFile = (index: number) => `window-state_${index}.json`
 
   const createWindow = (
     index: number,
@@ -56,18 +52,21 @@ const windowStateManager = <T>(
   ) => {
     const windowState = windowStateKeeper({
       path: savedDirectoryPath,
-      file: getWindowFilename(index),
+      file: getWindowFile(index),
     })
     const browserWindow = baseCreateWindow({
       ...windowState,
       ...(options ?? {}),
     })
     windowState.manage(browserWindow)
-    infos[browserWindow.id] = { index, params }
+
+    details[browserWindow.id] = { index, params }
+
     browserWindow.on('close', () => {
-      delete infos[browserWindow.id]
-      state[index] = false
+      delete details[browserWindow.id]
+      visibilities[index] = false
     })
+
     return browserWindow
   }
 
@@ -87,23 +86,23 @@ const windowStateManager = <T>(
   }
 
   const create = (params?: T) => {
-    const index = state.reduce(
+    const index = visibilities.reduce(
       (acc, visible, index) => (visible ? acc : Math.min(index, acc)),
-      state.length,
+      visibilities.length,
     )
-    state[index] = true
+    visibilities[index] = true
     return createWindow(index, params, getNewWindowOptions())
   }
 
   const restore = () => {
-    restoreState()
-    return state.reduce(
+    restoreVisibilities()
+    return visibilities.reduce(
       (acc, visible, index) => (visible ? [...acc, createWindow(index)] : acc),
       [] as BrowserWindow[],
     )
   }
 
-  const save = () => saveState()
+  const save = () => saveVisibilities()
 
   return {
     create,
@@ -112,4 +111,4 @@ const windowStateManager = <T>(
   }
 }
 
-export default windowStateManager
+export default windowManager

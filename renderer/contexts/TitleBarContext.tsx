@@ -26,6 +26,12 @@ export const TitleBarProvider = (props: Props) => {
   const visible = useMemo(() => darwin && !fullscreen, [darwin, fullscreen])
 
   useEffect(() => {
+    const removeListener =
+      window.electronAPI.fullscreen.addListener(setFullscreen)
+    return () => removeListener()
+  }, [])
+
+  useEffect(() => {
     ;(async () => {
       const darwin = await window.electronAPI.isDarwin()
       setDarwin(darwin)
@@ -34,11 +40,6 @@ export const TitleBarProvider = (props: Props) => {
       // for initial rendering
       setReady(true)
     })()
-
-    const removeListener =
-      window.electronAPI.fullscreen.addListener(setFullscreen)
-
-    return () => removeListener()
   }, [])
 
   const value = { visible }

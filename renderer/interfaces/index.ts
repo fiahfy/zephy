@@ -50,9 +50,10 @@ export interface IElectronAPI {
       ) => void,
     ) => Promise<void>
   }
-  windowState: {
-    getIndex: () => Promise<number | undefined>
-    getParams: () => Promise<{ directory?: string } | undefined>
+  window: {
+    getDetails: () => Promise<
+      { index: number; params: { directory?: string } } | undefined
+    >
   }
 }
 

@@ -83,8 +83,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return ipcRenderer.invoke('watcher-watch', directoryPaths)
     },
   },
-  windowState: {
-    getIndex: () => ipcRenderer.invoke('window-state-get-index'),
-    getParams: () => ipcRenderer.invoke('window-state-get-params'),
+  window: {
+    getDetails: () => ipcRenderer.invoke('window-get-details'),
   },
 })

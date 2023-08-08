@@ -10,7 +10,6 @@ import useApplicationMenuListener from 'hooks/useApplicationMenuListener'
 import useContextMenu from 'hooks/useContextMenu'
 import useContextMenuListener from 'hooks/useContextMenuListener'
 import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
-import useWindow from 'hooks/useWindow'
 
 type Props = {
   children: ReactNode
@@ -23,7 +22,6 @@ const Layout = (props: Props) => {
   const { createMenuHandler } = useContextMenu()
   useContextMenuListener()
   useDocumentEventHandler()
-  useWindow()
 
   return (
     <Box
