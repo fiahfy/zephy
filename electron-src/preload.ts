@@ -29,28 +29,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('rename-entry', path, newName),
   trashItems: (paths: string[]) => ipcRenderer.invoke('trash-items', paths),
   applicationMenu: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const handler = (_event: IpcRendererEvent, message: any) =>
-        callback(message)
-      ipcRenderer.on('application-menu-send', handler)
-      return () => ipcRenderer.removeListener('application-menu-send', handler)
-    },
-    select: (paths: string[]) =>
-      ipcRenderer.invoke('application-menu-select', paths),
+    setState: (paths: string[]) =>
+      ipcRenderer.invoke('application-menu-set-state', paths),
   },
   contextMenu: {
+    show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
+      ipcRenderer.invoke('context-menu-show', params, options),
+  },
+  message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handler = (_event: IpcRendererEvent, message: any) =>
         callback(message)
-      ipcRenderer.on('context-menu-send', handler)
-      return () => ipcRenderer.removeListener('context-menu-send', handler)
+      ipcRenderer.on('message-send', handler)
+      return () => ipcRenderer.removeListener('message send', handler)
     },
-    show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
-      ipcRenderer.invoke('context-menu-show', params, options),
   },
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => {
@@ -59,7 +53,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('fullscreen-send', handler)
       return () => ipcRenderer.removeListener('fullscreen-send', handler)
     },
-    isFullscreen: () => ipcRenderer.invoke('fullscreen-is-fullscreen'),
+    isEntered: () => ipcRenderer.invoke('fullscreen-is-entered'),
   },
   watcher: {
     watch: (

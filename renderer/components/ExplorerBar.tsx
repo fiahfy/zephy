@@ -79,27 +79,18 @@ const ExplorerBar = () => {
   )
 
   useEffect(() => {
-    const removeListener = window.electronAPI.applicationMenu.addListener(
-      (message) => {
-        const { type } = message
-        if (type === 'find') {
+    const removeListener = window.electronAPI.message.addListener((message) => {
+      const { type } = message
+      switch (type) {
+        case 'find':
           ref.current?.focus()
-        }
-      },
-    )
-    return () => removeListener()
-  }, [dispatch, search])
-
-  useEffect(() => {
-    const removeListener = window.electronAPI.contextMenu.addListener(
-      (message) => {
-        const { type } = message
-        if (type === 'search') {
+          break
+        case 'search':
           search(document.getSelection()?.toString() ?? '')
           ref.current?.focus()
-        }
-      },
-    )
+          break
+      }
+    })
     return () => removeListener()
   }, [dispatch, search])
 

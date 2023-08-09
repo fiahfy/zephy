@@ -35,7 +35,7 @@ export const TitleBarProvider = (props: Props) => {
     ;(async () => {
       const darwin = await window.electronAPI.isDarwin()
       setDarwin(darwin)
-      const fullscreen = await window.electronAPI.fullscreen.isFullscreen()
+      const fullscreen = await window.electronAPI.fullscreen.isEntered()
       setFullscreen(fullscreen)
       // for initial rendering
       setReady(true)

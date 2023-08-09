@@ -24,21 +24,21 @@ export interface IElectronAPI {
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   trashItems: (paths: string[]) => Promise<void>
   applicationMenu: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => () => void
-    select: (paths: string[]) => Promise<void>
+    setState: (paths: string[]) => Promise<void>
   }
   contextMenu: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => () => void
     show: (
       params: ContextMenuParams,
       options: ContextMenuOption[],
     ) => Promise<void>
   }
+  message: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addListener: (callback: (message: any) => void) => () => void
+  }
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => () => void
-    isFullscreen: () => Promise<boolean>
+    isEntered: () => Promise<boolean>
   }
   watcher: {
     watch: (

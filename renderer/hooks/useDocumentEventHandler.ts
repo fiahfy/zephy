@@ -7,7 +7,7 @@ const useDocumentEventHandler = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handler = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowLeft':
           if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
@@ -21,7 +21,16 @@ const useDocumentEventHandler = () => {
           break
       }
     }
-    const handleMouseDown = (e: MouseEvent) => {
+
+    document.addEventListener('keydown', handler)
+
+    return () => {
+      document.removeEventListener('keydown', handler)
+    }
+  }, [dispatch])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
       switch (e.button) {
         case 3:
           return dispatch(back())
@@ -30,12 +39,10 @@ const useDocumentEventHandler = () => {
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mousedown', handler)
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('mousedown', handler)
     }
   }, [dispatch])
 }

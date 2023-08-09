@@ -6,10 +6,9 @@ import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
 import TitleBar from 'components/TitleBar'
-import useApplicationMenuListener from 'hooks/useApplicationMenuListener'
 import useContextMenu from 'hooks/useContextMenu'
-import useContextMenuListener from 'hooks/useContextMenuListener'
 import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
+import useMessageListener from 'hooks/useMessageListener'
 
 type Props = {
   children: ReactNode
@@ -18,10 +17,9 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  useApplicationMenuListener()
   const { createMenuHandler } = useContextMenu()
-  useContextMenuListener()
   useDocumentEventHandler()
+  useMessageListener()
 
   return (
     <Box

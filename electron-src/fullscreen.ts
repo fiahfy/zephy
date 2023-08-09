@@ -2,7 +2,7 @@ import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from 'electron'
 
 const fullscreenManager = () => {
   ipcMain.handle(
-    'fullscreen-is-fullscreen',
+    'fullscreen-is-entered',
     (event: IpcMainInvokeEvent) =>
       BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false,
   )

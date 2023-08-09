@@ -31,8 +31,7 @@ const registerContextMenu = (
       options: ContextMenuOption[],
     ) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const send = (message: any) =>
-        event.sender.send('context-menu-send', message)
+      const send = (message: any) => event.sender.send('message-send', message)
 
       const defaultActions = {
         separator: { type: 'separator' as const },

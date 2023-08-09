@@ -223,7 +223,7 @@ export const setSelected =
     const { setSelected } = explorerSlice.actions
     dispatch(setSelected(paths))
     // update application menu after dispatch, because it is little bit slow
-    await window.electronAPI.applicationMenu.select(paths)
+    await window.electronAPI.applicationMenu.setState(paths)
   }
 
 export const select =

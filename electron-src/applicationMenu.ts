@@ -11,7 +11,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send = (message: any) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
-  activeWindow?.webContents.send('application-menu-send', message)
+  activeWindow?.webContents.send('message-send', message)
 }
 
 const registerApplicationMenu = (
@@ -154,7 +154,7 @@ const registerApplicationMenu = (
   Menu.setApplicationMenu(menu)
 
   ipcMain.handle(
-    'application-menu-select',
+    'application-menu-set-state',
     (_event: IpcMainInvokeEvent, paths: string[]) => {
       const menu = Menu.getApplicationMenu()
       if (!menu) {
