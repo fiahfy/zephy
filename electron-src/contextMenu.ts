@@ -68,7 +68,24 @@ const registerContextMenu = (
           option: ContextMenuOption,
         ) => MenuItemConstructorOptions
       } = {
-        separator: () => defaultActions.separator,
+        copyPath: ({ params }) => ({
+          click: () => clipboard.writeText(params.path),
+          label: 'Copy Path',
+        }),
+        go: ({ params }) => ({
+          click: () => send({ type: 'go', data: { offset: params.offset } }),
+          label: basename(params.path),
+        }),
+        moveToTrash: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+Backspace',
+          click: () =>
+            send({ type: 'moveToTrash', data: { paths: params.paths } }),
+          label: 'Move to Trash',
+        }),
+        newFolder: ({ params }) => ({
+          click: () => send({ type: 'newFolder', data: { path: params.path } }),
+          label: 'New Folder',
+        }),
         open: ({ params }) => ({
           click: () => shell.openPath(params.path),
           label: 'Open',
@@ -82,73 +99,18 @@ const registerContextMenu = (
           click: () => createWindow({ directory: params.path }),
           label: 'Open in New Window',
         }),
-        revealInFinder: ({ params }) => ({
-          click: () => shell.showItemInFolder(params.path),
-          label: 'Reveal in Finder',
-        }),
-        newFolder: ({ params }) => ({
-          click: () => send({ type: 'newFolder', data: { path: params.path } }),
-          label: 'New Folder',
-        }),
-        copyPath: ({ params }) => ({
-          click: () => clipboard.writeText(params.path),
-          label: 'Copy Path',
-        }),
         rename: ({ params }) => ({
           click: () => send({ type: 'rename', data: { path: params.path } }),
           label: 'Rename...',
         }),
-        moveToTrash: ({ params }) => ({
-          accelerator: 'CmdOrCtrl+Backspace',
-          click: () =>
-            send({ type: 'moveToTrash', data: { paths: params.paths } }),
-          label: 'Move to Trash',
+        revealInFinder: ({ params }) => ({
+          click: () => shell.showItemInFolder(params.path),
+          label: 'Reveal in Finder',
         }),
-        // TODO: Implement
-        cut: ({ params }) => ({
-          accelerator: 'CmdOrCtrl+X',
-          click: () => send({ type: 'cut', data: { paths: params.paths } }),
-          label: 'Cut',
-        }),
-        copy: ({ params }) => ({
-          accelerator: 'CmdOrCtrl+C',
-          click: () => send({ type: 'copy', data: { paths: params.paths } }),
-          label: 'Copy',
-        }),
-        paste: () => ({
-          accelerator: 'CmdOrCtrl+V',
-          click: () => send({ type: 'paste' }),
-          label: 'Paste',
-        }),
-        toggleFavorite: ({ params }) => ({
-          click: () =>
-            send({
-              type: params.favorite ? 'removeFromFavorites' : 'addToFavorites',
-              data: {
-                path: params.path,
-              },
-            }),
-          label: params.favorite ? 'Remove from Favorites' : 'Add to Favorites',
-        }),
-        go: ({ params }) => ({
-          click: () => send({ type: 'go', data: { offset: params.offset } }),
-          label: basename(params.path),
-        }),
-        view: ({ params }) => ({
-          label: 'View',
-          submenu: [
-            { label: 'as List', viewMode: 'list' },
-            { label: 'as Thumbnail', viewMode: 'thumbnail' },
-          ].map((menu) => ({
-            ...menu,
-            checked: menu.viewMode === params.viewMode,
-            click: () =>
-              send({
-                type: 'changeViewMode',
-                data: { viewMode: menu.viewMode },
-              }),
-            type: 'checkbox',
-          })),
+        settings: () => ({
+          accelerator: 'CmdOrCtrl+,',
+          click: () => send({ type: 'goToSettings' }),
+          label: 'Settings',
         }),
         sortBy: ({ params }) => ({
           label: 'Sort By',
@@ -167,16 +129,15 @@ const registerContextMenu = (
             type: 'checkbox',
           })),
         }),
-        toggleNavigator: ({ params }) => ({
-          label: params.hidden ? 'Show Navigator' : 'Hide Navigator',
+        toggleFavorite: ({ params }) => ({
           click: () =>
             send({
-              type: 'changeSidebarHidden',
+              type: params.favorite ? 'removeFromFavorites' : 'addToFavorites',
               data: {
-                variant: 'primary',
-                hidden: !params.hidden,
+                path: params.path,
               },
             }),
+          label: params.favorite ? 'Remove from Favorites' : 'Add to Favorites',
         }),
         toggleInspector: ({ params }) => ({
           label: params.hidden ? 'Show Inspector' : 'Hide Inspector',
@@ -189,11 +150,50 @@ const registerContextMenu = (
               },
             }),
         }),
-        settings: () => ({
-          accelerator: 'CmdOrCtrl+,',
-          click: () => send({ type: 'goToSettings' }),
-          label: 'Settings',
+        toggleNavigator: ({ params }) => ({
+          label: params.hidden ? 'Show Navigator' : 'Hide Navigator',
+          click: () =>
+            send({
+              type: 'changeSidebarHidden',
+              data: {
+                variant: 'primary',
+                hidden: !params.hidden,
+              },
+            }),
         }),
+        view: ({ params }) => ({
+          label: 'View',
+          submenu: [
+            { label: 'as List', viewMode: 'list' },
+            { label: 'as Thumbnail', viewMode: 'thumbnail' },
+          ].map((menu) => ({
+            ...menu,
+            checked: menu.viewMode === params.viewMode,
+            click: () =>
+              send({
+                type: 'changeViewMode',
+                data: { viewMode: menu.viewMode },
+              }),
+            type: 'checkbox',
+          })),
+        }),
+        // TODO: Implement
+        cut: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+X',
+          click: () => send({ type: 'cut', data: { paths: params.paths } }),
+          label: 'Cut',
+        }),
+        copy: ({ params }) => ({
+          accelerator: 'CmdOrCtrl+C',
+          click: () => send({ type: 'copy', data: { paths: params.paths } }),
+          label: 'Copy',
+        }),
+        paste: () => ({
+          accelerator: 'CmdOrCtrl+V',
+          click: () => send({ type: 'paste' }),
+          label: 'Paste',
+        }),
+        separator: () => defaultActions.separator,
       }
 
       const actions = options.flatMap((option) => {
@@ -202,10 +202,9 @@ const registerContextMenu = (
       })
 
       const template = [
-        defaultActions.search,
-        defaultActions.separator,
         ...actions,
         defaultActions.separator,
+        defaultActions.search,
         defaultActions.cut,
         defaultActions.copy,
         defaultActions.paste,

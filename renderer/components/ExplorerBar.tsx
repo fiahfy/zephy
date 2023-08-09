@@ -84,11 +84,11 @@ const ExplorerBar = () => {
       switch (type) {
         case 'find':
           ref.current?.focus()
-          break
+          return
         case 'search':
           search(document.getSelection()?.toString() ?? '')
           ref.current?.focus()
-          break
+          return
       }
     })
     return () => removeListener()

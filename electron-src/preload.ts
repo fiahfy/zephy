@@ -2,6 +2,7 @@ import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // TODO: rename funcs
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('create-directory', directoryPath),
   createThumbnail: (path: string) =>
