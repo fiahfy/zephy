@@ -16,7 +16,13 @@ import {
   renameEntry,
 } from './utils/file'
 
-const registerHandlers = () => {
+const registerHandlers = (
+  notify: (
+    eventType: 'create' | 'delete',
+    directoryPath: string,
+    filePath: string,
+  ) => void,
+) => {
   ipcMain.handle(
     'create-directory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
@@ -78,7 +84,13 @@ const registerHandlers = () => {
   ipcMain.handle(
     'trash-entries',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
-      Promise.all(paths.map((path) => shell.trashItem(path))),
+      Promise.all(
+        paths.map(async (path) => {
+          await shell.trashItem(path)
+          // notify event manually because chokidar doesn't detect trashItem event
+          notify('delete', dirname(path), path)
+        }),
+      ),
   )
 }
 

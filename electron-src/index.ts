@@ -52,7 +52,7 @@ app.whenReady().then(async () => {
 
   registerApplicationMenu(createWindow)
   registerContextMenu(createWindow)
-  registerHandlers()
+  registerHandlers(watcher.notify)
 
   const browserWindows = windowManager.restore()
   if (browserWindows.length === 0) {

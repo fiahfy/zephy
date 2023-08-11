@@ -41,16 +41,34 @@ const createWatcher = () => {
   ) => {
     await close(id)
     watchers[id] = chokidar
-      .watch(directoryPaths, { depth: 0, ignoreInitial: true })
+      .watch(directoryPaths, {
+        depth: 0,
+        ignoreInitial: true,
+      })
       .on('add', createHandler('create', directoryPaths, callback))
       .on('addDir', createHandler('create', directoryPaths, callback))
       .on('unlink', createHandler('delete', directoryPaths, callback))
       .on('unlinkDir', createHandler('delete', directoryPaths, callback))
-      .on('all', (...args) => console.log(...args))
   }
 
   const register = (browserWindow: BrowserWindow) =>
     browserWindow.on('close', () => close(browserWindow.webContents.id))
+
+  const notify = (
+    eventType: 'create' | 'delete',
+    directoryPath: string,
+    filePath: string,
+  ) => {
+    const windows = BrowserWindow.getAllWindows()
+    windows.forEach((window) => {
+      window.webContents.send(
+        'watcher-notify',
+        eventType,
+        directoryPath,
+        filePath,
+      )
+    })
+  }
 
   ipcMain.handle(
     'watcher-watch',
@@ -68,7 +86,7 @@ const createWatcher = () => {
       ),
   )
 
-  return { register }
+  return { notify, register }
 }
 
 export default createWatcher
