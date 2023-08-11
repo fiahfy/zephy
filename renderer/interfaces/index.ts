@@ -22,7 +22,7 @@ export interface IElectronAPI {
   ) => Promise<DetailedEntry[]>
   openPath: (path: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
-  trashItems: (paths: string[]) => Promise<void>
+  trashEntries: (paths: string[]) => Promise<void>
   applicationMenu: {
     setState: (paths: string[]) => Promise<void>
   }

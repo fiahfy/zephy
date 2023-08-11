@@ -285,8 +285,9 @@ export const moveToTrash =
   (paths: string[]): AppThunk =>
   async (dispatch) => {
     const { remove } = explorerSlice.actions
-    await window.electronAPI.trashItems(paths)
+    await window.electronAPI.trashEntries(paths)
     dispatch(remove(paths))
+    dispatch(unselect())
   }
 
 export const rename =
@@ -301,9 +302,9 @@ export const rename =
 
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
-  async () => {
+  async (dispatch) => {
     await window.electronAPI.moveEntries(paths, directoryPath)
-    // TODO: fix
+    dispatch(unselect())
   }
 
 export const handle =

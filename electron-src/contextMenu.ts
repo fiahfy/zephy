@@ -188,6 +188,7 @@ const registerContextMenu = (
         copy: ({ params }) => ({
           accelerator: 'CmdOrCtrl+C',
           click: () => copy(params.paths),
+          enabled: params.paths.length > 0,
           label: 'Copy',
         }),
         paste: ({ params }) => ({

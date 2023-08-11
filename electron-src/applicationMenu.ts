@@ -52,6 +52,7 @@ const registerApplicationMenu = (
       submenu: [
         {
           accelerator: 'CmdOrCtrl+N',
+          // TODO: open with current directory
           click: () => createWindow({}),
           label: 'New Window',
         },

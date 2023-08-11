@@ -75,8 +75,10 @@ const registerHandlers = () => {
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName),
   )
-  ipcMain.handle('trash-items', (_event: IpcMainInvokeEvent, paths: string[]) =>
-    Promise.all(paths.map((path) => shell.trashItem(path))),
+  ipcMain.handle(
+    'trash-entries',
+    (_event: IpcMainInvokeEvent, paths: string[]) =>
+      Promise.all(paths.map((path) => shell.trashItem(path))),
   )
 }
 

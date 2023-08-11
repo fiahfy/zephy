@@ -1,7 +1,7 @@
 import { app } from 'electron'
-import { Dirent, Stats, constants } from 'fs'
+import { Dirent, Stats } from 'fs'
 import { copy, pathExists } from 'fs-extra'
-import { access, mkdir, readdir, rename, stat } from 'fs/promises'
+import { mkdir, readdir, rename, stat } from 'fs/promises'
 import { basename, dirname, join, parse, sep } from 'path'
 
 type File = {
@@ -23,6 +23,9 @@ type DetailedEntry = Entry & {
   size: number
 }
 
+// @see https://stackoverflow.com/a/3561711
+const escape = (s: string) => s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
+
 const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
     return 'file' as const
@@ -31,6 +34,77 @@ const getEntryType = (obj: Dirent | Stats) => {
   } else {
     return 'other' as const
   }
+}
+
+const parsePath = (path: string) => {
+  const dirnames = path.split(sep)
+  let rootPath = dirnames[0]
+  // for darwin
+  if (!rootPath) {
+    rootPath = sep
+  }
+  dirnames[0] = rootPath
+  return dirnames
+}
+
+const findMissingNumber = (arr: number[]) => {
+  const sortedArr = arr.sort((a, b) => a - b)
+  let missingNumber = 1
+
+  for (const num of sortedArr) {
+    if (num === missingNumber) {
+      missingNumber++
+    } else if (num > missingNumber) {
+      break
+    }
+  }
+
+  return missingNumber
+}
+
+const generateNewDirectoryName = async (directoryPath: string) => {
+  const filename = 'untitled folder'
+  const entries = await getEntries(directoryPath)
+  const numbers = entries.reduce((acc, entry) => {
+    if (entry.type !== 'directory') {
+      return acc
+    }
+    if (entry.name === filename) {
+      return [...acc, 1]
+    }
+    const reg = new RegExp(`^${escape(filename)} (\\d+)$`)
+    const match = entry.name.match(reg)
+    if (match) {
+      return [...acc, Number(match[1])]
+    }
+    return acc
+  }, [] as number[])
+  const missingNumber = findMissingNumber(numbers)
+  return missingNumber === 1 ? filename : `${filename} ${missingNumber}`
+}
+
+const generateCopyFilename = async (path: string, directoryPath: string) => {
+  const filename = basename(path)
+  const exists = await pathExists(join(directoryPath, filename))
+  if (!exists) {
+    return filename
+  }
+  const parsed = parse(path)
+  const name = parsed.name.replace(/ copy( \d+)?$/, '').normalize('NFC')
+  const ext = parsed.ext
+  const entries = await getEntries(directoryPath)
+  const numbers = entries.reduce((acc, entry) => {
+    const reg = new RegExp(`^${escape(name)} copy( (\\d+))?${escape(ext)}$`)
+    const match = entry.name.match(reg)
+    if (match) {
+      return [...acc, Number(match[2] ?? 1)]
+    }
+    return acc
+  }, [] as number[])
+  const missingNumber = findMissingNumber(numbers)
+  return missingNumber === 1
+    ? `${name} copy${ext}`
+    : `${name} copy ${missingNumber}${ext}`
 }
 
 export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
@@ -90,17 +164,6 @@ export const getDetailedEntries = async (
   return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
 }
 
-const parsePath = (path: string) => {
-  const dirnames = path.split(sep)
-  let rootPath = dirnames[0]
-  // for darwin
-  if (!rootPath) {
-    rootPath = sep
-  }
-  dirnames[0] = rootPath
-  return dirnames
-}
-
 export const getEntryHierarchy = async (
   path?: string,
 ): Promise<Entry | undefined> => {
@@ -151,41 +214,6 @@ export const getEntryHierarchy = async (
   return entry.children?.[0]
 }
 
-const findMissingNumber = (arr: number[]) => {
-  const sortedArr = arr.sort((a, b) => a - b)
-  let missingNumber = 1
-
-  for (const num of sortedArr) {
-    if (num === missingNumber) {
-      missingNumber++
-    } else if (num > missingNumber) {
-      break
-    }
-  }
-
-  return missingNumber
-}
-
-const generateNewDirectoryName = async (directoryPath: string) => {
-  const filename = 'untitled folder'
-  const entries = await getEntries(directoryPath)
-  const numbers = entries.reduce((acc, entry) => {
-    if (entry.type !== 'directory') {
-      return acc
-    }
-    if (entry.name === filename) {
-      return [...acc, 1]
-    }
-    const match = entry.name.match(/^untitled folder ([1-9]\d*)$/)
-    if (match) {
-      return [...acc, Number(match[1])]
-    }
-    return acc
-  }, [] as number[])
-  const missingNumber = findMissingNumber(numbers)
-  return missingNumber === 1 ? filename : `${filename} ${missingNumber}`
-}
-
 export const createDirectory = async (
   directoryPath: string,
 ): Promise<DetailedEntry> => {
@@ -195,13 +223,15 @@ export const createDirectory = async (
   return await getDetailedEntry(path)
 }
 
-const exists = async (path: string) => {
-  try {
-    await access(path, constants.F_OK)
-  } catch (e) {
-    return false
-  }
-  return true
+export const copyEntries = async (paths: string[], directoryPath: string) => {
+  return await Promise.all(
+    paths.map(async (path) => {
+      const filename = await generateCopyFilename(path, directoryPath)
+      const newPath = join(directoryPath, filename)
+      await copy(path, newPath)
+      return await getDetailedEntry(newPath)
+    }),
+  )
 }
 
 export const moveEntries = async (
@@ -212,7 +242,8 @@ export const moveEntries = async (
     paths.map(async (path) => {
       const newPath = join(directoryPath, basename(path))
       if (!paths.includes(newPath)) {
-        if (await exists(newPath)) {
+        const exists = await pathExists(newPath)
+        if (exists) {
           throw new Error('File already exists')
         }
         await rename(path, newPath)
@@ -227,39 +258,10 @@ export const renameEntry = async (
   newName: string,
 ): Promise<DetailedEntry> => {
   const newPath = join(dirname(path), newName)
-  if (await exists(newPath)) {
+  const exists = await pathExists(newPath)
+  if (exists) {
     throw new Error('File already exists')
   }
   await rename(path, newPath)
   return await getDetailedEntry(newPath)
-}
-
-const generateCopyFileName = async (path: string, directoryPath: string) => {
-  const filename = basename(path)
-  const exists = await pathExists(join(directoryPath, filename))
-  if (!exists) {
-    return filename
-  }
-  const parsed = parse(path)
-  const name = parsed.name.replace(/ copy( \d+)?$/, '')
-  const ext = parsed.ext
-  const entries = await getEntries(directoryPath)
-  const numbers = entries.reduce((acc, entry) => {
-    const reg = new RegExp(`^${name} copy( (\\d+))?${ext}$`)
-    const match = entry.name.match(reg)
-    if (match) {
-      return [...acc, Number(match[2] ?? 1)]
-    }
-    return acc
-  }, [] as number[])
-  const missingNumber = findMissingNumber(numbers)
-  return missingNumber === 1
-    ? `${name} copy${ext}`
-    : `${name} copy ${missingNumber}${ext}`
-}
-
-export const copyFile = async (path: string, directoryPath: string) => {
-  const filename = await generateCopyFileName(path, directoryPath)
-  const newPath = join(directoryPath, filename)
-  await copy(path, newPath)
 }

@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('rename-entry', path, newName),
-  trashItems: (paths: string[]) => ipcRenderer.invoke('trash-items', paths),
+  trashEntries: (paths: string[]) => ipcRenderer.invoke('trash-entries', paths),
   applicationMenu: {
     setState: (paths: string[]) =>
       ipcRenderer.invoke('application-menu-set-state', paths),

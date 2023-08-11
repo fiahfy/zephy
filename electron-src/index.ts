@@ -16,7 +16,7 @@ app.whenReady().then(async () => {
   const fullscreenManager = createFullscreenManager()
   const watcher = createWatcher()
 
-  const createWindow = (state: State) => {
+  const baseCreateWindow = (state: State) => {
     const browserWindow = new BrowserWindow({
       ...state,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
@@ -43,20 +43,20 @@ app.whenReady().then(async () => {
     return browserWindow
   }
 
-  const windowManager = createWindowManager(createWindow)
+  const windowManager = createWindowManager(baseCreateWindow)
 
-  const create = (params?: { directory?: string }) => {
+  const createWindow = (params?: { directory?: string }) => {
     const directory = params?.directory ?? app.getPath('home')
     windowManager.create({ directory })
   }
 
-  registerApplicationMenu(create)
-  registerContextMenu(create)
+  registerApplicationMenu(createWindow)
+  registerContextMenu(createWindow)
   registerHandlers()
 
   const browserWindows = windowManager.restore()
   if (browserWindows.length === 0) {
-    create()
+    createWindow()
   }
 
   app.on('window-all-closed', () => {
@@ -67,7 +67,7 @@ app.whenReady().then(async () => {
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      create()
+      createWindow()
     }
   })
 

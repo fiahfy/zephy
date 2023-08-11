@@ -36,7 +36,7 @@ const createWatcher = () => {
     callback: (
       eventType: 'create' | 'delete',
       directoryPath: string,
-      path: string,
+      filePath: string,
     ) => void,
   ) => {
     await close(id)
@@ -46,6 +46,7 @@ const createWatcher = () => {
       .on('addDir', createHandler('create', directoryPaths, callback))
       .on('unlink', createHandler('delete', directoryPaths, callback))
       .on('unlinkDir', createHandler('delete', directoryPaths, callback))
+      .on('all', (...args) => console.log(...args))
   }
 
   const register = (browserWindow: BrowserWindow) =>

@@ -1,6 +1,6 @@
 import { clipboard } from 'electron'
 import { build, parse } from 'plist'
-import { copyFile } from './file'
+import { copyEntries } from './file'
 
 // @see https://github.com/electron/electron/issues/9035#issuecomment-359554116
 const format = 'NSFilenamesPboardType'
@@ -16,7 +16,7 @@ export const paste = async (directoryPath: string) => {
   if (!Array.isArray(paths)) {
     return
   }
-  await Promise.all(paths.map((path) => copyFile(path, directoryPath)))
+  await copyEntries(paths, directoryPath)
 }
 
 export const copy = (paths: string[]) => {

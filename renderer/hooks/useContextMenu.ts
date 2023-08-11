@@ -141,6 +141,10 @@ const useContextMenu = () => {
       createMenuHandler([
         { id: 'newFolder', params: { path: currentDirectory } },
         { id: 'separator' },
+        { id: 'cut', params: { paths: [] } },
+        { id: 'copy', params: { paths: [] } },
+        { id: 'paste', params: { path: currentDirectory } },
+        { id: 'separator' },
         { id: 'view', params: { viewMode: currentViewMode } },
         { id: 'separator' },
         {
