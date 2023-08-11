@@ -130,10 +130,10 @@ const useContextMenu = () => {
         { id: 'separator' },
         { id: 'cut', params: { paths } },
         { id: 'copy', params: { paths } },
-        { id: 'paste' },
+        { id: 'paste', params: { path: currentDirectory } },
       ])
     },
-    [isFavorite],
+    [currentDirectory, isFavorite],
   )
 
   const createCurrentDirectoryMenuHandler = useCallback(

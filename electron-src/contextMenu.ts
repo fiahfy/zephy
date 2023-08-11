@@ -8,6 +8,7 @@ import {
   shell,
 } from 'electron'
 import { basename } from 'path'
+import { canPaste, copy, paste } from './utils/clipboard'
 
 export type ContextMenuParams = {
   isEditable: boolean
@@ -178,19 +179,21 @@ const registerContextMenu = (
           })),
         }),
         // TODO: Implement
-        cut: ({ params }) => ({
+        cut: () => ({
           accelerator: 'CmdOrCtrl+X',
-          click: () => send({ type: 'cut', data: { paths: params.paths } }),
+          click: () => undefined,
+          enabled: false,
           label: 'Cut',
         }),
         copy: ({ params }) => ({
           accelerator: 'CmdOrCtrl+C',
-          click: () => send({ type: 'copy', data: { paths: params.paths } }),
+          click: () => copy(params.paths),
           label: 'Copy',
         }),
-        paste: () => ({
+        paste: ({ params }) => ({
           accelerator: 'CmdOrCtrl+V',
-          click: () => send({ type: 'paste' }),
+          click: () => paste(params.path),
+          enabled: canPaste(),
           label: 'Paste',
         }),
         separator: () => defaultActions.separator,

@@ -1,8 +1,8 @@
 import { app } from 'electron'
-import { Dirent, Stats, constants, promises } from 'fs'
-import { basename, dirname, join, sep } from 'path'
-
-const { access, mkdir, readdir, rename, stat } = promises
+import { Dirent, Stats, constants } from 'fs'
+import { copy, pathExists } from 'fs-extra'
+import { access, mkdir, readdir, rename, stat } from 'fs/promises'
+import { basename, dirname, join, parse, sep } from 'path'
 
 type File = {
   name: string
@@ -167,13 +167,13 @@ const findMissingNumber = (arr: number[]) => {
 }
 
 const generateNewDirectoryName = async (directoryPath: string) => {
-  const basename = 'untitled folder'
+  const filename = 'untitled folder'
   const entries = await getEntries(directoryPath)
   const numbers = entries.reduce((acc, entry) => {
     if (entry.type !== 'directory') {
       return acc
     }
-    if (entry.name === basename) {
+    if (entry.name === filename) {
       return [...acc, 1]
     }
     const match = entry.name.match(/^untitled folder ([1-9]\d*)$/)
@@ -183,7 +183,7 @@ const generateNewDirectoryName = async (directoryPath: string) => {
     return acc
   }, [] as number[])
   const missingNumber = findMissingNumber(numbers)
-  return missingNumber === 1 ? basename : `${basename} ${missingNumber}`
+  return missingNumber === 1 ? filename : `${filename} ${missingNumber}`
 }
 
 export const createDirectory = async (
@@ -232,4 +232,34 @@ export const renameEntry = async (
   }
   await rename(path, newPath)
   return await getDetailedEntry(newPath)
+}
+
+const generateCopyFileName = async (path: string, directoryPath: string) => {
+  const filename = basename(path)
+  const exists = await pathExists(join(directoryPath, filename))
+  if (!exists) {
+    return filename
+  }
+  const parsed = parse(path)
+  const name = parsed.name.replace(/ copy( \d+)?$/, '')
+  const ext = parsed.ext
+  const entries = await getEntries(directoryPath)
+  const numbers = entries.reduce((acc, entry) => {
+    const reg = new RegExp(`^${name} copy( (\\d+))?${ext}$`)
+    const match = entry.name.match(reg)
+    if (match) {
+      return [...acc, Number(match[2] ?? 1)]
+    }
+    return acc
+  }, [] as number[])
+  const missingNumber = findMissingNumber(numbers)
+  return missingNumber === 1
+    ? `${name} copy${ext}`
+    : `${name} copy ${missingNumber}${ext}`
+}
+
+export const copyFile = async (path: string, directoryPath: string) => {
+  const filename = await generateCopyFileName(path, directoryPath)
+  const newPath = join(directoryPath, filename)
+  await copy(path, newPath)
 }

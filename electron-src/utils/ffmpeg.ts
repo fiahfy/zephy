@@ -3,10 +3,9 @@ import { app } from 'electron'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
-import { constants, promises } from 'fs'
+import { constants } from 'fs'
+import { access } from 'fs/promises'
 import { join } from 'path'
-
-const { access } = promises
 
 // @see https://stackoverflow.com/q/63106834
 ffmpeg.setFfmpegPath(ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked'))
