@@ -8,6 +8,7 @@ import {
   openWindow,
   paste,
   select,
+  selectAll,
   startEditing,
 } from 'store/explorer'
 import { add, remove } from 'store/favorite'
@@ -35,12 +36,16 @@ const useMessageListener = () => {
           return dispatch(setSidebarHidden(data.variant, data.hidden))
         case 'changeViewMode':
           return dispatch(setCurrentViewMode(data.viewMode))
+        case 'copy':
+          return dispatch(copy())
         case 'go':
           return dispatch(go(data.offset))
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'moveToTrash':
           return dispatch(moveToTrash(data?.paths))
+        case 'newWindow':
+          return dispatch(openWindow(data?.path))
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'removeFromFavorites':
@@ -49,14 +54,12 @@ const useMessageListener = () => {
           dispatch(select(data.path))
           dispatch(startEditing(data.path))
           return
-        case 'sort':
-          return dispatch(setCurrentOrderBy(data.orderBy))
-        case 'copy':
-          return dispatch(copy())
         case 'paste':
           return dispatch(paste())
-        case 'newWindow':
-          return dispatch(openWindow(data?.path))
+        case 'selectAll':
+          return dispatch(selectAll())
+        case 'sort':
+          return dispatch(setCurrentOrderBy(data.orderBy))
       }
     })
     return () => removeListener()

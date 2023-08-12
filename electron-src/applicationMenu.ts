@@ -102,25 +102,16 @@ const registerApplicationMenu = () => {
                   click: () => send({ type: 'paste' }),
                   label: 'Paste',
                 },
-              ]
-            : [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }]),
-          ...(isMac
-            ? [
-                { role: 'pasteAndMatchStyle' },
-                { role: 'delete' },
-                { role: 'selectAll' },
-                { type: 'separator' },
                 {
-                  label: 'Speech',
-                  submenu: [
-                    { role: 'startSpeaking' },
-                    { role: 'stopSpeaking' },
-                  ],
+                  accelerator: 'CmdOrCtrl+A',
+                  click: () => send({ type: 'selectAll' }),
+                  label: 'Select All',
                 },
               ]
             : [
-                { role: 'delete' },
-                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
                 { role: 'selectAll' },
               ]),
         ],

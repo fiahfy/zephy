@@ -103,6 +103,11 @@ export const explorerSlice = createSlice({
       ]
       return { ...state, selected }
     },
+    selectAll(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
+      const selected = paths
+      return { ...state, selected }
+    },
     unselect(state) {
       return { ...state, selected: [] }
     },
@@ -264,6 +269,13 @@ export const rangeSelect =
     }
     dispatch(rangeSelect(newPaths))
   }
+
+export const selectAll = (): AppThunk => async (dispatch, getState) => {
+  const { selectAll } = explorerSlice.actions
+  const contents = selectContents(getState())
+  const paths = contents.map((content) => content.path)
+  dispatch(selectAll(paths))
+}
 
 export const newFolder =
   (directoryPath: string): AppThunk =>
