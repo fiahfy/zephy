@@ -1,12 +1,35 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
 
 import { useTitleBar } from 'contexts/TitleBarContext'
+import { useAppSelector } from 'store'
+import { selectCurrentDirectory, selectExplorable } from 'store/window'
+import Head from 'next/head'
 
 const TitleBar = () => {
+  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const explorable = useAppSelector(selectExplorable)
+
   const { visible } = useTitleBar()
+
+  const [title, setTitle] = useState('')
+
+  useEffect(() => {
+    ;(async () => {
+      if (explorable) {
+        const basename = await window.electronAPI.basename(currentDirectory)
+        setTitle(basename)
+      } else {
+        setTitle('Settings')
+      }
+    })()
+  }, [currentDirectory, explorable])
 
   return (
     <>
+      <Head>
+        <title>{title}</title>
+      </Head>
       {visible && (
         <AppBar
           color="default"

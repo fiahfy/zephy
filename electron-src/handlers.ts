@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
-import { dirname } from 'path'
+import { basename, dirname } from 'path'
 import { copy, paste } from './utils/clipboard'
 import {
   createThumbnail,
@@ -24,6 +24,9 @@ const registerHandlers = (
     filePath: string,
   ) => void,
 ) => {
+  ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
+    basename(path),
+  )
   ipcMain.handle(
     'create-directory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
@@ -36,6 +39,9 @@ const registerHandlers = (
   ipcMain.handle(
     'create-video-thumbnails',
     (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path),
+  )
+  ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
+    dirname(path),
   )
   ipcMain.handle(
     'get-detailed-entries',
@@ -50,10 +56,6 @@ const registerHandlers = (
   ipcMain.handle(
     'get-detailed-entry',
     (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path),
-  )
-  ipcMain.handle(
-    'get-directory-path',
-    (_event: IpcMainInvokeEvent, path: string) => dirname(path),
   )
   ipcMain.handle(
     'get-entries',

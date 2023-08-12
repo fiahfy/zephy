@@ -407,7 +407,7 @@ export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
   const currentDirectory = selectCurrentDirectory(getState())
-  const path = await window.electronAPI.getDirectoryPath(currentDirectory)
+  const path = await window.electronAPI.dirname(currentDirectory)
   dispatch(changeDirectory(path))
 }
 

@@ -6,13 +6,14 @@
 
 export interface IElectronAPI {
   copyEntries: (paths: string[]) => Promise<void>
+  basename: (path: string) => Promise<string>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
+  dirname: (path: string) => Promise<string>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
-  getDirectoryPath: (path: string) => Promise<string>
   getEntries: (directoryPath: string) => Promise<Entry[]>
   getEntryHierarchy: (path?: string) => Promise<Entry>
   getMetadata: (path: string) => Promise<Metadata>

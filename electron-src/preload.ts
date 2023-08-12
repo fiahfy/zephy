@@ -4,20 +4,20 @@ import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 contextBridge.exposeInMainWorld('electronAPI', {
   // TODO: rename funcs
   copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
+  basename: (path: string) => ipcRenderer.invoke('basename', path),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('create-directory', directoryPath),
   createThumbnail: (path: string) =>
     ipcRenderer.invoke('create-thumbnail', path),
   createVideoThumbnails: (path: string) =>
     ipcRenderer.invoke('create-video-thumbnails', path),
+  dirname: (path: string) => ipcRenderer.invoke('dirname', path),
   getDetailedEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-detailed-entries', directoryPath),
   getDetailedEntriesForPaths: (paths: string[]) =>
     ipcRenderer.invoke('get-detailed-entries-for-paths', paths),
   getDetailedEntry: (path: string) =>
     ipcRenderer.invoke('get-detailed-entry', path),
-  getDirectoryPath: (path: string) =>
-    ipcRenderer.invoke('get-directory-path', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-entries', directoryPath),
   getEntryHierarchy: (path?: string) =>
