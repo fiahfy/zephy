@@ -50,7 +50,7 @@ export const WatcherProvider = (props: Props) => {
     window.electronAPI.watcher.watch(
       paths,
       (eventType, directoryPath, filePath) => {
-        // TODO: check
+        // TODO: remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
           currentDirectory,
           directoryPaths,

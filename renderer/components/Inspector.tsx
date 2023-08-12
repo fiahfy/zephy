@@ -5,6 +5,7 @@ import DirectoryPreviewList from 'components/DirectoryPreviewList'
 import EntryInformation from 'components/EntryInformation'
 import FilePreviewList from 'components/FilePreviewList'
 import MessagePreviewListItem from 'components/MessagePreviewListItem'
+import Panel from 'components/Panel'
 import { useAppSelector } from 'store'
 import { selectSelectedContents } from 'store/explorer'
 
@@ -32,22 +33,7 @@ const Inspector = () => {
       }}
     >
       {content ? (
-        <>
-          <Typography
-            paragraph
-            sx={{
-              background: (theme) => theme.palette.background.default,
-              mb: 0,
-              position: 'sticky',
-              px: 1,
-              top: 0,
-              userSelect: 'none',
-              zIndex: 1,
-            }}
-            variant="overline"
-          >
-            Preview
-          </Typography>
+        <Panel footer={<EntryInformation entries={contents} />} title="Preview">
           {contents.length > 1 ? (
             <ImageList cols={1} sx={{ m: 0 }}>
               <MessagePreviewListItem message="No Preview" />
@@ -60,9 +46,7 @@ const Inspector = () => {
               {content.type === 'file' && <FilePreviewList entry={content} />}
             </>
           )}
-
-          <EntryInformation entries={contents} />
-        </>
+        </Panel>
       ) : (
         <Box
           sx={{

@@ -246,6 +246,7 @@ export const moveEntries = async (
       if (!paths.includes(newPath)) {
         const exists = await pathExists(newPath)
         if (exists) {
+          // TODO: fix error handling
           throw new Error('File already exists')
         }
         await rename(path, newPath)
@@ -262,6 +263,7 @@ export const renameEntry = async (
   const newPath = join(dirname(path), newName)
   const exists = await pathExists(newPath)
   if (exists) {
+    // TODO: fix error handling
     throw new Error('File already exists')
   }
   await rename(path, newPath)

@@ -21,6 +21,16 @@ import {
   selectExplorable,
 } from 'store/window'
 
+const getLoadedDirectories = (entry: Entry) => {
+  const reducer = (acc: string[], entry: Entry): string[] => {
+    if (entry.type === 'directory' && entry.children) {
+      return [entry.path, ...entry.children.reduce(reducer, acc)]
+    }
+    return acc
+  }
+  return [entry].reduce(reducer, [])
+}
+
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const explorable = useAppSelector(selectExplorable)
@@ -32,20 +42,7 @@ const ExplorerTreeView = () => {
   const [selected, setSelected] = useState<string[]>([])
   const [root, setRoot] = useState<Entry>()
 
-  const getLoadedDirectories = useCallback((entry: Entry) => {
-    const reducer = (acc: string[], entry: Entry): string[] => {
-      if (entry.type === 'directory' && entry.children) {
-        return [entry.path, ...entry.children.reduce(reducer, acc)]
-      }
-      return acc
-    }
-    return [entry].reduce(reducer, [])
-  }, [])
-
-  const loaded = useMemo(
-    () => (root ? getLoadedDirectories(root) : []),
-    [getLoadedDirectories, root],
-  )
+  const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
 
   useEffect(() => {
     ;(async () => {
@@ -57,7 +54,7 @@ const ExplorerTreeView = () => {
       setSelected([currentDirectory])
       setRoot(entry)
     })()
-  }, [currentDirectory, explorable, getLoadedDirectories])
+  }, [currentDirectory, explorable])
 
   useEffect(
     () =>

@@ -284,6 +284,7 @@ export const newFolder =
     const entry = await window.electronAPI.createDirectory(directoryPath)
     dispatch(add([entry]))
     dispatch(select(entry.path))
+    dispatch(startEditing(entry.path))
   }
 
 export const moveToTrash =

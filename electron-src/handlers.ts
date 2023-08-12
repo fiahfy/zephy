@@ -73,7 +73,6 @@ const registerHandlers = (
   ipcMain.handle(
     'move-entries',
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
-      // TODO: prevent duplicated filename
       moveEntries(paths, directoryPath),
   )
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>

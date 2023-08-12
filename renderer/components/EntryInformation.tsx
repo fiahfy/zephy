@@ -43,14 +43,10 @@ const EntryInformation = (props: Props) => {
       {entry && (
         <Box
           sx={{
-            background: (theme) => theme.palette.background.default,
-            bottom: 0,
             display: 'flex',
             flexDirection: 'column',
             gap: 1,
-            position: 'sticky',
             py: 1,
-            zIndex: 1,
           }}
         >
           <Typography

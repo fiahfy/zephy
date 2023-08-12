@@ -62,6 +62,92 @@ const columns: ColumnType[] = [
   },
 ]
 
+const getWidths = (wrapperWidth: number) => {
+  const widths = columns.map((column) => column.width)
+  const flexibleNum = widths.filter((width) => width === undefined).length
+  if (flexibleNum === 0) {
+    return widths
+  }
+  const sumWidth = widths.reduce<number>((acc, width) => acc + (width ?? 0), 0)
+  // 10px is custom scrollbar width
+  const flexibleWidth = (wrapperWidth - sumWidth - 10) / flexibleNum
+  return widths.map((width) => (width === undefined ? flexibleWidth : width))
+}
+
+// @see https://github.com/bvaughn/react-virtualized/blob/master/source/Table/defaultRowRenderer.js
+const rowRenderer = ({
+  className,
+  columns,
+  index,
+  key,
+  onRowClick,
+  onRowDoubleClick,
+  onRowMouseOut,
+  onRowMouseOver,
+  onRowRightClick,
+  rowData,
+  style,
+}: TableRowProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const a11yProps: any = { 'aria-rowindex': index + 1 }
+
+  if (
+    onRowClick ||
+    onRowDoubleClick ||
+    onRowMouseOut ||
+    onRowMouseOver ||
+    onRowRightClick
+  ) {
+    a11yProps['aria-label'] = 'row'
+    // a11yProps.tabIndex = 0
+
+    if (onRowClick) {
+      a11yProps.onClick = (event: MouseEvent) =>
+        onRowClick({ event, index, rowData })
+    }
+    if (onRowDoubleClick) {
+      a11yProps.onDoubleClick = (event: MouseEvent) =>
+        onRowDoubleClick({ event, index, rowData })
+    }
+    if (onRowMouseOut) {
+      a11yProps.onMouseOut = (event: MouseEvent) =>
+        onRowMouseOut({ event, index, rowData })
+    }
+    if (onRowMouseOver) {
+      a11yProps.onMouseOver = (event: MouseEvent) =>
+        onRowMouseOver({ event, index, rowData })
+    }
+    if (onRowRightClick) {
+      a11yProps.onContextMenu = (event: MouseEvent) =>
+        onRowRightClick({ event, index, rowData })
+    }
+  }
+
+  return (
+    <div
+      {...a11yProps}
+      className={className}
+      key={key}
+      role="row"
+      style={style}
+    >
+      {columns}
+    </div>
+  )
+}
+
+const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
+  const align = columns.find((column) => column.key === dataKey)?.align
+  return (
+    <ExplorerTableCell
+      align={align}
+      content={rowData}
+      dataKey={dataKey as Key}
+      height={rowHeight}
+    />
+  )
+}
+
 type Props = {
   contentFocused: (content: Content) => boolean
   contentSelected: (content: Content) => boolean
@@ -132,21 +218,6 @@ const ExplorerTable = (props: Props) => {
     focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }, [focused])
 
-  const getWidths = useCallback((wrapperWidth: number) => {
-    const widths = columns.map((column) => column.width)
-    const flexibleNum = widths.filter((width) => width === undefined).length
-    if (flexibleNum === 0) {
-      return widths
-    }
-    const sumWidth = widths.reduce<number>(
-      (acc, width) => acc + (width ?? 0),
-      0,
-    )
-    // 10px is custom scrollbar width
-    const flexibleWidth = (wrapperWidth - sumWidth - 10) / flexibleNum
-    return widths.map((width) => (width === undefined ? flexibleWidth : width))
-  }, [])
-
   const focus = useCallback(
     (e: KeyboardEvent, row: number, focused: boolean) => {
       const content = contents[row - 1] ?? (focused ? undefined : contents[0])
@@ -206,83 +277,6 @@ const ExplorerTable = (props: Props) => {
     ),
     [onChangeSortOption, sortOption],
   )
-
-  // @see https://github.com/bvaughn/react-virtualized/blob/master/source/Table/defaultRowRenderer.js
-  const rowRenderer = useCallback(
-    ({
-      className,
-      columns,
-      index,
-      key,
-      onRowClick,
-      onRowDoubleClick,
-      onRowMouseOut,
-      onRowMouseOver,
-      onRowRightClick,
-      rowData,
-      style,
-    }: TableRowProps) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const a11yProps: any = { 'aria-rowindex': index + 1 }
-
-      if (
-        onRowClick ||
-        onRowDoubleClick ||
-        onRowMouseOut ||
-        onRowMouseOver ||
-        onRowRightClick
-      ) {
-        a11yProps['aria-label'] = 'row'
-        // a11yProps.tabIndex = 0
-
-        if (onRowClick) {
-          a11yProps.onClick = (event: MouseEvent) =>
-            onRowClick({ event, index, rowData })
-        }
-        if (onRowDoubleClick) {
-          a11yProps.onDoubleClick = (event: MouseEvent) =>
-            onRowDoubleClick({ event, index, rowData })
-        }
-        if (onRowMouseOut) {
-          a11yProps.onMouseOut = (event: MouseEvent) =>
-            onRowMouseOut({ event, index, rowData })
-        }
-        if (onRowMouseOver) {
-          a11yProps.onMouseOver = (event: MouseEvent) =>
-            onRowMouseOver({ event, index, rowData })
-        }
-        if (onRowRightClick) {
-          a11yProps.onContextMenu = (event: MouseEvent) =>
-            onRowRightClick({ event, index, rowData })
-        }
-      }
-
-      return (
-        <div
-          {...a11yProps}
-          className={className}
-          key={key}
-          role="row"
-          style={style}
-        >
-          {columns}
-        </div>
-      )
-    },
-    [],
-  )
-
-  const cellRenderer = useCallback(({ dataKey, rowData }: TableCellProps) => {
-    const align = columns.find((column) => column.key === dataKey)?.align
-    return (
-      <ExplorerTableCell
-        align={align}
-        content={rowData}
-        dataKey={dataKey as Key}
-        height={rowHeight}
-      />
-    )
-  }, [])
 
   return (
     <Box

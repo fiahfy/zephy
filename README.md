@@ -13,8 +13,6 @@
 
 ## TODOs
 
-- [ ] New Folder
-- [ ] Copy Item
 - [ ] Sort Favorites
 - [ ] Rating List
 - [ ] Change Thumbnail Size
