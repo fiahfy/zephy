@@ -5,6 +5,7 @@
 // import User from 'path/to/interfaces';
 
 export interface IElectronAPI {
+  copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   createVideoThumbnails: (path: string) => Promise<string[]>
@@ -21,10 +22,12 @@ export interface IElectronAPI {
     directoryPath: string,
   ) => Promise<DetailedEntry[]>
   openPath: (path: string) => Promise<void>
+  pasteEntries: (directoryPath: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   trashEntries: (paths: string[]) => Promise<void>
   applicationMenu: {
-    setState: (paths: string[]) => Promise<void>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setState: (state: any) => Promise<void>
   }
   contextMenu: {
     show: (
@@ -32,13 +35,13 @@ export interface IElectronAPI {
       options: ContextMenuOption[],
     ) => Promise<void>
   }
-  message: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => () => void
-  }
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => () => void
     isEntered: () => Promise<boolean>
+  }
+  message: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addListener: (callback: (message: any) => void) => () => void
   }
   watcher: {
     watch: (
@@ -54,6 +57,7 @@ export interface IElectronAPI {
     getDetails: () => Promise<
       { index: number; params: { directory?: string } } | undefined
     >
+    open: (params: { directory: string }) => Promise<void>
   }
 }
 

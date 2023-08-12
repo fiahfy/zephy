@@ -21,9 +21,7 @@ export type ContextMenuOption = {
   params?: any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-const registerContextMenu = (
-  createWindow: (params?: { directory?: string }) => void,
-) => {
+const registerContextMenu = () => {
   ipcMain.handle(
     'context-menu-show',
     (
@@ -97,7 +95,7 @@ const registerContextMenu = (
           label: 'Open',
         }),
         openDirectoryInNewWindow: ({ params }) => ({
-          click: () => createWindow({ directory: params.path }),
+          click: () => send({ type: 'newWindow', data: { path: params.path } }),
           label: 'Open in New Window',
         }),
         rename: ({ params }) => ({

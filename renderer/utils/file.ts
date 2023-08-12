@@ -60,6 +60,9 @@ export const createVideoThumbnails = async (path: string) => {
 
 export const getMetadata = async (path: string) => {
   try {
+    if (!isMediaFile(path)) {
+      return undefined
+    }
     const metadata = await window.electronAPI.getMetadata(path)
     const hasDuration = isVideoFile(path) || isAudioFile(path)
     return {

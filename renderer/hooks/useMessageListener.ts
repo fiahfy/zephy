@@ -1,7 +1,15 @@
 import { useEffect } from 'react'
 
 import { useAppDispatch } from 'store'
-import { moveToTrash, newFolder, select, startEditing } from 'store/explorer'
+import {
+  copy,
+  moveToTrash,
+  newFolder,
+  openWindow,
+  paste,
+  select,
+  startEditing,
+} from 'store/explorer'
 import { add, remove } from 'store/favorite'
 import {
   changeDirectory,
@@ -32,7 +40,7 @@ const useMessageListener = () => {
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'moveToTrash':
-          return dispatch(moveToTrash(data.paths))
+          return dispatch(moveToTrash(data?.paths))
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'removeFromFavorites':
@@ -43,6 +51,12 @@ const useMessageListener = () => {
           return
         case 'sort':
           return dispatch(setCurrentOrderBy(data.orderBy))
+        case 'copy':
+          return dispatch(copy())
+        case 'paste':
+          return dispatch(paste())
+        case 'newWindow':
+          return dispatch(openWindow(data?.path))
       }
     })
     return () => removeListener()

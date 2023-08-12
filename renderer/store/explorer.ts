@@ -84,15 +84,40 @@ export const explorerSlice = createSlice({
     blur(state) {
       return { ...state, focused: undefined }
     },
-    setSelected(state, action: PayloadAction<string[]>) {
-      const selected = action.payload
+    select(state, action: PayloadAction<string>) {
+      const path = action.payload
+      return { ...state, selected: [path] }
+    },
+    multiSelect(state, action: PayloadAction<string>) {
+      const path = action.payload
+      const selected = state.selected.includes(path)
+        ? state.selected.filter((p) => p !== path)
+        : [...state.selected, path]
       return { ...state, selected }
+    },
+    rangeSelect(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
+      const selected = [
+        ...state.selected.filter((p) => !paths.includes(p)),
+        ...paths,
+      ]
+      return { ...state, selected }
+    },
+    unselect(state) {
+      return { ...state, selected: [] }
     },
   },
 })
 
-export const { focus, blur, startEditing, finishEditing } =
-  explorerSlice.actions
+export const {
+  startEditing,
+  finishEditing,
+  focus,
+  blur,
+  select,
+  multiSelect,
+  unselect,
+} = explorerSlice.actions
 
 export default explorerSlice.reducer
 
@@ -217,39 +242,15 @@ export const load = (): AppThunk => async (dispatch, getState) => {
   }
 }
 
-export const setSelected =
-  (paths: string[]): AppThunk =>
-  async (dispatch) => {
-    const { setSelected } = explorerSlice.actions
-    dispatch(setSelected(paths))
-    // update application menu after dispatch, because it is little bit slow
-    await window.electronAPI.applicationMenu.setState(paths)
-  }
-
-export const select =
-  (path: string): AppThunk =>
-  async (dispatch) => {
-    dispatch(setSelected([path]))
-  }
-
-export const multiSelect =
-  (path: string): AppThunk =>
-  async (dispatch, getState) => {
-    const selected = selectSelected(getState())
-    const newSelected = selected.includes(path)
-      ? selected.filter((p) => p !== path)
-      : [...selected, path]
-    dispatch(setSelected(newSelected))
-  }
-
 export const rangeSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
+    const { rangeSelect } = explorerSlice.actions
     const contents = selectContents(getState())
     const selected = selectSelected(getState())
     const paths = contents.map((content) => content.path)
     const prevSelected = selected[selected.length - 1]
-    let newPaths: string[]
+    let newPaths
     if (prevSelected) {
       const index = paths.indexOf(path)
       const prevIndex = paths.indexOf(prevSelected)
@@ -261,16 +262,8 @@ export const rangeSelect =
       const index = paths.indexOf(path)
       newPaths = paths.slice(0, index + 1)
     }
-    const newSelected = [
-      ...selected.filter((p) => !newPaths.includes(p)),
-      ...newPaths,
-    ]
-    dispatch(setSelected(newSelected))
+    dispatch(rangeSelect(newPaths))
   }
-
-export const unselect = (): AppThunk => async (dispatch) => {
-  dispatch(setSelected([]))
-}
 
 export const newFolder =
   (directoryPath: string): AppThunk =>
@@ -282,11 +275,13 @@ export const newFolder =
   }
 
 export const moveToTrash =
-  (paths: string[]): AppThunk =>
-  async (dispatch) => {
+  (paths?: string[]): AppThunk =>
+  async (dispatch, getState) => {
     const { remove } = explorerSlice.actions
-    await window.electronAPI.trashEntries(paths)
-    dispatch(remove(paths))
+    const selected = selectSelected(getState())
+    const targetPaths = paths ?? selected
+    await window.electronAPI.trashEntries(targetPaths)
+    dispatch(remove(targetPaths))
     dispatch(unselect())
   }
 
@@ -305,6 +300,25 @@ export const move =
   async (dispatch) => {
     await window.electronAPI.moveEntries(paths, directoryPath)
     dispatch(unselect())
+  }
+
+export const copy = (): AppThunk => async (_, getState) => {
+  const selected = selectSelected(getState())
+  await window.electronAPI.copyEntries(selected)
+}
+
+export const paste = (): AppThunk => async (_, getState) => {
+  const currentDirectory = selectCurrentDirectory(getState())
+  await window.electronAPI.pasteEntries(currentDirectory)
+}
+
+export const openWindow =
+  (directory?: string): AppThunk =>
+  async (_, getState) => {
+    const currentDirectory = selectCurrentDirectory(getState())
+    await window.electronAPI.window.open({
+      directory: directory ?? currentDirectory,
+    })
   }
 
 export const handle =

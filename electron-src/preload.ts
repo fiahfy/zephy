@@ -3,6 +3,7 @@ import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // TODO: rename funcs
+  copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('create-directory', directoryPath),
   createThumbnail: (path: string) =>
@@ -26,35 +27,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
   moveEntries: (paths: string[], directoryPath: string) =>
     ipcRenderer.invoke('move-entries', paths, directoryPath),
   openPath: (path: string) => ipcRenderer.invoke('open-path', path),
+  pasteEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('paste-entries', directoryPath),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('rename-entry', path, newName),
   trashEntries: (paths: string[]) => ipcRenderer.invoke('trash-entries', paths),
   applicationMenu: {
-    setState: (paths: string[]) =>
-      ipcRenderer.invoke('application-menu-set-state', paths),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setState: (state: any) =>
+      ipcRenderer.invoke('application-menu-set-state', state),
   },
   contextMenu: {
     show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
       ipcRenderer.invoke('context-menu-show', params, options),
   },
+  fullscreen: {
+    addListener: (callback: (fullscreen: boolean) => void) => {
+      const listener = (_event: IpcRendererEvent, fullscreen: boolean) =>
+        callback(fullscreen)
+      ipcRenderer.on('fullscreen-send', listener)
+      return () => ipcRenderer.removeListener('fullscreen-send', listener)
+    },
+    isEntered: () => ipcRenderer.invoke('fullscreen-is-entered'),
+  },
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const handler = (_event: IpcRendererEvent, message: any) =>
+      const listener = (_event: IpcRendererEvent, message: any) =>
         callback(message)
-      ipcRenderer.on('message-send', handler)
-      return () => ipcRenderer.removeListener('message send', handler)
+      ipcRenderer.on('message-send', listener)
+      return () => ipcRenderer.removeListener('message-send', listener)
     },
-  },
-  fullscreen: {
-    addListener: (callback: (fullscreen: boolean) => void) => {
-      const handler = (_event: IpcRendererEvent, fullscreen: boolean) =>
-        callback(fullscreen)
-      ipcRenderer.on('fullscreen-send', handler)
-      return () => ipcRenderer.removeListener('fullscreen-send', handler)
-    },
-    isEntered: () => ipcRenderer.invoke('fullscreen-is-entered'),
   },
   watcher: {
     watch: (
@@ -80,5 +84,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   window: {
     getDetails: () => ipcRenderer.invoke('window-get-details'),
+    open: (params: { directory: string }) =>
+      ipcRenderer.invoke('window-open', params),
   },
 })

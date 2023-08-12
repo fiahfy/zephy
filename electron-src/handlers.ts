@@ -1,5 +1,6 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
 import { dirname } from 'path'
+import { copy, paste } from './utils/clipboard'
 import {
   createThumbnail,
   createVideoThumbnails,
@@ -91,6 +92,13 @@ const registerHandlers = (
           notify('delete', dirname(path), path)
         }),
       ),
+  )
+  ipcMain.handle(
+    'copy-entries',
+    (_event: IpcMainInvokeEvent, paths: string[]) => copy(paths),
+  )
+  ipcMain.handle('paste-entries', (_event: IpcMainInvokeEvent, directoryPath) =>
+    paste(directoryPath),
   )
 }
 

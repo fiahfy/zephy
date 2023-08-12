@@ -187,8 +187,8 @@ export const getEntryHierarchy = async (
     type: 'directory',
   }
 
-  entry = await dirnames.reduce(async (_e, _dirname, i) => {
-    const e = await _e
+  entry = await dirnames.reduce(async (promise, _dirname, i) => {
+    const e = await promise
     const targetEntry = dirnames
       .slice(0, i + 1)
       .reduce(
@@ -223,16 +223,18 @@ export const createDirectory = async (
   return await getDetailedEntry(path)
 }
 
-export const copyEntries = async (paths: string[], directoryPath: string) => {
-  return await Promise.all(
-    paths.map(async (path) => {
+export const copyEntries = async (paths: string[], directoryPath: string) =>
+  paths.reduce(
+    async (promise, path) => {
+      const acc = await promise
       const filename = await generateCopyFilename(path, directoryPath)
       const newPath = join(directoryPath, filename)
       await copy(path, newPath)
-      return await getDetailedEntry(newPath)
-    }),
+      const entry = await getDetailedEntry(newPath)
+      return [...acc, entry]
+    },
+    Promise.resolve([]) as Promise<DetailedEntry[]>,
   )
-}
 
 export const moveEntries = async (
   paths: string[],

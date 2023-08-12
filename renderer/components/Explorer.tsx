@@ -149,10 +149,18 @@ const Explorer = () => {
     dispatch(blur())
   }, [dispatch])
 
+  const handleBlur = () =>
+    window.electronAPI.applicationMenu.setState({ focused: false })
+
+  const handleFocus = () =>
+    window.electronAPI.applicationMenu.setState({ focused: true })
+
   return (
     <Box
+      onBlur={handleBlur}
       onClick={handleClick}
       onContextMenu={createCurrentDirectoryMenuHandler()}
+      onFocus={handleFocus}
       sx={{ height: '100%', position: 'relative' }}
       {...createCurrentDirectoryDroppableBinder()}
     >

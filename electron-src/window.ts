@@ -20,6 +20,9 @@ const windowManager = <T>(
     const windowId = getWindowId(event)
     return windowId ? details[windowId] : undefined
   })
+  ipcMain.handle('window-open', (event: IpcMainInvokeEvent, params?: T) =>
+    create(params),
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isVisibilities = (visibilities: any): visibilities is boolean[] =>
