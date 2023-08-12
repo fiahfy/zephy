@@ -1,6 +1,6 @@
-import { Box, BoxProps, Typography } from '@mui/material'
 import { TreeItem, TreeItemContentProps, TreeItemProps } from '@mui/lab'
 import { useTreeItem } from '@mui/lab/TreeItem'
+import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { MouseEvent, ReactNode, forwardRef } from 'react'
 

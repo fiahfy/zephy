@@ -8,8 +8,8 @@ import useContextMenu from 'hooks/useContextMenu'
 import useDnd from 'hooks/useDnd'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { changeDirectory } from 'store/window'
 import { selectShouldShowHiddenFiles } from 'store/settings'
+import { changeDirectory } from 'store/window'
 import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
 
 type State = {

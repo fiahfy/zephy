@@ -1,10 +1,10 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
+import Head from 'next/head'
 import { useEffect, useState } from 'react'
 
 import { useTitleBar } from 'contexts/TitleBarContext'
 import { useAppSelector } from 'store'
 import { selectCurrentDirectory, selectExplorable } from 'store/window'
-import Head from 'next/head'
 
 const TitleBar = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)

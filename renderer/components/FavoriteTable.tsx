@@ -9,10 +9,10 @@ import { useCallback, useEffect, useState } from 'react'
 
 import Icon from 'components/Icon'
 import useContextMenu from 'hooks/useContextMenu'
+import { DetailedEntry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectFavorites } from 'store/favorite'
 import { changeDirectory } from 'store/window'
-import { DetailedEntry } from 'interfaces'
 
 const FavoriteTable = () => {
   const favorites = useAppSelector(selectFavorites)
