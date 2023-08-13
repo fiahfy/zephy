@@ -4,6 +4,7 @@ import {
   Folder as FolderIcon,
   Image as ImageIcon,
   InsertDriveFile as InsertDriveFileIcon,
+  Settings as SettingsIcon,
   StarBorder as StarBorderIcon,
   Star as StarIcon,
   VideoFile as VideoFileIcon,
@@ -31,6 +32,10 @@ const icons = {
     Component: InsertDriveFileIcon,
     color: grey['500'],
   },
+  settings: {
+    Component: SettingsIcon,
+    color: grey['500'],
+  },
   star: {
     Component: StarIcon,
     color: '#faaf00',
@@ -52,6 +57,7 @@ type Props = {
     | 'folder'
     | 'image'
     | 'insert-drive-file'
+    | 'settings'
     | 'star'
     | 'star-border'
     | 'video-file'

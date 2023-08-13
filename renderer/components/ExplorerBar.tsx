@@ -3,7 +3,6 @@ import {
   ArrowForward as ArrowForwardIcon,
   ArrowUpward as ArrowUpwardIcon,
   Delete as DeleteIcon,
-  Folder as FolderIcon,
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
   Search as SearchIcon,
@@ -25,6 +24,7 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -46,6 +46,7 @@ import {
   selectCanForward,
   selectCurrentDirectory,
   selectZephySchema,
+  selectZephyUrl,
   upward,
 } from 'store/window'
 
@@ -55,6 +56,7 @@ const ExplorerBar = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const zephyUrl = useAppSelector(selectZephyUrl)
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
@@ -102,6 +104,18 @@ const ExplorerBar = () => {
     dispatch(load())
     dispatch(unselect())
   }, [currentDirectory, dispatch])
+
+  const directoryIconType = useMemo(() => {
+    if (zephyUrl) {
+      switch (zephyUrl.pathname) {
+        case 'ratings':
+          return 'star'
+        case 'settings':
+          return 'settings'
+      }
+    }
+    return 'folder'
+  }, [zephyUrl])
 
   const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 
@@ -196,6 +210,7 @@ const ExplorerBar = () => {
         <Box
           sx={{
             WebkitAppRegion: 'no-drag',
+            alignItems: 'center',
             display: 'flex',
             flex: '6 1 0',
             gap: 0.5,
@@ -234,13 +249,9 @@ const ExplorerBar = () => {
           </IconButton>
           <RoundedFilledTextField
             InputProps={{
-              endAdornment: (
+              endAdornment: !zephySchema && (
                 <InputAdornment position="end">
-                  <IconButton
-                    disabled={zephySchema}
-                    onClick={handleClickFavorite}
-                    size="small"
-                  >
+                  <IconButton onClick={handleClickFavorite} size="small">
                     <Icon iconType={favorite ? 'star' : 'star-border'} />
                   </IconButton>
                 </InputAdornment>
@@ -249,10 +260,10 @@ const ExplorerBar = () => {
                 <InputAdornment position="start">
                   <IconButton
                     disabled={zephySchema}
-                    onClick={handleClickFolder}
+                    onClick={zephySchema ? undefined : handleClickFolder}
                     size="small"
                   >
-                    <FolderIcon fontSize="small" />
+                    <Icon iconType={directoryIconType} />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -268,6 +279,7 @@ const ExplorerBar = () => {
         <Box
           sx={{
             WebkitAppRegion: 'no-drag',
+            alignItems: 'center',
             display: 'flex',
             flex: '3 1 0',
             gap: 1,

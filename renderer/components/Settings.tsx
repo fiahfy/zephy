@@ -1,5 +1,4 @@
 import {
-  AppBar,
   Box,
   Checkbox,
   Container,
@@ -9,7 +8,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Toolbar,
   Typography,
 } from '@mui/material'
 import { ChangeEvent, useCallback } from 'react'
@@ -51,56 +49,47 @@ const Settings = () => {
   )
 
   return (
-    <>
-      <AppBar color="default" elevation={0} position="sticky" sx={{ top: 0 }}>
-        <Toolbar variant="dense">
-          <Typography component="div" variant="subtitle1">
-            Settings
+    <Container>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, my: 2 }}>
+        <Box>
+          <Typography gutterBottom variant="subtitle2">
+            Appearance
           </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, my: 2 }}>
-          <Box>
-            <Typography gutterBottom variant="subtitle2">
-              Appearance
-            </Typography>
-            <FormControl sx={{ mt: 1, width: 128 }}>
-              <InputLabel id="theme">Theme</InputLabel>
-              <Select
-                label="Theme"
-                labelId="theme"
-                onChange={handleChangeTheme}
-                size="small"
-                value={theme}
-              >
-                {options.map(({ label, value }) => (
-                  <MenuItem dense key={value} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box>
-            <Typography gutterBottom variant="subtitle2">
-              Advanced
-            </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={shouldShowHiddenFiles}
-                  onChange={handleShouldShowHiddenFiles}
-                  size="small"
-                />
-              }
-              label="Show Hidden Files"
-              slotProps={{ typography: { variant: 'body2' } }}
-            />
-          </Box>
+          <FormControl sx={{ mt: 1, width: 128 }}>
+            <InputLabel id="theme">Theme</InputLabel>
+            <Select
+              label="Theme"
+              labelId="theme"
+              onChange={handleChangeTheme}
+              size="small"
+              value={theme}
+            >
+              {options.map(({ label, value }) => (
+                <MenuItem dense key={value} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
-      </Container>
-    </>
+        <Box>
+          <Typography gutterBottom variant="subtitle2">
+            Advanced
+          </Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={shouldShowHiddenFiles}
+                onChange={handleShouldShowHiddenFiles}
+                size="small"
+              />
+            }
+            label="Show Hidden Files"
+            slotProps={{ typography: { variant: 'body2' } }}
+          />
+        </Box>
+      </Box>
+    </Container>
   )
 }
 
