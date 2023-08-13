@@ -3,12 +3,13 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content, DetailedEntry } from 'interfaces'
 import { AppState, AppThunk } from 'store'
 import { add } from 'store/queryHistory'
-import { selectGetRating } from 'store/rating'
+import { selectGetScore, selectPathsByScore } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import {
   selectCurrentDirectory,
   selectCurrentSortOption,
-  selectExplorable,
+  selectZephySchema,
+  selectZephyUrl,
 } from 'store/window'
 import { isHiddenFile } from 'utils/file'
 
@@ -178,8 +179,8 @@ export const selectContents = createSelector(
   selectQuery,
   selectCurrentSortOption,
   selectShouldShowHiddenFiles,
-  selectGetRating,
-  (entries, query, currentSortOption, shouldShowHiddenFiles, getRating) => {
+  selectGetScore,
+  (entries, query, currentSortOption, shouldShowHiddenFiles, getScore) => {
     const comparator = (a: Content, b: Content) => {
       const aValue = a[currentSortOption.orderBy]
       const bValue = b[currentSortOption.orderBy]
@@ -208,7 +209,7 @@ export const selectContents = createSelector(
       )
       .map((entry) => ({
         ...entry,
-        rating: getRating(entry.path),
+        rating: getScore(entry.path),
       }))
       .sort((a, b) => comparator(a, b))
   },
@@ -231,16 +232,20 @@ export const searchQuery =
 
 export const load = (): AppThunk => async (dispatch, getState) => {
   const { loading, loaded } = explorerSlice.actions
-  const explorable = selectExplorable(getState())
-  if (!explorable) {
-    return
-  }
   dispatch(loading())
   try {
-    const currentDirectory = selectCurrentDirectory(getState())
-    const entries = await window.electronAPI.getDetailedEntries(
-      currentDirectory,
-    )
+    let entries: DetailedEntry[] = []
+    const url = selectZephyUrl(getState())
+    if (url) {
+      if (url.pathname === 'ratings') {
+        const pathsMap = selectPathsByScore(getState())
+        const paths = pathsMap[Number(url.params.score ?? 0)] ?? []
+        entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
+      }
+    } else {
+      const currentDirectory = selectCurrentDirectory(getState())
+      entries = await window.electronAPI.getDetailedEntries(currentDirectory)
+    }
     dispatch(loaded(entries))
   } catch (e) {
     dispatch(loaded([]))
@@ -322,6 +327,10 @@ export const copy = (): AppThunk => async (_, getState) => {
 
 export const paste = (): AppThunk => async (_, getState) => {
   const currentDirectory = selectCurrentDirectory(getState())
+  const zephySchema = selectZephySchema(getState())
+  if (!zephySchema) {
+    return
+  }
   await window.electronAPI.pasteEntries(currentDirectory)
 }
 

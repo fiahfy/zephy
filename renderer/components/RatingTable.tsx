@@ -1,60 +1,52 @@
 import {
+  Rating,
   Table,
   TableBody,
   TableCell,
   TableRow,
   Typography,
 } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-import Icon from 'components/Icon'
-import useContextMenu from 'hooks/useContextMenu'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectFavorites } from 'store/favorite'
-import { changeDirectory } from 'store/window'
-import { DetailedEntry } from 'interfaces'
+import { selectPathsByScore } from 'store/rating'
+import { goToRatings } from 'store/window'
 
-// TODO: Implement
 const RatingTable = () => {
-  const favorites = useAppSelector(selectFavorites)
+  const pathsByScore = useAppSelector(selectPathsByScore)
   const dispatch = useAppDispatch()
 
-  const { createEntryMenuHandler } = useContextMenu()
+  const [selected, setSelected] = useState<number[]>([])
 
-  const [selected, setSelected] = useState<string[]>([])
-  const [entries, setEntries] = useState<DetailedEntry[]>([])
-
-  useEffect(() => {
-    ;(async () => {
-      let entries = await window.electronAPI.getDetailedEntriesForPaths(
-        favorites.map((favorite) => favorite.path),
-      )
-      entries = entries.sort((a, b) => a.name.localeCompare(b.name))
-      setEntries(entries)
-    })()
-  }, [favorites])
+  const items = useMemo(() => {
+    return Object.keys(pathsByScore)
+      .map((score) => ({
+        score: Number(score),
+        count: pathsByScore[Number(score)]?.length ?? 0,
+      }))
+      .sort((a, b) => b.score - a.score)
+  }, [pathsByScore])
 
   const handleBlur = useCallback(() => setSelected([]), [])
 
   const handleClick = useCallback(
-    (path: string) => dispatch(changeDirectory(path)),
+    (score: number) => dispatch(goToRatings(score)),
     [dispatch],
   )
 
-  const handleFocus = useCallback((path: string) => setSelected([path]), [])
+  const handleFocus = useCallback((score: number) => setSelected([score]), [])
 
   return (
     <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>
       <TableBody sx={{ width: '100%' }}>
-        {entries.map((entry) => (
+        {items.map((item) => (
           <TableRow
             hover
-            key={entry.path}
+            key={item.score}
             onBlur={() => handleBlur()}
-            onClick={() => handleClick(entry.path)}
-            onContextMenu={createEntryMenuHandler(entry)}
-            onFocus={() => handleFocus(entry.path)}
-            selected={selected.includes(entry.path)}
+            onClick={() => handleClick(item.score)}
+            onFocus={() => handleFocus(item.score)}
+            selected={selected.includes(item.score)}
             sx={{
               cursor: 'pointer',
               display: 'flex',
@@ -64,7 +56,7 @@ const RatingTable = () => {
               },
             }}
             tabIndex={0}
-            title={entry.name}
+            title={''}
           >
             <TableCell
               sx={{
@@ -78,9 +70,14 @@ const RatingTable = () => {
                 width: '100%',
               }}
             >
-              <Icon iconType="folder" />
+              <Rating
+                precision={0.5}
+                readOnly
+                size="small"
+                value={item.score}
+              />
               <Typography noWrap variant="caption">
-                {entry.name}
+                ({item.count})
               </Typography>
             </TableCell>
           </TableRow>

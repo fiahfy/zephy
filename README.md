@@ -14,7 +14,6 @@
 ## TODOs
 
 - [ ] Sort Favorites
-- [ ] Rating List
 - [ ] Change Thumbnail Size
 - [ ] Video Preview Thumbnails
 - [ ] Folder Preview

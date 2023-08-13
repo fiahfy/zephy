@@ -37,7 +37,24 @@ export const selectRatings = createSelector(
   (rating) => rating.ratings,
 )
 
-export const selectGetRating = createSelector(
+export const selectGetScore = createSelector(
   selectRatings,
   (ratings) => (path: string) => ratings[path] ?? 0,
+)
+
+export const selectPathsByScore = createSelector(selectRatings, (ratings) =>
+  Object.keys(ratings).reduce(
+    (acc, path) => {
+      const score = ratings[path]
+      if (score) {
+        const paths = acc[score] ?? []
+        return {
+          ...acc,
+          [score]: [...paths, path],
+        }
+      }
+      return acc
+    },
+    {} as { [score: number]: string[] },
+  ),
 )

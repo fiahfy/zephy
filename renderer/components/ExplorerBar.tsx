@@ -44,7 +44,7 @@ import {
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
-  selectExplorable,
+  selectZephySchema,
   upward,
 } from 'store/window'
 
@@ -52,9 +52,9 @@ const ExplorerBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const explorable = useAppSelector(selectExplorable)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
   const {
@@ -204,7 +204,7 @@ const ExplorerBar = () => {
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
           <IconButton
-            disabled={!explorable}
+            disabled={zephySchema}
             onClick={handleClickUpward}
             size="small"
             title="Go up"
@@ -222,7 +222,7 @@ const ExplorerBar = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      disabled={!explorable}
+                      disabled={zephySchema}
                       onClick={handleClickFavorite}
                       size="small"
                     >
@@ -233,7 +233,7 @@ const ExplorerBar = () => {
                 startAdornment: (
                   <InputAdornment position="start">
                     <IconButton
-                      disabled={!explorable}
+                      disabled={zephySchema}
                       onClick={handleClickFolder}
                       size="small"
                     >

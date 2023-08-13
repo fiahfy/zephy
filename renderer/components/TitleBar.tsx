@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react'
 
 import { useTitleBar } from 'contexts/TitleBarContext'
 import { useAppSelector } from 'store'
-import { selectCurrentDirectory, selectExplorable } from 'store/window'
+import { getTitle, selectCurrentDirectory } from 'store/window'
 
 const TitleBar = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const explorable = useAppSelector(selectExplorable)
 
   const { visible } = useTitleBar()
 
@@ -16,14 +15,10 @@ const TitleBar = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (explorable) {
-        const basename = await window.electronAPI.basename(currentDirectory)
-        setTitle(basename)
-      } else {
-        setTitle('Settings')
-      }
+      const title = await getTitle(currentDirectory)
+      setTitle(title)
     })()
-  }, [currentDirectory, explorable])
+  }, [currentDirectory])
 
   return (
     <>

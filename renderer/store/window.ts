@@ -7,6 +7,7 @@ import { selectWindowIndex } from 'store/windowIndex'
 type History = {
   directory: string
   scrollTop: number
+  title: string
 }
 
 type HistoryState = {
@@ -56,6 +57,51 @@ export const defaultOrders = {
   size: 'desc',
   rating: 'desc',
 } as const
+
+const parseZephyUrl = (input: string) => {
+  const match = input.match(/^zephy:\/\/([^/]+)(?:\/([^/]+))?$/)
+  if (!match || !match[1]) {
+    return undefined
+  }
+  switch (match[1]) {
+    case 'ratings':
+      return {
+        pathname: 'ratings' as const,
+        params: { score: Number(match[2] ?? 0) },
+      }
+    case 'settings':
+      return { pathname: 'settings' as const }
+    default:
+      return undefined
+  }
+}
+
+const buildZephyUrl = (
+  url:
+    | { pathname: 'ratings'; params: { score: number } }
+    | { pathname: 'settings' },
+) => {
+  switch (url.pathname) {
+    case 'ratings':
+      return `zephy://ratings/${url.params.score}`
+    case 'settings':
+      return 'zephy://settings'
+  }
+}
+
+export const getTitle = async (path: string) => {
+  const url = parseZephyUrl(path)
+  if (url) {
+    switch (url.pathname) {
+      case 'ratings':
+        return 'Ratings'
+      case 'settings':
+        return 'Settings'
+    }
+  } else {
+    return await window.electronAPI.basename(path)
+  }
+}
 
 const defaultState: WindowState = {
   history: {
@@ -138,9 +184,9 @@ export const windowSlice = createSlice({
     },
     changeDirectory(
       state,
-      action: PayloadAction<{ index: number; path: string }>,
+      action: PayloadAction<{ index: number; path: string; title: string }>,
     ) {
-      const { index, path } = action.payload
+      const { index, path, title } = action.payload
       const windowState = state[index]
       if (!windowState) {
         return state
@@ -153,7 +199,7 @@ export const windowSlice = createSlice({
       const historyIndex = windowState.history.index + 1
       const histories = [
         ...windowState.history.histories.slice(0, historyIndex),
-        { directory: path, scrollTop: 0 },
+        { directory: path, scrollTop: 0, title },
       ]
       return {
         ...state,
@@ -348,10 +394,14 @@ export const selectCurrentScrollTop = createSelector(
   (currentHistory) => currentHistory.scrollTop,
 )
 
-export const selectExplorable = createSelector(
+export const selectZephyUrl = createSelector(
   selectCurrentDirectory,
-  (currentDirectory) =>
-    currentDirectory && !currentDirectory.startsWith('zephy://'),
+  (currentDirectory) => parseZephyUrl(currentDirectory),
+)
+
+export const selectZephySchema = createSelector(
+  selectZephyUrl,
+  (zephyUrl) => !!zephyUrl,
 )
 
 export const selectCurrentSortOption = createSelector(
@@ -416,12 +466,21 @@ export const changeDirectory =
   async (dispatch, getState) => {
     const { changeDirectory } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(changeDirectory({ index, path }))
+    const title = await getTitle(path)
+    dispatch(changeDirectory({ index, path, title }))
   }
 
-export const goToSettings = (): AppThunk => async (dispatch) => {
-  dispatch(changeDirectory('zephy://settings'))
-}
+export const goToRatings =
+  (score: number): AppThunk =>
+  async (dispatch) =>
+    dispatch(
+      changeDirectory(
+        buildZephyUrl({ pathname: 'ratings', params: { score } }),
+      ),
+    )
+
+export const goToSettings = (): AppThunk => async (dispatch) =>
+  dispatch(changeDirectory(buildZephyUrl({ pathname: 'settings' })))
 
 export const setCurrentScrollTop =
   (scrollTop: number): AppThunk =>

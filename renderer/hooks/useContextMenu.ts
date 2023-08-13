@@ -10,6 +10,7 @@ import {
   selectCurrentViewMode,
   selectForwardHistories,
   selectIsSidebarHidden,
+  selectZephySchema,
 } from 'store/window'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
@@ -39,6 +40,7 @@ const useContextMenu = () => {
   const forwardHistories = useAppSelector(selectForwardHistories)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
+  const zephySchema = useAppSelector(selectZephySchema)
 
   const createEntryMenuHandler = useCallback(
     (entry: Entry) => {
@@ -130,20 +132,29 @@ const useContextMenu = () => {
         { id: 'separator' },
         { id: 'cut', params: { paths } },
         { id: 'copy', params: { paths } },
-        { id: 'paste', params: { path: currentDirectory } },
+        {
+          id: 'paste',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
       ])
     },
-    [currentDirectory, isFavorite],
+    [currentDirectory, isFavorite, zephySchema],
   )
 
   const createCurrentDirectoryMenuHandler = useCallback(
     () =>
       createMenuHandler([
-        { id: 'newFolder', params: { path: currentDirectory } },
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
         { id: 'separator' },
         { id: 'cut', params: { paths: [] } },
         { id: 'copy', params: { paths: [] } },
-        { id: 'paste', params: { path: currentDirectory } },
+        {
+          id: 'paste',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
         { id: 'separator' },
         { id: 'view', params: { viewMode: currentViewMode } },
         { id: 'separator' },
@@ -152,13 +163,16 @@ const useContextMenu = () => {
           params: { orderBy: currentSortOption.orderBy },
         },
       ]),
-    [currentDirectory, currentSortOption.orderBy, currentViewMode],
+    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
   )
 
   const createMoreMenuHandler = useCallback(
     () =>
       createMenuHandler([
-        { id: 'newFolder', params: { path: currentDirectory } },
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
         { id: 'separator' },
         { id: 'view', params: { viewMode: currentViewMode } },
         { id: 'separator' },
@@ -183,6 +197,7 @@ const useContextMenu = () => {
       currentSortOption.orderBy,
       currentViewMode,
       isSidebarHidden,
+      zephySchema,
     ],
   )
 
@@ -191,7 +206,10 @@ const useContextMenu = () => {
       createMenuHandler(
         backHistories.slice(0, 12).map((history, i) => ({
           id: 'go',
-          params: { offset: -(i + 1), path: history.directory },
+          params: {
+            offset: -(i + 1),
+            title: history.title,
+          },
         })),
       ),
     [backHistories],
@@ -202,7 +220,10 @@ const useContextMenu = () => {
       createMenuHandler(
         forwardHistories.slice(0, 12).map((history, i) => ({
           id: 'go',
-          params: { offset: i + 1, path: history.directory },
+          params: {
+            offset: i + 1,
+            title: history.title,
+          },
         })),
       ),
     [forwardHistories],

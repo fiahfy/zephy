@@ -6,7 +6,7 @@ import Panel from 'components/Panel'
 import RatingTable from 'components/RatingTable'
 
 const Navigator = () => (
-  <Box sx={{ height: '100%', overflowY: 'auto' }}>
+  <Box sx={{ height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
     <Panel title="Favorites">
       <FavoriteTable />
     </Panel>

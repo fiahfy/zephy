@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import {
   changeDirectory,
   selectCurrentDirectory,
-  selectExplorable,
+  selectZephySchema,
 } from 'store/window'
 
 const getLoadedDirectories = (entry: Entry) => {
@@ -33,7 +33,7 @@ const getLoadedDirectories = (entry: Entry) => {
 
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const explorable = useAppSelector(selectExplorable)
+  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
   const { watch } = useWatcher()
@@ -47,14 +47,14 @@ const ExplorerTreeView = () => {
   useEffect(() => {
     ;(async () => {
       const entry = await window.electronAPI.getEntryHierarchy(
-        explorable ? currentDirectory : undefined,
+        zephySchema ? undefined : currentDirectory,
       )
       const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setSelected([currentDirectory])
       setRoot(entry)
     })()
-  }, [currentDirectory, explorable])
+  }, [currentDirectory, zephySchema])
 
   useEffect(
     () =>

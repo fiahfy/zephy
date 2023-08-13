@@ -7,7 +7,6 @@ import {
   ipcMain,
   shell,
 } from 'electron'
-import { basename } from 'path'
 import { canPaste, copy, paste } from './utils/clipboard'
 
 export type ContextMenuParams = {
@@ -73,7 +72,7 @@ const registerContextMenu = () => {
         }),
         go: ({ params }) => ({
           click: () => send({ type: 'go', data: { offset: params.offset } }),
-          label: basename(params.path),
+          label: params.title,
         }),
         moveToTrash: ({ params }) => ({
           accelerator: 'CmdOrCtrl+Backspace',
@@ -83,6 +82,7 @@ const registerContextMenu = () => {
         }),
         newFolder: ({ params }) => ({
           click: () => send({ type: 'newFolder', data: { path: params.path } }),
+          enabled: !!params.path,
           label: 'New Folder',
         }),
         open: ({ params }) => ({
@@ -192,7 +192,7 @@ const registerContextMenu = () => {
         paste: ({ params }) => ({
           accelerator: 'CmdOrCtrl+V',
           click: () => paste(params.path),
-          enabled: canPaste(),
+          enabled: !!params.path && canPaste(),
           label: 'Paste',
         }),
         separator: () => defaultActions.separator,
