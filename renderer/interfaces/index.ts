@@ -75,8 +75,8 @@ export type ContextMenuOption = {
 }
 
 export type Settings = {
-  darkMode: boolean
   shouldShowHiddenFiles: boolean
+  theme: 'light' | 'dark' | 'system'
 }
 
 type File = {

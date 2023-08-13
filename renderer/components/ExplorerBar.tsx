@@ -131,7 +131,7 @@ const ExplorerBar = () => {
 
   const handleChangeDirectory = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.currentTarget.value
+      const value = e.target.value
       setDirectory(value)
     },
     [],

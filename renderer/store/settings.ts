@@ -6,16 +6,16 @@ import { AppState } from 'store'
 type State = Settings
 
 const initialState: State = {
-  darkMode: false,
   shouldShowHiddenFiles: false,
+  theme: 'system',
 }
 
 export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    setDarkMode(state, action: PayloadAction<boolean>) {
-      return { ...state, darkMode: action.payload }
+    setTheme(state, action: PayloadAction<State['theme']>) {
+      return { ...state, theme: action.payload }
     },
     setShouldShowHiddenFiles(state, action: PayloadAction<boolean>) {
       return { ...state, shouldShowHiddenFiles: action.payload }
@@ -26,16 +26,16 @@ export const settingsSlice = createSlice({
   },
 })
 
-export const { replace, setDarkMode, setShouldShowHiddenFiles } =
+export const { replace, setShouldShowHiddenFiles, setTheme } =
   settingsSlice.actions
 
 export default settingsSlice.reducer
 
 export const selectSettings = (state: AppState) => state.settings
 
-export const selectDarkMode = createSelector(
+export const selectTheme = createSelector(
   selectSettings,
-  (settings) => settings.darkMode,
+  (settings) => settings.theme,
 )
 
 export const selectShouldShowHiddenFiles = createSelector(
