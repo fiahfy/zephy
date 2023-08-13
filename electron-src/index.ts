@@ -19,7 +19,7 @@ app.whenReady().then(async () => {
   const baseCreateWindow = (state: State) => {
     const browserWindow = new BrowserWindow({
       ...state,
-      titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
+      titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         webSecurity: !isDev,

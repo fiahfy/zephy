@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react'
 
-const TitleBarContext = createContext<
+const TrafficLightsContext = createContext<
   | {
       visible: boolean
     }
@@ -16,7 +16,7 @@ const TitleBarContext = createContext<
 
 type Props = { children: ReactNode }
 
-export const TitleBarProvider = (props: Props) => {
+export const TrafficLightsProvider = (props: Props) => {
   const { children } = props
 
   const [ready, setReady] = useState(false)
@@ -45,16 +45,16 @@ export const TitleBarProvider = (props: Props) => {
   const value = { visible }
 
   return (
-    <TitleBarContext.Provider value={value}>
+    <TrafficLightsContext.Provider value={value}>
       {ready && children}
-    </TitleBarContext.Provider>
+    </TrafficLightsContext.Provider>
   )
 }
 
-export const useTitleBar = () => {
-  const context = useContext(TitleBarContext)
+export const useTrafficLights = () => {
+  const context = useContext(TrafficLightsContext)
   if (!context) {
-    throw new Error('useTitleBar must be used within a Provider')
+    throw new Error('useTrafficLights must be used within a Provider')
   }
   return context
 }

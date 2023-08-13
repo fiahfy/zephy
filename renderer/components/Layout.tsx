@@ -1,14 +1,15 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
+import Head from 'next/head'
 import { ReactNode } from 'react'
 
 import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
-import TitleBar from 'components/TitleBar'
 import useContextMenu from 'hooks/useContextMenu'
 import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
 import useMessageListener from 'hooks/useMessageListener'
+import useTitle from 'hooks/useTitle'
 
 type Props = {
   children: ReactNode
@@ -20,12 +21,16 @@ const Layout = (props: Props) => {
   const { createMenuHandler } = useContextMenu()
   useDocumentEventHandler()
   useMessageListener()
+  const title = useTitle()
 
   return (
     <Box
       onContextMenu={createMenuHandler()}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
+      <Head>
+        <title>{title}</title>
+      </Head>
       <GlobalStyles
         styles={{
           'html, body, #__next': {
@@ -66,7 +71,6 @@ const Layout = (props: Props) => {
           },
         }}
       />
-      <TitleBar />
       <ExplorerBar />
       <Sidebar variant="primary">
         <Navigator />
@@ -78,10 +82,10 @@ const Layout = (props: Props) => {
         <Toolbar
           sx={{
             flexShrink: 0,
-            minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
+            minHeight: (theme) =>
+              `${theme.mixins.explorerBar.height}!important`,
           }}
         />
-        <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>
       </Box>
       <Sidebar variant="secondary">

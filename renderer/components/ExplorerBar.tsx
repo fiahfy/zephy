@@ -31,6 +31,7 @@ import {
 
 import Icon from 'components/Icon'
 import RoundedFilledTextField from 'components/mui/RoundedFilledTextField'
+import { useTrafficLights } from 'contexts/TrafficLightsContext'
 import useContextMenu from 'hooks/useContextMenu'
 import useLongPress from 'hooks/useLongPress'
 import { useAppDispatch, useAppSelector } from 'store'
@@ -56,6 +57,8 @@ const ExplorerBar = () => {
   const queryHistories = useAppSelector(selectQueryHistories)
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
+
+  const { visible } = useTrafficLights()
 
   const {
     createBackHistoryMenuHandler,
@@ -176,13 +179,28 @@ const ExplorerBar = () => {
       color="default"
       component="div"
       elevation={0}
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      sx={{
+        WebkitAppRegion: 'drag',
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
     >
       <Toolbar
         disableGutters
-        sx={{ gap: 1, minHeight: '34px!important', px: 1 }}
+        sx={{
+          minHeight: (theme) => `${theme.mixins.explorerBar.height}!important`,
+          pl: visible ? 10 : 1,
+          pr: 1,
+        }}
       >
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Box sx={{ flex: '1 1 0' }} />
+        <Box
+          sx={{
+            WebkitAppRegion: 'no-drag',
+            display: 'flex',
+            flex: '6 1 0',
+            gap: 0.5,
+          }}
+        >
           <IconButton
             disabled={!canBack}
             onClick={handleClickBack}
@@ -214,117 +232,121 @@ const ExplorerBar = () => {
           <IconButton onClick={handleClickRefresh} size="small" title="Refresh">
             <RefreshIcon fontSize="small" />
           </IconButton>
-        </Box>
-        <Box sx={{ display: 'flex', flexGrow: 1, gap: 1 }}>
-          <Box sx={{ display: 'flex', flex: '2 1 0' }}>
-            <RoundedFilledTextField
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      disabled={zephySchema}
-                      onClick={handleClickFavorite}
-                      size="small"
-                    >
-                      <Icon iconType={favorite ? 'star' : 'star-border'} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      disabled={zephySchema}
-                      onClick={handleClickFolder}
-                      size="small"
-                    >
-                      <FolderIcon fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              fullWidth
-              onChange={handleChangeDirectory}
-              onKeyDown={handleKeyDownDirectory}
-              spellCheck={false}
-              value={directory}
-            />
-          </Box>
-          <Box sx={{ display: 'flex', flex: '1 1 0' }}>
-            <Autocomplete
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ListboxProps={{ sx: { typography: 'body2' } } as any}
-              freeSolo
-              fullWidth
-              inputValue={query}
-              onChange={handleChangeQuery}
-              onInputChange={handleInputChangeQuery}
-              onKeyDown={handleKeyDownQuery}
-              options={queryHistories.concat().reverse()}
-              renderInput={(params) => (
-                <RoundedFilledTextField
-                  {...params}
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <IconButton onClick={handleClickSearch} size="small">
-                          <SearchIcon fontSize="small" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  fullWidth
-                  inputRef={ref}
-                  placeholder="Search..."
-                />
-              )}
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={(theme) => ({
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    px: `${theme.spacing(1.5)}!important`,
-                    py: `${theme.spacing(0)}!important`,
-                  })}
-                  {...props}
-                >
-                  <Typography noWrap sx={{ flexGrow: 1 }} variant="caption">
-                    {option}
-                  </Typography>
+          <RoundedFilledTextField
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
                   <IconButton
-                    onClick={(e) => handleClickRemove(e, option)}
+                    disabled={zephySchema}
+                    onClick={handleClickFavorite}
                     size="small"
-                    title="Remove"
                   >
-                    <DeleteIcon fontSize="small" />
+                    <Icon iconType={favorite ? 'star' : 'star-border'} />
                   </IconButton>
-                </Box>
-              )}
-              size="small"
-              sx={{
-                '.MuiFormControl-root': {
-                  '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
-                    {
-                      px: 1.5,
-                      py: 0,
-                      '.MuiFilledInput-input': { px: 0, py: 0.5 },
-                    },
-                },
-              }}
-            />
-          </Box>
+                </InputAdornment>
+              ),
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton
+                    disabled={zephySchema}
+                    onClick={handleClickFolder}
+                    size="small"
+                  >
+                    <FolderIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
+            onChange={handleChangeDirectory}
+            onKeyDown={handleKeyDownDirectory}
+            spellCheck={false}
+            value={directory}
+          />
         </Box>
-        <IconButton
-          onClick={createMoreMenuHandler()}
-          size="small"
-          title="Settings"
+        <Box sx={{ flex: '1 1 0' }} />
+        <Box
+          sx={{
+            WebkitAppRegion: 'no-drag',
+            display: 'flex',
+            flex: '3 1 0',
+            gap: 1,
+          }}
         >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+          <Autocomplete
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ListboxProps={{ sx: { typography: 'body2' } } as any}
+            freeSolo
+            fullWidth
+            inputValue={query}
+            onChange={handleChangeQuery}
+            onInputChange={handleInputChangeQuery}
+            onKeyDown={handleKeyDownQuery}
+            options={queryHistories.concat().reverse()}
+            renderInput={(params) => (
+              <RoundedFilledTextField
+                {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <IconButton onClick={handleClickSearch} size="small">
+                        <SearchIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                fullWidth
+                inputRef={ref}
+                placeholder="Search..."
+              />
+            )}
+            renderOption={(props, option) => (
+              <Box
+                component="li"
+                sx={(theme) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: `${theme.spacing(1.5)}!important`,
+                  py: `${theme.spacing(0)}!important`,
+                })}
+                {...props}
+              >
+                <Typography noWrap sx={{ flexGrow: 1 }} variant="caption">
+                  {option}
+                </Typography>
+                <IconButton
+                  onClick={(e) => handleClickRemove(e, option)}
+                  size="small"
+                  title="Remove"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+            size="small"
+            sx={{
+              '.MuiFormControl-root': {
+                '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
+                  {
+                    px: 1.5,
+                    py: 0,
+                    '.MuiFilledInput-input': { px: 0, py: 0.5 },
+                  },
+              },
+            }}
+          />
+          <IconButton
+            onClick={createMoreMenuHandler()}
+            size="small"
+            title="Settings"
+          >
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        </Box>
       </Toolbar>
-      <Divider />
+      <Divider sx={{ bottom: 0, position: 'absolute', width: '100%' }} />
     </AppBar>
   )
 }

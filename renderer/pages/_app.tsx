@@ -9,7 +9,7 @@ import Head from 'next/head'
 import Layout from 'components/Layout'
 import { StoreProvider } from 'contexts/StoreContext'
 import { ThemeProvider } from 'contexts/ThemeContext'
-import { TitleBarProvider } from 'contexts/TitleBarContext'
+import { TrafficLightsProvider } from 'contexts/TrafficLightsContext'
 import { WatcherProvider } from 'contexts/WatcherContext'
 import createEmotionCache from 'utils/createEmotionCache'
 
@@ -29,15 +29,15 @@ export default function MyApp(props: MyAppProps) {
         <meta content="initial-scale=1, width=device-width" name="viewport" />
       </Head>
       <StoreProvider>
-        <TitleBarProvider>
-          <ThemeProvider>
+        <ThemeProvider>
+          <TrafficLightsProvider>
             <WatcherProvider>
               <Layout>
                 <Component {...pageProps} />
               </Layout>
             </WatcherProvider>
-          </ThemeProvider>
-        </TitleBarProvider>
+          </TrafficLightsProvider>
+        </ThemeProvider>
       </StoreProvider>
     </CacheProvider>
   )

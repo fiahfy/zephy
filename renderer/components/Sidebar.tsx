@@ -97,10 +97,10 @@ const Sidebar = (props: Props) => {
           <Toolbar
             sx={{
               flexShrink: 0,
-              minHeight: (theme) => `${theme.mixins.titleBar.height}!important`,
+              minHeight: (theme) =>
+                `${theme.mixins.explorerBar.height}!important`,
             }}
           />
-          <Toolbar sx={{ flexShrink: 0, minHeight: '35px!important' }} />
           <Box
             sx={{
               flexGrow: 1,

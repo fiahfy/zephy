@@ -5,7 +5,6 @@ import {
 } from '@mui/material/styles'
 import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
 
-import { useTitleBar } from 'contexts/TitleBarContext'
 import { useAppSelector } from 'store'
 import { selectDarkMode } from 'store/settings'
 
@@ -22,8 +21,6 @@ export const ThemeProvider = (props: Props) => {
   const { children } = props
 
   const darkMode = useAppSelector(selectDarkMode)
-
-  const { visible } = useTitleBar()
 
   const mode = darkMode ? 'dark' : 'light'
 
@@ -53,22 +50,13 @@ export const ThemeProvider = (props: Props) => {
       },
     })
     return createTheme(theme, {
-      components: {
-        MuiAppBar: {
-          styleOverrides: {
-            root: {
-              top: visible ? theme.spacing(3.5) : 0,
-            },
-          },
-        },
-      },
       mixins: {
-        titleBar: {
-          height: visible ? theme.spacing(3.5) : 0,
+        explorerBar: {
+          height: theme.spacing(4.75),
         },
       },
     })
-  }, [mode, visible])
+  }, [mode])
 
   const value = { theme }
 

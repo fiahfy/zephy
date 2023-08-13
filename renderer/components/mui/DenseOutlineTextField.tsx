@@ -7,7 +7,7 @@ const DenseOutlineTextField = styled((props: TextFieldProps) => (
   theme.unstable_sx({
     '.MuiInputBase-input': {
       ...theme.typography.caption,
-      height: '1.125rem',
+      height: 18,
       px: 0.5,
       py: 0,
     },
