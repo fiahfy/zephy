@@ -59,7 +59,6 @@ const DirectoryPreviewListItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-
       const paths = await (async () => {
         if (entry.type === 'file') {
           return [entry.path]

@@ -21,7 +21,7 @@ const Inspector = () => {
     if (el) {
       el.scrollTop = 0
     }
-  }, [content, contents.length])
+  }, [content?.path, contents.length])
 
   return (
     <Box

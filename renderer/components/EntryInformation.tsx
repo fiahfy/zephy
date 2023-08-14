@@ -23,7 +23,7 @@ const EntryInformation = (props: Props) => {
       if (entries.length > 1) {
         return
       }
-      if (!entry) {
+      if (!entry?.path) {
         return
       }
       const metadata = await getMetadata(entry.path)
@@ -36,7 +36,7 @@ const EntryInformation = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry, entries.length])
+  }, [entries.length, entry?.path])
 
   return (
     <>
@@ -57,7 +57,6 @@ const EntryInformation = (props: Props) => {
               mb: 0,
               overflowWrap: 'break-word',
               px: 1,
-              userSelect: 'none',
             }}
             variant="caption"
           >

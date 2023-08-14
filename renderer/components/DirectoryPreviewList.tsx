@@ -1,5 +1,5 @@
 import { ImageList } from '@mui/material'
-import { useEffect, useReducer } from 'react'
+import { useEffect, useMemo, useReducer } from 'react'
 
 import DirectoryPreviewListItem from 'components/DirectoryPreviewListItem'
 import MessagePreviewListItem from 'components/MessagePreviewListItem'
@@ -48,15 +48,17 @@ const DirectoryPreviewList = (props: Props) => {
     entries: [],
   })
 
+  const over = useMemo(() => entries.length - max, [entries])
+
   useEffect(() => {
     let unmounted = false
 
     ;(async () => {
       dispatch({ type: 'loading' })
       let entries = await window.electronAPI.getEntries(entry.path)
-      entries = entries
-        .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
-        .slice(0, max)
+      entries = entries.filter(
+        (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path),
+      )
       if (unmounted) {
         return
       }
@@ -66,7 +68,7 @@ const DirectoryPreviewList = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry, shouldShowHiddenFiles])
+  }, [entry.path, shouldShowHiddenFiles])
 
   return (
     <ImageList cols={1} gap={1} sx={{ m: 0 }}>
@@ -75,9 +77,14 @@ const DirectoryPreviewList = (props: Props) => {
       ) : (
         <>
           {entries.length > 0 ? (
-            entries.map((entry) => (
-              <DirectoryPreviewListItem entry={entry} key={entry.path} />
-            ))
+            <>
+              {entries.slice(0, max).map((entry) => (
+                <DirectoryPreviewListItem entry={entry} key={entry.path} />
+              ))}
+              {over > 0 && (
+                <MessagePreviewListItem message={`Other ${over} items`} />
+              )}
+            </>
           ) : (
             <MessagePreviewListItem message="No Items" />
           )}

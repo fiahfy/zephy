@@ -57,7 +57,7 @@ const VideoPreviewListItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry])
+  }, [entry.path])
 
   return (
     <>

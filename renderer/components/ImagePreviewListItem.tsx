@@ -57,7 +57,7 @@ const ImagePreviewListItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry])
+  }, [entry.path])
 
   return (
     <>

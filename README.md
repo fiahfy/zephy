@@ -13,6 +13,7 @@
 
 ## TODOs
 
+- [ ] Copy & Move Duplicated Item
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
 - [ ] Video Preview Thumbnails

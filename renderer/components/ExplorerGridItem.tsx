@@ -16,7 +16,7 @@ import EntryIcon from 'components/EntryIcon'
 import ExplorerNameTextField from 'components/ExplorerNameTextField'
 import Outline from 'components/Outline'
 import useDnd from 'hooks/useDnd'
-import { Content, Entry } from 'interfaces'
+import { Content } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import {
   selectIsEditing,
@@ -95,15 +95,13 @@ const ExplorerGridItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-
       const paths = await (async () => {
         if (content.type === 'file') {
           return [content.path]
         }
 
-        let entries: Entry[] = []
         try {
-          entries = await window.electronAPI.getEntries(content.path)
+          const entries = await window.electronAPI.getEntries(content.path)
           return entries
             .filter(
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
