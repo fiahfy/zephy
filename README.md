@@ -6,10 +6,13 @@
 
 ## Features
 
+- File and Folder Management
 - Favorites
 - Rating
-- Light/Dark mode
-- Cross platform support
+- Dark Mode Support
+- Tree View Display
+- Image and Video Preview
+- Cross-Platform Compatibility
 
 ## TODOs
 
@@ -21,8 +24,7 @@
 
 ## Screenshots
 
-![screenshot](.github/img/screenshot1.png)
-![screenshot](.github/img/screenshot2.png)
+![screenshot](.github/img/screenshot.png)
 
 ## Installation
 
