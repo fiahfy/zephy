@@ -334,7 +334,7 @@ export const paste = (): AppThunk => async (_, getState) => {
   await window.electronAPI.pasteEntries(currentDirectory)
 }
 
-export const openWindow =
+export const newWindow =
   (directory?: string): AppThunk =>
   async (_, getState) => {
     const currentDirectory = selectCurrentDirectory(getState())

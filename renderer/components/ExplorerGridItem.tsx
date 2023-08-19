@@ -106,6 +106,7 @@ const ExplorerGridItem = (props: Props) => {
             .filter(
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map((entry) => entry.path)
         } catch (e) {
           return []
