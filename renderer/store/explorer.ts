@@ -328,7 +328,7 @@ export const copy = (): AppThunk => async (_, getState) => {
 export const paste = (): AppThunk => async (_, getState) => {
   const currentDirectory = selectCurrentDirectory(getState())
   const zephySchema = selectZephySchema(getState())
-  if (!zephySchema) {
+  if (zephySchema) {
     return
   }
   await window.electronAPI.pasteEntries(currentDirectory)
