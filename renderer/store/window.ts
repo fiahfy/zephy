@@ -49,7 +49,7 @@ type State = {
   [index: number]: WindowState
 }
 
-export const defaultOrders = {
+const defaultOrders = {
   name: 'asc',
   dateLastOpened: 'desc',
   dateModified: 'desc',
@@ -255,29 +255,26 @@ export const windowSlice = createSlice({
         },
       }
     },
-    setSortOption(
+    sort(
       state,
       action: PayloadAction<{
         index: number
         path: string
-        sortOption: {
-          order?: SortOption['order']
-          orderBy: SortOption['orderBy']
-        }
+        orderBy: SortOption['orderBy']
       }>,
     ) {
-      const {
-        index,
-        path,
-        sortOption: { order, orderBy },
-      } = action.payload
+      const { index, path, orderBy } = action.payload
       const windowState = state[index]
       if (!windowState) {
         return state
       }
-      const newOrder = order
-        ? order
-        : defaultOrders[orderBy as keyof typeof defaultOrders]
+      const option = windowState.sorting[path]
+      const newOrder =
+        option && option.orderBy === orderBy
+          ? option.order === 'desc'
+            ? 'asc'
+            : 'desc'
+          : defaultOrders[orderBy as keyof typeof defaultOrders]
       return {
         ...state,
         [index]: {
@@ -433,6 +430,7 @@ export const setSidebarHidden =
     const { setSidebarHidden } = windowSlice.actions
     const index = selectWindowIndex(getState())
     dispatch(setSidebarHidden({ index, variant, hidden }))
+    dispatch(updateApplicationMenu())
   }
 
 export const setSidebarWidth =
@@ -468,6 +466,7 @@ export const changeDirectory =
     const index = selectWindowIndex(getState())
     const title = await getTitle(path)
     dispatch(changeDirectory({ index, path, title }))
+    dispatch(updateApplicationMenu())
   }
 
 export const goToRatings =
@@ -490,28 +489,20 @@ export const setCurrentScrollTop =
     dispatch(setCurrentScrollTop({ index, scrollTop }))
   }
 
-export const setCurrentSortOption =
-  (sortOption: SortOption): AppThunk =>
-  async (dispatch, getState) => {
-    const { setSortOption } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    const currentDirectory = selectCurrentDirectory(getState())
-    dispatch(setSortOption({ index, path: currentDirectory, sortOption }))
-  }
-
-export const setCurrentOrderBy =
+export const sort =
   (orderBy: SortOption['orderBy']): AppThunk =>
   async (dispatch, getState) => {
-    const { setSortOption } = windowSlice.actions
+    const { sort } = windowSlice.actions
     const index = selectWindowIndex(getState())
     const currentDirectory = selectCurrentDirectory(getState())
     dispatch(
-      setSortOption({
+      sort({
         index,
         path: currentDirectory,
-        sortOption: { orderBy },
+        orderBy,
       }),
     )
+    dispatch(updateApplicationMenu())
   }
 
 export const setCurrentViewMode =
@@ -521,4 +512,16 @@ export const setCurrentViewMode =
     const index = selectWindowIndex(getState())
     const currentDirectory = selectCurrentDirectory(getState())
     dispatch(setViewMode({ index, path: currentDirectory, viewMode }))
+    dispatch(updateApplicationMenu())
   }
+
+export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
+  const viewMode = selectCurrentViewMode(getState())
+  const sortOption = selectCurrentSortOption(getState())
+  const sidebar = selectSidebar(getState())
+  await window.electronAPI.applicationMenu.update({
+    sidebar,
+    sortOption,
+    viewMode,
+  })
+}

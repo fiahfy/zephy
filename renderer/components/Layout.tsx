@@ -7,7 +7,7 @@ import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
 import useContextMenu from 'hooks/useContextMenu'
-import useDocumentEventHandler from 'hooks/useDocumentEventHandler'
+import useEventListener from 'hooks/useEventListener'
 import useMessageListener from 'hooks/useMessageListener'
 import useTitle from 'hooks/useTitle'
 
@@ -19,7 +19,7 @@ const Layout = (props: Props) => {
   const { children } = props
 
   const { createMenuHandler } = useContextMenu()
-  useDocumentEventHandler()
+  useEventListener()
   useMessageListener()
   const title = useTitle()
 

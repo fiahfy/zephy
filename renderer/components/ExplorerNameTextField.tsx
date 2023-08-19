@@ -1,6 +1,5 @@
 import {
   ChangeEvent,
-  FocusEvent,
   KeyboardEvent,
   useCallback,
   useEffect,
@@ -56,11 +55,6 @@ const ExplorerNameTextField = (props: Props) => {
     setName(value)
   }, [])
 
-  const handleFocus = useCallback(
-    (e: FocusEvent<HTMLInputElement>) => e.stopPropagation(),
-    [],
-  )
-
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       e.stopPropagation()
@@ -85,7 +79,6 @@ const ExplorerNameTextField = (props: Props) => {
       onBlur={handleBlur}
       onChange={handleChange}
       onContextMenu={createMenuHandler()}
-      onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       spellCheck={false}
       sx={{ '.MuiInputBase-root': { color: 'inherit' } }}

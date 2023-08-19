@@ -154,7 +154,7 @@ type Props = {
   contents: Content[]
   focused: string | undefined
   loading: boolean
-  onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
+  onChangeOrderBy: (orderBy: Key) => void
   onClickContent: (e: MouseEvent, content: Content) => void
   onContextMenuContent: (e: MouseEvent, content: Content) => void
   onDoubleClickContent: (e: MouseEvent, content: Content) => void
@@ -172,7 +172,7 @@ const ExplorerTable = (props: Props) => {
     contents,
     focused,
     loading,
-    onChangeSortOption,
+    onChangeOrderBy,
     onClickContent,
     onContextMenuContent,
     onDoubleClickContent,
@@ -271,11 +271,11 @@ const ExplorerTable = (props: Props) => {
         dataKey={dataKey as Key}
         height={headerHeight}
         label={label}
-        onChangeSortOption={onChangeSortOption}
+        onChangeOrderBy={onChangeOrderBy}
         sortOption={sortOption}
       />
     ),
-    [onChangeSortOption, sortOption],
+    [onChangeOrderBy, sortOption],
   )
 
   return (

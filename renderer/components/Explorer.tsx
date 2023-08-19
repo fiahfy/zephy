@@ -31,7 +31,7 @@ import {
   selectCurrentSortOption,
   selectCurrentViewMode,
   setCurrentScrollTop,
-  setCurrentSortOption,
+  sort,
 } from 'store/window'
 
 const Explorer = () => {
@@ -103,9 +103,8 @@ const Explorer = () => {
     [isSelected],
   )
 
-  const handleChangeSortOption = useCallback(
-    (sortOption: { order: 'asc' | 'desc'; orderBy: keyof Content }) =>
-      dispatch(setCurrentSortOption(sortOption)),
+  const handleChangeOrderBy = useCallback(
+    (orderBy: keyof Content) => dispatch(sort(orderBy)),
     [dispatch],
   )
 
@@ -149,18 +148,10 @@ const Explorer = () => {
     dispatch(blur())
   }, [dispatch])
 
-  const handleBlur = () =>
-    window.electronAPI.applicationMenu.setState({ focused: false })
-
-  const handleFocus = () =>
-    window.electronAPI.applicationMenu.setState({ focused: true })
-
   return (
     <Box
-      onBlur={handleBlur}
       onClick={handleClick}
       onContextMenu={createCurrentDirectoryMenuHandler()}
-      onFocus={handleFocus}
       sx={{ height: '100%', position: 'relative' }}
       {...createCurrentDirectoryDroppableBinder()}
     >
@@ -172,7 +163,7 @@ const Explorer = () => {
           contents,
           focused,
           loading,
-          onChangeSortOption: handleChangeSortOption,
+          onChangeOrderBy: handleChangeOrderBy,
           onClickContent: handleClickContent,
           onContextMenuContent: handleContextMenuContent,
           onDoubleClickContent: handleDoubleClickContent,

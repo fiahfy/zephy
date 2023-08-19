@@ -28,7 +28,7 @@ export interface IElectronAPI {
   trashEntries: (paths: string[]) => Promise<void>
   applicationMenu: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState: (state: any) => Promise<void>
+    update: (params: any) => Promise<void>
   }
   contextMenu: {
     show: (

@@ -34,8 +34,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   trashEntries: (paths: string[]) => ipcRenderer.invoke('trash-entries', paths),
   applicationMenu: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState: (state: any) =>
-      ipcRenderer.invoke('application-menu-set-state', state),
+    update: (params: any) =>
+      ipcRenderer.invoke('application-menu-update', params),
   },
   contextMenu: {
     show: (params: ContextMenuParams, options: ContextMenuOption[]) =>

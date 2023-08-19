@@ -2,7 +2,6 @@ import { TableCell, TableSortLabel, Typography } from '@mui/material'
 import { ReactNode, useCallback } from 'react'
 
 import { Content } from 'interfaces'
-import { defaultOrders } from 'store/window'
 
 type Key = keyof Content
 type Order = 'asc' | 'desc'
@@ -11,26 +10,17 @@ type Props = {
   dataKey: Key
   height: number
   label: ReactNode
-  onChangeSortOption: (sortOption: { order: Order; orderBy: Key }) => void
+  onChangeOrderBy: (orderBy: Key) => void
   sortOption: { order: Order; orderBy: Key }
 }
 
 const ExplorerTableHeaderCell = (props: Props) => {
-  const { height, dataKey, label, onChangeSortOption, sortOption } = props
+  const { height, dataKey, label, onChangeOrderBy, sortOption } = props
 
-  const handleClick = useCallback(() => {
-    const defaultOrder =
-      defaultOrders[dataKey as keyof typeof defaultOrders] ?? 'asc'
-    const reverseSign =
-      sortOption.orderBy === dataKey && sortOption.order === defaultOrder
-        ? -1
-        : 1
-    const defaultSign = defaultOrder === 'asc' ? 1 : -1
-    onChangeSortOption({
-      order: defaultSign * reverseSign === 1 ? 'asc' : 'desc',
-      orderBy: dataKey,
-    })
-  }, [dataKey, onChangeSortOption, sortOption.order, sortOption.orderBy])
+  const handleClick = useCallback(
+    () => onChangeOrderBy(dataKey),
+    [dataKey, onChangeOrderBy],
+  )
 
   return (
     <TableCell

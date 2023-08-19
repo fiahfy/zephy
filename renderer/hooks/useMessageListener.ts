@@ -16,9 +16,9 @@ import {
   changeDirectory,
   go,
   goToSettings,
-  setCurrentOrderBy,
   setCurrentViewMode,
   setSidebarHidden,
+  sort,
 } from 'store/window'
 
 const useMessageListener = () => {
@@ -59,7 +59,7 @@ const useMessageListener = () => {
         case 'selectAll':
           return dispatch(selectAll())
         case 'sort':
-          return dispatch(setCurrentOrderBy(data.orderBy))
+          return dispatch(sort(data.orderBy))
       }
     })
     return () => removeListener()

@@ -9,7 +9,28 @@ import {
 } from 'electron'
 
 type State = {
-  focused: boolean
+  isEditable: boolean
+  sidebar: {
+    primary: {
+      hidden: boolean
+      width: number
+    }
+    secondary: {
+      hidden: boolean
+      width: number
+    }
+  }
+  sortOption: {
+    order: 'asc' | 'desc'
+    orderBy:
+      | 'name'
+      | 'dateLastOpened'
+      | 'dateModified'
+      | 'dateCreated'
+      | 'size'
+      | 'rating'
+  }
+  viewMode: 'list' | 'thumbnail'
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,10 +43,22 @@ const registerApplicationMenu = () => {
   const isMac = process.platform === 'darwin'
 
   let state: State = {
-    focused: false,
+    isEditable: false,
+    sidebar: {
+      primary: {
+        hidden: false,
+        width: 0,
+      },
+      secondary: {
+        hidden: false,
+        width: 0,
+      },
+    },
+    sortOption: { order: 'asc', orderBy: 'name' },
+    viewMode: 'list',
   }
 
-  const updateMenu = (state: State) => {
+  const update = () => {
     // @see https://www.electronjs.org/docs/latest/api/menu#examples
     const template: MenuItemConstructorOptions[] = [
       // { role: 'appMenu' }
@@ -85,8 +118,14 @@ const registerApplicationMenu = () => {
           { role: 'redo' },
           { type: 'separator' },
 
-          ...(state.focused
+          ...(state.isEditable
             ? [
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+                { role: 'selectAll' },
+              ]
+            : [
                 {
                   accelerator: 'CmdOrCtrl+X',
                   enabled: false,
@@ -107,12 +146,6 @@ const registerApplicationMenu = () => {
                   click: () => send({ type: 'selectAll' }),
                   label: 'Select All',
                 },
-              ]
-            : [
-                { role: 'cut' },
-                { role: 'copy' },
-                { role: 'paste' },
-                { role: 'selectAll' },
               ]),
         ],
       } as MenuItemConstructorOptions,
@@ -120,17 +153,71 @@ const registerApplicationMenu = () => {
       {
         label: 'View',
         submenu: [
-          {
-            accelerator: 'CmdOrCtrl+1',
+          ...[
+            {
+              accelerator: 'CmdOrCtrl+1',
+              label: 'as List',
+              viewMode: 'list',
+            },
+            {
+              accelerator: 'CmdOrCtrl+2',
+              label: 'as Thumbnail',
+              viewMode: 'thumbnail',
+            },
+          ].map((menu) => ({
+            ...menu,
+            checked: menu.viewMode === state.viewMode,
             click: () =>
-              send({ type: 'changeViewMode', data: { viewMode: 'list' } }),
-            label: 'as List',
+              send({
+                type: 'changeViewMode',
+                data: { viewMode: menu.viewMode },
+              }),
+            type: 'checkbox',
+          })),
+          { type: 'separator' },
+          {
+            label: 'Sort By',
+            submenu: [
+              { label: 'Name', orderBy: 'name' },
+              { label: 'Date Last Opened', orderBy: 'dateLastOpened' },
+              { label: 'Date Modified', orderBy: 'dateModified' },
+              { label: 'Date Created', orderBy: 'dateCreated' },
+              { label: 'Size', orderBy: 'size' },
+              { label: 'Rating', orderBy: 'rating' },
+            ].map((menu) => ({
+              ...menu,
+              checked: menu.orderBy === state.sortOption.orderBy,
+              click: () =>
+                send({ type: 'sort', data: { orderBy: menu.orderBy } }),
+              type: 'checkbox',
+            })),
+          },
+          { type: 'separator' },
+          {
+            label: state.sidebar.primary.hidden
+              ? 'Show Navigator'
+              : 'Hide Navigator',
+            click: () =>
+              send({
+                type: 'changeSidebarHidden',
+                data: {
+                  variant: 'primary',
+                  hidden: !state.sidebar.primary.hidden,
+                },
+              }),
           },
           {
-            accelerator: 'CmdOrCtrl+2',
+            label: state.sidebar.secondary.hidden
+              ? 'Show Inspector'
+              : 'Hide Inspector',
             click: () =>
-              send({ type: 'changeViewMode', data: { viewMode: 'thumbnail' } }),
-            label: 'as Thumbnail',
+              send({
+                type: 'changeSidebarHidden',
+                data: {
+                  variant: 'secondary',
+                  hidden: !state.sidebar.secondary.hidden,
+                },
+              }),
           },
           { type: 'separator' },
           { role: 'reload' },
@@ -139,7 +226,7 @@ const registerApplicationMenu = () => {
           { type: 'separator' },
           { role: 'togglefullscreen' },
         ],
-      },
+      } as MenuItemConstructorOptions,
       // { role: 'windowMenu' }
       {
         label: 'Window',
@@ -171,13 +258,13 @@ const registerApplicationMenu = () => {
     Menu.setApplicationMenu(menu)
   }
 
-  updateMenu(state)
+  update()
 
   ipcMain.handle(
-    'application-menu-set-state',
-    (_event: IpcMainInvokeEvent, newState: State) => {
-      state = { ...state, ...newState }
-      updateMenu(state)
+    'application-menu-update',
+    (_event: IpcMainInvokeEvent, params: Partial<State>) => {
+      state = { ...state, ...params }
+      update()
     },
   )
 }
