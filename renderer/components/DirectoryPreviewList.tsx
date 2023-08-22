@@ -1,4 +1,5 @@
 import { ImageList } from '@mui/material'
+import pluralize from 'pluralize'
 import { useEffect, useMemo, useReducer } from 'react'
 
 import DirectoryPreviewListItem from 'components/DirectoryPreviewListItem'
@@ -82,7 +83,9 @@ const DirectoryPreviewList = (props: Props) => {
                 <DirectoryPreviewListItem entry={entry} key={entry.path} />
               ))}
               {over > 0 && (
-                <MessagePreviewListItem message={`Other ${over} items`} />
+                <MessagePreviewListItem
+                  message={`Other ${pluralize('item', over, true)}`}
+                />
               )}
             </>
           ) : (

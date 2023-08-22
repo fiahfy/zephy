@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material'
+import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
@@ -60,7 +61,9 @@ const EntryInformation = (props: Props) => {
             }}
             variant="caption"
           >
-            {entries.length > 1 ? `${entries.length} items` : entry.name}
+            {entries.length > 1
+              ? pluralize('item', entries.length, true)
+              : entry.name}
           </Typography>
           <EntryInformationTable entries={entries} metadata={metadata} />
         </Box>

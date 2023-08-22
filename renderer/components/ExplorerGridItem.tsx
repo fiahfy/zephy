@@ -2,6 +2,7 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import fileUrl from 'file-url'
+import pluralize from 'pluralize'
 import {
   MouseEvent,
   SyntheticEvent,
@@ -231,7 +232,7 @@ const ExplorerGridItem = (props: Props) => {
             />
             {!loading && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
-                {paths.length} items
+                {pluralize('item', paths.length, true)}
               </Typography>
             )}
           </Box>
