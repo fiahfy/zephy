@@ -111,6 +111,13 @@ const Sidebar = (props: Props) => {
           >
             {children}
           </Box>
+          <Toolbar
+            sx={{
+              flexShrink: 0,
+              minHeight: (theme) =>
+                `${theme.mixins.statusBar.height}!important`,
+            }}
+          />
           <Box
             onMouseDown={handleMouseDown}
             sx={{

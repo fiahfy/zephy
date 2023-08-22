@@ -6,6 +6,7 @@ import ExplorerBar from 'components/ExplorerBar'
 import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
+import StatusBar from 'components/StatusBar'
 import useContextMenu from 'hooks/useContextMenu'
 import useEventListener from 'hooks/useEventListener'
 import useMessageListener from 'hooks/useMessageListener'
@@ -87,10 +88,17 @@ const Layout = (props: Props) => {
           }}
         />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>
+        <Toolbar
+          sx={{
+            flexShrink: 0,
+            minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
+          }}
+        />
       </Box>
       <Sidebar variant="secondary">
         <Inspector />
       </Sidebar>
+      <StatusBar />
     </Box>
   )
 }

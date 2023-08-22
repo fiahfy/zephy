@@ -61,6 +61,9 @@ export const ThemeProvider = (props: Props) => {
         explorerBar: {
           height: theme.spacing(4.75),
         },
+        statusBar: {
+          height: theme.spacing(3),
+        },
       },
     })
   }, [mode])
