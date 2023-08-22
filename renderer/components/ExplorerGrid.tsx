@@ -1,4 +1,4 @@
-import { Box, LinearProgress } from '@mui/material'
+import { Box, LinearProgress, Typography } from '@mui/material'
 import {
   KeyboardEvent,
   MouseEvent,
@@ -22,6 +22,7 @@ type Props = {
   contents: Content[]
   focused: string | undefined
   loading: boolean
+  noDataText: string
   onClickContent: (e: MouseEvent, content: Content) => void
   onContextMenuContent: (e: MouseEvent, content: Content) => void
   onDoubleClickContent: (e: MouseEvent, content: Content) => void
@@ -38,6 +39,7 @@ const ExplorerGrid = (props: Props) => {
     contents,
     focused,
     loading,
+    noDataText,
     onClickContent,
     onContextMenuContent,
     onDoubleClickContent,
@@ -197,6 +199,19 @@ const ExplorerGrid = (props: Props) => {
             columnCount={columns}
             columnWidth={wrapperWidth / columns}
             height={height}
+            noContentRenderer={() => (
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  height: '100%',
+                  justifyContent: 'center',
+                  userSelect: 'none',
+                }}
+              >
+                <Typography variant="caption">{noDataText}</Typography>
+              </Box>
+            )}
             rowCount={chunks.length}
             rowHeight={rowHeight}
             style={{

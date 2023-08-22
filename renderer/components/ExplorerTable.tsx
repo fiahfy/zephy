@@ -1,4 +1,4 @@
-import { Box, LinearProgress } from '@mui/material'
+import { Box, LinearProgress, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import {
@@ -154,6 +154,7 @@ type Props = {
   contents: Content[]
   focused: string | undefined
   loading: boolean
+  noDataText: string
   onChangeOrderBy: (orderBy: Key) => void
   onClickContent: (e: MouseEvent, content: Content) => void
   onContextMenuContent: (e: MouseEvent, content: Content) => void
@@ -172,6 +173,7 @@ const ExplorerTable = (props: Props) => {
     contents,
     focused,
     loading,
+    noDataText,
     onChangeOrderBy,
     onClickContent,
     onContextMenuContent,
@@ -330,6 +332,19 @@ const ExplorerTable = (props: Props) => {
               gridStyle={{ overflowY: 'scroll' }}
               headerHeight={headerHeight}
               height={height}
+              noRowsRenderer={() => (
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    height: `calc(100% - ${headerHeight}px)`,
+                    justifyContent: 'center',
+                    userSelect: 'none',
+                  }}
+                >
+                  <Typography variant="caption">{noDataText}</Typography>
+                </Box>
+              )}
               onRowClick={handleRowClick}
               onRowDoubleClick={handleRowDoubleClick}
               onRowRightClick={handleRowRightClick}

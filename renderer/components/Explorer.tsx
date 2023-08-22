@@ -1,5 +1,11 @@
 import { Box } from '@mui/material'
-import { KeyboardEvent, MouseEvent, createElement, useCallback } from 'react'
+import {
+  KeyboardEvent,
+  MouseEvent,
+  createElement,
+  useCallback,
+  useMemo,
+} from 'react'
 
 import ExplorerGrid from 'components/ExplorerGrid'
 import ExplorerTable from 'components/ExplorerTable'
@@ -21,6 +27,7 @@ import {
   selectIsFocused,
   selectIsSelected,
   selectLoading,
+  selectQuery,
   selectSelectedContents,
   startEditing,
   unselect,
@@ -45,6 +52,7 @@ const Explorer = () => {
   const isSelected = useAppSelector(selectIsSelected)
   const loading = useAppSelector(selectLoading)
   const selectedContents = useAppSelector(selectSelectedContents)
+  const query = useAppSelector(selectQuery)
   const dispatch = useAppDispatch()
 
   const { createContentMenuHandler, createCurrentDirectoryMenuHandler } =
@@ -91,6 +99,11 @@ const Explorer = () => {
         open(content)
       }
     },
+  )
+
+  const noDataText = useMemo(
+    () => (query ? 'No results found' : 'No items'),
+    [query],
   )
 
   const isContentFocused = useCallback(
@@ -163,6 +176,7 @@ const Explorer = () => {
           contents,
           focused,
           loading,
+          noDataText,
           onChangeOrderBy: handleChangeOrderBy,
           onClickContent: handleClickContent,
           onContextMenuContent: handleContextMenuContent,
