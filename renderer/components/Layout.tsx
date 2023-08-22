@@ -2,7 +2,7 @@ import { Box, GlobalStyles, Toolbar } from '@mui/material'
 import Head from 'next/head'
 import { ReactNode } from 'react'
 
-import ExplorerBar from 'components/ExplorerBar'
+import AddressBar from 'components/AddressBar'
 import Inspector from 'components/Inspector'
 import Navigator from 'components/Navigator'
 import Sidebar from 'components/Sidebar'
@@ -72,7 +72,7 @@ const Layout = (props: Props) => {
           },
         }}
       />
-      <ExplorerBar />
+      <AddressBar />
       <Sidebar variant="primary">
         <Navigator />
       </Sidebar>
@@ -83,8 +83,7 @@ const Layout = (props: Props) => {
         <Toolbar
           sx={{
             flexShrink: 0,
-            minHeight: (theme) =>
-              `${theme.mixins.explorerBar.height}!important`,
+            minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
           }}
         />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{children}</Box>

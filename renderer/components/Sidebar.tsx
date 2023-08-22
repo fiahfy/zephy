@@ -98,7 +98,7 @@ const Sidebar = (props: Props) => {
             sx={{
               flexShrink: 0,
               minHeight: (theme) =>
-                `${theme.mixins.explorerBar.height}!important`,
+                `${theme.mixins.addressBar.height}!important`,
             }}
           />
           <Box

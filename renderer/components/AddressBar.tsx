@@ -50,7 +50,7 @@ import {
   upward,
 } from 'store/window'
 
-const ExplorerBar = () => {
+const AddressBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
@@ -201,7 +201,7 @@ const ExplorerBar = () => {
       <Toolbar
         disableGutters
         sx={{
-          minHeight: (theme) => `${theme.mixins.explorerBar.height}!important`,
+          minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
           pl: visible ? 10 : 1,
           pr: 1,
         }}
@@ -363,4 +363,4 @@ const ExplorerBar = () => {
   )
 }
 
-export default ExplorerBar
+export default AddressBar

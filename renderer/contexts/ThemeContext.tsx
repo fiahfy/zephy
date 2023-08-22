@@ -58,7 +58,7 @@ export const ThemeProvider = (props: Props) => {
     })
     return createTheme(theme, {
       mixins: {
-        explorerBar: {
+        addressBar: {
           height: theme.spacing(4.75),
         },
         statusBar: {
