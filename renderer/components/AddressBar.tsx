@@ -35,7 +35,7 @@ import { useTrafficLights } from 'contexts/TrafficLightsContext'
 import useContextMenu from 'hooks/useContextMenu'
 import useLongPress from 'hooks/useLongPress'
 import { useAppDispatch, useAppSelector } from 'store'
-import { load, searchQuery, unselect } from 'store/explorer'
+import { load, searchQuery, selectLoading, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
 import { remove, selectQueryHistories } from 'store/queryHistory'
 import {
@@ -55,6 +55,7 @@ const AddressBar = () => {
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
+  const loading = useAppSelector(selectLoading)
   const queryHistories = useAppSelector(selectQueryHistories)
   const zephyUrl = useAppSelector(selectZephyUrl)
   const zephySchema = useAppSelector(selectZephySchema)
@@ -217,7 +218,7 @@ const AddressBar = () => {
           }}
         >
           <IconButton
-            disabled={!canBack}
+            disabled={loading || !canBack}
             onClick={handleClickBack}
             onContextMenu={createBackHistoryMenuHandler()}
             size="small"
@@ -227,7 +228,7 @@ const AddressBar = () => {
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <IconButton
-            disabled={!canForward}
+            disabled={loading || !canForward}
             onClick={handleClickForward}
             onContextMenu={createForwardHistoryMenuHandler()}
             size="small"
@@ -237,14 +238,19 @@ const AddressBar = () => {
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
           <IconButton
-            disabled={zephySchema}
+            disabled={loading || zephySchema}
             onClick={handleClickUpward}
             size="small"
             title="Go up"
           >
             <ArrowUpwardIcon fontSize="small" />
           </IconButton>
-          <IconButton onClick={handleClickRefresh} size="small" title="Refresh">
+          <IconButton
+            disabled={loading}
+            onClick={handleClickRefresh}
+            size="small"
+            title="Refresh"
+          >
             <RefreshIcon fontSize="small" />
           </IconButton>
           <RoundedFilledTextField

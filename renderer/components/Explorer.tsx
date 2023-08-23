@@ -22,6 +22,7 @@ import {
   rangeSelect,
   select,
   selectContents,
+  selectError,
   selectFocused,
   selectIsEditing,
   selectIsFocused,
@@ -46,6 +47,7 @@ const Explorer = () => {
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
+  const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
   const isEditing = useAppSelector(selectIsEditing)
   const isFocused = useAppSelector(selectIsFocused)
@@ -102,8 +104,15 @@ const Explorer = () => {
   )
 
   const noDataText = useMemo(
-    () => (query ? 'No results found' : 'No items'),
-    [query],
+    () =>
+      loading
+        ? 'Loading items...'
+        : error
+        ? 'The specified directory does not exist'
+        : query
+        ? 'No results found'
+        : 'No items',
+    [error, loading, query],
   )
 
   const isContentFocused = useCallback(

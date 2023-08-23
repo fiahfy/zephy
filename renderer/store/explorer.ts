@@ -16,6 +16,7 @@ import { isHiddenFile } from 'utils/file'
 type State = {
   editing: string | undefined
   entries: DetailedEntry[]
+  error: boolean
   focused: string | undefined
   loading: boolean
   query: string
@@ -25,6 +26,7 @@ type State = {
 const initialState: State = {
   editing: undefined,
   entries: [],
+  error: false,
   focused: undefined,
   loading: false,
   query: '',
@@ -39,11 +41,15 @@ export const explorerSlice = createSlice({
       const query = action.payload
       return { ...state, query }
     },
-    loaded(state, action: PayloadAction<DetailedEntry[]>) {
-      const entries = action.payload
+    loaded(
+      state,
+      action: PayloadAction<{ entries?: DetailedEntry[]; error?: boolean }>,
+    ) {
+      const { entries = [], error = false } = action.payload
       return {
         ...state,
         entries,
+        error,
         loading: false,
         query: '',
       }
@@ -53,6 +59,7 @@ export const explorerSlice = createSlice({
         ...state,
         entries: [],
         loading: true,
+        error: false,
       }
     },
     add(state, action: PayloadAction<DetailedEntry[]>) {
@@ -132,6 +139,11 @@ export const selectExplorer = (state: AppState) => state.explorer
 export const selectEntries = createSelector(
   selectExplorer,
   (explorer) => explorer.entries,
+)
+
+export const selectError = createSelector(
+  selectExplorer,
+  (explorer) => explorer.error,
 )
 
 export const selectLoading = createSelector(
@@ -246,9 +258,9 @@ export const load = (): AppThunk => async (dispatch, getState) => {
       const currentDirectory = selectCurrentDirectory(getState())
       entries = await window.electronAPI.getDetailedEntries(currentDirectory)
     }
-    dispatch(loaded(entries))
+    dispatch(loaded({ entries }))
   } catch (e) {
-    dispatch(loaded([]))
+    dispatch(loaded({ error: true }))
   }
 }
 

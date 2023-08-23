@@ -3,6 +3,7 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from 'interfaces'
 import { AppState, AppThunk } from 'store'
 import { selectWindowIndex } from 'store/windowIndex'
+import { selectLoading } from './explorer'
 
 type History = {
   directory: string
@@ -444,6 +445,10 @@ export const setSidebarWidth =
 export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
+    const loading = selectLoading(getState())
+    if (loading) {
+      return
+    }
     const { go } = windowSlice.actions
     const index = selectWindowIndex(getState())
     dispatch(go({ index, offset }))
@@ -453,21 +458,25 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
-export const upward = (): AppThunk => async (dispatch, getState) => {
-  const currentDirectory = selectCurrentDirectory(getState())
-  const path = await window.electronAPI.dirname(currentDirectory)
-  dispatch(changeDirectory(path))
-}
-
 export const changeDirectory =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
+    const loading = selectLoading(getState())
+    if (loading) {
+      return
+    }
     const { changeDirectory } = windowSlice.actions
     const index = selectWindowIndex(getState())
     const title = await getTitle(path)
     dispatch(changeDirectory({ index, path, title }))
     dispatch(updateApplicationMenu())
   }
+
+export const upward = (): AppThunk => async (dispatch, getState) => {
+  const currentDirectory = selectCurrentDirectory(getState())
+  const path = await window.electronAPI.dirname(currentDirectory)
+  dispatch(changeDirectory(path))
+}
 
 export const goToRatings =
   (score: number): AppThunk =>
