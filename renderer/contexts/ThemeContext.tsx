@@ -62,7 +62,7 @@ export const ThemeProvider = (props: Props) => {
           height: theme.spacing(4.75),
         },
         statusBar: {
-          height: theme.spacing(3),
+          height: theme.spacing(2.75),
         },
       },
     })

@@ -24,6 +24,7 @@ const StatusBar = () => {
       elevation={0}
       position="fixed"
       sx={{
+        WebkitAppRegion: 'drag',
         bottom: 0,
         top: 'auto',
         zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -37,7 +38,9 @@ const StatusBar = () => {
           px: 1,
         }}
       >
-        <Typography variant="caption">{message}</Typography>
+        <Typography mt={0.25} variant="caption">
+          {message}
+        </Typography>
       </Toolbar>
       <Divider sx={{ top: 0, position: 'absolute', width: '100%' }} />
     </AppBar>
