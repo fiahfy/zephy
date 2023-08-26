@@ -51,6 +51,14 @@ const useContextMenu = () => {
           id: directory ? 'openDirectory' : 'open',
           params: { path },
         },
+        ...(directory
+          ? [
+              {
+                id: 'openDirectoryInNewWindow',
+                params: { path },
+              },
+            ]
+          : []),
         {
           id: 'revealInFinder',
           params: { path },
