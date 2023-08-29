@@ -50,6 +50,7 @@ const useEventListener = () => {
     return () => document.removeEventListener('mousedown', handler)
   }, [dispatch])
 
+  // TODO: for text selection with application menu
   useEffect(() => {
     const handler = (e: FocusEvent) => {
       if (e.target instanceof HTMLInputElement && e.target.type === 'text') {
