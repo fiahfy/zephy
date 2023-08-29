@@ -14,7 +14,7 @@ import {
   selectSelectedContents,
 } from 'store/explorer'
 import { rate } from 'store/rating'
-import { formatDate, formatFileSize } from 'utils/formatter'
+import { formatDateTime, formatFileSize } from 'utils/formatter'
 
 type Key = keyof Content
 
@@ -122,7 +122,7 @@ const ExplorerTableCell = (props: Props) => {
       )}
       {dataKey === 'dateModified' && (
         <Typography noWrap variant="caption">
-          {formatDate(content.dateModified)}
+          {formatDateTime(content.dateModified)}
         </Typography>
       )}
       {dropping && <Outline />}

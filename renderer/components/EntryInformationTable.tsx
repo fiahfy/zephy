@@ -7,7 +7,7 @@ import {
 } from '@mui/material'
 
 import { DetailedEntry, Metadata } from 'interfaces'
-import { formatDate, formatFileSize, formatTime } from 'utils/formatter'
+import { formatDateTime, formatDuration, formatFileSize } from 'utils/formatter'
 
 const getTotalFileSize = (entries: DetailedEntry[]) =>
   entries
@@ -27,10 +27,10 @@ const formatDateRange = (
     const minDate = Math.min(...dates)
     const maxDate = Math.max(...dates)
     return minDate === maxDate
-      ? formatDate(minDate)
-      : `${formatDate(minDate)} - ${formatDate(maxDate)}`
+      ? formatDateTime(minDate)
+      : `${formatDateTime(minDate)} - ${formatDateTime(maxDate)}`
   } else {
-    return formatDate(entry[dateProperty])
+    return formatDateTime(entry[dateProperty])
   }
 }
 
@@ -79,7 +79,7 @@ const EntryInformationTable = (props: Props) => {
             ? [
                 {
                   label: 'Duration',
-                  value: formatTime(metadata.duration),
+                  value: formatDuration(metadata.duration),
                 },
               ]
             : []),

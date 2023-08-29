@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, isToday, isYesterday } from 'date-fns'
 
 export const formatFileSize = (bytes: number) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
@@ -13,9 +13,17 @@ export const formatFileSize = (bytes: number) => {
   return `${formattedSize} ${sizes[i]}`
 }
 
-export const formatDate = (timestamp: number) => format(timestamp, 'PP HH:mm')
+export const formatDateTime = (timestamp: number) => {
+  if (isToday(timestamp)) {
+    return 'Today ' + format(timestamp, 'HH:mm')
+  } else if (isYesterday(timestamp)) {
+    return 'Yesterday ' + format(timestamp, 'HH:mm')
+  } else {
+    return format(timestamp, 'PP HH:mm')
+  }
+}
 
-export const formatTime = (sec: number) => {
+export const formatDuration = (sec: number) => {
   const hours = Math.floor(sec / 3600)
   const minutes = Math.floor((sec % 3600) / 60)
   const seconds = Math.round(sec % 60)
