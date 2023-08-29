@@ -75,7 +75,7 @@ const ImagePreviewListItem = (props: Props) => {
               />
             </ImageListItem>
           ) : (
-            <MessagePreviewListItem message="No Preview" />
+            <MessagePreviewListItem message="No preview" />
           )}
         </>
       )}

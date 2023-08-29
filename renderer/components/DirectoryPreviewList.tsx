@@ -89,7 +89,7 @@ const DirectoryPreviewList = (props: Props) => {
               )}
             </>
           ) : (
-            <MessagePreviewListItem message="No Items" />
+            <MessagePreviewListItem message="No items" />
           )}
         </>
       )}

@@ -126,7 +126,7 @@ const ExplorerGridItem = (props: Props) => {
   }, [content.path, content.type, shouldShowHiddenFiles])
 
   const message = useMemo(
-    () => (loading ? 'Loading...' : 'No Preview'),
+    () => (loading ? 'Loading...' : 'No preview'),
     [loading],
   )
 

@@ -89,7 +89,7 @@ const DirectoryPreviewListItem = (props: Props) => {
   }, [entry.path, entry.type, shouldShowHiddenFiles])
 
   const message = useMemo(
-    () => (loading ? 'Loading...' : 'No Preview'),
+    () => (loading ? 'Loading...' : 'No preview'),
     [loading],
   )
 

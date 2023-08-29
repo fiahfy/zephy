@@ -36,7 +36,7 @@ const Inspector = () => {
         <Panel footer={<EntryInformation entries={contents} />} title="Preview">
           {contents.length > 1 ? (
             <ImageList cols={1} sx={{ m: 0 }}>
-              <MessagePreviewListItem message="No Preview" />
+              <MessagePreviewListItem message="No preview" />
             </ImageList>
           ) : (
             <>
@@ -57,7 +57,7 @@ const Inspector = () => {
             userSelect: 'none',
           }}
         >
-          <Typography variant="caption">No Selected</Typography>
+          <Typography variant="caption">No selected</Typography>
         </Box>
       )}
     </Box>
