@@ -5,8 +5,8 @@
 // import User from 'path/to/interfaces';
 
 export interface IElectronAPI {
-  copyEntries: (paths: string[]) => Promise<void>
   basename: (path: string) => Promise<string>
+  copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
   dirname: (path: string) => Promise<string>

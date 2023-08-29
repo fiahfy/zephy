@@ -11,9 +11,7 @@ const useEventListener = () => {
 
     window.addEventListener('focus', handler)
 
-    return () => {
-      window.removeEventListener('focus', handler)
-    }
+    return () => window.removeEventListener('focus', handler)
   }, [dispatch])
 
   useEffect(() => {
@@ -34,9 +32,7 @@ const useEventListener = () => {
 
     document.addEventListener('keydown', handler)
 
-    return () => {
-      document.removeEventListener('keydown', handler)
-    }
+    return () => document.removeEventListener('keydown', handler)
   }, [dispatch])
 
   useEffect(() => {
@@ -51,9 +47,7 @@ const useEventListener = () => {
 
     document.addEventListener('mousedown', handler)
 
-    return () => {
-      document.removeEventListener('mousedown', handler)
-    }
+    return () => document.removeEventListener('mousedown', handler)
   }, [dispatch])
 
   useEffect(() => {
@@ -65,9 +59,7 @@ const useEventListener = () => {
 
     document.addEventListener('focus', handler, true)
 
-    return () => {
-      document.removeEventListener('focus', handler, true)
-    }
+    return () => document.removeEventListener('focus', handler, true)
   }, [dispatch])
 
   useEffect(() => {
@@ -79,9 +71,7 @@ const useEventListener = () => {
 
     document.addEventListener('blur', handler, true)
 
-    return () => {
-      document.removeEventListener('blur', handler, true)
-    }
+    return () => document.removeEventListener('blur', handler, true)
   }, [dispatch])
 }
 

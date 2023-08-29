@@ -24,6 +24,10 @@ const registerHandlers = (
     basename(path),
   )
   ipcMain.handle(
+    'copy-entries',
+    (_event: IpcMainInvokeEvent, paths: string[]) => copy(paths),
+  )
+  ipcMain.handle(
     'create-directory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       createDirectory(directoryPath),
@@ -70,6 +74,9 @@ const registerHandlers = (
   ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
   )
+  ipcMain.handle('paste-entries', (_event: IpcMainInvokeEvent, directoryPath) =>
+    paste(directoryPath),
+  )
   ipcMain.handle(
     'rename-entry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
@@ -85,13 +92,6 @@ const registerHandlers = (
           notify('delete', dirname(path), path)
         }),
       ),
-  )
-  ipcMain.handle(
-    'copy-entries',
-    (_event: IpcMainInvokeEvent, paths: string[]) => copy(paths),
-  )
-  ipcMain.handle('paste-entries', (_event: IpcMainInvokeEvent, directoryPath) =>
-    paste(directoryPath),
   )
 }
 

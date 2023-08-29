@@ -3,8 +3,8 @@ import { ContextMenuOption, ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // TODO: rename funcs
-  copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
   basename: (path: string) => ipcRenderer.invoke('basename', path),
+  copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('create-directory', directoryPath),
   createThumbnail: (path: string) =>
