@@ -32,6 +32,7 @@ const ExplorerTreeItem = (props: Props) => {
     [entry],
   )
 
+  // TODO: remove onNodeSelect ?
   const handleDoubleClick = useCallback(async () => {
     if (entry.type === 'file') {
       await window.electronAPI.openPath(entry.path)

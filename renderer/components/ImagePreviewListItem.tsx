@@ -2,7 +2,7 @@ import { ImageListItem } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import PreviewMessageItem from 'components/MessagePreviewListItem'
+import MessagePreviewListItem from 'components/MessagePreviewListItem'
 import { Entry } from 'interfaces'
 import { createThumbnailIfNeeded } from 'utils/file'
 
@@ -62,7 +62,7 @@ const ImagePreviewListItem = (props: Props) => {
   return (
     <>
       {loading ? (
-        <PreviewMessageItem message="Loading..." />
+        <MessagePreviewListItem message="Loading..." />
       ) : (
         <>
           {thumbnail ? (
@@ -75,7 +75,7 @@ const ImagePreviewListItem = (props: Props) => {
               />
             </ImageListItem>
           ) : (
-            <PreviewMessageItem message="No Preview" />
+            <MessagePreviewListItem message="No Preview" />
           )}
         </>
       )}

@@ -2,7 +2,7 @@ import { ImageListItem } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import PreviewMessageItem from 'components/MessagePreviewListItem'
+import MessagePreviewListItem from 'components/MessagePreviewListItem'
 import { Entry } from 'interfaces'
 import { createVideoThumbnails } from 'utils/file'
 
@@ -62,7 +62,7 @@ const VideoPreviewListItem = (props: Props) => {
   return (
     <>
       {loading ? (
-        <PreviewMessageItem message="Loading..." />
+        <MessagePreviewListItem message="Loading..." />
       ) : (
         <>
           {thumbnails.length > 0 ? (
@@ -80,7 +80,7 @@ const VideoPreviewListItem = (props: Props) => {
               </ImageListItem>
             ))
           ) : (
-            <PreviewMessageItem message="No Preview" />
+            <MessagePreviewListItem message="No Preview" />
           )}
         </>
       )}
