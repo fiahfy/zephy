@@ -5,7 +5,8 @@ import { PersistGate } from 'redux-persist/integration/react'
 
 import store, { storageKey } from 'store'
 import { replace as replaceFavorite } from 'store/favorite'
-import { replace as replaceQueryHistory } from 'store/queryHistory'
+import { replace as replacePreview } from 'store/preview'
+import { replace as replaceQuery } from 'store/query'
 import { replace as replaceRating } from 'store/rating'
 import { replace as replaceSettings } from 'store/settings'
 import {
@@ -36,7 +37,8 @@ export const StoreProvider = (props: Props) => {
       }
       const newState = JSON.parse(e.newValue)
       dispatch(replaceFavorite(JSON.parse(newState.favorite)))
-      dispatch(replaceQueryHistory(JSON.parse(newState.queryHistory)))
+      dispatch(replacePreview(JSON.parse(newState.preview)))
+      dispatch(replaceQuery(JSON.parse(newState.query)))
       dispatch(replaceRating(JSON.parse(newState.rating)))
       dispatch(replaceSettings(JSON.parse(newState.settings)))
       dispatch(replaceWindow(JSON.parse(newState.window)))

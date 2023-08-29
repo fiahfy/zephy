@@ -19,7 +19,8 @@ import storage from 'redux-persist/lib/storage'
 
 import explorerReducer from 'store/explorer'
 import favoriteReducer from 'store/favorite'
-import queryHistoryReducer from 'store/queryHistory'
+import previewReducer from 'store/preview'
+import queryReducer from 'store/query'
 import ratingReducer from 'store/rating'
 import settingsReducer from 'store/settings'
 import windowReducer from 'store/window'
@@ -28,7 +29,8 @@ import windowIndexReducer from 'store/windowIndex'
 const reducers = combineReducers({
   explorer: explorerReducer,
   favorite: favoriteReducer,
-  queryHistory: queryHistoryReducer,
+  preview: previewReducer,
+  query: queryReducer,
   rating: ratingReducer,
   settings: settingsReducer,
   window: windowReducer,
@@ -39,7 +41,7 @@ const persistConfig = {
   key: 'root',
   storage,
   version: 1,
-  whitelist: ['favorite', 'queryHistory', 'rating', 'settings', 'window'],
+  whitelist: ['favorite', 'preview', 'query', 'rating', 'settings', 'window'],
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)

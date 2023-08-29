@@ -1,8 +1,10 @@
 import fileUrl from 'file-url'
-import { useEffect, useReducer } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 
 import EmptyPreview from 'components/EmptyPreview'
 import { Entry } from 'interfaces'
+import { useAppDispatch, useAppSelector } from 'store'
+import { selectVolume, setVolume } from 'store/preview'
 import { createThumbnailIfNeeded } from 'utils/file'
 
 type State = {
@@ -36,10 +38,14 @@ type Props = {
 const VideoPreview = (props: Props) => {
   const { entry } = props
 
+  const volume = useAppSelector(selectVolume)
+  const appDispatch = useAppDispatch()
+
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
     thumbnail: undefined,
   })
+  const ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     let unmounted = false
@@ -58,6 +64,20 @@ const VideoPreview = (props: Props) => {
     }
   }, [entry.path])
 
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    el.volume = volume
+
+    const handler = () => appDispatch(setVolume(el.volume))
+
+    el.addEventListener('volumechange', handler)
+
+    return () => el.removeEventListener('volumechange', handler)
+  }, [appDispatch, volume])
+
   return (
     <>
       {loading ? (
@@ -66,6 +86,7 @@ const VideoPreview = (props: Props) => {
         <video
           controls
           poster={thumbnail ? fileUrl(thumbnail) : undefined}
+          ref={ref}
           src={fileUrl(entry.path)}
           style={{ width: '100%' }}
         />
