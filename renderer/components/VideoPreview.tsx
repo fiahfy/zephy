@@ -1,5 +1,11 @@
 import fileUrl from 'file-url'
-import { useEffect, useReducer, useRef } from 'react'
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+} from 'react'
 
 import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
@@ -74,12 +80,6 @@ const VideoPreview = (props: Props) => {
 
     el.loop = loop
     el.volume = volume
-
-    const handler = () => appDispatch(setVolume(el.volume))
-
-    el.addEventListener('volumechange', handler)
-
-    return () => el.removeEventListener('volumechange', handler)
   }, [appDispatch, loop, volume])
 
   useEffect(() => {
@@ -99,14 +99,38 @@ const VideoPreview = (props: Props) => {
     }
   }, [entry.path])
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    switch (e.key) {
+      case 'ArrowLeft':
+        el.currentTime -= 5
+        break
+      case 'ArrowRight':
+        el.currentTime += 5
+        break
+    }
+  }, [])
+
+  const handleVolumeChange = useCallback(() => {
+    const el = ref.current
+    if (el) {
+      appDispatch(setVolume(el.volume))
+    }
+  }, [appDispatch])
+
   return (
     <video
       controls
       onContextMenu={mediaMenuHandler}
+      onKeyDown={handleKeyDown}
+      onVolumeChange={handleVolumeChange}
       poster={thumbnail ? fileUrl(thumbnail) : undefined}
       ref={ref}
       src={fileUrl(entry.path)}
-      style={{ width: '100%' }}
+      style={{ outline: 'none', width: '100%' }}
     />
   )
 }

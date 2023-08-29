@@ -1,6 +1,17 @@
-import { Box, GlobalStyles, Typography } from '@mui/material'
+import {
+  Pause as PauseIcon,
+  PlayArrow as PlayArrowIcon,
+} from '@mui/icons-material'
+import { Box, GlobalStyles } from '@mui/material'
 import fileUrl from 'file-url'
-import { useEffect, useRef } from 'react'
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
@@ -21,6 +32,7 @@ const AudioPreview = (props: Props) => {
   const { mediaMenuHandler } = useContextMenu()
 
   const ref = useRef<HTMLAudioElement>(null)
+  const [paused, setPaused] = useState(true)
 
   useEffect(() => {
     const removeListener = window.electronAPI.message.addListener((message) => {
@@ -46,13 +58,44 @@ const AudioPreview = (props: Props) => {
 
     el.loop = loop
     el.volume = volume
-
-    const handler = () => dispatch(setVolume(el.volume))
-
-    el.addEventListener('volumechange', handler)
-
-    return () => el.removeEventListener('volumechange', handler)
   }, [dispatch, loop, volume])
+
+  const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
+
+  const handleClick = useCallback(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    if (el.paused) {
+      el.play()
+    } else {
+      el.pause()
+    }
+    el.focus()
+  }, [])
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    switch (e.key) {
+      case 'ArrowLeft':
+        el.currentTime -= 5
+        break
+      case 'ArrowRight':
+        el.currentTime += 5
+        break
+    }
+  }, [])
+
+  const handleVolumeChange = useCallback(() => {
+    const el = ref.current
+    if (el) {
+      dispatch(setVolume(el.volume))
+    }
+  }, [dispatch])
 
   return (
     <>
@@ -74,21 +117,32 @@ const AudioPreview = (props: Props) => {
         }}
       >
         <Box
+          onClick={handleClick}
           sx={{
             alignItems: 'center',
+            cursor: 'pointer',
             display: 'flex',
             flexGrow: 1,
             justifyContent: 'center',
+            userSelect: 'none',
           }}
         >
-          <Typography variant="caption">Sound only</Typography>
+          <Icon fontSize="large" />
         </Box>
         <audio
           controls
           id="custom-audio"
+          onKeyDown={handleKeyDown}
+          onPause={() => setPaused(true)}
+          onPlay={() => setPaused(false)}
+          onVolumeChange={handleVolumeChange}
           ref={ref}
           src={fileUrl(entry.path)}
-          style={{ width: '100%' }}
+          style={{
+            height: 38,
+            outline: 'none',
+            width: '100%',
+          }}
         />
       </Box>
     </>
