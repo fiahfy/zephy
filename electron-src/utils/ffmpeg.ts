@@ -3,8 +3,7 @@ import { app } from 'electron'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
-import { constants } from 'fs'
-import { access } from 'fs/promises'
+import { pathExists } from 'fs-extra'
 import { join } from 'path'
 
 // @see https://stackoverflow.com/q/63106834
@@ -25,9 +24,8 @@ export const createThumbnail = async (path: string) => {
   const thumbnailFilename =
     crypto.createHash('md5').update(path).digest('hex') + '.png'
   const thumbnailPath = join(thumbnailDir, thumbnailFilename)
-  try {
-    await access(thumbnailPath, constants.F_OK)
-  } catch (e) {
+  const exists = await pathExists(thumbnailPath)
+  if (!exists) {
     await new Promise<void>((resolve, reject) => {
       ffmpeg(path)
         .screenshots({
@@ -52,11 +50,10 @@ export const createVideoThumbnails = async (path: string) => {
   const thumbnailPaths = thumbnailFilenames.map((filename) =>
     join(thumbnailDir, filename),
   )
-  try {
-    await Promise.all(
-      thumbnailPaths.map((path) => access(path), constants.F_OK),
-    )
-  } catch (e) {
+  const allExists = (
+    await Promise.all(thumbnailPaths.map((path) => pathExists(path)))
+  ).every((exists) => exists)
+  if (!allExists) {
     await Promise.all(
       thumbnailFilenames.map((filename, i) => {
         const percentage = `${(100 / (count + 1)) * i}%`
