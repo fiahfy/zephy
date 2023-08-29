@@ -1,10 +1,10 @@
 import fileUrl from 'file-url'
 import { useEffect, useReducer, useRef } from 'react'
 
-import EmptyPreview from 'components/EmptyPreview'
+import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectVolume, setVolume } from 'store/preview'
+import { selectLoop, selectVolume, setLoop, setVolume } from 'store/preview'
 import { createThumbnailIfNeeded } from 'utils/file'
 
 type State = {
@@ -38,14 +38,49 @@ type Props = {
 const VideoPreview = (props: Props) => {
   const { entry } = props
 
+  const loop = useAppSelector(selectLoop)
   const volume = useAppSelector(selectVolume)
   const appDispatch = useAppDispatch()
 
-  const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
+  const { mediaMenuHandler } = useContextMenu()
+
+  const [{ thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
     thumbnail: undefined,
   })
   const ref = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const removeListener = window.electronAPI.message.addListener((message) => {
+      const { type, data } = message
+      if (type !== 'changeLoop') {
+        return
+      }
+      const el = ref.current
+      if (!el) {
+        return
+      }
+      el.loop = data.enabled
+      appDispatch(setLoop(data.enabled))
+    })
+    return () => removeListener()
+  }, [appDispatch])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+
+    el.loop = loop
+    el.volume = volume
+
+    const handler = () => appDispatch(setVolume(el.volume))
+
+    el.addEventListener('volumechange', handler)
+
+    return () => el.removeEventListener('volumechange', handler)
+  }, [appDispatch, loop, volume])
 
   useEffect(() => {
     let unmounted = false
@@ -64,34 +99,15 @@ const VideoPreview = (props: Props) => {
     }
   }, [entry.path])
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    el.volume = volume
-
-    const handler = () => appDispatch(setVolume(el.volume))
-
-    el.addEventListener('volumechange', handler)
-
-    return () => el.removeEventListener('volumechange', handler)
-  }, [appDispatch, volume])
-
   return (
-    <>
-      {loading ? (
-        <EmptyPreview message="Loading..." />
-      ) : (
-        <video
-          controls
-          poster={thumbnail ? fileUrl(thumbnail) : undefined}
-          ref={ref}
-          src={fileUrl(entry.path)}
-          style={{ width: '100%' }}
-        />
-      )}
-    </>
+    <video
+      controls
+      onContextMenu={mediaMenuHandler}
+      poster={thumbnail ? fileUrl(thumbnail) : undefined}
+      ref={ref}
+      src={fileUrl(entry.path)}
+      style={{ width: '100%' }}
+    />
   )
 }
 

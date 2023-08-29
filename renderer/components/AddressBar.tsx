@@ -63,14 +63,11 @@ const AddressBar = () => {
 
   const { visible } = useTrafficLights()
 
-  const {
-    createBackHistoryMenuHandler,
-    createForwardHistoryMenuHandler,
-    createMoreMenuHandler,
-  } = useContextMenu()
+  const { backHistoryMenuHandler, forwardHistoryMenuHandler, moreMenuHandler } =
+    useContextMenu()
 
-  const bindBack = useLongPress(createBackHistoryMenuHandler())
-  const bindForward = useLongPress(createForwardHistoryMenuHandler())
+  const bindBack = useLongPress(backHistoryMenuHandler)
+  const bindForward = useLongPress(forwardHistoryMenuHandler)
 
   const [directory, setDirectory] = useState('')
   const [query, setQuery] = useState('')
@@ -220,7 +217,7 @@ const AddressBar = () => {
           <IconButton
             disabled={loading || !canBack}
             onClick={handleClickBack}
-            onContextMenu={createBackHistoryMenuHandler()}
+            onContextMenu={backHistoryMenuHandler}
             size="small"
             title="Go back"
             {...bindBack}
@@ -230,7 +227,7 @@ const AddressBar = () => {
           <IconButton
             disabled={loading || !canForward}
             onClick={handleClickForward}
-            onContextMenu={createForwardHistoryMenuHandler()}
+            onContextMenu={forwardHistoryMenuHandler}
             size="small"
             title="Go forward"
             {...bindForward}
@@ -355,11 +352,7 @@ const AddressBar = () => {
               },
             }}
           />
-          <IconButton
-            onClick={createMoreMenuHandler()}
-            size="small"
-            title="Settings"
-          >
+          <IconButton onClick={moreMenuHandler} size="small" title="Settings">
             <MoreVertIcon fontSize="small" />
           </IconButton>
         </Box>

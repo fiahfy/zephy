@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback } from 'react'
+import { MouseEvent, useCallback, useMemo } from 'react'
 
 import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
@@ -12,6 +12,7 @@ import {
   selectIsSidebarHidden,
   selectZephySchema,
 } from 'store/window'
+import { selectLoop } from 'store/preview'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
   return async (e: MouseEvent) => {
@@ -40,7 +41,103 @@ const useContextMenu = () => {
   const forwardHistories = useAppSelector(selectForwardHistories)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
+  const loop = useAppSelector(selectLoop)
   const zephySchema = useAppSelector(selectZephySchema)
+
+  const defaultMenuHandler = useMemo(() => createMenuHandler(), [])
+
+  const mediaMenuHandler = useMemo(
+    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
+    [loop],
+  )
+
+  const backHistoryMenuHandler = useMemo(
+    () =>
+      createMenuHandler(
+        backHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: {
+            offset: -(i + 1),
+            title: history.title,
+          },
+        })),
+      ),
+    [backHistories],
+  )
+
+  const forwardHistoryMenuHandler = useMemo(
+    () =>
+      createMenuHandler(
+        forwardHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: {
+            offset: i + 1,
+            title: history.title,
+          },
+        })),
+      ),
+    [forwardHistories],
+  )
+
+  const moreMenuHandler = useMemo(
+    () =>
+      createMenuHandler([
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+        { id: 'separator' },
+        {
+          id: 'toggleNavigator',
+          params: { hidden: isSidebarHidden('primary') },
+        },
+        {
+          id: 'toggleInspector',
+          params: { hidden: isSidebarHidden('secondary') },
+        },
+        { id: 'separator' },
+        { id: 'settings' },
+      ]),
+    [
+      currentDirectory,
+      currentSortOption.orderBy,
+      currentViewMode,
+      isSidebarHidden,
+      zephySchema,
+    ],
+  )
+
+  const currentDirectoryMenuHandler = useMemo(
+    () =>
+      createMenuHandler([
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'cut', params: { paths: [] } },
+        { id: 'copy', params: { paths: [] } },
+        {
+          id: 'paste',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+      ]),
+    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
+  )
 
   const createEntryMenuHandler = useCallback(
     (entry: Entry) => {
@@ -149,102 +246,15 @@ const useContextMenu = () => {
     [currentDirectory, isFavorite, zephySchema],
   )
 
-  const createCurrentDirectoryMenuHandler = useCallback(
-    () =>
-      createMenuHandler([
-        {
-          id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'cut', params: { paths: [] } },
-        { id: 'copy', params: { paths: [] } },
-        {
-          id: 'paste',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
-        { id: 'separator' },
-        {
-          id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
-        },
-      ]),
-    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
-  )
-
-  const createMoreMenuHandler = useCallback(
-    () =>
-      createMenuHandler([
-        {
-          id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
-        { id: 'separator' },
-        {
-          id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
-        },
-        { id: 'separator' },
-        {
-          id: 'toggleNavigator',
-          params: { hidden: isSidebarHidden('primary') },
-        },
-        {
-          id: 'toggleInspector',
-          params: { hidden: isSidebarHidden('secondary') },
-        },
-        { id: 'separator' },
-        { id: 'settings' },
-      ]),
-    [
-      currentDirectory,
-      currentSortOption.orderBy,
-      currentViewMode,
-      isSidebarHidden,
-      zephySchema,
-    ],
-  )
-
-  const createBackHistoryMenuHandler = useCallback(
-    () =>
-      createMenuHandler(
-        backHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
-          params: {
-            offset: -(i + 1),
-            title: history.title,
-          },
-        })),
-      ),
-    [backHistories],
-  )
-
-  const createForwardHistoryMenuHandler = useCallback(
-    () =>
-      createMenuHandler(
-        forwardHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
-          params: {
-            offset: i + 1,
-            title: history.title,
-          },
-        })),
-      ),
-    [forwardHistories],
-  )
-
   return {
-    createBackHistoryMenuHandler,
+    backHistoryMenuHandler,
     createContentMenuHandler,
-    createCurrentDirectoryMenuHandler,
     createEntryMenuHandler,
-    createForwardHistoryMenuHandler,
-    createMenuHandler,
-    createMoreMenuHandler,
+    currentDirectoryMenuHandler,
+    defaultMenuHandler,
+    forwardHistoryMenuHandler,
+    mediaMenuHandler,
+    moreMenuHandler,
   }
 }
 

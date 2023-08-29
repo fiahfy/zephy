@@ -57,7 +57,7 @@ const Explorer = () => {
   const query = useAppSelector(selectQuery)
   const dispatch = useAppDispatch()
 
-  const { createContentMenuHandler, createCurrentDirectoryMenuHandler } =
+  const { createContentMenuHandler, currentDirectoryMenuHandler } =
     useContextMenu()
   const { createCurrentDirectoryDroppableBinder, dropping } = useDnd()
 
@@ -173,7 +173,7 @@ const Explorer = () => {
   return (
     <Box
       onClick={handleClick}
-      onContextMenu={createCurrentDirectoryMenuHandler()}
+      onContextMenu={currentDirectoryMenuHandler}
       sx={{ height: '100%', position: 'relative' }}
       {...createCurrentDirectoryDroppableBinder()}
     >

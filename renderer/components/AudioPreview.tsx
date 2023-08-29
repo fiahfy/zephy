@@ -2,9 +2,10 @@ import { Box, GlobalStyles, Typography } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useRef } from 'react'
 
+import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
-import { selectVolume, setVolume } from 'store/preview'
+import { selectLoop, selectVolume, setLoop, setVolume } from 'store/preview'
 
 type Props = {
   entry: Entry
@@ -13,16 +14,37 @@ type Props = {
 const AudioPreview = (props: Props) => {
   const { entry } = props
 
+  const loop = useAppSelector(selectLoop)
   const volume = useAppSelector(selectVolume)
   const dispatch = useAppDispatch()
 
+  const { mediaMenuHandler } = useContextMenu()
+
   const ref = useRef<HTMLAudioElement>(null)
+
+  useEffect(() => {
+    const removeListener = window.electronAPI.message.addListener((message) => {
+      const { type, data } = message
+      if (type !== 'changeLoop') {
+        return
+      }
+      const el = ref.current
+      if (!el) {
+        return
+      }
+      el.loop = data.enabled
+      dispatch(setLoop(data.enabled))
+    })
+    return () => removeListener()
+  }, [dispatch])
 
   useEffect(() => {
     const el = ref.current
     if (!el) {
       return
     }
+
+    el.loop = loop
     el.volume = volume
 
     const handler = () => dispatch(setVolume(el.volume))
@@ -30,7 +52,7 @@ const AudioPreview = (props: Props) => {
     el.addEventListener('volumechange', handler)
 
     return () => el.removeEventListener('volumechange', handler)
-  }, [dispatch, volume])
+  }, [dispatch, loop, volume])
 
   return (
     <>
@@ -44,6 +66,7 @@ const AudioPreview = (props: Props) => {
         }}
       />
       <Box
+        onContextMenu={mediaMenuHandler}
         sx={{
           aspectRatio: '16 / 9',
           display: 'flex',

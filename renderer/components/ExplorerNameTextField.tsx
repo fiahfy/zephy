@@ -22,7 +22,7 @@ const ExplorerNameTextField = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const { createMenuHandler } = useContextMenu()
+  const { defaultMenuHandler } = useContextMenu()
 
   const [name, setName] = useState(content.name)
   const ref = useRef<HTMLInputElement>(null)
@@ -78,7 +78,7 @@ const ExplorerNameTextField = (props: Props) => {
       inputRef={ref}
       onBlur={handleBlur}
       onChange={handleChange}
-      onContextMenu={createMenuHandler()}
+      onContextMenu={defaultMenuHandler}
       onKeyDown={handleKeyDown}
       spellCheck={false}
       sx={{ '.MuiInputBase-root': { color: 'inherit' } }}

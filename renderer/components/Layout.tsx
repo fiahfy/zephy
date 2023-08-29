@@ -19,14 +19,14 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  const { createMenuHandler } = useContextMenu()
+  const { defaultMenuHandler } = useContextMenu()
   useEventListener()
   useMessageListener()
   const title = useTitle()
 
   return (
     <Box
-      onContextMenu={createMenuHandler()}
+      onContextMenu={defaultMenuHandler}
       sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
     >
       <Head>

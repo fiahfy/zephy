@@ -21,11 +21,9 @@ export const detectFileType = (path: string) => {
   }
 }
 
+export const isAudioFile = (path: string) => detectFileType(path) === 'audio'
 export const isImageFile = (path: string) => detectFileType(path) === 'image'
 export const isVideoFile = (path: string) => detectFileType(path) === 'video'
-export const isAudioFile = (path: string) => detectFileType(path) === 'audio'
-export const isMediaFile = (path: string) =>
-  isImageFile(path) || isVideoFile(path) || isAudioFile(path)
 
 export const createThumbnailIfNeeded = async (paths: string | string[]) => {
   const path = Array.isArray(paths)
@@ -49,11 +47,12 @@ export const createThumbnailIfNeeded = async (paths: string | string[]) => {
 
 export const getMetadata = async (path: string) => {
   try {
-    if (!isMediaFile(path)) {
+    const target = isAudioFile(path) || isImageFile(path) || isVideoFile(path)
+    if (!target) {
       return undefined
     }
     const metadata = await window.electronAPI.getMetadata(path)
-    const hasDuration = isVideoFile(path) || isAudioFile(path)
+    const hasDuration = isAudioFile(path) || isVideoFile(path)
     return {
       ...metadata,
       ...(hasDuration ? {} : { duration: undefined }),

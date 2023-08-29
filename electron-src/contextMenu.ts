@@ -74,6 +74,18 @@ const registerContextMenu = () => {
           click: () => send({ type: 'go', data: { offset: params.offset } }),
           label: params.title,
         }),
+        loop: ({ params }) => ({
+          label: 'Loop',
+          checked: params.enabled,
+          click: () =>
+            send({
+              type: 'changeLoop',
+              data: {
+                enabled: !params.enabled,
+              },
+            }),
+          type: 'checkbox',
+        }),
         moveToTrash: ({ params }) => ({
           accelerator: 'CmdOrCtrl+Backspace',
           click: () =>
