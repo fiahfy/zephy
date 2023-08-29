@@ -4,7 +4,7 @@ type Props = {
   message: string
 }
 
-const MessagePreview = (props: Props) => {
+const EmptyPreview = (props: Props) => {
   const { message } = props
 
   return (
@@ -22,4 +22,4 @@ const MessagePreview = (props: Props) => {
   )
 }
 
-export default MessagePreview
+export default EmptyPreview

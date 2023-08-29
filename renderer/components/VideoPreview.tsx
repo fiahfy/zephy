@@ -1,7 +1,7 @@
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import MessagePreview from 'components/MessagePreview'
+import EmptyPreview from 'components/EmptyPreview'
 import { Entry } from 'interfaces'
 import { createThumbnailIfNeeded } from 'utils/file'
 
@@ -61,7 +61,7 @@ const VideoPreview = (props: Props) => {
   return (
     <>
       {loading ? (
-        <MessagePreview message="Loading..." />
+        <EmptyPreview message="Loading..." />
       ) : (
         <video
           controls

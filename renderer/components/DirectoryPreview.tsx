@@ -3,7 +3,7 @@ import pluralize from 'pluralize'
 import { useEffect, useMemo, useReducer } from 'react'
 
 import DirectoryPreviewItem from 'components/DirectoryPreviewItem'
-import MessagePreview from 'components/MessagePreview'
+import EmptyPreview from 'components/EmptyPreview'
 import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
@@ -74,7 +74,7 @@ const DirectoryPreview = (props: Props) => {
   return (
     <>
       {loading ? (
-        <MessagePreview message="Loading..." />
+        <EmptyPreview message="Loading..." />
       ) : (
         <>
           {entries.length > 0 ? (
@@ -84,14 +84,14 @@ const DirectoryPreview = (props: Props) => {
               ))}
               {over > 0 && (
                 <ImageListItem>
-                  <MessagePreview
+                  <EmptyPreview
                     message={`Other ${pluralize('item', over, true)}`}
                   />
                 </ImageListItem>
               )}
             </ImageList>
           ) : (
-            <MessagePreview message="No items" />
+            <EmptyPreview message="No items" />
           )}
         </>
       )}
