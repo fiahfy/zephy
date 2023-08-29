@@ -40,39 +40,6 @@ export const createThumbnail = async (path: string) => {
   return thumbnailPath
 }
 
-export const createVideoThumbnails = async (path: string) => {
-  const count = 9
-  const thumbnailFilename =
-    crypto.createHash('md5').update(path).digest('hex') + '_%i.png'
-  const thumbnailFilenames = Array(count)
-    .fill(1)
-    .map((_, i) => thumbnailFilename.replace('%i', String(i + 1)))
-  const thumbnailPaths = thumbnailFilenames.map((filename) =>
-    join(thumbnailDir, filename),
-  )
-  const allExists = (
-    await Promise.all(thumbnailPaths.map((path) => pathExists(path)))
-  ).every((exists) => exists)
-  if (!allExists) {
-    await Promise.all(
-      thumbnailFilenames.map((filename, i) => {
-        const percentage = `${(100 / (count + 1)) * i}%`
-        return new Promise<void>((resolve, reject) => {
-          ffmpeg(path)
-            .screenshots({
-              timestamps: [percentage],
-              folder: thumbnailDir,
-              filename,
-            })
-            .on('error', (e) => reject(e))
-            .on('end', () => resolve())
-        })
-      }),
-    )
-  }
-  return thumbnailPaths
-}
-
 export const getMetadata = async (path: string): Promise<Metadata> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const metadata: any = await new Promise((resolve, reject) => {

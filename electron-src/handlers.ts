@@ -1,11 +1,7 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
 import { basename, dirname } from 'path'
 import { copy, paste } from './utils/clipboard'
-import {
-  createThumbnail,
-  createVideoThumbnails,
-  getMetadata,
-} from './utils/ffmpeg'
+import { createThumbnail, getMetadata } from './utils/ffmpeg'
 import {
   createDirectory,
   getDetailedEntries,
@@ -35,10 +31,6 @@ const registerHandlers = (
   ipcMain.handle(
     'create-thumbnail',
     (_event: IpcMainInvokeEvent, path: string) => createThumbnail(path),
-  )
-  ipcMain.handle(
-    'create-video-thumbnails',
-    (_event: IpcMainInvokeEvent, path: string) => createVideoThumbnails(path),
   )
   ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
     dirname(path),

@@ -1,6 +1,7 @@
 import { ImageList } from '@mui/material'
 import { useMemo } from 'react'
 
+import AudioPreviewListItem from 'components/AudioPreviewListItem'
 import ImagePreviewListItem from 'components/ImagePreviewListItem'
 import MessagePreviewListItem from 'components/MessagePreviewListItem'
 import VideoPreviewListItem from 'components/VideoPreviewListItem'
@@ -18,10 +19,11 @@ const FilePreviewList = (props: Props) => {
 
   return (
     <ImageList cols={1} gap={1} sx={{ m: 0 }}>
+      {fileType === 'audio' && <AudioPreviewListItem entry={entry} />}
       {fileType === 'image' && <ImagePreviewListItem entry={entry} />}
       {fileType === 'video' && <VideoPreviewListItem entry={entry} />}
-      {!['image', 'video'].includes(fileType) && (
-        <MessagePreviewListItem message="No Preview" />
+      {!['audio', 'image', 'video'].includes(fileType) && (
+        <MessagePreviewListItem message="No preview" />
       )}
     </ImageList>
   )

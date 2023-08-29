@@ -47,17 +47,6 @@ export const createThumbnailIfNeeded = async (paths: string | string[]) => {
   }
 }
 
-export const createThumbnailsIfNeeded = (paths: string[]) =>
-  Promise.all(paths.map(createThumbnailIfNeeded))
-
-export const createVideoThumbnails = async (path: string) => {
-  try {
-    return await window.electronAPI.createVideoThumbnails(path)
-  } catch (e) {
-    return []
-  }
-}
-
 export const getMetadata = async (path: string) => {
   try {
     if (!isMediaFile(path)) {

@@ -9,7 +9,6 @@ export interface IElectronAPI {
   basename: (path: string) => Promise<string>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createThumbnail: (path: string) => Promise<string>
-  createVideoThumbnails: (path: string) => Promise<string[]>
   dirname: (path: string) => Promise<string>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
