@@ -2,7 +2,7 @@ import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 
 import { Content, DetailedEntry } from 'interfaces'
 import { AppState, AppThunk } from 'store'
-import { add } from 'store/queryHistory'
+import { add } from 'store/query'
 import { selectGetScore, selectPathsByScore } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import {

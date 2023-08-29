@@ -37,7 +37,7 @@ import useLongPress from 'hooks/useLongPress'
 import { useAppDispatch, useAppSelector } from 'store'
 import { load, searchQuery, selectLoading, unselect } from 'store/explorer'
 import { selectIsFavorite, toggle } from 'store/favorite'
-import { remove, selectQueryHistories } from 'store/queryHistory'
+import { remove, selectQueryHistories } from 'store/query'
 import {
   back,
   changeDirectory,

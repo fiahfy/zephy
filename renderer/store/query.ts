@@ -9,7 +9,7 @@ type State = {
 const initialState: State = { histories: [] }
 
 export const querySlice = createSlice({
-  name: 'queryHistory',
+  name: 'query',
   initialState,
   reducers: {
     add(state, action: PayloadAction<string>) {
@@ -41,9 +41,9 @@ export const { add, remove, replace } = querySlice.actions
 
 export default querySlice.reducer
 
-export const selectQueryHistory = (state: AppState) => state.queryHistory
+export const selectQuery = (state: AppState) => state.query
 
 export const selectQueryHistories = createSelector(
-  selectQueryHistory,
-  (queryHistory) => queryHistory.histories,
+  selectQuery,
+  (query) => query.histories,
 )
