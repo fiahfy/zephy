@@ -1,9 +1,9 @@
-import { ImageList } from '@mui/material'
+import { ImageList, ImageListItem } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useReducer } from 'react'
 
-import DirectoryPreviewListItem from 'components/DirectoryPreviewListItem'
-import MessagePreviewListItem from 'components/MessagePreviewListItem'
+import DirectoryPreviewItem from 'components/DirectoryPreviewItem'
+import MessagePreview from 'components/MessagePreview'
 import { Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
@@ -39,7 +39,7 @@ type Props = {
   entry: Entry
 }
 
-const DirectoryPreviewList = (props: Props) => {
+const DirectoryPreview = (props: Props) => {
   const { entry } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
@@ -72,29 +72,31 @@ const DirectoryPreviewList = (props: Props) => {
   }, [entry.path, shouldShowHiddenFiles])
 
   return (
-    <ImageList cols={1} gap={1} sx={{ m: 0 }}>
+    <>
       {loading ? (
-        <MessagePreviewListItem message="Loading..." />
+        <MessagePreview message="Loading..." />
       ) : (
         <>
           {entries.length > 0 ? (
-            <>
+            <ImageList cols={1} gap={1} sx={{ m: 0 }}>
               {entries.slice(0, max).map((entry) => (
-                <DirectoryPreviewListItem entry={entry} key={entry.path} />
+                <DirectoryPreviewItem entry={entry} key={entry.path} />
               ))}
               {over > 0 && (
-                <MessagePreviewListItem
-                  message={`Other ${pluralize('item', over, true)}`}
-                />
+                <ImageListItem>
+                  <MessagePreview
+                    message={`Other ${pluralize('item', over, true)}`}
+                  />
+                </ImageListItem>
               )}
-            </>
+            </ImageList>
           ) : (
-            <MessagePreviewListItem message="No items" />
+            <MessagePreview message="No items" />
           )}
         </>
       )}
-    </ImageList>
+    </>
   )
 }
 
-export default DirectoryPreviewList
+export default DirectoryPreview

@@ -40,7 +40,7 @@ type Props = {
   entry: Entry
 }
 
-const DirectoryPreviewListItem = (props: Props) => {
+const DirectoryPreviewItem = (props: Props) => {
   const { entry } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
@@ -167,4 +167,4 @@ const DirectoryPreviewListItem = (props: Props) => {
   )
 }
 
-export default DirectoryPreviewListItem
+export default DirectoryPreviewItem

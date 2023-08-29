@@ -1,8 +1,7 @@
-import { ImageListItem } from '@mui/material'
 import fileUrl from 'file-url'
 import { useEffect, useReducer } from 'react'
 
-import MessagePreviewListItem from 'components/MessagePreviewListItem'
+import MessagePreview from 'components/MessagePreview'
 import { Entry } from 'interfaces'
 import { createThumbnailIfNeeded } from 'utils/file'
 
@@ -34,7 +33,7 @@ type Props = {
   entry: Entry
 }
 
-const VideoPreviewListItem = (props: Props) => {
+const VideoPreview = (props: Props) => {
   const { entry } = props
 
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
@@ -62,19 +61,17 @@ const VideoPreviewListItem = (props: Props) => {
   return (
     <>
       {loading ? (
-        <MessagePreviewListItem message="Loading..." />
+        <MessagePreview message="Loading..." />
       ) : (
-        <ImageListItem>
-          <video
-            controls
-            poster={thumbnail ? fileUrl(thumbnail) : undefined}
-            src={fileUrl(entry.path)}
-            style={{ width: '100%' }}
-          />
-        </ImageListItem>
+        <video
+          controls
+          poster={thumbnail ? fileUrl(thumbnail) : undefined}
+          src={fileUrl(entry.path)}
+          style={{ width: '100%' }}
+        />
       )}
     </>
   )
 }
 
-export default VideoPreviewListItem
+export default VideoPreview

@@ -1,27 +1,23 @@
-import { Box, ImageList, Typography } from '@mui/material'
-import { useEffect, useMemo, useRef } from 'react'
+import { Box, Typography } from '@mui/material'
+import { useEffect, useRef } from 'react'
 
-import DirectoryPreviewList from 'components/DirectoryPreviewList'
 import EntryInformation from 'components/EntryInformation'
-import FilePreviewList from 'components/FilePreviewList'
-import MessagePreviewListItem from 'components/MessagePreviewListItem'
 import Panel from 'components/Panel'
+import Preview from 'components/Preview'
 import { useAppSelector } from 'store'
-import { selectSelectedContents } from 'store/explorer'
+import { selectSelected } from 'store/explorer'
 
 const Inspector = () => {
-  const contents = useAppSelector(selectSelectedContents)
+  const selected = useAppSelector(selectSelected)
 
   const ref = useRef<HTMLElement>(null)
-
-  const content = useMemo(() => contents[0], [contents])
 
   useEffect(() => {
     const el = ref.current
     if (el) {
       el.scrollTop = 0
     }
-  }, [content?.path, contents.length])
+  }, [selected])
 
   return (
     <Box
@@ -32,20 +28,9 @@ const Inspector = () => {
         overflowY: 'auto',
       }}
     >
-      {content ? (
-        <Panel footer={<EntryInformation entries={contents} />} title="Preview">
-          {contents.length > 1 ? (
-            <ImageList cols={1} sx={{ m: 0 }}>
-              <MessagePreviewListItem message="No preview" />
-            </ImageList>
-          ) : (
-            <>
-              {content.type === 'directory' && (
-                <DirectoryPreviewList entry={content} />
-              )}
-              {content.type === 'file' && <FilePreviewList entry={content} />}
-            </>
-          )}
+      {selected.length > 0 ? (
+        <Panel footer={<EntryInformation />} title="Preview">
+          <Preview />
         </Panel>
       ) : (
         <Box

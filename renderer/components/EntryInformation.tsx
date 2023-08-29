@@ -3,15 +3,13 @@ import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
 
 import EntryInformationTable from 'components/EntryInformationTable'
-import { DetailedEntry, Metadata } from 'interfaces'
+import { Metadata } from 'interfaces'
+import { useAppSelector } from 'store'
+import { selectSelectedContents } from 'store/explorer'
 import { getMetadata } from 'utils/file'
 
-type Props = {
-  entries: DetailedEntry[]
-}
-
-const EntryInformation = (props: Props) => {
-  const { entries } = props
+const EntryInformation = () => {
+  const entries = useAppSelector(selectSelectedContents)
 
   const [metadata, setMetadata] = useState<Metadata>()
 
