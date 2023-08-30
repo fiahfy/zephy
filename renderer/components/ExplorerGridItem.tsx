@@ -217,6 +217,7 @@ const ExplorerGridItem = (props: Props) => {
         subtitle={
           <Box
             sx={{
+              alignItems: 'end',
               display: 'flex',
               justifyContent: 'space-between',
             }}
@@ -241,7 +242,7 @@ const ExplorerGridItem = (props: Props) => {
           '.MuiImageListItemBar-titleWrap': {
             overflow: 'visible',
             p: 0,
-            pb: 1,
+            pb: 0.5,
             pr: 1,
             '.MuiImageListItemBar-title': {
               overflow: 'visible',
