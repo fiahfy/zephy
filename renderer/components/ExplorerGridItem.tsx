@@ -158,7 +158,6 @@ const ExplorerGridItem = (props: Props) => {
       sx={{
         cursor: 'pointer',
         height: '100%!important',
-        userSelect: 'none',
         width: '100%',
         '&:hover': {
           '.overlay': {

@@ -39,7 +39,6 @@ const Inspector = () => {
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
-            userSelect: 'none',
           }}
         >
           <Typography variant="caption">No selected</Typography>

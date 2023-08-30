@@ -56,6 +56,7 @@ const EntryInformation = () => {
               mb: 0,
               overflowWrap: 'break-word',
               px: 1,
+              userSelect: 'text',
             }}
             variant="caption"
           >

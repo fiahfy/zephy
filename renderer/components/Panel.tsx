@@ -20,7 +20,6 @@ const Panel = (props: Props) => {
           position: 'sticky',
           px: 1,
           top: 0,
-          userSelect: 'none',
           zIndex: 1,
         }}
         variant="overline"

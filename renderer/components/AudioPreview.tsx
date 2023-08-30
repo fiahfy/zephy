@@ -124,7 +124,6 @@ const AudioPreview = (props: Props) => {
             display: 'flex',
             flexGrow: 1,
             justifyContent: 'center',
-            userSelect: 'none',
           }}
         >
           <Icon fontSize="large" />

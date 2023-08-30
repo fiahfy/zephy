@@ -74,7 +74,6 @@ const ExplorerTableCell = (props: Props) => {
         position: 'relative',
         px: 1,
         py: 0,
-        userSelect: 'none',
       }}
       title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'

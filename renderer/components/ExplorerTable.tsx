@@ -339,7 +339,6 @@ const ExplorerTable = (props: Props) => {
                     display: 'flex',
                     height: `calc(100% - ${headerHeight}px)`,
                     justifyContent: 'center',
-                    userSelect: 'none',
                   }}
                 >
                   <Typography variant="caption">{noDataText}</Typography>

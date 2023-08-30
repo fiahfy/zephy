@@ -27,7 +27,12 @@ const Layout = (props: Props) => {
   return (
     <Box
       onContextMenu={defaultMenuHandler}
-      sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}
+      sx={{
+        display: 'flex',
+        height: '100%',
+        overflow: 'hidden',
+        userSelect: 'none',
+      }}
     >
       <Head>
         <title>{title}</title>

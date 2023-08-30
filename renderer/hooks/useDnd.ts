@@ -41,6 +41,7 @@ const useDnd = () => {
         // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
         // e.preventDefault()
         e.stopPropagation()
+        // TODO: improve dragging elements
         e.dataTransfer.effectAllowed = 'move'
         setPaths(
           e,

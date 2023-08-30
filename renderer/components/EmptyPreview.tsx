@@ -14,7 +14,6 @@ const EmptyPreview = (props: Props) => {
         aspectRatio: '16 / 9',
         display: 'flex',
         justifyContent: 'center',
-        userSelect: 'none',
       }}
     >
       <Typography variant="caption">{message}</Typography>

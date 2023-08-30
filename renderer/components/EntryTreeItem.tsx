@@ -80,7 +80,6 @@ const EntryTreeItem = (props: Props) => {
             alignItems: 'center',
             display: 'flex',
             gap: 1,
-            userSelect: 'none',
           }}
         >
           {icon}

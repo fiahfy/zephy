@@ -206,7 +206,6 @@ const ExplorerGrid = (props: Props) => {
                   display: 'flex',
                   height: '100%',
                   justifyContent: 'center',
-                  userSelect: 'none',
                 }}
               >
                 <Typography variant="caption">{noDataText}</Typography>
