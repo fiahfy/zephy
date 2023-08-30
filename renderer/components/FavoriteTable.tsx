@@ -25,10 +25,16 @@ const FavoriteTable = () => {
 
   useEffect(() => {
     ;(async () => {
-      let entries = await window.electronAPI.getDetailedEntriesForPaths(
-        favorites.map((favorite) => favorite.path),
-      )
-      entries = entries.sort((a, b) => a.name.localeCompare(b.name))
+      const entries = await (async () => {
+        try {
+          const entries = await window.electronAPI.getDetailedEntriesForPaths(
+            favorites.map((favorite) => favorite.path),
+          )
+          return entries.sort((a, b) => a.name.localeCompare(b.name))
+        } catch (e) {
+          return []
+        }
+      })()
       setEntries(entries)
     })()
   }, [favorites])

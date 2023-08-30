@@ -56,10 +56,18 @@ const DirectoryPreview = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      let entries = await window.electronAPI.getEntries(entry.path)
-      entries = entries
-        .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
-        .sort((a, b) => a.name.localeCompare(b.name))
+      const entries = await (async () => {
+        try {
+          const entries = await window.electronAPI.getEntries(entry.path)
+          return entries
+            .filter(
+              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
+            )
+            .sort((a, b) => a.name.localeCompare(b.name))
+        } catch (e) {
+          return []
+        }
+      })()
       if (unmounted) {
         return
       }
