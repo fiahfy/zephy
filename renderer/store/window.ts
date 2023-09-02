@@ -425,6 +425,11 @@ export const selectGetSidebarWidth = createSelector(
   (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width,
 )
 
+export const selectGetViewMode = createSelector(
+  selectViewMode,
+  (viewMode) => (path: string) => viewMode[path],
+)
+
 export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
@@ -465,8 +470,19 @@ export const changeDirectory =
     if (loading) {
       return
     }
-    const { changeDirectory } = windowSlice.actions
+    const { changeDirectory, setViewMode } = windowSlice.actions
     const index = selectWindowIndex(getState())
+    // inherit view mode if the path is a child of the current directory
+    const currentDirectory = selectCurrentDirectory(getState())
+    if (path.startsWith(currentDirectory)) {
+      const viewMode = selectGetViewMode(getState())(path)
+      if (!viewMode) {
+        const currentViewMode = selectCurrentViewMode(getState())
+        if (currentViewMode !== 'list') {
+          dispatch(setViewMode({ index, path, viewMode: currentViewMode }))
+        }
+      }
+    }
     const title = await getTitle(path)
     dispatch(changeDirectory({ index, path, title }))
     dispatch(updateApplicationMenu())
