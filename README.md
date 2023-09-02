@@ -19,8 +19,7 @@
 - [ ] Copy & Move Duplicated Item
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
-- [ ] Video Preview Thumbnails
-- [ ] Folder Preview
+- [ ] Text Preview
 
 ## Screenshots
 
