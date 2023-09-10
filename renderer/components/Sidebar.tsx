@@ -55,7 +55,7 @@ const Sidebar = (props: Props) => {
     [getSidebarWidth, variant],
   )
 
-  // TODO: improve performance
+  // TODO: improve performance on development
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       const newWidth =

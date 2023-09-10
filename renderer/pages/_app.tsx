@@ -12,6 +12,7 @@ import { ThemeProvider } from 'contexts/ThemeContext'
 import { TrafficLightsProvider } from 'contexts/TrafficLightsContext'
 import { WatcherProvider } from 'contexts/WatcherContext'
 import createEmotionCache from 'utils/createEmotionCache'
+import { DragGhostProvider } from 'contexts/DragGhostContext'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -32,9 +33,11 @@ export default function MyApp(props: MyAppProps) {
         <ThemeProvider>
           <TrafficLightsProvider>
             <WatcherProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
+              <DragGhostProvider>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </DragGhostProvider>
             </WatcherProvider>
           </TrafficLightsProvider>
         </ThemeProvider>

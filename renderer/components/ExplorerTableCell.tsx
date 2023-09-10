@@ -40,7 +40,7 @@ const ExplorerTableCell = (props: Props) => {
     [content.path, isEditing],
   )
 
-  const draggingContents = useMemo(
+  const dragContents = useMemo(
     () =>
       editing
         ? undefined
@@ -78,7 +78,7 @@ const ExplorerTableCell = (props: Props) => {
       title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'
         ? {
-            ...createDraggableBinder(draggingContents),
+            ...createDraggableBinder(dragContents),
             ...createDroppableBinder(content),
           }
         : {})}
@@ -104,7 +104,7 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </>
       )}
-      {/* TODO: slow rendering on development */}
+      {/* TODO: improve performance on development */}
       {dataKey === 'rating' && (
         <NoOutlineRating
           onChange={handleChangeRating}

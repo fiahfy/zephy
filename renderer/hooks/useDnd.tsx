@@ -1,5 +1,7 @@
+import { Box, Typography } from '@mui/material'
 import { DragEvent, useCallback, useMemo, useState } from 'react'
 
+import { useDragGhost } from 'contexts/DragGhostContext'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { move } from 'store/explorer'
@@ -25,6 +27,8 @@ const useDnd = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const dispatch = useAppDispatch()
 
+  const { render } = useDragGhost()
+
   const [enterCount, setEnterCount] = useState(0)
 
   const dropping = useMemo(() => enterCount > 0, [enterCount])
@@ -36,13 +40,29 @@ const useDnd = () => {
     const es = Array.isArray(entries) ? entries : [entries]
     return {
       draggable: true,
+      onDragEnd: (e: DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        render(null)
+      },
       onDragStart: (e: DragEvent) => {
         // TODO: native drag and drop
         // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
         // e.preventDefault()
         e.stopPropagation()
-        // TODO: improve dragging elements
         e.dataTransfer.effectAllowed = 'move'
+        const ref = render(
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {es.map((entry) => (
+              <Typography key={entry.path} variant="caption">
+                {entry.name}
+              </Typography>
+            ))}
+          </Box>,
+        )
+        if (ref.current) {
+          e.dataTransfer.setDragImage(ref.current, 0, 0)
+        }
         setPaths(
           e,
           es.map((e) => e.path),

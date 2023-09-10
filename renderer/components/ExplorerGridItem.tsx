@@ -130,7 +130,7 @@ const ExplorerGridItem = (props: Props) => {
     [loading],
   )
 
-  const draggingContents = useMemo(
+  const dragContents = useMemo(
     () =>
       editing
         ? undefined
@@ -184,7 +184,7 @@ const ExplorerGridItem = (props: Props) => {
           },
         },
       }}
-      {...createDraggableBinder(draggingContents)}
+      {...createDraggableBinder(dragContents)}
       {...createDroppableBinder(content)}
     >
       {thumbnail ? (
