@@ -47,7 +47,7 @@ export interface IElectronAPI {
     watch: (
       directoryPaths: string[],
       callback: (
-        eventType: 'create' | 'delete',
+        eventType: 'create' | 'update' | 'delete',
         directoryPath: string,
         filePath: string,
       ) => void,

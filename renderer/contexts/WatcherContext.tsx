@@ -16,7 +16,7 @@ const WatcherContext = createContext<
       watch: (
         paths: string[],
         callback: (
-          eventType: 'create' | 'delete',
+          eventType: 'create' | 'update' | 'delete',
           directoryPath: string,
           filePath: string,
         ) => void,
@@ -37,7 +37,7 @@ export const WatcherProvider = (props: Props) => {
   const [callback, setCallback] =
     useState<
       () => (
-        eventType: 'create' | 'delete',
+        eventType: 'create' | 'update' | 'delete',
         directoryPath: string,
         filePath: string,
       ) => void
@@ -68,7 +68,7 @@ export const WatcherProvider = (props: Props) => {
     (
       paths: string[],
       callback: (
-        eventType: 'create' | 'delete',
+        eventType: 'create' | 'update' | 'delete',
         directoryPath: string,
         filePath: string,
       ) => void,

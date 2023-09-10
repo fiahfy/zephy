@@ -54,13 +54,14 @@ const ExplorerTreeView = () => {
     () =>
       watch(loaded, async (eventType, directoryPath, filePath) => {
         const entry =
-          eventType === 'create'
-            ? await window.electronAPI.getDetailedEntry(filePath)
-            : undefined
+          eventType === 'delete'
+            ? undefined
+            : await window.electronAPI.getDetailedEntry(filePath)
+
         const mapper = (e: Entry): Entry => {
           if (e.type === 'directory') {
             if (e.path === directoryPath && e.children) {
-              // イベントが複数回発火するため、まず該当 entry を削除し、create の場合のみ追加する
+              // イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
               let children = e.children.filter(
                 (entry) => entry.path !== filePath,
               )
@@ -81,6 +82,7 @@ const ExplorerTreeView = () => {
           }
           return e
         }
+
         setRoot((root) => (root ? mapper(root) : root))
       }),
     [loaded, watch],

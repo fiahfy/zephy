@@ -357,7 +357,7 @@ export const newWindow =
 
 export const handle =
   (
-    eventType: 'create' | 'delete',
+    eventType: 'create' | 'update' | 'delete',
     directoryPath: string,
     filePath: string,
   ): AppThunk =>
@@ -368,7 +368,8 @@ export const handle =
     }
     const { add, remove } = explorerSlice.actions
     switch (eventType) {
-      case 'create': {
+      case 'create':
+      case 'update': {
         const entry = await window.electronAPI.getDetailedEntry(filePath)
         return dispatch(add([entry]))
       }

@@ -6,10 +6,10 @@ const createWatcher = () => {
   const watchers: { [key: string]: FSWatcher } = {}
 
   const createHandler = (
-    eventType: 'create' | 'delete',
+    eventType: 'create' | 'update' | 'delete',
     directoryPaths: string[],
     callback: (
-      eventType: 'create' | 'delete',
+      eventType: 'create' | 'update' | 'delete',
       directoryPath: string,
       filePath: string,
     ) => void,
@@ -34,7 +34,7 @@ const createWatcher = () => {
     id: number,
     directoryPaths: string[],
     callback: (
-      eventType: 'create' | 'delete',
+      eventType: 'create' | 'update' | 'delete',
       directoryPath: string,
       filePath: string,
     ) => void,
@@ -49,13 +49,14 @@ const createWatcher = () => {
       .on('addDir', createHandler('create', directoryPaths, callback))
       .on('unlink', createHandler('delete', directoryPaths, callback))
       .on('unlinkDir', createHandler('delete', directoryPaths, callback))
+      .on('change', createHandler('update', directoryPaths, callback))
   }
 
   const register = (browserWindow: BrowserWindow) =>
     browserWindow.on('close', () => close(browserWindow.webContents.id))
 
   const notify = (
-    eventType: 'create' | 'delete',
+    eventType: 'create' | 'update' | 'delete',
     directoryPath: string,
     filePath: string,
   ) => {
