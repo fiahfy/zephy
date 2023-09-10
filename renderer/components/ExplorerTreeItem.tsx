@@ -7,8 +7,9 @@ import Icon from 'components/Icon'
 import useContextMenu from 'hooks/useContextMenu'
 import useDnd from 'hooks/useDnd'
 import { Entry } from 'interfaces'
-import { useAppSelector } from 'store'
+import { useAppDispatch, useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
+import { changeDirectory } from 'store/window'
 import { isHiddenFile } from 'utils/file'
 
 const max = 100
@@ -21,6 +22,7 @@ const ExplorerTreeItem = (props: Props) => {
   const { entry } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const dispatch = useAppDispatch()
 
   const { createEntryMenuHandler } = useContextMenu()
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
@@ -32,7 +34,12 @@ const ExplorerTreeItem = (props: Props) => {
     [entry],
   )
 
-  // TODO: remove onNodeSelect ?
+  const handleClick = useCallback(() => {
+    if (entry.type === 'directory') {
+      dispatch(changeDirectory(entry.path))
+    }
+  }, [dispatch, entry.path, entry.type])
+
   const handleDoubleClick = useCallback(async () => {
     if (entry.type === 'file') {
       await window.electronAPI.openPath(entry.path)
@@ -42,6 +49,7 @@ const ExplorerTreeItem = (props: Props) => {
   return (
     <EntryTreeItem
       LabelProps={{
+        onClick: handleClick,
         onContextMenu: createEntryMenuHandler(entry),
         onDoubleClick: handleDoubleClick,
       }}

@@ -2,6 +2,7 @@ import {
   ReactNode,
   RefObject,
   createContext,
+  useCallback,
   useContext,
   useRef,
   useState,
@@ -22,10 +23,10 @@ export const DragGhostProvider = (props: Props) => {
   const [node, setNode] = useState<ReactNode>()
   const ref = useRef<HTMLDivElement>(null)
 
-  const render = (node: ReactNode) => {
+  const render = useCallback((node: ReactNode) => {
     setNode(node)
     return ref
-  }
+  }, [])
 
   const value = { render }
 

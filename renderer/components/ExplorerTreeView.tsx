@@ -14,12 +14,8 @@ import {
 import ExplorerTreeItem from 'components/ExplorerTreeItem'
 import { useWatcher } from 'contexts/WatcherContext'
 import { Entry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import {
-  changeDirectory,
-  selectCurrentDirectory,
-  selectZephySchema,
-} from 'store/window'
+import { useAppSelector } from 'store'
+import { selectCurrentDirectory, selectZephySchema } from 'store/window'
 
 const getLoadedDirectories = (entry: Entry) => {
   const reducer = (acc: string[], entry: Entry): string[] => {
@@ -34,7 +30,6 @@ const getLoadedDirectories = (entry: Entry) => {
 const ExplorerTreeView = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const zephySchema = useAppSelector(selectZephySchema)
-  const dispatch = useAppDispatch()
 
   const { watch } = useWatcher()
 
@@ -51,7 +46,6 @@ const ExplorerTreeView = () => {
       )
       const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
-      setSelected([currentDirectory])
       setRoot(entry)
     })()
   }, [currentDirectory, zephySchema])
@@ -112,16 +106,9 @@ const ExplorerTreeView = () => {
   }, [root])
 
   const handleSelect = useCallback(
-    (_event: SyntheticEvent, nodeIds: string[] | string) => {
-      if (Array.isArray(nodeIds)) {
-        return
-      }
-      const entry = entryMap[nodeIds]
-      if (entry && entry.type === 'directory') {
-        dispatch(changeDirectory(nodeIds))
-      }
-    },
-    [dispatch, entryMap],
+    (_event: SyntheticEvent, nodeIds: string[] | string) =>
+      setSelected(Array.isArray(nodeIds) ? nodeIds : [nodeIds]),
+    [],
   )
 
   const handleToggle = useCallback(
