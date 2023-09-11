@@ -14,7 +14,7 @@ import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
 
-const rowHeight = 256
+const maxItemSize = 256
 
 type Props = {
   contentFocused: (content: Content) => boolean
@@ -102,9 +102,11 @@ const ExplorerGrid = (props: Props) => {
   }, [focused])
 
   const columns = useMemo(
-    () => Math.ceil(wrapperWidth / rowHeight) || 1,
+    () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
+
+  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
   const chunks = useMemo(
     () =>
@@ -197,7 +199,7 @@ const ExplorerGrid = (props: Props) => {
           <Grid
             cellRenderer={cellRenderer}
             columnCount={columns}
-            columnWidth={wrapperWidth / columns}
+            columnWidth={size}
             height={height}
             noContentRenderer={() => (
               <Box
@@ -212,7 +214,7 @@ const ExplorerGrid = (props: Props) => {
               </Box>
             )}
             rowCount={chunks.length}
-            rowHeight={rowHeight}
+            rowHeight={size}
             style={{
               outline: 'none',
               overflowY: 'scroll',
