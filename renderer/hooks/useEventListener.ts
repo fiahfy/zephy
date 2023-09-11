@@ -49,31 +49,6 @@ const useEventListener = () => {
 
     return () => document.removeEventListener('mousedown', handler)
   }, [dispatch])
-
-  // TODO: for text selection with application menu
-  useEffect(() => {
-    const handler = (e: FocusEvent) => {
-      if (e.target instanceof HTMLInputElement && e.target.type === 'text') {
-        window.electronAPI.applicationMenu.update({ isEditable: true })
-      }
-    }
-
-    document.addEventListener('focus', handler, true)
-
-    return () => document.removeEventListener('focus', handler, true)
-  }, [dispatch])
-
-  useEffect(() => {
-    const handler = (e: FocusEvent) => {
-      if (e.target instanceof HTMLInputElement && e.target.type === 'text') {
-        window.electronAPI.applicationMenu.update({ isEditable: false })
-      }
-    }
-
-    document.addEventListener('blur', handler, true)
-
-    return () => document.removeEventListener('blur', handler, true)
-  }, [dispatch])
 }
 
 export default useEventListener

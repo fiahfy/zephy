@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
 import {
+  FocusEvent,
   KeyboardEvent,
   MouseEvent,
   createElement,
@@ -170,10 +171,23 @@ const Explorer = () => {
     dispatch(blur())
   }, [dispatch])
 
+  const handleBlur = useCallback(
+    () => window.electronAPI.applicationMenu.update({ isEditable: true }),
+    [],
+  )
+
+  const handleFocus = useCallback((e: FocusEvent) => {
+    const isEditable =
+      e.target instanceof HTMLInputElement && e.target.type === 'text'
+    window.electronAPI.applicationMenu.update({ isEditable })
+  }, [])
+
   return (
     <Box
+      onBlur={handleBlur}
       onClick={handleClick}
       onContextMenu={currentDirectoryMenuHandler}
+      onFocus={handleFocus}
       sx={{ height: '100%', position: 'relative' }}
       {...createCurrentDirectoryDroppableBinder()}
     >
