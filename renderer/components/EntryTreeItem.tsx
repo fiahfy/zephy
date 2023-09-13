@@ -1,8 +1,8 @@
-import { TreeItem, TreeItemContentProps, TreeItemProps } from '@mui/lab'
+import { TreeItem, TreeItemContentProps } from '@mui/lab'
 import { useTreeItem } from '@mui/lab/TreeItem'
 import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
-import { MouseEvent, ReactNode, forwardRef } from 'react'
+import { ComponentProps, ReactNode, forwardRef } from 'react'
 
 import Outline from 'components/Outline'
 
@@ -32,12 +32,6 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
 
   const icon = iconProp || expansionIcon || displayIcon
 
-  const handleMouseDown = (event: MouseEvent) => preventSelection(event)
-
-  const handleExpansionClick = (event: MouseEvent) => handleExpansion(event)
-
-  const handleSelectionClick = (event: MouseEvent) => handleSelection(event)
-
   return (
     <Box
       className={clsx(className, classes.root, {
@@ -46,21 +40,21 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
         [classes.focused]: focused,
         [classes.disabled]: disabled,
       })}
-      onMouseDown={handleMouseDown}
+      onMouseDown={preventSelection}
       ref={ref}
       sx={{ height: 20 }}
     >
-      <Box className={classes.iconContainer} onClick={handleExpansionClick}>
+      <Box className={classes.iconContainer} onClick={handleExpansion}>
         {icon}
       </Box>
-      <Box className={classes.label} onClick={handleSelectionClick}>
+      <Box className={classes.label} onClick={handleSelection}>
         {label}
       </Box>
     </Box>
   )
 })
 
-type Props = TreeItemProps & {
+type Props = ComponentProps<typeof TreeItem> & {
   LabelProps?: BoxProps
   icon: ReactNode
   outlined?: boolean

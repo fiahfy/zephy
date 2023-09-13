@@ -33,43 +33,46 @@ const useDnd = () => {
 
   const dropping = useMemo(() => enterCount > 0, [enterCount])
 
-  const createDraggableBinder = useCallback((entries?: Entry | Entry[]) => {
-    if (!entries) {
-      return {}
-    }
-    const es = Array.isArray(entries) ? entries : [entries]
-    return {
-      draggable: true,
-      onDragEnd: (e: DragEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
-        render(null)
-      },
-      onDragStart: (e: DragEvent) => {
-        // TODO: native drag and drop
-        // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
-        // e.preventDefault()
-        e.stopPropagation()
-        e.dataTransfer.effectAllowed = 'move'
-        const ref = render(
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {es.map((entry) => (
-              <Typography key={entry.path} variant="caption">
-                {entry.name}
-              </Typography>
-            ))}
-          </Box>,
-        )
-        if (ref.current) {
-          e.dataTransfer.setDragImage(ref.current, 0, 0)
-        }
-        setPaths(
-          e,
-          es.map((e) => e.path),
-        )
-      },
-    }
-  }, [])
+  const createDraggableBinder = useCallback(
+    (entries?: Entry | Entry[]) => {
+      if (!entries) {
+        return {}
+      }
+      const es = Array.isArray(entries) ? entries : [entries]
+      return {
+        draggable: true,
+        onDragEnd: (e: DragEvent) => {
+          e.preventDefault()
+          e.stopPropagation()
+          render(null)
+        },
+        onDragStart: (e: DragEvent) => {
+          // TODO: native drag and drop
+          // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
+          // e.preventDefault()
+          e.stopPropagation()
+          e.dataTransfer.effectAllowed = 'move'
+          const ref = render(
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {es.map((entry) => (
+                <Typography key={entry.path} variant="caption">
+                  {entry.name}
+                </Typography>
+              ))}
+            </Box>,
+          )
+          if (ref.current) {
+            e.dataTransfer.setDragImage(ref.current, 0, 0)
+          }
+          setPaths(
+            e,
+            es.map((e) => e.path),
+          )
+        },
+      }
+    },
+    [render],
+  )
 
   const getDroppableBinder = useCallback(
     (path: string) => {
