@@ -315,6 +315,7 @@ export const moveToTrash =
     dispatch(unselect())
   }
 
+// TODO: update favorites and ratings
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch) => {
@@ -325,6 +326,7 @@ export const rename =
     dispatch(select(entry.path))
   }
 
+// TODO: update favorites and ratings
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {

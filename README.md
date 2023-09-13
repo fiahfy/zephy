@@ -20,6 +20,7 @@
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
 - [ ] Text Preview
+- [ ] Use Electron Forge
 
 ## Screenshots
 
