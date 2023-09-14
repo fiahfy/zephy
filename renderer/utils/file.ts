@@ -1,20 +1,20 @@
-import mime from 'mime-types'
+import mime from 'mime'
 
 export const isHiddenFile = (path: string) => path.startsWith('.')
 
 export const detectFileType = (path: string) => {
-  const mimeType = mime.lookup(path)
-  if (!mimeType) {
+  const type = mime.getType(path)
+  if (!type) {
     return 'unknown'
   }
   switch (true) {
-    case mimeType.startsWith('image/'):
+    case type.startsWith('image/'):
       return 'image'
-    case mimeType.startsWith('video/'):
+    case type.startsWith('video/'):
       return 'video'
-    case mimeType.startsWith('audio/'):
+    case type.startsWith('audio/'):
       return 'audio'
-    case mimeType.startsWith('text/'):
+    case type.startsWith('text/'):
       return 'text'
     default:
       return 'unknown'
