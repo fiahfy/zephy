@@ -2,7 +2,7 @@ import { BrowserWindow, app } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
-import { join } from 'path'
+import { join } from 'node:path'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
 import createFullscreenManager from './fullscreen'
@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
   registerContextMenu()
   registerHandlers(watcher.notify)
 
-  const browserWindows = windowManager.restore()
+  const browserWindows = await windowManager.restore()
   if (browserWindows.length === 0) {
     createWindow()
   }
@@ -71,7 +71,7 @@ app.whenReady().then(async () => {
     }
   })
 
-  app.on('before-quit', () => {
-    windowManager.save()
+  app.on('before-quit', async () => {
+    await windowManager.save()
   })
 })

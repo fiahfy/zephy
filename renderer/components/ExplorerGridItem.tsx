@@ -1,7 +1,6 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
-import fileUrl from 'file-url'
 import pluralize from 'pluralize'
 import {
   MouseEvent,
@@ -28,12 +27,12 @@ import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
 
-type State = { loading: boolean; paths: string[]; thumbnail?: string }
+type State = { loading: boolean; thumbnail?: string; urls: string[] }
 
 type Action =
   | {
       type: 'loaded'
-      payload: { paths: string[]; thumbnail?: string }
+      payload: { thumbnail?: string; urls: string[] }
     }
   | { type: 'loading' }
 
@@ -45,7 +44,7 @@ const reducer = (_state: State, action: Action) => {
         loading: false,
       }
     case 'loading':
-      return { loading: true, paths: [], thumbnail: undefined }
+      return { loading: true, thumbnail: undefined, urls: [] }
   }
 }
 
@@ -80,10 +79,10 @@ const ExplorerGridItem = (props: Props) => {
 
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
-  const [{ loading, paths, thumbnail }, dispatch] = useReducer(reducer, {
+  const [{ loading, thumbnail, urls }, dispatch] = useReducer(reducer, {
     loading: false,
-    paths: [],
     thumbnail: undefined,
+    urls: [],
   })
 
   const editing = useMemo(
@@ -96,9 +95,9 @@ const ExplorerGridItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const paths = await (async () => {
+      const urls = await (async () => {
         if (content.type === 'file') {
-          return [content.path]
+          return [content.url]
         }
 
         try {
@@ -108,22 +107,22 @@ const ExplorerGridItem = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.path)
+            .map((entry) => entry.url)
         } catch (e) {
           return []
         }
       })()
-      const thumbnail = await createThumbnailIfNeeded(paths)
+      const thumbnail = await createThumbnailIfNeeded(urls)
       if (unmounted) {
         return
       }
-      dispatch({ type: 'loaded', payload: { paths, thumbnail } })
+      dispatch({ type: 'loaded', payload: { thumbnail, urls } })
     })()
 
     return () => {
       unmounted = true
     }
-  }, [content.path, content.type, shouldShowHiddenFiles])
+  }, [content.path, content.type, content.url, shouldShowHiddenFiles])
 
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No preview'),
@@ -191,7 +190,7 @@ const ExplorerGridItem = (props: Props) => {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           loading="lazy"
-          src={fileUrl(thumbnail)}
+          src={thumbnail}
           style={{ objectPosition: 'center top' }}
         />
       ) : (
@@ -232,7 +231,7 @@ const ExplorerGridItem = (props: Props) => {
             />
             {!loading && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
-                {pluralize('item', paths.length, true)}
+                {pluralize('item', urls.length, true)}
               </Typography>
             )}
           </Box>

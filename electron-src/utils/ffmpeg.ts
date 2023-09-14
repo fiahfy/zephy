@@ -1,10 +1,11 @@
-import crypto from 'crypto'
 import { app } from 'electron'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
 import { pathExists } from 'fs-extra'
-import { join } from 'path'
+import { createHash } from 'node:crypto'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 // @see https://stackoverflow.com/q/63106834
 ffmpeg.setFfmpegPath(ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked'))
@@ -21,8 +22,9 @@ type Metadata = {
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 export const createThumbnail = async (path: string) => {
+  // TODO: use checksum
   const thumbnailFilename =
-    crypto.createHash('md5').update(path).digest('hex') + '.png'
+    createHash('md5').update(path).digest('hex') + '.png'
   const thumbnailPath = join(thumbnailDir, thumbnailFilename)
   const exists = await pathExists(thumbnailPath)
   if (!exists) {
@@ -37,7 +39,7 @@ export const createThumbnail = async (path: string) => {
         .on('end', () => resolve())
     })
   }
-  return thumbnailPath
+  return pathToFileURL(thumbnailPath).href
 }
 
 export const getMetadata = async (path: string): Promise<Metadata> => {

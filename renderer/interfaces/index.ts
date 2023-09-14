@@ -82,12 +82,14 @@ type File = {
   name: string
   path: string
   type: 'file'
+  url: string
 }
 type Directory = {
   children?: Entry[]
   name: string
   path: string
   type: 'directory'
+  url: string
 }
 export type Entry = File | Directory
 export type DetailedEntry = Entry & {

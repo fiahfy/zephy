@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
-import { basename, dirname } from 'path'
+import { basename, dirname } from 'node:path'
 import { copy, paste } from './utils/clipboard'
 import { createThumbnail, getMetadata } from './utils/ffmpeg'
 import {

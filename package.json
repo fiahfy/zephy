@@ -20,7 +20,6 @@
     "electron-window-state": "^5.0.3",
     "ffmpeg-static-electron": "^2.0.3",
     "ffprobe-static-electron": "^2.0.2",
-    "file-url": "^4.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.1.1",
     "mime": "^3.0.0",

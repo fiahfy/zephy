@@ -25,21 +25,21 @@ export const isAudioFile = (path: string) => detectFileType(path) === 'audio'
 export const isImageFile = (path: string) => detectFileType(path) === 'image'
 export const isVideoFile = (path: string) => detectFileType(path) === 'video'
 
-export const createThumbnailIfNeeded = async (paths: string | string[]) => {
-  const path = Array.isArray(paths)
-    ? paths.filter((path) => isImageFile(path) || isVideoFile(path))[0]
-    : paths
-  if (!path) {
+export const createThumbnailIfNeeded = async (urls: string | string[]) => {
+  const url = Array.isArray(urls)
+    ? urls.filter((url) => isImageFile(url) || isVideoFile(url))[0]
+    : urls
+  if (!url) {
     return undefined
   }
-  if (isVideoFile(path)) {
+  if (isVideoFile(url)) {
     try {
-      return await window.electronAPI.createThumbnail(path)
+      return await window.electronAPI.createThumbnail(url)
     } catch (e) {
       return undefined
     }
-  } else if (isImageFile(path)) {
-    return path
+  } else if (isImageFile(url)) {
+    return url
   } else {
     return undefined
   }

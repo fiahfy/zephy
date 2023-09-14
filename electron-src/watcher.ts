@@ -1,6 +1,6 @@
 import chokidar, { FSWatcher } from 'chokidar'
 import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from 'electron'
-import { dirname } from 'path'
+import { dirname } from 'node:path'
 
 const createWatcher = () => {
   const watchers: { [key: string]: FSWatcher } = {}

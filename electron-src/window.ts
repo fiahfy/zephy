@@ -1,13 +1,13 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import windowStateKeeper, { State } from 'electron-window-state'
-import fs from 'fs'
-import path from 'path'
+import { readFile, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 
 const windowManager = <T>(
   baseCreateWindow: (state: State) => BrowserWindow,
 ) => {
   const savedDirectoryPath = app.getPath('userData')
-  const savedPath = path.join(savedDirectoryPath, 'window-state.json')
+  const savedPath = join(savedDirectoryPath, 'window-state.json')
 
   let visibilities: boolean[] = []
 
@@ -20,7 +20,7 @@ const windowManager = <T>(
     const windowId = getWindowId(event)
     return windowId ? details[windowId] : undefined
   })
-  ipcMain.handle('window-open', (event: IpcMainInvokeEvent, params?: T) =>
+  ipcMain.handle('window-open', (_event: IpcMainInvokeEvent, params?: T) =>
     create(params),
   )
 
@@ -29,9 +29,9 @@ const windowManager = <T>(
     Array.isArray(visibilities) &&
     visibilities.every((visible: unknown) => typeof visible === 'boolean')
 
-  const restoreVisibilities = () => {
+  const restoreVisibilities = async () => {
     try {
-      const json = fs.readFileSync(savedPath, 'utf8')
+      const json = await readFile(savedPath, 'utf8')
       const restored = JSON.parse(json)
       if (isVisibilities(restored)) {
         visibilities = restored
@@ -41,9 +41,9 @@ const windowManager = <T>(
     }
   }
 
-  const saveVisibilities = () => {
+  const saveVisibilities = async () => {
     const json = JSON.stringify(visibilities)
-    fs.writeFileSync(savedPath, json)
+    await writeFile(savedPath, json)
   }
 
   const getWindowFile = (index: number) => `window-state_${index}.json`
@@ -97,8 +97,8 @@ const windowManager = <T>(
     return createWindow(index, params, getNewWindowOptions())
   }
 
-  const restore = () => {
-    restoreVisibilities()
+  const restore = async () => {
+    await restoreVisibilities()
     return visibilities.reduce(
       (acc, visible, index) => (visible ? [...acc, createWindow(index)] : acc),
       [] as BrowserWindow[],

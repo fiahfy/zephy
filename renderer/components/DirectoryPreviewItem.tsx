@@ -1,5 +1,4 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
-import fileUrl from 'file-url'
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
@@ -59,9 +58,9 @@ const DirectoryPreviewItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const paths = await (async () => {
+      const urls = await (async () => {
         if (entry.type === 'file') {
-          return [entry.path]
+          return [entry.url]
         }
 
         try {
@@ -71,12 +70,12 @@ const DirectoryPreviewItem = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.path)
+            .map((entry) => entry.url)
         } catch (e) {
           return []
         }
       })()
-      const thumbnail = await createThumbnailIfNeeded(paths)
+      const thumbnail = await createThumbnailIfNeeded(urls)
       if (unmounted) {
         return
       }
@@ -86,7 +85,7 @@ const DirectoryPreviewItem = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path, entry.type, shouldShowHiddenFiles])
+  }, [entry.path, entry.type, entry.url, shouldShowHiddenFiles])
 
   const message = useMemo(
     () => (loading ? 'Loading...' : 'No preview'),
@@ -122,7 +121,7 @@ const DirectoryPreviewItem = (props: Props) => {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           loading="lazy"
-          src={fileUrl(thumbnail)}
+          src={thumbnail}
           style={{
             aspectRatio: '16 / 9',
             objectPosition: 'center top',

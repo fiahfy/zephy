@@ -3,7 +3,6 @@ import {
   PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material'
 import { Box, GlobalStyles } from '@mui/material'
-import fileUrl from 'file-url'
 import {
   KeyboardEvent,
   useCallback,
@@ -138,7 +137,7 @@ const AudioPreview = (props: Props) => {
           onPlay={() => setPaused(false)}
           onVolumeChange={handleVolumeChange}
           ref={ref}
-          src={fileUrl(entry.path)}
+          src={entry.url}
           style={{
             height: 38,
             outline: 'none',

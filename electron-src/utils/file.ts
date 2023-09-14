@@ -1,19 +1,22 @@
 import { app } from 'electron'
-import { Dirent, Stats } from 'fs'
 import { copy, pathExists } from 'fs-extra'
-import { mkdir, readdir, rename, stat } from 'fs/promises'
-import { basename, dirname, join, parse, sep } from 'path'
+import { Dirent, Stats } from 'node:fs'
+import { mkdir, readdir, rename, stat } from 'node:fs/promises'
+import { basename, dirname, join, parse, sep } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 type File = {
   name: string
   path: string
   type: 'file'
+  url: string
 }
 type Directory = {
   children?: Entry[]
   name: string
   path: string
   type: 'directory'
+  url: string
 }
 type Entry = File | Directory
 type DetailedEntry = Entry & {
@@ -114,12 +117,14 @@ export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
     if (type === 'other') {
       return acc
     }
+    const path = join(directoryPath, dirent.name)
     return [
       ...acc,
       {
         name: dirent.name.normalize('NFC'),
-        path: join(directoryPath, dirent.name),
+        path,
         type,
+        url: pathToFileURL(path).href,
       },
     ]
   }, [] as Entry[])
@@ -137,6 +142,7 @@ export const getDetailedEntry = async (
     name: basename(path).normalize('NFC'),
     path,
     type,
+    url: pathToFileURL(path).href,
     dateCreated: stats.birthtimeMs,
     dateModified: stats.mtimeMs,
     dateLastOpened: stats.atimeMs,
@@ -180,11 +186,13 @@ export const getEntryHierarchy = async (
         name: rootPath,
         path: rootPath,
         type: 'directory',
+        url: pathToFileURL(rootPath).href,
       },
     ],
     name: '',
     path: '',
     type: 'directory',
+    url: '',
   }
 
   entry = await dirnames.reduce(async (promise, _dirname, i) => {

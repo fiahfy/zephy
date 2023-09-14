@@ -1,4 +1,3 @@
-import fileUrl from 'file-url'
 import {
   KeyboardEvent,
   useCallback,
@@ -87,7 +86,7 @@ const VideoPreview = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnail = await createThumbnailIfNeeded(entry.path)
+      const thumbnail = await createThumbnailIfNeeded(entry.url)
       if (unmounted) {
         return
       }
@@ -97,7 +96,7 @@ const VideoPreview = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path])
+  }, [entry.path, entry.url])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const el = ref.current
@@ -127,9 +126,9 @@ const VideoPreview = (props: Props) => {
       onContextMenu={mediaMenuHandler}
       onKeyDown={handleKeyDown}
       onVolumeChange={handleVolumeChange}
-      poster={thumbnail ? fileUrl(thumbnail) : undefined}
+      poster={thumbnail}
       ref={ref}
-      src={fileUrl(entry.path)}
+      src={entry.url}
       style={{ outline: 'none', width: '100%' }}
     />
   )
