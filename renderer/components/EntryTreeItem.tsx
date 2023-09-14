@@ -73,7 +73,7 @@ const EntryTreeItem = (props: Props) => {
           sx={{
             alignItems: 'center',
             display: 'flex',
-            gap: 1,
+            gap: 0.5,
           }}
         >
           {icon}

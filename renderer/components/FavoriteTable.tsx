@@ -77,7 +77,7 @@ const FavoriteTable = () => {
                 borderBottom: 'none',
                 display: 'flex',
                 height: 20,
-                gap: 1,
+                gap: 0.5,
                 px: 1,
                 py: 0,
                 width: '100%',

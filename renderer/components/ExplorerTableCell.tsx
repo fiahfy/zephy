@@ -69,7 +69,7 @@ const ExplorerTableCell = (props: Props) => {
         alignItems: 'center',
         borderBottom: 'none',
         display: 'flex',
-        gap: 1,
+        gap: 0.5,
         height,
         position: 'relative',
         px: 1,
