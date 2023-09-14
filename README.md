@@ -40,3 +40,8 @@ yarn
 # serve with hot reload
 yarn dev
 ```
+
+## References
+
+- https://github.com/vercel/next.js/tree/canary/examples/with-electron-typescript
+- https://github.com/mui/material-ui/tree/master/examples/material-ui-vite-ts
