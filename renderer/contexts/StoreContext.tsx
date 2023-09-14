@@ -1,9 +1,8 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 
-import store, { storageKey } from 'store'
+import { persistor, storageKey, store } from 'store'
 import { replace as replaceFavorite } from 'store/favorite'
 import { replace as replacePreview } from 'store/preview'
 import { replace as replaceQuery } from 'store/query'
@@ -20,8 +19,6 @@ type Props = { children: ReactNode }
 
 export const StoreProvider = (props: Props) => {
   const { children } = props
-
-  const persistor = persistStore(store)
 
   const { dispatch } = store
 

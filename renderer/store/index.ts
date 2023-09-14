@@ -14,6 +14,7 @@ import {
   REGISTER,
   REHYDRATE,
   persistReducer,
+  persistStore,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
@@ -46,20 +47,16 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, reducers)
 
-function makeStore() {
-  return configureStore({
-    reducer: persistedReducer,
-    // @see https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
-      }),
-  })
-}
-
-const store = makeStore()
+export const store = configureStore({
+  reducer: persistedReducer,
+  // @see https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+})
 
 export type AppState = ReturnType<typeof store.getState>
 
@@ -72,7 +69,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >
 
-export default store
+export const persistor = persistStore(store)
 
 export const useAppDispatch = () => useDispatch<AppDispatch>()
 
