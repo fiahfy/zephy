@@ -164,11 +164,10 @@ const ExplorerGrid = (props: Props) => {
   return (
     <Box
       onKeyDown={handleKeyDown}
-      ref={parentRef}
       sx={{
         height: '100%',
         outline: 'none',
-        overflowY: 'scroll',
+        position: 'relative',
         '&:focus-visible': {
           '.focused': {
             outline: '-webkit-focus-ring-color auto 1px',
@@ -177,65 +176,73 @@ const ExplorerGrid = (props: Props) => {
       }}
       tabIndex={0}
     >
-      {wrapperWidth > 0 && (
-        <>
-          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
-            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
-              const columns = rows[virtualRow.index] as Content[]
-              return (
-                <Box
-                  key={virtualRow.index}
-                  sx={{
-                    display: 'flex',
-                    height: size,
-                    transform: `translateY(${
-                      virtualRow.start - rowIndex * virtualRow.size
-                    }px)`,
-                  }}
-                >
-                  {columns.map((content, columnIndex) => (
-                    <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                      <ExplorerGridItem
-                        aria-colindex={columnIndex + 1}
-                        aria-rowindex={virtualRow.index + 1}
-                        content={content}
-                        focused={contentFocused(content)}
-                        onClick={(e) => onClickContent(e, content)}
-                        onContextMenu={(e) => onContextMenuContent(e, content)}
-                        onDoubleClick={(e) => onDoubleClickContent(e, content)}
-                        selected={contentSelected(content)}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              )
-            })}
-          </Box>
-          {contents.length === 0 && (
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-                height: '100%',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography variant="caption">{noDataText}</Typography>
+      <Box ref={parentRef} sx={{ overflowY: 'scroll' }}>
+        {wrapperWidth > 0 && (
+          <>
+            <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+              {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+                const columns = rows[virtualRow.index] as Content[]
+                return (
+                  <Box
+                    key={virtualRow.index}
+                    sx={{
+                      display: 'flex',
+                      height: size,
+                      transform: `translateY(${
+                        virtualRow.start - rowIndex * virtualRow.size
+                      }px)`,
+                    }}
+                  >
+                    {columns.map((content, columnIndex) => (
+                      <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                        <ExplorerGridItem
+                          aria-colindex={columnIndex + 1}
+                          aria-rowindex={virtualRow.index + 1}
+                          content={content}
+                          focused={contentFocused(content)}
+                          onClick={(e) => onClickContent(e, content)}
+                          onContextMenu={(e) =>
+                            onContextMenuContent(e, content)
+                          }
+                          onDoubleClick={(e) =>
+                            onDoubleClickContent(e, content)
+                          }
+                          selected={contentSelected(content)}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )
+              })}
             </Box>
-          )}
-          {loading && (
-            <LinearProgress
-              sx={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 0,
-                zIndex: 1,
-              }}
-            />
-          )}
-        </>
-      )}
+            {contents.length === 0 && (
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  height: '100%',
+                  inset: 0,
+                  justifyContent: 'center',
+                  position: 'absolute',
+                }}
+              >
+                <Typography variant="caption">{noDataText}</Typography>
+              </Box>
+            )}
+            {loading && (
+              <LinearProgress
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </>
+        )}
+      </Box>
     </Box>
   )
 }

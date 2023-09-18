@@ -164,11 +164,12 @@ const ExplorerTable = (props: Props) => {
   return (
     <Box
       onKeyDown={handleKeyDown}
-      ref={parentRef}
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
         height: '100%',
         outline: 'none',
-        overflowY: 'scroll',
+        position: 'relative',
         '&:focus-visible': {
           '.focused': {
             outline: '-webkit-focus-ring-color auto 1px',
@@ -177,62 +178,62 @@ const ExplorerTable = (props: Props) => {
       }}
       tabIndex={0}
     >
-      <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
-        <Box
-          sx={{
-            background: (theme) => theme.palette.background.default,
-            display: 'flex',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-          }}
-        >
-          {columns.map((column) => (
-            <ExplorerTableHeaderCell
-              dataKey={column.key}
-              height={headerHeight}
-              key={column.key}
-              label={column.label}
-              onChangeOrderBy={onChangeOrderBy}
-              sortOption={sortOption}
-              width={column.width}
-            />
-          ))}
-        </Box>
-        {virtualizer.getVirtualItems().map((virtualRow, index) => {
-          const content = contents[virtualRow.index] as Content
-          return (
-            <Box
-              key={virtualRow.index}
-              sx={{
-                height: `${virtualRow.size}px`,
-                transform: `translateY(${
-                  virtualRow.start - index * virtualRow.size
-                }px)`,
-              }}
-            >
-              <ExplorerTableRow
-                aria-rowindex={virtualRow.index + 1}
-                focused={contentFocused(content)}
-                onClick={(e) => onClickContent(e, content)}
-                onContextMenu={(e) => onContextMenuContent(e, content)}
-                onDoubleClick={(e) => onDoubleClickContent(e, content)}
-                selected={contentSelected(content)}
+      <Box sx={{ display: 'flex', pr: '10px' }}>
+        {columns.map((column) => (
+          <ExplorerTableHeaderCell
+            dataKey={column.key}
+            height={headerHeight}
+            key={column.key}
+            label={column.label}
+            onChangeOrderBy={onChangeOrderBy}
+            sortOption={sortOption}
+            width={column.width}
+          />
+        ))}
+      </Box>
+      <Box
+        ref={parentRef}
+        sx={{
+          flexGrow: 1,
+          overflowY: 'scroll',
+        }}
+      >
+        <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+          {virtualizer.getVirtualItems().map((virtualRow, index) => {
+            const content = contents[virtualRow.index] as Content
+            return (
+              <Box
+                key={virtualRow.index}
+                sx={{
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${
+                    virtualRow.start - index * virtualRow.size
+                  }px)`,
+                }}
               >
-                {columns.map((column) => (
-                  <ExplorerTableCell
-                    align={column.align}
-                    content={content}
-                    dataKey={column.key}
-                    height={rowHeight}
-                    key={column.key}
-                    width={column.width}
-                  />
-                ))}
-              </ExplorerTableRow>
-            </Box>
-          )
-        })}
+                <ExplorerTableRow
+                  aria-rowindex={virtualRow.index + 1}
+                  focused={contentFocused(content)}
+                  onClick={(e) => onClickContent(e, content)}
+                  onContextMenu={(e) => onContextMenuContent(e, content)}
+                  onDoubleClick={(e) => onDoubleClickContent(e, content)}
+                  selected={contentSelected(content)}
+                >
+                  {columns.map((column) => (
+                    <ExplorerTableCell
+                      align={column.align}
+                      content={content}
+                      dataKey={column.key}
+                      height={rowHeight}
+                      key={column.key}
+                      width={column.width}
+                    />
+                  ))}
+                </ExplorerTableRow>
+              </Box>
+            )
+          })}
+        </Box>
       </Box>
       {contents.length === 0 && (
         <Box
@@ -240,7 +241,9 @@ const ExplorerTable = (props: Props) => {
             alignItems: 'center',
             display: 'flex',
             height: '100%',
+            inset: 0,
             justifyContent: 'center',
+            position: 'absolute',
           }}
         >
           <Typography variant="caption">{noDataText}</Typography>
