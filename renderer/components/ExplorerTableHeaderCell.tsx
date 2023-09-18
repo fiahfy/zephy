@@ -12,10 +12,11 @@ type Props = {
   label: ReactNode
   onChangeOrderBy: (orderBy: Key) => void
   sortOption: { order: Order; orderBy: Key }
+  width?: number
 }
 
 const ExplorerTableHeaderCell = (props: Props) => {
-  const { height, dataKey, label, onChangeOrderBy, sortOption } = props
+  const { height, dataKey, label, onChangeOrderBy, sortOption, width } = props
 
   const handleClick = useCallback(
     () => onChangeOrderBy(dataKey),
@@ -27,12 +28,15 @@ const ExplorerTableHeaderCell = (props: Props) => {
       component="div"
       sortDirection={sortOption.orderBy === dataKey ? sortOption.order : false}
       sx={{
-        alignItems: 'center',
         borderBottom: 'none',
         display: 'flex',
+        flexGrow: width ? 0 : 1,
+        flexShrink: width ? 0 : 1,
         height,
+        minWidth: 0,
         px: 1,
         py: 0,
+        width,
       }}
       variant="head"
     >

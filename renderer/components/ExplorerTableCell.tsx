@@ -23,10 +23,11 @@ type Props = {
   content: Content
   dataKey: Key
   height: number
+  width?: number
 }
 
 const ExplorerTableCell = (props: Props) => {
-  const { align, content, height, dataKey } = props
+  const { align, content, dataKey, height, width } = props
 
   const isEditing = useAppSelector(selectIsEditing)
   const isSelected = useAppSelector(selectIsSelected)
@@ -66,14 +67,15 @@ const ExplorerTableCell = (props: Props) => {
       align={align}
       component="div"
       sx={{
-        alignItems: 'center',
         borderBottom: 'none',
         display: 'flex',
-        gap: 0.5,
+        flexGrow: width ? 0 : 1,
+        flexShrink: width ? 0 : 1,
         height,
-        position: 'relative',
+        minWidth: 0,
         px: 1,
         py: 0,
+        width,
       }}
       title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'
@@ -84,7 +86,7 @@ const ExplorerTableCell = (props: Props) => {
         : {})}
     >
       {dataKey === 'name' && (
-        <>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
           <EntryIcon entry={content} />
           {editing ? (
             <Box
@@ -102,7 +104,7 @@ const ExplorerTableCell = (props: Props) => {
               {content.name}
             </Typography>
           )}
-        </>
+        </Box>
       )}
       {/* TODO: improve performance on development */}
       {dataKey === 'rating' && (

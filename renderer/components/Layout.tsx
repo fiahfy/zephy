@@ -83,7 +83,12 @@ const Layout = (props: Props) => {
       </Sidebar>
       <Box
         component="main"
-        sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1,
+          minWidth: 0,
+        }}
       >
         <Toolbar
           sx={{
