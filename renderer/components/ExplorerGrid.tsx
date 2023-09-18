@@ -176,7 +176,13 @@ const ExplorerGrid = (props: Props) => {
       }}
       tabIndex={0}
     >
-      <Box ref={parentRef} sx={{ overflowY: 'scroll' }}>
+      <Box
+        ref={parentRef}
+        sx={{
+          height: '100%',
+          overflowY: 'scroll',
+        }}
+      >
         {wrapperWidth > 0 && (
           <>
             <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>

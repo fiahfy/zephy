@@ -21,6 +21,7 @@
 - [ ] Change Thumbnail Size
 - [ ] Text Preview
 - [ ] Use Electron Forge
+- [ ] Use vite or Next.js App Router
 
 ## Screenshots
 
@@ -44,4 +45,4 @@ yarn dev
 ## References
 
 - https://github.com/vercel/next.js/tree/canary/examples/with-electron-typescript
-- https://github.com/mui/material-ui/tree/master/examples/material-ui-vite-ts
+- https://github.com/mui/material-ui/tree/master/examples/material-ui-nextjs-ts-v4-v5-migration

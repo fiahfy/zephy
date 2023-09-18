@@ -106,7 +106,6 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </Box>
       )}
-      {/* TODO: improve performance on development */}
       {dataKey === 'rating' && (
         <NoOutlineRating
           onChange={handleChangeRating}

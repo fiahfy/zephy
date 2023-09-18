@@ -188,7 +188,7 @@ const registerContextMenu = () => {
             type: 'checkbox',
           })),
         }),
-        // TODO: Implement
+        // TODO: implement
         cut: () => ({
           accelerator: 'CmdOrCtrl+X',
           click: () => undefined,
