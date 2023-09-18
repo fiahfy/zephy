@@ -1,6 +1,5 @@
 import { Box, LinearProgress, Typography } from '@mui/material'
-import { alpha } from '@mui/material/styles'
-import clsx from 'clsx'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   KeyboardEvent,
   MouseEvent,
@@ -11,9 +10,9 @@ import {
 
 import ExplorerTableCell from 'components/ExplorerTableCell'
 import ExplorerTableHeaderCell from 'components/ExplorerTableHeaderCell'
+import ExplorerTableRow from 'components/ExplorerTableRow'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
-import { useVirtualizer } from '@tanstack/react-virtual'
 
 const headerHeight = 32
 const rowHeight = 20
@@ -138,7 +137,6 @@ const ExplorerTable = (props: Props) => {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      console.log(1)
       const el = parentRef.current?.querySelector('.focused')
       const row = Number(el?.getAttribute('aria-rowindex'))
       switch (e.key) {
@@ -205,53 +203,33 @@ const ExplorerTable = (props: Props) => {
           const content = contents[virtualRow.index] as Content
           return (
             <Box
-              aria-rowindex={virtualRow.index + 1}
-              className={clsx({
-                focused: contentFocused(content),
-                selected: contentSelected(content),
-              })}
-              component="div"
-              key={content.path}
-              onClick={(e) => onClickContent(e, content)}
-              onContextMenu={(e) => onContextMenuContent(e, content)}
-              onDoubleClick={(e) => onDoubleClickContent(e, content)}
+              key={virtualRow.index}
               sx={{
-                cursor: 'pointer',
-                display: 'flex',
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${
                   virtualRow.start - index * virtualRow.size
                 }px)`,
-                '&:hover': {
-                  backgroundColor: (theme) => theme.palette.action.hover,
-                },
-                '&.selected': {
-                  backgroundColor: (theme) =>
-                    alpha(
-                      theme.palette.primary.main,
-                      theme.palette.action.selectedOpacity,
-                    ),
-                  '&:hover': {
-                    backgroundColor: (theme) =>
-                      alpha(
-                        theme.palette.primary.main,
-                        theme.palette.action.selectedOpacity +
-                          theme.palette.action.hoverOpacity,
-                      ),
-                  },
-                },
               }}
             >
-              {columns.map((column) => (
-                <ExplorerTableCell
-                  align={column.align}
-                  content={content}
-                  dataKey={column.key}
-                  height={rowHeight}
-                  key={column.key}
-                  width={column.width}
-                />
-              ))}
+              <ExplorerTableRow
+                aria-rowindex={virtualRow.index + 1}
+                focused={contentFocused(content)}
+                onClick={(e) => onClickContent(e, content)}
+                onContextMenu={(e) => onContextMenuContent(e, content)}
+                onDoubleClick={(e) => onDoubleClickContent(e, content)}
+                selected={contentSelected(content)}
+              >
+                {columns.map((column) => (
+                  <ExplorerTableCell
+                    align={column.align}
+                    content={content}
+                    dataKey={column.key}
+                    height={rowHeight}
+                    key={column.key}
+                    width={column.width}
+                  />
+                ))}
+              </ExplorerTableRow>
             </Box>
           )
         })}

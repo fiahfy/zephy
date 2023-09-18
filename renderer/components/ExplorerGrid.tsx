@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Typography } from '@mui/material'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   KeyboardEvent,
   MouseEvent,
@@ -8,7 +9,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import { AutoSizer, Grid, GridCellProps } from 'react-virtualized'
 
 import ExplorerGridItem from 'components/ExplorerGridItem'
 import usePrevious from 'hooks/usePrevious'
@@ -51,11 +51,12 @@ const ExplorerGrid = (props: Props) => {
 
   const previousLoading = usePrevious(loading)
 
-  const ref = useRef<HTMLElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
+
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    const el = parentRef.current
     if (!el) {
       return
     }
@@ -71,7 +72,7 @@ const ExplorerGrid = (props: Props) => {
   }, [onScroll])
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    const el = parentRef.current
     if (!el) {
       return
     }
@@ -80,7 +81,7 @@ const ExplorerGrid = (props: Props) => {
   }, [onScroll])
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    const el = parentRef.current
     if (!el) {
       return
     }
@@ -90,7 +91,7 @@ const ExplorerGrid = (props: Props) => {
   }, [loading, previousLoading, scrollTop])
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    const el = parentRef.current
     if (!el) {
       return
     }
@@ -108,7 +109,7 @@ const ExplorerGrid = (props: Props) => {
 
   const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
-  const chunks = useMemo(
+  const rows = useMemo(
     () =>
       contents.reduce(
         (acc, _, i) =>
@@ -121,19 +122,19 @@ const ExplorerGrid = (props: Props) => {
   const focus = useCallback(
     (e: KeyboardEvent, row: number, column: number, focused: boolean) => {
       const content =
-        chunks[row - 1]?.[column - 1] ?? (focused ? undefined : chunks[0]?.[0])
+        rows[row - 1]?.[column - 1] ?? (focused ? undefined : rows[0]?.[0])
       if (content) {
         onKeyDownArrow(e, content)
       }
     },
-    [chunks, onKeyDownArrow],
+    [onKeyDownArrow, rows],
   )
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const el = ref.current?.querySelector('.focused')
-      const row = Number(el?.getAttribute('data-grid-row'))
-      const column = Number(el?.getAttribute('data-grid-column'))
+      const el = parentRef.current?.querySelector('.focused')
+      const row = Number(el?.getAttribute('aria-rowindex'))
+      const col = Number(el?.getAttribute('aria-colindex'))
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
@@ -141,89 +142,100 @@ const ExplorerGrid = (props: Props) => {
           }
           return
         case 'ArrowUp':
-          return focus(e, row - 1, column, !!el)
+          return focus(e, row - 1, col, !!el)
         case 'ArrowDown':
-          return focus(e, row + 1, column, !!el)
+          return focus(e, row + 1, col, !!el)
         case 'ArrowLeft':
-          return focus(e, row, column - 1, !!el)
+          return focus(e, row, col - 1, !!el)
         case 'ArrowRight':
-          return focus(e, row, column + 1, !!el)
+          return focus(e, row, col + 1, !!el)
       }
     },
     [focus, onKeyDownEnter],
   )
 
-  const cellRenderer = useCallback(
-    ({ columnIndex, key, rowIndex, style }: GridCellProps) => {
-      const content = chunks[rowIndex]?.[columnIndex]
-      return (
-        content && (
-          <Box key={key} style={style} sx={{ p: 0.0625 }}>
-            <ExplorerGridItem
-              columnIndex={columnIndex}
-              content={content}
-              focused={contentFocused(content)}
-              onClick={(e) => onClickContent(e, content)}
-              onContextMenu={(e) => onContextMenuContent(e, content)}
-              onDoubleClick={(e) => onDoubleClickContent(e, content)}
-              rowIndex={rowIndex}
-              selected={contentSelected(content)}
-            />
-          </Box>
-        )
-      )
-    },
-    [
-      chunks,
-      contentFocused,
-      contentSelected,
-      onClickContent,
-      onContextMenuContent,
-      onDoubleClickContent,
-    ],
-  )
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => size,
+    overscan: 20,
+  })
 
   return (
     <Box
       onKeyDown={handleKeyDown}
-      ref={ref}
+      ref={parentRef}
       sx={{
         height: '100%',
-        '.ReactVirtualized__Grid:focus-visible .focused': {
-          outline: '-webkit-focus-ring-color auto 1px',
+        outline: 'none',
+        overflowY: 'scroll',
+        '&:focus-visible': {
+          '.focused': {
+            outline: '-webkit-focus-ring-color auto 1px',
+          },
         },
       }}
+      tabIndex={0}
     >
-      <AutoSizer>
-        {({ height, width }) => (
-          <Grid
-            cellRenderer={cellRenderer}
-            columnCount={columns}
-            columnWidth={size}
-            height={height}
-            noContentRenderer={() => (
-              <Box
-                sx={{
-                  alignItems: 'center',
-                  display: 'flex',
-                  height: '100%',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography variant="caption">{noDataText}</Typography>
-              </Box>
-            )}
-            rowCount={chunks.length}
-            rowHeight={size}
-            style={{
-              outline: 'none',
-              overflowY: 'scroll',
-            }}
-            width={width}
-          />
-        )}
-      </AutoSizer>
-      {loading && <LinearProgress />}
+      {wrapperWidth > 0 && (
+        <>
+          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+              const columns = rows[virtualRow.index] as Content[]
+              return (
+                <Box
+                  key={virtualRow.index}
+                  sx={{
+                    display: 'flex',
+                    height: size,
+                    transform: `translateY(${
+                      virtualRow.start - rowIndex * virtualRow.size
+                    }px)`,
+                  }}
+                >
+                  {columns.map((content, columnIndex) => (
+                    <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                      <ExplorerGridItem
+                        aria-colindex={columnIndex + 1}
+                        aria-rowindex={virtualRow.index + 1}
+                        content={content}
+                        focused={contentFocused(content)}
+                        onClick={(e) => onClickContent(e, content)}
+                        onContextMenu={(e) => onContextMenuContent(e, content)}
+                        onDoubleClick={(e) => onDoubleClickContent(e, content)}
+                        selected={contentSelected(content)}
+                      />
+                    </Box>
+                  ))}
+                </Box>
+              )
+            })}
+          </Box>
+          {contents.length === 0 && (
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+                height: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="caption">{noDataText}</Typography>
+            </Box>
+          )}
+          {loading && (
+            <LinearProgress
+              sx={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                zIndex: 1,
+              }}
+            />
+          )}
+        </>
+      )}
     </Box>
   )
 }

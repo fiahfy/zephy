@@ -49,27 +49,19 @@ const reducer = (_state: State, action: Action) => {
 }
 
 type Props = {
-  columnIndex: number
+  'aria-colindex': number
+  'aria-rowindex': number
   content: Content
   focused: boolean
   onClick: (e: MouseEvent) => void
   onContextMenu: (e: MouseEvent) => void
   onDoubleClick: (e: MouseEvent) => void
-  rowIndex: number
   selected: boolean
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const {
-    columnIndex,
-    content,
-    focused,
-    onClick,
-    onContextMenu,
-    onDoubleClick,
-    rowIndex,
-    selected,
-  } = props
+  const { content, focused, onClick, onContextMenu, onDoubleClick, selected } =
+    props
 
   const isEditing = useAppSelector(selectIsEditing)
   const isSelected = useAppSelector(selectIsSelected)
@@ -147,10 +139,10 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
+      aria-colindex={props['aria-colindex']}
+      aria-rowindex={props['aria-rowindex']}
       className={clsx({ focused, selected })}
       component="div"
-      data-grid-column={columnIndex + 1}
-      data-grid-row={rowIndex + 1}
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
