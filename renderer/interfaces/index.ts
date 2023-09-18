@@ -55,7 +55,8 @@ export interface IElectronAPI {
   }
   window: {
     getDetails: () => Promise<
-      { index: number; params: { directory?: string } } | undefined
+      | { index: number; params: { directory?: string }; restored: boolean }
+      | undefined
     >
     open: (params: { directory: string }) => Promise<void>
   }

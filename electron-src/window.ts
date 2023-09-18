@@ -11,14 +11,25 @@ const windowManager = <T>(
 
   let visibilities: boolean[] = []
 
-  const details: { [id: number]: { index: number; params?: T } } = {}
+  const detailsMap: {
+    [id: number]: { index: number; params?: T; restored: boolean }
+  } = {}
 
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
   ipcMain.handle('window-get-details', (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
-    return windowId ? details[windowId] : undefined
+    if (!windowId) {
+      return undefined
+    }
+    const details = detailsMap[windowId]
+    if (!details) {
+      return undefined
+    }
+    const result = { ...details }
+    details.restored = true
+    return result
   })
   ipcMain.handle('window-open', (_event: IpcMainInvokeEvent, params?: T) =>
     create(params),
@@ -63,10 +74,10 @@ const windowManager = <T>(
     })
     windowState.manage(browserWindow)
 
-    details[browserWindow.id] = { index, params }
+    detailsMap[browserWindow.id] = { index, params, restored: false }
 
     browserWindow.on('close', () => {
-      delete details[browserWindow.id]
+      delete detailsMap[browserWindow.id]
       visibilities[index] = false
     })
 
