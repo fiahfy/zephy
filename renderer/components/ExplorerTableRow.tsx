@@ -22,7 +22,6 @@ const ExplorerTableRow = (props: Props) => {
         focused,
         selected,
       })}
-      component="div"
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
