@@ -1,7 +1,7 @@
 {
   "name": "zephy",
   "description": "Simple Media File Manager based on Electron.",
-  "version": "0.0.1",
+  "version": "0.0.1-dev",
   "dependencies": {
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.1",
