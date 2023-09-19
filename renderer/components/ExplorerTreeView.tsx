@@ -2,7 +2,7 @@ import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
-import { TreeView } from '@mui/lab'
+import { TreeView } from '@mui/x-tree-view'
 import {
   SyntheticEvent,
   useCallback,

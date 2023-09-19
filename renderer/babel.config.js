@@ -19,14 +19,5 @@ module.exports = {
       },
       'icons',
     ],
-    [
-      'babel-plugin-import',
-      {
-        libraryName: '@mui/lab',
-        libraryDirectory: '',
-        camel2DashComponentName: false,
-      },
-      'lab',
-    ],
   ],
 }
