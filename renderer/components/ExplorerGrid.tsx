@@ -200,7 +200,7 @@ const ExplorerGrid = (props: Props) => {
                     }}
                   >
                     {columns.map((content, columnIndex) => (
-                      <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                      <Box key={columnIndex} sx={{ p: 0.0625, width: size }}>
                         <ExplorerGridItem
                           aria-colindex={columnIndex + 1}
                           aria-rowindex={virtualRow.index + 1}

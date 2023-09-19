@@ -137,6 +137,22 @@ const ExplorerGridItem = (props: Props) => {
     [appDispatch, content.path],
   )
 
+  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
+  const rating = useMemo(
+    () => (
+      <NoOutlineRating
+        color="primary"
+        onChange={handleChangeRating}
+        onClick={(e) => e.stopPropagation()}
+        precision={0.5}
+        size="small"
+        sx={{ my: 0.25 }}
+        value={content.rating}
+      />
+    ),
+    [content.rating, handleChangeRating],
+  )
+
   return (
     <ImageListItem
       aria-colindex={props['aria-colindex']}
@@ -212,15 +228,7 @@ const ExplorerGridItem = (props: Props) => {
               justifyContent: 'space-between',
             }}
           >
-            <NoOutlineRating
-              color="primary"
-              onChange={handleChangeRating}
-              onClick={(e) => e.stopPropagation()}
-              precision={0.5}
-              size="small"
-              sx={{ my: 0.25 }}
-              value={content.rating}
-            />
+            {rating}
             {!loading && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
                 {pluralize('item', urls.length, true)}

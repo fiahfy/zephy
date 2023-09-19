@@ -1,5 +1,5 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
-import { MouseEvent, SyntheticEvent, useCallback, useMemo } from 'react'
+import { SyntheticEvent, useCallback, useMemo } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/mui/NoOutlineRating'
@@ -57,9 +57,18 @@ const ExplorerTableCell = (props: Props) => {
     [content.path, dispatch],
   )
 
-  const handleClickRating = useCallback(
-    (e: MouseEvent) => e.stopPropagation(),
-    [],
+  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
+  const rating = useMemo(
+    () => (
+      <NoOutlineRating
+        onChange={handleChangeRating}
+        onClick={(e) => e.stopPropagation()}
+        precision={0.5}
+        size="small"
+        value={content.rating}
+      />
+    ),
+    [content.rating, handleChangeRating],
   )
 
   return (
@@ -106,15 +115,7 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </Box>
       )}
-      {dataKey === 'rating' && (
-        <NoOutlineRating
-          onChange={handleChangeRating}
-          onClick={handleClickRating}
-          precision={0.5}
-          size="small"
-          value={content.rating}
-        />
-      )}
+      {dataKey === 'rating' && rating}
       {dataKey === 'size' && content.type === 'file' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}
