@@ -118,6 +118,7 @@ const Sidebar = (props: Props) => {
                 `${theme.mixins.statusBar.height}!important`,
             }}
           />
+          {/* TODO: use Divider */}
           <Box
             onMouseDown={handleMouseDown}
             sx={{
