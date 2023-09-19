@@ -1,5 +1,4 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
-import { grey } from '@mui/material/colors'
 import { styled } from '@mui/material/styles'
 import { useCallback, useMemo } from 'react'
 
@@ -118,12 +117,13 @@ const Sidebar = (props: Props) => {
                 `${theme.mixins.statusBar.height}!important`,
             }}
           />
-          {/* TODO: use Divider */}
           <Box
             onMouseDown={handleMouseDown}
             sx={{
               backgroundColor: (theme) =>
-                theme.palette.mode === 'light' ? grey[100] : grey[900],
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
               bottom: 0,
               cursor: 'col-resize',
               position: 'absolute',

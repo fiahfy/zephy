@@ -191,6 +191,7 @@ const AddressBar = () => {
       color="default"
       component="div"
       elevation={0}
+      enableColorOnDark
       sx={{
         WebkitAppRegion: 'drag',
         zIndex: (theme) => theme.zIndex.drawer + 1,

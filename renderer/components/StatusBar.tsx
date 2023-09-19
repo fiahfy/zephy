@@ -22,6 +22,7 @@ const StatusBar = () => {
       color="default"
       component="div"
       elevation={0}
+      enableColorOnDark
       position="fixed"
       sx={{
         WebkitAppRegion: 'drag',
