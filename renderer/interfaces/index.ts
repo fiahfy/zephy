@@ -8,14 +8,14 @@ export interface IElectronAPI {
   basename: (path: string) => Promise<string>
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
-  createThumbnail: (path: string) => Promise<string>
+  createThumbnailUrl: (paths: string | string[]) => Promise<string>
   dirname: (path: string) => Promise<string>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
   getEntries: (directoryPath: string) => Promise<Entry[]>
   getEntryHierarchy: (path?: string) => Promise<Entry>
-  getMetadata: (path: string) => Promise<Metadata>
+  getMetadata: (path: string) => Promise<Metadata | undefined>
   isDarwin: () => Promise<boolean>
   moveEntries: (
     paths: string[],

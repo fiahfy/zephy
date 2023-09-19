@@ -6,7 +6,6 @@ import EntryInformationTable from 'components/EntryInformationTable'
 import { Metadata } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectSelectedContents } from 'store/explorer'
-import { getMetadata } from 'utils/file'
 
 const EntryInformation = () => {
   const entries = useAppSelector(selectSelectedContents)
@@ -25,7 +24,7 @@ const EntryInformation = () => {
       if (!entry?.path) {
         return
       }
-      const metadata = await getMetadata(entry.path)
+      const metadata = await window.electronAPI.getMetadata(entry.path)
       if (unmounted) {
         return
       }

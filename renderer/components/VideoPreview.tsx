@@ -10,7 +10,6 @@ import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectLoop, selectVolume, setLoop, setVolume } from 'store/preview'
-import { createThumbnailIfNeeded } from 'utils/file'
 
 type State = {
   loading: boolean
@@ -86,7 +85,7 @@ const VideoPreview = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnail = await createThumbnailIfNeeded(entry.url)
+      const thumbnail = await window.electronAPI.createThumbnailUrl(entry.path)
       if (unmounted) {
         return
       }
@@ -96,7 +95,7 @@ const VideoPreview = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path, entry.url])
+  }, [entry.path])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const el = ref.current

@@ -7,8 +7,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('create-directory', directoryPath),
-  createThumbnail: (path: string) =>
-    ipcRenderer.invoke('create-thumbnail', path),
+  createThumbnailUrl: (paths: string | string[]) =>
+    ipcRenderer.invoke('create-thumbnail-url', paths),
   dirname: (path: string) => ipcRenderer.invoke('dirname', path),
   getDetailedEntries: (directoryPath: string) =>
     ipcRenderer.invoke('get-detailed-entries', directoryPath),

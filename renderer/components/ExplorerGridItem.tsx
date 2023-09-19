@@ -25,14 +25,14 @@ import {
 } from 'store/explorer'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
+import { isHiddenFile } from 'utils/file'
 
-type State = { loading: boolean; thumbnail?: string; urls: string[] }
+type State = { itemCount: number; loading: boolean; thumbnail?: string }
 
 type Action =
   | {
       type: 'loaded'
-      payload: { thumbnail?: string; urls: string[] }
+      payload: { itemCount: number; thumbnail?: string }
     }
   | { type: 'loading' }
 
@@ -44,7 +44,7 @@ const reducer = (_state: State, action: Action) => {
         loading: false,
       }
     case 'loading':
-      return { loading: true, thumbnail: undefined, urls: [] }
+      return { itemCount: 0, loading: true, thumbnail: undefined }
   }
 }
 
@@ -71,10 +71,10 @@ const ExplorerGridItem = (props: Props) => {
 
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
-  const [{ loading, thumbnail, urls }, dispatch] = useReducer(reducer, {
+  const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
+    itemCount: 0,
     loading: false,
     thumbnail: undefined,
-    urls: [],
   })
 
   const editing = useMemo(
@@ -87,9 +87,9 @@ const ExplorerGridItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const urls = await (async () => {
+      const paths = await (async () => {
         if (content.type === 'file') {
-          return [content.url]
+          return [content.path]
         }
 
         try {
@@ -99,16 +99,19 @@ const ExplorerGridItem = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.url)
+            .map((entry) => entry.path)
         } catch (e) {
           return []
         }
       })()
-      const thumbnail = await createThumbnailIfNeeded(urls)
+      const thumbnail = await window.electronAPI.createThumbnailUrl(paths)
       if (unmounted) {
         return
       }
-      dispatch({ type: 'loaded', payload: { thumbnail, urls } })
+      dispatch({
+        type: 'loaded',
+        payload: { itemCount: paths.length, thumbnail },
+      })
     })()
 
     return () => {
@@ -231,7 +234,7 @@ const ExplorerGridItem = (props: Props) => {
             {rating}
             {!loading && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
-                {pluralize('item', urls.length, true)}
+                {pluralize('item', itemCount, true)}
               </Typography>
             )}
           </Box>
