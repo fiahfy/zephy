@@ -24,6 +24,7 @@ const setPaths = (e: DragEvent, paths: string[]) =>
   e.dataTransfer.setData(mime, JSON.stringify(paths))
 
 const useDnd = () => {
+  // TODO: remove this
   const currentDirectory = useAppSelector(selectCurrentDirectory)
   const dispatch = useAppDispatch()
 

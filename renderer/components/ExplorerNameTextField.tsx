@@ -3,6 +3,7 @@ import {
   KeyboardEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -22,7 +23,7 @@ const ExplorerNameTextField = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const { defaultMenuHandler } = useContextMenu()
+  const { createMenuHandler } = useContextMenu()
 
   const [name, setName] = useState(content.name)
   const ref = useRef<HTMLInputElement>(null)
@@ -72,13 +73,18 @@ const ExplorerNameTextField = (props: Props) => {
     [dispatch, finish],
   )
 
+  const handleContextMenu = useMemo(
+    () => createMenuHandler([]),
+    [createMenuHandler],
+  )
+
   return (
     <DenseOutlineTextField
       fullWidth
       inputRef={ref}
       onBlur={handleBlur}
       onChange={handleChange}
-      onContextMenu={defaultMenuHandler}
+      onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
       spellCheck={false}
       sx={{ '.MuiInputBase-root': { color: 'inherit' } }}

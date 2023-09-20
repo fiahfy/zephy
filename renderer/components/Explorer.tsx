@@ -36,30 +36,35 @@ import {
 } from 'store/explorer'
 import {
   changeDirectory,
+  selectCurrentDirectory,
   selectCurrentScrollTop,
   selectCurrentSortOption,
   selectCurrentViewMode,
+  selectZephySchema,
   setCurrentScrollTop,
   sort,
 } from 'store/window'
+import { selectIsFavorite } from 'store/favorite'
 
 const Explorer = () => {
   const contents = useAppSelector(selectContents)
+  const currentDirectory = useAppSelector(selectCurrentDirectory)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
   const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
   const isEditing = useAppSelector(selectIsEditing)
+  const isFavorite = useAppSelector(selectIsFavorite)
   const isFocused = useAppSelector(selectIsFocused)
   const isSelected = useAppSelector(selectIsSelected)
   const loading = useAppSelector(selectLoading)
-  const selectedContents = useAppSelector(selectSelectedContents)
   const query = useAppSelector(selectQuery)
+  const selectedContents = useAppSelector(selectSelectedContents)
+  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
-  const { createContentMenuHandler, currentDirectoryMenuHandler } =
-    useContextMenu()
+  const { createMenuHandler } = useContextMenu()
   const { createCurrentDirectoryDroppableBinder, dropping } = useDnd()
 
   const open = useCallback(
@@ -131,6 +136,68 @@ const Explorer = () => {
     [dispatch],
   )
 
+  const createContentMenuHandler = useCallback(
+    (content: Content, selectedContents: Content[]) => {
+      const directory = content.type === 'directory'
+      const path = content.path
+      const selectedPaths = selectedContents.map((content) => content.path)
+      const paths = selectedPaths.includes(path) ? selectedPaths : [path]
+      return createMenuHandler([
+        ...(paths.length === 1
+          ? [
+              {
+                id: directory ? 'openDirectory' : 'open',
+                params: { path },
+              },
+              ...(directory
+                ? [
+                    {
+                      id: 'openDirectoryInNewWindow',
+                      params: { path },
+                    },
+                  ]
+                : []),
+              {
+                id: 'revealInFinder',
+                params: { path },
+              },
+              { id: 'separator' },
+              {
+                id: 'copyPath',
+                params: { path },
+              },
+              { id: 'separator' },
+              ...(directory
+                ? [
+                    {
+                      id: 'toggleFavorite',
+                      params: { path, favorite: isFavorite(path) },
+                    },
+                  ]
+                : []),
+              { id: 'separator' },
+              {
+                id: 'rename',
+                params: { path },
+              },
+            ]
+          : []),
+        {
+          id: 'moveToTrash',
+          params: { paths },
+        },
+        { id: 'separator' },
+        { id: 'cut', params: { paths } },
+        { id: 'copy', params: { paths } },
+        {
+          id: 'paste',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+      ])
+    },
+    [createMenuHandler, currentDirectory, isFavorite, zephySchema],
+  )
+
   const handleContextMenuContent = useCallback(
     (e: MouseEvent, content: Content) =>
       createContentMenuHandler(content, selectedContents)(e),
@@ -171,6 +238,37 @@ const Explorer = () => {
     dispatch(blur())
   }, [dispatch])
 
+  const handleContextMenu = useMemo(
+    () =>
+      createMenuHandler([
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'cut', params: { paths: [] } },
+        { id: 'copy', params: { paths: [] } },
+        {
+          id: 'paste',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+      ]),
+    [
+      createMenuHandler,
+      currentDirectory,
+      currentSortOption.orderBy,
+      currentViewMode,
+      zephySchema,
+    ],
+  )
+
   const handleBlur = useCallback(
     () => window.electronAPI.applicationMenu.update({ isEditable: true }),
     [],
@@ -186,7 +284,7 @@ const Explorer = () => {
     <Box
       onBlur={handleBlur}
       onClick={handleClick}
-      onContextMenu={currentDirectoryMenuHandler}
+      onContextMenu={handleContextMenu}
       onFocus={handleFocus}
       sx={{ height: '100%', position: 'relative' }}
       {...createCurrentDirectoryDroppableBinder()}

@@ -42,19 +42,29 @@ import {
   back,
   changeDirectory,
   forward,
+  selectBackHistories,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectory,
+  selectCurrentSortOption,
+  selectCurrentViewMode,
+  selectForwardHistories,
+  selectIsSidebarHidden,
   selectZephySchema,
   selectZephyUrl,
   upward,
 } from 'store/window'
 
 const AddressBar = () => {
+  const backHistories = useAppSelector(selectBackHistories)
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const currentViewMode = useAppSelector(selectCurrentViewMode)
   const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
+  const forwardHistories = useAppSelector(selectForwardHistories)
+  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const loading = useAppSelector(selectLoading)
   const queryHistories = useAppSelector(selectQueryHistories)
   const zephyUrl = useAppSelector(selectZephyUrl)
@@ -63,8 +73,34 @@ const AddressBar = () => {
 
   const { visible } = useTrafficLights()
 
-  const { backHistoryMenuHandler, forwardHistoryMenuHandler, moreMenuHandler } =
-    useContextMenu()
+  const { createMenuHandler } = useContextMenu()
+
+  const backHistoryMenuHandler = useMemo(
+    () =>
+      createMenuHandler(
+        backHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: {
+            offset: -(i + 1),
+            title: history.title,
+          },
+        })),
+      ),
+    [backHistories, createMenuHandler],
+  )
+  const forwardHistoryMenuHandler = useMemo(
+    () =>
+      createMenuHandler(
+        forwardHistories.slice(0, 12).map((history, i) => ({
+          id: 'go',
+          params: {
+            offset: i + 1,
+            title: history.title,
+          },
+        })),
+      ),
+    [createMenuHandler, forwardHistories],
+  )
 
   const bindBack = useLongPress(backHistoryMenuHandler)
   const bindForward = useLongPress(forwardHistoryMenuHandler)
@@ -141,20 +177,55 @@ const AddressBar = () => {
 
   const handleClickSearch = useCallback(() => search(query), [query, search])
 
-  const handleChangeDirectory = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      setDirectory(value)
-    },
-    [],
-  )
-
   const handleClickRemove = useCallback(
     (e: MouseEvent, query: string) => {
       e.stopPropagation()
       dispatch(remove(query))
     },
     [dispatch],
+  )
+
+  const handleClickMore = useMemo(
+    () =>
+      createMenuHandler([
+        {
+          id: 'newFolder',
+          params: { path: zephySchema ? undefined : currentDirectory },
+        },
+        { id: 'separator' },
+        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'separator' },
+        {
+          id: 'sortBy',
+          params: { orderBy: currentSortOption.orderBy },
+        },
+        { id: 'separator' },
+        {
+          id: 'toggleNavigator',
+          params: { hidden: isSidebarHidden('primary') },
+        },
+        {
+          id: 'toggleInspector',
+          params: { hidden: isSidebarHidden('secondary') },
+        },
+        { id: 'separator' },
+        { id: 'settings' },
+      ]),
+    [
+      createMenuHandler,
+      currentDirectory,
+      currentSortOption.orderBy,
+      currentViewMode,
+      isSidebarHidden,
+      zephySchema,
+    ],
+  )
+  const handleChangeDirectory = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+      setDirectory(value)
+    },
+    [],
   )
 
   const handleChangeQuery = useCallback(
@@ -353,7 +424,7 @@ const AddressBar = () => {
               },
             }}
           />
-          <IconButton onClick={moreMenuHandler} size="small" title="Settings">
+          <IconButton onClick={handleClickMore} size="small" title="Settings">
             <MoreVertIcon fontSize="small" />
           </IconButton>
         </Box>

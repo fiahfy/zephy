@@ -2,6 +2,7 @@ import {
   KeyboardEvent,
   useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
 } from 'react'
@@ -46,7 +47,7 @@ const VideoPreview = (props: Props) => {
   const volume = useAppSelector(selectVolume)
   const appDispatch = useAppDispatch()
 
-  const { mediaMenuHandler } = useContextMenu()
+  const { createMenuHandler } = useContextMenu()
 
   const [{ thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -97,6 +98,11 @@ const VideoPreview = (props: Props) => {
     }
   }, [entry.path])
 
+  const handleContextMenu = useMemo(
+    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
+    [createMenuHandler, loop],
+  )
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const el = ref.current
     if (!el) {
@@ -122,7 +128,7 @@ const VideoPreview = (props: Props) => {
   return (
     <video
       controls
-      onContextMenu={mediaMenuHandler}
+      onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
       onVolumeChange={handleVolumeChange}
       poster={thumbnail}

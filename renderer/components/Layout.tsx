@@ -1,6 +1,6 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
 import Head from 'next/head'
-import { ReactNode } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 import AddressBar from 'components/AddressBar'
 import Inspector from 'components/Inspector'
@@ -19,14 +19,19 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  const { defaultMenuHandler } = useContextMenu()
+  const { createMenuHandler } = useContextMenu()
   useEventListener()
   useMessageListener()
   const title = useTitle()
 
+  const handleContextMenu = useMemo(
+    () => createMenuHandler([]),
+    [createMenuHandler],
+  )
+
   return (
     <Box
-      onContextMenu={defaultMenuHandler}
+      onContextMenu={handleContextMenu}
       sx={{
         display: 'flex',
         height: '100%',
