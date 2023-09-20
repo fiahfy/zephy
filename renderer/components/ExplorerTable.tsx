@@ -195,6 +195,7 @@ const ExplorerTable = (props: Props) => {
         ref={parentRef}
         sx={{
           flexGrow: 1,
+          overflowX: 'hidden',
           overflowY: 'scroll',
         }}
       >

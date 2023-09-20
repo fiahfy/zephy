@@ -180,6 +180,7 @@ const ExplorerGrid = (props: Props) => {
         ref={parentRef}
         sx={{
           height: '100%',
+          overflowX: 'hidden',
           overflowY: 'scroll',
         }}
       >
