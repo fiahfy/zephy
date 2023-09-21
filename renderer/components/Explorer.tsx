@@ -224,10 +224,10 @@ const Explorer = () => {
     [open, selectedContents],
   )
 
-  const handleScroll = useCallback(
-    (e: Event) => {
-      if (!loading && e.target instanceof HTMLElement) {
-        dispatch(setCurrentScrollTop(e.target.scrollTop))
+  const handleScrollEnd = useCallback(
+    (scrollTop: number) => {
+      if (!loading) {
+        dispatch(setCurrentScrollTop(scrollTop))
       }
     },
     [dispatch, loading],
@@ -304,7 +304,7 @@ const Explorer = () => {
           onDoubleClickContent: handleDoubleClickContent,
           onKeyDownArrow: handleKeyDownArrow,
           onKeyDownEnter: handleKeyDownEnter,
-          onScroll: handleScroll,
+          onScrollEnd: handleScrollEnd,
           scrollTop: currentScrollTop,
           sortOption: currentSortOption,
         },

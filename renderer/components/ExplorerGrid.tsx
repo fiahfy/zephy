@@ -28,7 +28,7 @@ type Props = {
   onDoubleClickContent: (e: MouseEvent, content: Content) => void
   onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent) => void
-  onScroll: (e: Event) => void
+  onScrollEnd: (scrollTop: number) => void
   scrollTop: number
 }
 
@@ -45,7 +45,7 @@ const ExplorerGrid = (props: Props) => {
     onDoubleClickContent,
     onKeyDownArrow,
     onKeyDownEnter,
-    onScroll,
+    onScrollEnd,
     scrollTop,
   } = props
 
@@ -54,53 +54,6 @@ const ExplorerGrid = (props: Props) => {
   const parentRef = useRef<HTMLDivElement>(null)
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
-
-  useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
-    }
-    const handleResize = (entries: ResizeObserverEntry[]) => {
-      const entry = entries[0]
-      if (entry) {
-        setWrapperWidth(entry.contentRect.width)
-      }
-    }
-    const observer = new ResizeObserver(handleResize)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [onScroll])
-
-  useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
-    }
-    el.addEventListener('scroll', onScroll)
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [onScroll])
-
-  useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
-    }
-    if (previousLoading && !loading) {
-      el.scrollTop = scrollTop
-    }
-  }, [loading, previousLoading, scrollTop])
-
-  useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
-    }
-    const focusedEl = el.querySelector('.focused')
-    if (!focusedEl) {
-      return
-    }
-    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [focused])
 
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
@@ -119,22 +72,87 @@ const ExplorerGrid = (props: Props) => {
     [columns, contents],
   )
 
-  const focus = useCallback(
-    (e: KeyboardEvent, row: number, column: number, focused: boolean) => {
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => size,
+    overscan: 5,
+  })
+
+  useEffect(() => {
+    const el = parentRef.current
+    if (!el) {
+      return
+    }
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      const entry = entries[0]
+      if (entry) {
+        setWrapperWidth(entry.contentRect.width)
+      }
+    }
+    const observer = new ResizeObserver(handleResize)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const el = parentRef.current
+    if (!el) {
+      return
+    }
+    const handler = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        onScrollEnd(e.target.scrollTop)
+      }
+    }
+    el.addEventListener('scrollend', handler)
+    return () => el.removeEventListener('scrollend', handler)
+  }, [onScrollEnd])
+
+  useEffect(() => {
+    if (previousLoading && !loading) {
+      virtualizer.scrollToOffset(scrollTop)
+    }
+  }, [loading, previousLoading, scrollTop, virtualizer])
+
+  useEffect(() => {
+    if (focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        const rowIndex = Math.floor(index / columns)
+        virtualizer.scrollToIndex(rowIndex)
+      }
+    }
+  }, [columns, contents, focused, loading, virtualizer])
+
+  const focusBy = useCallback(
+    (e: KeyboardEvent, rowOffset: number, columnOffset: number) => {
+      const index = contents.findIndex((content) => content.path === focused)
+      const rowIndex = Math.floor(index / columns)
+      const columnIndex = index % columns
       const content =
-        rows[row - 1]?.[column - 1] ?? (focused ? undefined : rows[0]?.[0])
+        index >= 0
+          ? rows[rowIndex + rowOffset]?.[columnIndex + columnOffset]
+          : rows[0]?.[0]
       if (content) {
         onKeyDownArrow(e, content)
       }
     },
-    [onKeyDownArrow, rows],
+    [columns, contents, focused, onKeyDownArrow, rows],
+  )
+
+  const focusTo = useCallback(
+    (e: KeyboardEvent, position: 'first' | 'last') => {
+      const content = contents[position === 'first' ? 0 : contents.length - 1]
+      if (content) {
+        onKeyDownArrow(e, content)
+      }
+    },
+    [contents, onKeyDownArrow],
   )
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const el = parentRef.current?.querySelector('.focused')
-      const row = Number(el?.getAttribute('aria-rowindex'))
-      const col = Number(el?.getAttribute('aria-colindex'))
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
@@ -142,24 +160,21 @@ const ExplorerGrid = (props: Props) => {
           }
           return
         case 'ArrowUp':
-          return focus(e, row - 1, col, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'first')
+            : focusBy(e, -1, 0)
         case 'ArrowDown':
-          return focus(e, row + 1, col, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'last')
+            : focusBy(e, 1, 0)
         case 'ArrowLeft':
-          return focus(e, row, col - 1, !!el)
+          return focusBy(e, 0, -1)
         case 'ArrowRight':
-          return focus(e, row, col + 1, !!el)
+          return focusBy(e, 0, 1)
       }
     },
-    [focus, onKeyDownEnter],
+    [focusBy, focusTo, onKeyDownEnter],
   )
-
-  const virtualizer = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => size,
-    overscan: 20,
-  })
 
   return (
     <Box
@@ -201,7 +216,7 @@ const ExplorerGrid = (props: Props) => {
                     }}
                   >
                     {columns.map((content, columnIndex) => (
-                      <Box key={columnIndex} sx={{ p: 0.0625, width: size }}>
+                      <Box key={content.path} sx={{ p: 0.0625, width: size }}>
                         <ExplorerGridItem
                           aria-colindex={columnIndex + 1}
                           aria-rowindex={virtualRow.index + 1}

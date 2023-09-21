@@ -66,7 +66,7 @@ type Props = {
   onDoubleClickContent: (e: MouseEvent, content: Content) => void
   onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent) => void
-  onScroll: (e: Event) => void
+  onScrollEnd: (scrollTop: number) => void
   scrollTop: number
   sortOption: { order: Order; orderBy: Key }
 }
@@ -85,7 +85,7 @@ const ExplorerTable = (props: Props) => {
     onDoubleClickContent,
     onKeyDownArrow,
     onKeyDownEnter,
-    onScroll,
+    onScrollEnd,
     scrollTop,
     sortOption,
   } = props
@@ -94,40 +94,56 @@ const ExplorerTable = (props: Props) => {
 
   const parentRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
-    }
-    el.addEventListener('scroll', onScroll)
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [onScroll])
+  const virtualizer = useVirtualizer({
+    count: contents.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => rowHeight,
+    overscan: 20,
+  })
 
   useEffect(() => {
     const el = parentRef.current
     if (!el) {
       return
     }
+    const handler = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        onScrollEnd(e.target.scrollTop)
+      }
+    }
+    el.addEventListener('scrollend', handler)
+    return () => el.removeEventListener('scrollend', handler)
+  }, [onScrollEnd])
+
+  useEffect(() => {
     if (previousLoading && !loading) {
-      el.scrollTop = scrollTop
+      virtualizer.scrollToOffset(scrollTop)
     }
-  }, [loading, previousLoading, scrollTop])
+  }, [loading, previousLoading, scrollTop, virtualizer])
 
   useEffect(() => {
-    const el = parentRef.current
-    if (!el) {
-      return
+    if (focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        virtualizer.scrollToIndex(index)
+      }
     }
-    const focusedEl = el.querySelector('.focused')
-    if (!focusedEl) {
-      return
-    }
-    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [focused])
+  }, [contents, focused, loading, virtualizer])
 
-  const focus = useCallback(
-    (e: KeyboardEvent, row: number, focused: boolean) => {
-      const content = contents[row - 1] ?? (focused ? undefined : contents[0])
+  const focusBy = useCallback(
+    (e: KeyboardEvent, offset: number) => {
+      const index = contents.findIndex((content) => content.path === focused)
+      const content = index >= 0 ? contents[index + offset] : contents[0]
+      if (content) {
+        onKeyDownArrow(e, content)
+      }
+    },
+    [contents, focused, onKeyDownArrow],
+  )
+
+  const focusTo = useCallback(
+    (e: KeyboardEvent, position: 'first' | 'last') => {
+      const content = contents[position === 'first' ? 0 : contents.length - 1]
       if (content) {
         onKeyDownArrow(e, content)
       }
@@ -137,8 +153,6 @@ const ExplorerTable = (props: Props) => {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const el = parentRef.current?.querySelector('.focused')
-      const row = Number(el?.getAttribute('aria-rowindex'))
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
@@ -146,20 +160,17 @@ const ExplorerTable = (props: Props) => {
           }
           return
         case 'ArrowUp':
-          return focus(e, row - 1, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'first')
+            : focusBy(e, -1)
         case 'ArrowDown':
-          return focus(e, row + 1, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'last')
+            : focusBy(e, 1)
       }
     },
-    [focus, onKeyDownEnter],
+    [focusBy, focusTo, onKeyDownEnter],
   )
-
-  const virtualizer = useVirtualizer({
-    count: contents.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => rowHeight,
-    overscan: 20,
-  })
 
   return (
     <Box
@@ -204,7 +215,7 @@ const ExplorerTable = (props: Props) => {
             const content = contents[virtualRow.index] as Content
             return (
               <Box
-                key={virtualRow.index}
+                key={content.path}
                 sx={{
                   height: `${virtualRow.size}px`,
                   transform: `translateY(${
