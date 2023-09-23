@@ -68,9 +68,9 @@
     "format": "prettier -c --ignore-path .gitignore .",
     "lint": "eslint --ext .js,.ts,.tsx --ignore-path .gitignore .",
     "package": "npm run build && electron-builder",
-    "package-dir": "npm run build && electron-builder --dir",
+    "package-dir": "npm run package --dir",
     "prepare": "husky install",
-    "release": "npm run build && electron-builder -mlw -c.snap.publish=github",
+    "release": "npm run package -mlw",
     "test": "npm run format && npm run lint && npm run type-check",
     "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
   }

@@ -12,6 +12,6 @@ jobs:
         with:
           node-version: 20
       - run: yarn
-      - run: yarn package -m
+      - run: yarn package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
