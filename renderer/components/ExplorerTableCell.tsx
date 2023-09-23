@@ -95,7 +95,7 @@ const ExplorerTableCell = (props: Props) => {
         : {})}
     >
       {dataKey === 'name' && (
-        <Box sx={{ display: 'flex', gap: 0.5, maxWidth: '100%' }}>
+        <Box sx={{ display: 'flex', flexGrow: 1, gap: 0.5, maxWidth: '100%' }}>
           <EntryIcon entry={content} />
           {editing ? (
             <Box
