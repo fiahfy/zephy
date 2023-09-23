@@ -28,7 +28,7 @@ const AudioPreview = (props: Props) => {
   const volume = useAppSelector(selectVolume)
   const dispatch = useAppDispatch()
 
-  const { mediaMenuHandler } = useContextMenu()
+  const { createMenuHandler } = useContextMenu()
 
   const ref = useRef<HTMLAudioElement>(null)
   const [paused, setPaused] = useState(true)
@@ -76,6 +76,11 @@ const AudioPreview = (props: Props) => {
     el.focus()
   }, [])
 
+  const handleContextMenu = useMemo(
+    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
+    [createMenuHandler, loop],
+  )
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const el = ref.current
     if (!el) {
@@ -110,7 +115,7 @@ const AudioPreview = (props: Props) => {
         }}
       />
       <Box
-        onContextMenu={mediaMenuHandler}
+        onContextMenu={handleContextMenu}
         sx={{
           aspectRatio: '16 / 9',
           display: 'flex',

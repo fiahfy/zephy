@@ -9,7 +9,7 @@ import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectShouldShowHiddenFiles } from 'store/settings'
 import { changeDirectory } from 'store/window'
-import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
+import { isHiddenFile } from 'utils/file'
 
 type State = {
   loading: boolean
@@ -58,9 +58,9 @@ const DirectoryPreviewItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const urls = await (async () => {
+      const paths = await (async () => {
         if (entry.type === 'file') {
-          return [entry.url]
+          return [entry.path]
         }
 
         try {
@@ -70,12 +70,12 @@ const DirectoryPreviewItem = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.url)
+            .map((entry) => entry.path)
         } catch (e) {
           return []
         }
       })()
-      const thumbnail = await createThumbnailIfNeeded(urls)
+      const thumbnail = await window.electronAPI.createThumbnailUrl(paths)
       if (unmounted) {
         return
       }

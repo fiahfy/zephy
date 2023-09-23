@@ -1,3 +1,4 @@
+// @see https://mui.com/material-ui/guides/minimizing-bundle-size/
 module.exports = {
   presets: ['next/babel'],
   plugins: [
@@ -18,15 +19,6 @@ module.exports = {
         camel2DashComponentName: false,
       },
       'icons',
-    ],
-    [
-      'babel-plugin-import',
-      {
-        libraryName: '@mui/lab',
-        libraryDirectory: '',
-        camel2DashComponentName: false,
-      },
-      'lab',
     ],
   ],
 }

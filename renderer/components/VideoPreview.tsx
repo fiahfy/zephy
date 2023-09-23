@@ -2,6 +2,7 @@ import {
   KeyboardEvent,
   useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
 } from 'react'
@@ -10,7 +11,6 @@ import useContextMenu from 'hooks/useContextMenu'
 import { Entry } from 'interfaces'
 import { useAppDispatch, useAppSelector } from 'store'
 import { selectLoop, selectVolume, setLoop, setVolume } from 'store/preview'
-import { createThumbnailIfNeeded } from 'utils/file'
 
 type State = {
   loading: boolean
@@ -47,7 +47,7 @@ const VideoPreview = (props: Props) => {
   const volume = useAppSelector(selectVolume)
   const appDispatch = useAppDispatch()
 
-  const { mediaMenuHandler } = useContextMenu()
+  const { createMenuHandler } = useContextMenu()
 
   const [{ thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -86,7 +86,7 @@ const VideoPreview = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnail = await createThumbnailIfNeeded(entry.url)
+      const thumbnail = await window.electronAPI.createThumbnailUrl(entry.path)
       if (unmounted) {
         return
       }
@@ -96,7 +96,12 @@ const VideoPreview = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path, entry.url])
+  }, [entry.path])
+
+  const handleContextMenu = useMemo(
+    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
+    [createMenuHandler, loop],
+  )
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const el = ref.current
@@ -123,7 +128,7 @@ const VideoPreview = (props: Props) => {
   return (
     <video
       controls
-      onContextMenu={mediaMenuHandler}
+      onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
       onVolumeChange={handleVolumeChange}
       poster={thumbnail}

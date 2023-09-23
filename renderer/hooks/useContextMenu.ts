@@ -1,18 +1,8 @@
-import { MouseEvent, useCallback, useMemo } from 'react'
+import { MouseEvent, useCallback } from 'react'
 
 import { ContextMenuOption, Entry } from 'interfaces'
 import { useAppSelector } from 'store'
 import { selectIsFavorite } from 'store/favorite'
-import {
-  selectBackHistories,
-  selectCurrentDirectory,
-  selectCurrentSortOption,
-  selectCurrentViewMode,
-  selectForwardHistories,
-  selectIsSidebarHidden,
-  selectZephySchema,
-} from 'store/window'
-import { selectLoop } from 'store/preview'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
   return async (e: MouseEvent) => {
@@ -34,110 +24,7 @@ const createMenuHandler = (options?: ContextMenuOption[]) => {
 }
 
 const useContextMenu = () => {
-  const backHistories = useAppSelector(selectBackHistories)
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
-  const currentSortOption = useAppSelector(selectCurrentSortOption)
-  const currentViewMode = useAppSelector(selectCurrentViewMode)
-  const forwardHistories = useAppSelector(selectForwardHistories)
   const isFavorite = useAppSelector(selectIsFavorite)
-  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
-  const loop = useAppSelector(selectLoop)
-  const zephySchema = useAppSelector(selectZephySchema)
-
-  const defaultMenuHandler = useMemo(() => createMenuHandler(), [])
-
-  const mediaMenuHandler = useMemo(
-    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
-    [loop],
-  )
-
-  const backHistoryMenuHandler = useMemo(
-    () =>
-      createMenuHandler(
-        backHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
-          params: {
-            offset: -(i + 1),
-            title: history.title,
-          },
-        })),
-      ),
-    [backHistories],
-  )
-
-  const forwardHistoryMenuHandler = useMemo(
-    () =>
-      createMenuHandler(
-        forwardHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
-          params: {
-            offset: i + 1,
-            title: history.title,
-          },
-        })),
-      ),
-    [forwardHistories],
-  )
-
-  const moreMenuHandler = useMemo(
-    () =>
-      createMenuHandler([
-        {
-          id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
-        { id: 'separator' },
-        {
-          id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
-        },
-        { id: 'separator' },
-        {
-          id: 'toggleNavigator',
-          params: { hidden: isSidebarHidden('primary') },
-        },
-        {
-          id: 'toggleInspector',
-          params: { hidden: isSidebarHidden('secondary') },
-        },
-        { id: 'separator' },
-        { id: 'settings' },
-      ]),
-    [
-      currentDirectory,
-      currentSortOption.orderBy,
-      currentViewMode,
-      isSidebarHidden,
-      zephySchema,
-    ],
-  )
-
-  const currentDirectoryMenuHandler = useMemo(
-    () =>
-      createMenuHandler([
-        {
-          id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'cut', params: { paths: [] } },
-        { id: 'copy', params: { paths: [] } },
-        {
-          id: 'paste',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-        { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
-        { id: 'separator' },
-        {
-          id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
-        },
-      ]),
-    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
-  )
 
   const createEntryMenuHandler = useCallback(
     (entry: Entry) => {
@@ -184,77 +71,9 @@ const useContextMenu = () => {
     [isFavorite],
   )
 
-  const createContentMenuHandler = useCallback(
-    (entry: Entry, selectedEntries: Entry[]) => {
-      const directory = entry.type === 'directory'
-      const path = entry.path
-      const selectedPaths = selectedEntries.map((e) => e.path)
-      const paths = selectedPaths.includes(path) ? selectedPaths : [path]
-      return createMenuHandler([
-        ...(paths.length === 1
-          ? [
-              {
-                id: directory ? 'openDirectory' : 'open',
-                params: { path },
-              },
-              ...(directory
-                ? [
-                    {
-                      id: 'openDirectoryInNewWindow',
-                      params: { path },
-                    },
-                  ]
-                : []),
-              {
-                id: 'revealInFinder',
-                params: { path },
-              },
-              { id: 'separator' },
-              {
-                id: 'copyPath',
-                params: { path },
-              },
-              { id: 'separator' },
-              ...(directory
-                ? [
-                    {
-                      id: 'toggleFavorite',
-                      params: { path, favorite: isFavorite(path) },
-                    },
-                  ]
-                : []),
-              { id: 'separator' },
-              {
-                id: 'rename',
-                params: { path },
-              },
-            ]
-          : []),
-        {
-          id: 'moveToTrash',
-          params: { paths },
-        },
-        { id: 'separator' },
-        { id: 'cut', params: { paths } },
-        { id: 'copy', params: { paths } },
-        {
-          id: 'paste',
-          params: { path: zephySchema ? undefined : currentDirectory },
-        },
-      ])
-    },
-    [currentDirectory, isFavorite, zephySchema],
-  )
-
   return {
-    backHistoryMenuHandler,
-    createContentMenuHandler,
+    createMenuHandler,
     createEntryMenuHandler,
-    currentDirectoryMenuHandler,
-    defaultMenuHandler,
-    forwardHistoryMenuHandler,
-    mediaMenuHandler,
-    moreMenuHandler,
   }
 }
 

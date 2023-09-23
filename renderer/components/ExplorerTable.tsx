@@ -1,6 +1,5 @@
 import { Box, LinearProgress, Typography } from '@mui/material'
-import { alpha } from '@mui/material/styles'
-import clsx from 'clsx'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   KeyboardEvent,
   MouseEvent,
@@ -8,18 +7,10 @@ import {
   useEffect,
   useRef,
 } from 'react'
-import {
-  AutoSizer,
-  Column,
-  RowMouseEventHandlerParams,
-  Table,
-  TableCellProps,
-  TableHeaderProps,
-  TableRowProps,
-} from 'react-virtualized'
 
 import ExplorerTableCell from 'components/ExplorerTableCell'
 import ExplorerTableHeaderCell from 'components/ExplorerTableHeaderCell'
+import ExplorerTableRow from 'components/ExplorerTableRow'
 import usePrevious from 'hooks/usePrevious'
 import { Content } from 'interfaces'
 
@@ -62,92 +53,6 @@ const columns: ColumnType[] = [
   },
 ]
 
-const getWidths = (wrapperWidth: number) => {
-  const widths = columns.map((column) => column.width)
-  const flexibleNum = widths.filter((width) => width === undefined).length
-  if (flexibleNum === 0) {
-    return widths
-  }
-  const sumWidth = widths.reduce<number>((acc, width) => acc + (width ?? 0), 0)
-  // 10px is custom scrollbar width
-  const flexibleWidth = (wrapperWidth - sumWidth - 10) / flexibleNum
-  return widths.map((width) => (width === undefined ? flexibleWidth : width))
-}
-
-// @see https://github.com/bvaughn/react-virtualized/blob/master/source/Table/defaultRowRenderer.js
-const rowRenderer = ({
-  className,
-  columns,
-  index,
-  key,
-  onRowClick,
-  onRowDoubleClick,
-  onRowMouseOut,
-  onRowMouseOver,
-  onRowRightClick,
-  rowData,
-  style,
-}: TableRowProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const a11yProps: any = { 'aria-rowindex': index + 1 }
-
-  if (
-    onRowClick ||
-    onRowDoubleClick ||
-    onRowMouseOut ||
-    onRowMouseOver ||
-    onRowRightClick
-  ) {
-    a11yProps['aria-label'] = 'row'
-    // a11yProps.tabIndex = 0
-
-    if (onRowClick) {
-      a11yProps.onClick = (event: MouseEvent) =>
-        onRowClick({ event, index, rowData })
-    }
-    if (onRowDoubleClick) {
-      a11yProps.onDoubleClick = (event: MouseEvent) =>
-        onRowDoubleClick({ event, index, rowData })
-    }
-    if (onRowMouseOut) {
-      a11yProps.onMouseOut = (event: MouseEvent) =>
-        onRowMouseOut({ event, index, rowData })
-    }
-    if (onRowMouseOver) {
-      a11yProps.onMouseOver = (event: MouseEvent) =>
-        onRowMouseOver({ event, index, rowData })
-    }
-    if (onRowRightClick) {
-      a11yProps.onContextMenu = (event: MouseEvent) =>
-        onRowRightClick({ event, index, rowData })
-    }
-  }
-
-  return (
-    <div
-      {...a11yProps}
-      className={className}
-      key={key}
-      role="row"
-      style={style}
-    >
-      {columns}
-    </div>
-  )
-}
-
-const cellRenderer = ({ dataKey, rowData }: TableCellProps) => {
-  const align = columns.find((column) => column.key === dataKey)?.align
-  return (
-    <ExplorerTableCell
-      align={align}
-      content={rowData}
-      dataKey={dataKey as Key}
-      height={rowHeight}
-    />
-  )
-}
-
 type Props = {
   contentFocused: (content: Content) => boolean
   contentSelected: (content: Content) => boolean
@@ -161,7 +66,7 @@ type Props = {
   onDoubleClickContent: (e: MouseEvent, content: Content) => void
   onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent) => void
-  onScroll: (e: Event) => void
+  onScrollEnd: (scrollTop: number) => void
   scrollTop: number
   sortOption: { order: Order; orderBy: Key }
 }
@@ -180,49 +85,65 @@ const ExplorerTable = (props: Props) => {
     onDoubleClickContent,
     onKeyDownArrow,
     onKeyDownEnter,
-    onScroll,
+    onScrollEnd,
     scrollTop,
     sortOption,
   } = props
 
   const previousLoading = usePrevious(loading)
 
-  const ref = useRef<HTMLElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const virtualizer = useVirtualizer({
+    count: contents.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => rowHeight,
+    overscan: 20,
+  })
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
+    const el = parentRef.current
     if (!el) {
       return
     }
-    el.addEventListener('scroll', onScroll)
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [onScroll])
+    const handler = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        onScrollEnd(e.target.scrollTop)
+      }
+    }
+    el.addEventListener('scrollend', handler)
+    return () => el.removeEventListener('scrollend', handler)
+  }, [onScrollEnd])
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
-    if (!el) {
-      return
-    }
     if (previousLoading && !loading) {
-      el.scrollTop = scrollTop
+      virtualizer.scrollToOffset(scrollTop)
     }
-  }, [loading, previousLoading, scrollTop])
+  }, [loading, previousLoading, scrollTop, virtualizer])
 
   useEffect(() => {
-    const el = ref.current?.querySelector('.ReactVirtualized__Grid')
-    if (!el) {
-      return
+    if (focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        virtualizer.scrollToIndex(index)
+      }
     }
-    const focusedEl = el.querySelector('.focused')
-    if (!focusedEl) {
-      return
-    }
-    focusedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [focused])
+  }, [contents, focused, loading, virtualizer])
 
-  const focus = useCallback(
-    (e: KeyboardEvent, row: number, focused: boolean) => {
-      const content = contents[row - 1] ?? (focused ? undefined : contents[0])
+  const focusBy = useCallback(
+    (e: KeyboardEvent, offset: number) => {
+      const index = contents.findIndex((content) => content.path === focused)
+      const content = index >= 0 ? contents[index + offset] : contents[0]
+      if (content) {
+        onKeyDownArrow(e, content)
+      }
+    },
+    [contents, focused, onKeyDownArrow],
+  )
+
+  const focusTo = useCallback(
+    (e: KeyboardEvent, position: 'first' | 'last') => {
+      const content = contents[position === 'first' ? 0 : contents.length - 1]
       if (content) {
         onKeyDownArrow(e, content)
       }
@@ -232,8 +153,6 @@ const ExplorerTable = (props: Props) => {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const el = ref.current?.querySelector('.focused')
-      const row = Number(el?.getAttribute('aria-rowindex'))
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
@@ -241,143 +160,112 @@ const ExplorerTable = (props: Props) => {
           }
           return
         case 'ArrowUp':
-          return focus(e, row - 1, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'first')
+            : focusBy(e, -1)
         case 'ArrowDown':
-          return focus(e, row + 1, !!el)
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo(e, 'last')
+            : focusBy(e, 1)
       }
     },
-    [focus, onKeyDownEnter],
-  )
-
-  const handleRowClick = useCallback(
-    (info: RowMouseEventHandlerParams) =>
-      onClickContent(info.event, info.rowData),
-    [onClickContent],
-  )
-
-  const handleRowDoubleClick = useCallback(
-    (info: RowMouseEventHandlerParams) =>
-      onDoubleClickContent(info.event, info.rowData),
-    [onDoubleClickContent],
-  )
-
-  const handleRowRightClick = useCallback(
-    (info: RowMouseEventHandlerParams) =>
-      onContextMenuContent(info.event, info.rowData),
-    [onContextMenuContent],
-  )
-
-  const headerRenderer = useCallback(
-    ({ dataKey, label }: TableHeaderProps) => (
-      <ExplorerTableHeaderCell
-        dataKey={dataKey as Key}
-        height={headerHeight}
-        label={label}
-        onChangeOrderBy={onChangeOrderBy}
-        sortOption={sortOption}
-      />
-    ),
-    [onChangeOrderBy, sortOption],
+    [focusBy, focusTo, onKeyDownEnter],
   )
 
   return (
     <Box
       onKeyDown={handleKeyDown}
-      ref={ref}
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
         height: '100%',
-        '.ReactVirtualized__Table__headerRow': {
-          display: 'flex',
-          '.ReactVirtualized__Table__headerColumn': {
-            overflow: 'hidden',
-          },
-        },
-        '.ReactVirtualized__Grid': {
-          outline: 'none',
-          '&:focus-visible': {
-            '.ReactVirtualized__Table__row.focused': {
-              outline: '-webkit-focus-ring-color auto 1px',
-            },
-          },
-          '.ReactVirtualized__Table__row': {
-            cursor: 'pointer',
-            display: 'flex',
-            '&:hover': {
-              backgroundColor: (theme) => theme.palette.action.hover,
-            },
-            '&.selected': {
-              backgroundColor: (theme) =>
-                alpha(
-                  theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity,
-                ),
-              '&:hover': {
-                backgroundColor: (theme) =>
-                  alpha(
-                    theme.palette.primary.main,
-                    theme.palette.action.selectedOpacity +
-                      theme.palette.action.hoverOpacity,
-                  ),
-              },
-            },
+        outline: 'none',
+        position: 'relative',
+        '&:focus-visible': {
+          '.focused': {
+            outline: '-webkit-focus-ring-color auto 1px',
           },
         },
       }}
+      tabIndex={0}
     >
-      <AutoSizer>
-        {({ height, width }) => {
-          const widths = getWidths(width)
-          return (
-            <Table
-              gridStyle={{ overflowY: 'scroll' }}
-              headerHeight={headerHeight}
-              height={height}
-              noRowsRenderer={() => (
-                <Box
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    height: `calc(100% - ${headerHeight}px)`,
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Typography variant="caption">{noDataText}</Typography>
-                </Box>
-              )}
-              onRowClick={handleRowClick}
-              onRowDoubleClick={handleRowDoubleClick}
-              onRowRightClick={handleRowRightClick}
-              rowClassName={({ index }) => {
-                // @see https://github.com/bvaughn/react-virtualized/issues/1357
-                const content = contents[index]
-                return content
-                  ? clsx({
-                      focused: contentFocused(content),
-                      selected: contentSelected(content),
-                    })
-                  : ''
-              }}
-              rowCount={contents.length}
-              rowGetter={({ index }) => contents[index]}
-              rowHeight={rowHeight}
-              rowRenderer={rowRenderer}
-              width={width}
-            >
-              {columns.map(({ key, label }, index) => (
-                <Column
-                  cellRenderer={cellRenderer}
-                  dataKey={key}
-                  headerRenderer={headerRenderer}
-                  key={key}
-                  label={label}
-                  width={widths[index] ?? 0}
-                />
-              ))}
-            </Table>
-          )
+      <Box sx={{ display: 'flex', pr: '10px' }}>
+        {columns.map((column) => (
+          <ExplorerTableHeaderCell
+            dataKey={column.key}
+            height={headerHeight}
+            key={column.key}
+            label={column.label}
+            onChangeOrderBy={onChangeOrderBy}
+            sortOption={sortOption}
+            width={column.width}
+          />
+        ))}
+      </Box>
+      <Box
+        ref={parentRef}
+        sx={{
+          flexGrow: 1,
+          overflowX: 'hidden',
+          overflowY: 'scroll',
         }}
-      </AutoSizer>
-      {loading && <LinearProgress />}
+      >
+        <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+          {virtualizer.getVirtualItems().map((virtualRow, index) => {
+            const content = contents[virtualRow.index] as Content
+            return (
+              <Box
+                key={content.path}
+                sx={{
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${
+                    virtualRow.start - index * virtualRow.size
+                  }px)`,
+                }}
+              >
+                <ExplorerTableRow
+                  aria-rowindex={virtualRow.index + 1}
+                  focused={contentFocused(content)}
+                  onClick={(e) => onClickContent(e, content)}
+                  onContextMenu={(e) => onContextMenuContent(e, content)}
+                  onDoubleClick={(e) => onDoubleClickContent(e, content)}
+                  selected={contentSelected(content)}
+                >
+                  {columns.map((column) => (
+                    <ExplorerTableCell
+                      align={column.align}
+                      content={content}
+                      dataKey={column.key}
+                      height={rowHeight}
+                      key={column.key}
+                      width={column.width}
+                    />
+                  ))}
+                </ExplorerTableRow>
+              </Box>
+            )
+          })}
+        </Box>
+      </Box>
+      {contents.length === 0 && (
+        <Box
+          sx={{
+            alignItems: 'center',
+            display: 'flex',
+            height: '100%',
+            inset: 0,
+            justifyContent: 'center',
+            position: 'absolute',
+          }}
+        >
+          <Typography variant="caption">{noDataText}</Typography>
+        </Box>
+      )}
+      {loading && (
+        <LinearProgress
+          sx={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 1 }}
+        />
+      )}
     </Box>
   )
 }

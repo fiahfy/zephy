@@ -1,5 +1,5 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
-import { MouseEvent, SyntheticEvent, useCallback, useMemo } from 'react'
+import { SyntheticEvent, useCallback, useMemo } from 'react'
 
 import EntryIcon from 'components/EntryIcon'
 import NoOutlineRating from 'components/mui/NoOutlineRating'
@@ -23,10 +23,11 @@ type Props = {
   content: Content
   dataKey: Key
   height: number
+  width?: number
 }
 
 const ExplorerTableCell = (props: Props) => {
-  const { align, content, height, dataKey } = props
+  const { align, content, dataKey, height, width } = props
 
   const isEditing = useAppSelector(selectIsEditing)
   const isSelected = useAppSelector(selectIsSelected)
@@ -56,9 +57,18 @@ const ExplorerTableCell = (props: Props) => {
     [content.path, dispatch],
   )
 
-  const handleClickRating = useCallback(
-    (e: MouseEvent) => e.stopPropagation(),
-    [],
+  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
+  const rating = useMemo(
+    () => (
+      <NoOutlineRating
+        onChange={handleChangeRating}
+        onClick={(e) => e.stopPropagation()}
+        precision={0.5}
+        size="small"
+        value={content.rating}
+      />
+    ),
+    [content.rating, handleChangeRating],
   )
 
   return (
@@ -66,14 +76,15 @@ const ExplorerTableCell = (props: Props) => {
       align={align}
       component="div"
       sx={{
-        alignItems: 'center',
         borderBottom: 'none',
         display: 'flex',
-        gap: 0.5,
+        flexGrow: width ? 0 : 1,
+        flexShrink: width ? 0 : 1,
         height,
-        position: 'relative',
+        minWidth: 0,
         px: 1,
         py: 0,
+        width,
       }}
       title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'
@@ -84,7 +95,7 @@ const ExplorerTableCell = (props: Props) => {
         : {})}
     >
       {dataKey === 'name' && (
-        <>
+        <Box sx={{ display: 'flex', flexGrow: 1, gap: 0.5, maxWidth: '100%' }}>
           <EntryIcon entry={content} />
           {editing ? (
             <Box
@@ -102,18 +113,9 @@ const ExplorerTableCell = (props: Props) => {
               {content.name}
             </Typography>
           )}
-        </>
+        </Box>
       )}
-      {/* TODO: improve performance on development */}
-      {dataKey === 'rating' && (
-        <NoOutlineRating
-          onChange={handleChangeRating}
-          onClick={handleClickRating}
-          precision={0.5}
-          size="small"
-          value={content.rating}
-        />
-      )}
+      {dataKey === 'rating' && rating}
       {dataKey === 'size' && content.type === 'file' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}

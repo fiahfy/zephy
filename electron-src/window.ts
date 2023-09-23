@@ -18,6 +18,7 @@ const windowManager = <T>(
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
+  // TODO: refactor
   ipcMain.handle('window-get-details', (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
     if (!windowId) {

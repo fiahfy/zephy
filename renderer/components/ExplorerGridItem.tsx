@@ -25,14 +25,14 @@ import {
 } from 'store/explorer'
 import { rate } from 'store/rating'
 import { selectShouldShowHiddenFiles } from 'store/settings'
-import { createThumbnailIfNeeded, isHiddenFile } from 'utils/file'
+import { isHiddenFile } from 'utils/file'
 
-type State = { loading: boolean; thumbnail?: string; urls: string[] }
+type State = { itemCount: number; loading: boolean; thumbnail?: string }
 
 type Action =
   | {
       type: 'loaded'
-      payload: { thumbnail?: string; urls: string[] }
+      payload: { itemCount: number; thumbnail?: string }
     }
   | { type: 'loading' }
 
@@ -44,32 +44,24 @@ const reducer = (_state: State, action: Action) => {
         loading: false,
       }
     case 'loading':
-      return { loading: true, thumbnail: undefined, urls: [] }
+      return { itemCount: 0, loading: true, thumbnail: undefined }
   }
 }
 
 type Props = {
-  columnIndex: number
+  'aria-colindex': number
+  'aria-rowindex': number
   content: Content
   focused: boolean
   onClick: (e: MouseEvent) => void
   onContextMenu: (e: MouseEvent) => void
   onDoubleClick: (e: MouseEvent) => void
-  rowIndex: number
   selected: boolean
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const {
-    columnIndex,
-    content,
-    focused,
-    onClick,
-    onContextMenu,
-    onDoubleClick,
-    rowIndex,
-    selected,
-  } = props
+  const { content, focused, onClick, onContextMenu, onDoubleClick, selected } =
+    props
 
   const isEditing = useAppSelector(selectIsEditing)
   const isSelected = useAppSelector(selectIsSelected)
@@ -79,10 +71,10 @@ const ExplorerGridItem = (props: Props) => {
 
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
-  const [{ loading, thumbnail, urls }, dispatch] = useReducer(reducer, {
+  const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
+    itemCount: 0,
     loading: false,
     thumbnail: undefined,
-    urls: [],
   })
 
   const editing = useMemo(
@@ -95,9 +87,9 @@ const ExplorerGridItem = (props: Props) => {
 
     ;(async () => {
       dispatch({ type: 'loading' })
-      const urls = await (async () => {
+      const paths = await (async () => {
         if (content.type === 'file') {
-          return [content.url]
+          return [content.path]
         }
 
         try {
@@ -107,16 +99,19 @@ const ExplorerGridItem = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.url)
+            .map((entry) => entry.path)
         } catch (e) {
           return []
         }
       })()
-      const thumbnail = await createThumbnailIfNeeded(urls)
+      const thumbnail = await window.electronAPI.createThumbnailUrl(paths)
       if (unmounted) {
         return
       }
-      dispatch({ type: 'loaded', payload: { thumbnail, urls } })
+      dispatch({
+        type: 'loaded',
+        payload: { itemCount: paths.length, thumbnail },
+      })
     })()
 
     return () => {
@@ -145,12 +140,28 @@ const ExplorerGridItem = (props: Props) => {
     [appDispatch, content.path],
   )
 
+  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
+  const rating = useMemo(
+    () => (
+      <NoOutlineRating
+        color="primary"
+        onChange={handleChangeRating}
+        onClick={(e) => e.stopPropagation()}
+        precision={0.5}
+        size="small"
+        sx={{ my: 0.25 }}
+        value={content.rating}
+      />
+    ),
+    [content.rating, handleChangeRating],
+  )
+
   return (
     <ImageListItem
+      aria-colindex={props['aria-colindex']}
+      aria-rowindex={props['aria-rowindex']}
       className={clsx({ focused, selected })}
       component="div"
-      data-grid-column={columnIndex + 1}
-      data-grid-row={rowIndex + 1}
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
@@ -220,18 +231,10 @@ const ExplorerGridItem = (props: Props) => {
               justifyContent: 'space-between',
             }}
           >
-            <NoOutlineRating
-              color="primary"
-              onChange={handleChangeRating}
-              onClick={(e) => e.stopPropagation()}
-              precision={0.5}
-              size="small"
-              sx={{ my: 0.25 }}
-              value={content.rating}
-            />
+            {rating}
             {!loading && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
-                {pluralize('item', urls.length, true)}
+                {pluralize('item', itemCount, true)}
               </Typography>
             )}
           </Box>

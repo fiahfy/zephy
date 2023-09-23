@@ -1,5 +1,4 @@
-import { TreeItem, TreeItemContentProps } from '@mui/lab'
-import { useTreeItem } from '@mui/lab/TreeItem'
+import { TreeItem, TreeItemContentProps, useTreeItem } from '@mui/x-tree-view'
 import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { ComponentProps, ReactNode, forwardRef } from 'react'

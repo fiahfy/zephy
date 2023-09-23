@@ -3,7 +3,9 @@ import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
 import { pathExists } from 'fs-extra'
+import mime from 'mime'
 import { createHash } from 'node:crypto'
+import { createReadStream } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -21,36 +23,101 @@ type Metadata = {
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
-export const createThumbnail = async (path: string) => {
-  // TODO: use checksum
-  const thumbnailFilename =
-    createHash('md5').update(path).digest('hex') + '.png'
-  const thumbnailPath = join(thumbnailDir, thumbnailFilename)
-  const exists = await pathExists(thumbnailPath)
-  if (!exists) {
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg(path)
-        .screenshots({
-          count: 1,
-          folder: thumbnailDir,
-          filename: thumbnailFilename,
-        })
-        .on('error', (e) => reject(e))
-        .on('end', () => resolve())
-    })
-  }
-  return pathToFileURL(thumbnailPath).href
+const generateChecksum = async (path: string) => {
+  return new Promise<string>((resolve, reject) => {
+    const hash = createHash('md5')
+    const stream = createReadStream(path)
+    stream.on('error', reject)
+    stream.on('data', (data) => hash.update(data))
+    stream.on('end', () => resolve(hash.digest('hex')))
+  })
 }
 
-export const getMetadata = async (path: string): Promise<Metadata> => {
+const generateThumbnailFilename = async (path: string) => {
+  const checksum = await generateChecksum(path)
+  return (
+    createHash('md5')
+      .update(path + checksum)
+      .digest('hex') + '.png'
+  )
+}
+
+const createThumbnail = async (path: string) => {
+  try {
+    const thumbnailFilename = await generateThumbnailFilename(path)
+    const thumbnailPath = join(thumbnailDir, thumbnailFilename)
+    const exists = await pathExists(thumbnailPath)
+    if (!exists) {
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(path)
+          .screenshots({
+            count: 1,
+            folder: thumbnailDir,
+            filename: thumbnailFilename,
+          })
+          .on('error', (e) => reject(e))
+          .on('end', () => resolve())
+      })
+    }
+    return pathToFileURL(thumbnailPath).href
+  } catch (e) {
+    return undefined
+  }
+}
+
+export const createThumbnailUrl = async (paths: string | string[]) => {
+  return (Array.isArray(paths) ? paths : [paths]).reduce(
+    async (promise, path) => {
+      const acc = await promise
+      if (acc) {
+        return acc
+      }
+
+      const type = mime.getType(path)
+      if (!type) {
+        return undefined
+      }
+
+      switch (true) {
+        case type.startsWith('image/'):
+          return pathToFileURL(path).href
+        case type.startsWith('video/'):
+          return await createThumbnail(path)
+        default:
+          return undefined
+      }
+    },
+    Promise.resolve(undefined) as Promise<string | undefined>,
+  )
+}
+
+export const getMetadata = async (
+  path: string,
+): Promise<Metadata | undefined> => {
+  const type = mime.getType(path)
+  if (!type) {
+    return undefined
+  }
+
+  if (
+    !type.startsWith('image/') &&
+    !type.startsWith('video/') &&
+    !type.startsWith('audio/')
+  ) {
+    return undefined
+  }
+
+  const hasDuration = type.startsWith('video/') || type.startsWith('audio/')
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const metadata: any = await new Promise((resolve, reject) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
       err ? reject(err) : resolve(metadata)
     })
   })
+
   return {
-    duration: metadata?.format?.duration,
+    duration: hasDuration ? metadata?.format?.duration : undefined,
     height: metadata?.streams[0]?.height,
     width: metadata?.streams[0]?.width,
   }
