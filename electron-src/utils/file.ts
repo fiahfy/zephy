@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { copy, pathExists } from 'fs-extra'
+import { copy, move, pathExists } from 'fs-extra'
 import { Dirent, Stats } from 'node:fs'
 import { mkdir, readdir, rename, stat } from 'node:fs/promises'
 import { basename, dirname, join, parse, sep } from 'node:path'
@@ -257,7 +257,7 @@ export const moveEntries = async (
           // TODO: fix error handling
           throw new Error('File already exists')
         }
-        await rename(path, newPath)
+        await move(path, newPath)
       }
       return await getDetailedEntry(newPath)
     }),
