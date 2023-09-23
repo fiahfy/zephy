@@ -10,7 +10,6 @@ const ImagePreview = (props: Props) => {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      loading="lazy"
       src={entry.url}
       style={{ minHeight: 128, objectFit: 'contain', width: '100%' }}
     />

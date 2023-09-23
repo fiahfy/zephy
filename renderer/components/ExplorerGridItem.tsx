@@ -199,11 +199,7 @@ const ExplorerGridItem = (props: Props) => {
     >
       {thumbnail ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          loading="lazy"
-          src={thumbnail}
-          style={{ objectPosition: 'center top' }}
-        />
+        <img src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
         <Box
           sx={{
