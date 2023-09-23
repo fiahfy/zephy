@@ -5,7 +5,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { pathExists } from 'fs-extra'
 import mime from 'mime'
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import { createReadStream } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -24,8 +24,13 @@ type Metadata = {
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 const generateChecksum = async (path: string) => {
-  const data = await readFile(path)
-  return createHash('md5').update(data).digest('hex')
+  return new Promise<string>((resolve, reject) => {
+    const hash = createHash('md5')
+    const stream = createReadStream(path)
+    stream.on('error', reject)
+    stream.on('data', (data) => hash.update(data))
+    stream.on('end', () => resolve(hash.digest('hex')))
+  })
 }
 
 const generateThumbnailFilename = async (path: string) => {
@@ -95,8 +100,8 @@ export const getMetadata = async (
   }
 
   if (
-    !type.startsWith('image/') ||
-    !type.startsWith('video/') ||
+    !type.startsWith('image/') &&
+    !type.startsWith('video/') &&
     !type.startsWith('audio/')
   ) {
     return undefined
