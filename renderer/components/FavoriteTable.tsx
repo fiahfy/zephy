@@ -1,12 +1,7 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@mui/material'
+import { Table, TableBody, TableCell, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
+import FavoriteTableRow from 'components/FavoriteTableRow'
 import Icon from 'components/Icon'
 import useContextMenu from 'hooks/useContextMenu'
 import { DetailedEntry } from 'interfaces'
@@ -49,29 +44,24 @@ const FavoriteTable = () => {
   const handleFocus = useCallback((path: string) => setSelected([path]), [])
 
   return (
-    <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>
-      <TableBody sx={{ width: '100%' }}>
+    <Table
+      component="div"
+      size="small"
+      sx={{ display: 'flex', userSelect: 'none' }}
+    >
+      <TableBody component="div" sx={{ width: '100%' }}>
         {entries.map((entry) => (
-          <TableRow
-            hover
+          <FavoriteTableRow
+            entry={entry}
             key={entry.path}
             onBlur={() => handleBlur()}
             onClick={() => handleClick(entry.path)}
             onContextMenu={createEntryMenuHandler(entry)}
             onFocus={() => handleFocus(entry.path)}
             selected={selected.includes(entry.path)}
-            sx={{
-              cursor: 'pointer',
-              display: 'flex',
-              width: '100%',
-              '&:focus-visible': {
-                outline: '-webkit-focus-ring-color auto 1px',
-              },
-            }}
-            tabIndex={0}
-            title={entry.name}
           >
             <TableCell
+              component="div"
               sx={{
                 alignItems: 'center',
                 borderBottom: 'none',
@@ -88,7 +78,7 @@ const FavoriteTable = () => {
                 {entry.name}
               </Typography>
             </TableCell>
-          </TableRow>
+          </FavoriteTableRow>
         ))}
       </TableBody>
     </Table>
