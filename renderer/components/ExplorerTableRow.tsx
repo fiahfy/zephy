@@ -1,23 +1,21 @@
 import { Box, alpha } from '@mui/system'
 import clsx from 'clsx'
-import { MouseEvent } from 'react'
+import useExplorerItem from '~/hooks/useExplorerItem'
+import { Content } from '~/interfaces'
 
 type Props = {
-  'aria-rowindex': number
   children: React.ReactNode
-  focused: boolean
-  selected: boolean
-  onClick: (e: MouseEvent) => void
-  onContextMenu: (e: MouseEvent) => void
-  onDoubleClick: (e: MouseEvent) => void
+  content: Content
 }
 
 const ExplorerTableRow = (props: Props) => {
-  const { children, focused, selected, onClick, onContextMenu, onDoubleClick } =
-    props
+  const { children, content } = props
+
+  const { focused, onClick, onContextMenu, onDoubleClick, selected } =
+    useExplorerItem(content)
+
   return (
     <Box
-      aria-rowindex={props['aria-rowindex']}
       className={clsx({
         focused,
         selected,

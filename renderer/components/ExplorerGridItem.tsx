@@ -3,7 +3,6 @@ import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
 import {
-  MouseEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -25,6 +24,7 @@ import {
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
+import useExplorerItem from '~/hooks/useExplorerItem'
 
 type State = { itemCount: number; loading: boolean; thumbnail?: string }
 
@@ -48,25 +48,20 @@ const reducer = (_state: State, action: Action) => {
 }
 
 type Props = {
-  'aria-colindex': number
-  'aria-rowindex': number
   content: Content
-  focused: boolean
-  onClick: (e: MouseEvent) => void
-  onContextMenu: (e: MouseEvent) => void
-  onDoubleClick: (e: MouseEvent) => void
-  selected: boolean
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const { content, focused, onClick, onContextMenu, onDoubleClick, selected } =
-    props
+  const { content } = props
 
   const isEditing = useAppSelector(selectIsEditing)
   const isSelected = useAppSelector(selectIsSelected)
   const selectedContents = useAppSelector(selectSelectedContents)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
+
+  const { focused, onClick, onContextMenu, onDoubleClick, selected } =
+    useExplorerItem(content)
 
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
@@ -75,11 +70,6 @@ const ExplorerGridItem = (props: Props) => {
     loading: false,
     thumbnail: undefined,
   })
-
-  const editing = useMemo(
-    () => isEditing(content.path),
-    [content.path, isEditing],
-  )
 
   useEffect(() => {
     let unmounted = false
@@ -123,6 +113,11 @@ const ExplorerGridItem = (props: Props) => {
     [loading],
   )
 
+  const editing = useMemo(
+    () => isEditing(content.path),
+    [content.path, isEditing],
+  )
+
   const dragContents = useMemo(
     () =>
       editing
@@ -157,8 +152,6 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      aria-colindex={props['aria-colindex']}
-      aria-rowindex={props['aria-rowindex']}
       className={clsx({ focused, selected })}
       component="div"
       onClick={onClick}

@@ -2,7 +2,6 @@ import { Box, LinearProgress, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   KeyboardEvent,
-  MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -16,15 +15,10 @@ import { Content } from '~/interfaces'
 const maxItemSize = 256
 
 type Props = {
-  contentFocused: (content: Content) => boolean
-  contentSelected: (content: Content) => boolean
   contents: Content[]
   focused: string | undefined
   loading: boolean
   noDataText: string
-  onClickContent: (e: MouseEvent, content: Content) => void
-  onContextMenuContent: (e: MouseEvent, content: Content) => void
-  onDoubleClickContent: (e: MouseEvent, content: Content) => void
   onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent) => void
   onScrollEnd: (scrollTop: number) => void
@@ -33,15 +27,10 @@ type Props = {
 
 const ExplorerGrid = (props: Props) => {
   const {
-    contentFocused,
-    contentSelected,
     contents,
     focused,
     loading,
     noDataText,
-    onClickContent,
-    onContextMenuContent,
-    onDoubleClickContent,
     onKeyDownArrow,
     onKeyDownEnter,
     onScrollEnd,
@@ -214,22 +203,9 @@ const ExplorerGrid = (props: Props) => {
                       }px)`,
                     }}
                   >
-                    {columns.map((content, columnIndex) => (
+                    {columns.map((content) => (
                       <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                        <ExplorerGridItem
-                          aria-colindex={columnIndex + 1}
-                          aria-rowindex={virtualRow.index + 1}
-                          content={content}
-                          focused={contentFocused(content)}
-                          onClick={(e) => onClickContent(e, content)}
-                          onContextMenu={(e) =>
-                            onContextMenuContent(e, content)
-                          }
-                          onDoubleClick={(e) =>
-                            onDoubleClickContent(e, content)
-                          }
-                          selected={contentSelected(content)}
-                        />
+                        <ExplorerGridItem content={content} />
                       </Box>
                     ))}
                   </Box>

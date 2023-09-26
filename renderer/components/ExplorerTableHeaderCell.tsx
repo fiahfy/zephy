@@ -1,31 +1,35 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
-import { ReactNode, useCallback } from 'react'
+import { useCallback } from 'react'
 import { Content } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectCurrentSortOption, sort } from '~/store/window'
 
 type Key = keyof Content
-type Order = 'asc' | 'desc'
 
 type Props = {
   dataKey: Key
   height: number
-  label: ReactNode
-  onChangeOrderBy: (orderBy: Key) => void
-  sortOption: { order: Order; orderBy: Key }
+  label: string
   width?: number
 }
 
 const ExplorerTableHeaderCell = (props: Props) => {
-  const { height, dataKey, label, onChangeOrderBy, sortOption, width } = props
+  const { height, dataKey, label, width } = props
+
+  const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const dispatch = useAppDispatch()
 
   const handleClick = useCallback(
-    () => onChangeOrderBy(dataKey),
-    [dataKey, onChangeOrderBy],
+    () => dispatch(sort(dataKey)),
+    [dataKey, dispatch],
   )
 
   return (
     <TableCell
       component="div"
-      sortDirection={sortOption.orderBy === dataKey ? sortOption.order : false}
+      sortDirection={
+        currentSortOption.orderBy === dataKey ? currentSortOption.order : false
+      }
       sx={{
         borderBottom: 'none',
         display: 'flex',
@@ -40,9 +44,14 @@ const ExplorerTableHeaderCell = (props: Props) => {
       variant="head"
     >
       <TableSortLabel
-        active={sortOption.orderBy === dataKey}
-        direction={sortOption.orderBy === dataKey ? sortOption.order : 'asc'}
+        active={currentSortOption.orderBy === dataKey}
+        direction={
+          currentSortOption.orderBy === dataKey
+            ? currentSortOption.order
+            : 'asc'
+        }
         onClick={handleClick}
+        sx={{ flexGrow: 1 }}
       >
         <Typography noWrap variant="caption">
           {label}

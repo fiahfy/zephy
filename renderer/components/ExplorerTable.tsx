@@ -1,12 +1,6 @@
 import { Box, LinearProgress, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import {
-  KeyboardEvent,
-  MouseEvent,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import { KeyboardEvent, useCallback, useEffect, useRef } from 'react'
 
 import ExplorerTableCell from '~/components/ExplorerTableCell'
 import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
@@ -18,7 +12,6 @@ const headerHeight = 32
 const rowHeight = 20
 
 type Key = keyof Content
-type Order = 'asc' | 'desc'
 
 type ColumnType = {
   align: 'left' | 'right'
@@ -54,40 +47,26 @@ const columns: ColumnType[] = [
 ]
 
 type Props = {
-  contentFocused: (content: Content) => boolean
-  contentSelected: (content: Content) => boolean
   contents: Content[]
   focused: string | undefined
   loading: boolean
   noDataText: string
-  onChangeOrderBy: (orderBy: Key) => void
-  onClickContent: (e: MouseEvent, content: Content) => void
-  onContextMenuContent: (e: MouseEvent, content: Content) => void
-  onDoubleClickContent: (e: MouseEvent, content: Content) => void
   onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
   onKeyDownEnter: (e: KeyboardEvent) => void
   onScrollEnd: (scrollTop: number) => void
   scrollTop: number
-  sortOption: { order: Order; orderBy: Key }
 }
 
 const ExplorerTable = (props: Props) => {
   const {
-    contentFocused,
-    contentSelected,
     contents,
     focused,
     loading,
     noDataText,
-    onChangeOrderBy,
-    onClickContent,
-    onContextMenuContent,
-    onDoubleClickContent,
     onKeyDownArrow,
     onKeyDownEnter,
     onScrollEnd,
     scrollTop,
-    sortOption,
   } = props
 
   const previousLoading = usePrevious(loading)
@@ -196,8 +175,6 @@ const ExplorerTable = (props: Props) => {
             height={headerHeight}
             key={column.key}
             label={column.label}
-            onChangeOrderBy={onChangeOrderBy}
-            sortOption={sortOption}
             width={column.width}
           />
         ))}
@@ -223,14 +200,7 @@ const ExplorerTable = (props: Props) => {
                   }px)`,
                 }}
               >
-                <ExplorerTableRow
-                  aria-rowindex={virtualRow.index + 1}
-                  focused={contentFocused(content)}
-                  onClick={(e) => onClickContent(e, content)}
-                  onContextMenu={(e) => onContextMenuContent(e, content)}
-                  onDoubleClick={(e) => onDoubleClickContent(e, content)}
-                  selected={contentSelected(content)}
-                >
+                <ExplorerTableRow content={content}>
                   {columns.map((column) => (
                     <ExplorerTableCell
                       align={column.align}
