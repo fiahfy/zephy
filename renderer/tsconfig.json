@@ -6,6 +6,9 @@
     // Modules
     "baseUrl": ".",
     "module": "esnext",
+    "paths": {
+      "~/*": ["./*"]
+    },
     // Emit
     "noEmit": true,
     // JavaScript Support

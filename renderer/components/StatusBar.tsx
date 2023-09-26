@@ -1,9 +1,8 @@
 import { AppBar, Divider, Toolbar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
 import { useMemo } from 'react'
-
-import { useAppSelector } from 'store'
-import { selectContents, selectSelected } from 'store/explorer'
+import { useAppSelector } from '~/store'
+import { selectContents, selectSelected } from '~/store/explorer'
 
 const StatusBar = () => {
   const contents = useAppSelector(selectContents)

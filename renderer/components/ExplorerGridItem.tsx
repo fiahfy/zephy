@@ -10,22 +10,21 @@ import {
   useMemo,
   useReducer,
 } from 'react'
-
-import NoOutlineRating from 'components/mui/NoOutlineRating'
-import EntryIcon from 'components/EntryIcon'
-import ExplorerNameTextField from 'components/ExplorerNameTextField'
-import Outline from 'components/Outline'
-import useDnd from 'hooks/useDnd'
-import { Content } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
+import NoOutlineRating from '~/components/mui/NoOutlineRating'
+import EntryIcon from '~/components/EntryIcon'
+import ExplorerNameTextField from '~/components/ExplorerNameTextField'
+import Outline from '~/components/Outline'
+import useDnd from '~/hooks/useDnd'
+import { Content } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectIsEditing,
   selectIsSelected,
   selectSelectedContents,
-} from 'store/explorer'
-import { rate } from 'store/rating'
-import { selectShouldShowHiddenFiles } from 'store/settings'
-import { isHiddenFile } from 'utils/file'
+} from '~/store/explorer'
+import { rate } from '~/store/rating'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { isHiddenFile } from '~/utils/file'
 
 type State = { itemCount: number; loading: boolean; thumbnail?: string }
 

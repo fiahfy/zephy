@@ -7,12 +7,11 @@ import {
   useRef,
   useState,
 } from 'react'
-
-import DenseOutlineTextField from 'components/mui/DenseOutlineTextField'
-import useContextMenu from 'hooks/useContextMenu'
-import { Content } from 'interfaces'
-import { useAppDispatch } from 'store'
-import { finishEditing, rename } from 'store/explorer'
+import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
+import useContextMenu from '~/hooks/useContextMenu'
+import { Content } from '~/interfaces'
+import { useAppDispatch } from '~/store'
+import { finishEditing, rename } from '~/store/explorer'
 
 type Props = {
   content: Content

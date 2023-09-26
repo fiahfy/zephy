@@ -1,13 +1,12 @@
 import { ImageList, ImageListItem } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useReducer } from 'react'
-
-import DirectoryPreviewItem from 'components/DirectoryPreviewItem'
-import EmptyPreview from 'components/EmptyPreview'
-import { Entry } from 'interfaces'
-import { useAppSelector } from 'store'
-import { selectShouldShowHiddenFiles } from 'store/settings'
-import { isHiddenFile } from 'utils/file'
+import DirectoryPreviewItem from '~/components/DirectoryPreviewItem'
+import EmptyPreview from '~/components/EmptyPreview'
+import { Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { isHiddenFile } from '~/utils/file'
 
 const max = 100
 

@@ -7,10 +7,9 @@ import {
   Typography,
 } from '@mui/material'
 import { useCallback, useMemo, useState } from 'react'
-
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectPathsByScore } from 'store/rating'
-import { goToRatings } from 'store/window'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectPathsByScore } from '~/store/rating'
+import { goToRatings } from '~/store/window'
 
 const RatingTable = () => {
   const pathsByScore = useAppSelector(selectPathsByScore)

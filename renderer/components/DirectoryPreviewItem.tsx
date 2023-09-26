@@ -1,15 +1,14 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
-
-import EntryIcon from 'components/EntryIcon'
-import Outline from 'components/Outline'
-import useContextMenu from 'hooks/useContextMenu'
-import useDnd from 'hooks/useDnd'
-import { Entry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectShouldShowHiddenFiles } from 'store/settings'
-import { changeDirectory } from 'store/window'
-import { isHiddenFile } from 'utils/file'
+import EntryIcon from '~/components/EntryIcon'
+import Outline from '~/components/Outline'
+import useContextMenu from '~/hooks/useContextMenu'
+import useDnd from '~/hooks/useDnd'
+import { Entry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { changeDirectory } from '~/store/window'
+import { isHiddenFile } from '~/utils/file'
 
 type State = {
   loading: boolean

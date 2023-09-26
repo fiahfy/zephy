@@ -1,13 +1,12 @@
 import { Table, TableBody, TableCell, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
-
-import FavoriteTableRow from 'components/FavoriteTableRow'
-import Icon from 'components/Icon'
-import useContextMenu from 'hooks/useContextMenu'
-import { DetailedEntry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectFavorites } from 'store/favorite'
-import { changeDirectory } from 'store/window'
+import FavoriteTableRow from '~/components/FavoriteTableRow'
+import Icon from '~/components/Icon'
+import useContextMenu from '~/hooks/useContextMenu'
+import { DetailedEntry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectFavorites } from '~/store/favorite'
+import { changeDirectory } from '~/store/window'
 
 const FavoriteTable = () => {
   const favorites = useAppSelector(selectFavorites)

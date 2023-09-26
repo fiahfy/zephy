@@ -17,15 +17,14 @@ import {
   persistStore,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-
-import explorerReducer from 'store/explorer'
-import favoriteReducer from 'store/favorite'
-import previewReducer from 'store/preview'
-import queryReducer from 'store/query'
-import ratingReducer from 'store/rating'
-import settingsReducer from 'store/settings'
-import windowReducer from 'store/window'
-import windowIndexReducer from 'store/windowIndex'
+import explorerReducer from '~/store/explorer'
+import favoriteReducer from '~/store/favorite'
+import previewReducer from '~/store/preview'
+import queryReducer from '~/store/query'
+import ratingReducer from '~/store/rating'
+import settingsReducer from '~/store/settings'
+import windowReducer from '~/store/window'
+import windowIndexReducer from '~/store/windowIndex'
 
 const reducers = combineReducers({
   explorer: explorerReducer,

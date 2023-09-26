@@ -7,7 +7,7 @@ import {
   ipcMain,
   shell,
 } from 'electron'
-import { canPaste, copy, paste } from './utils/clipboard'
+import { canPaste, copy, paste } from '~/utils/clipboard'
 
 export type ContextMenuParams = {
   isEditable: boolean

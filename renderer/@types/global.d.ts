@@ -1,4 +1,4 @@
-import { IElectronAPI } from 'interfaces'
+import { IElectronAPI } from '~/interfaces'
 
 declare global {
   interface Window {

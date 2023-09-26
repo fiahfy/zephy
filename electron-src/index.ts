@@ -3,12 +3,12 @@ import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
 import { join } from 'node:path'
-import registerApplicationMenu from './applicationMenu'
-import registerContextMenu from './contextMenu'
-import createFullscreenManager from './fullscreen'
-import registerHandlers from './handlers'
-import createWatcher from './watcher'
-import createWindowManager from './window'
+import registerApplicationMenu from '~/applicationMenu'
+import registerContextMenu from '~/contextMenu'
+import createFullscreenManager from '~/fullscreen'
+import registerHandlers from '~/handlers'
+import createWatcher from '~/watcher'
+import createWindowManager from '~/window'
 
 app.whenReady().then(async () => {
   await prepareNext('./renderer')

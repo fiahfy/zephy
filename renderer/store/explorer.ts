@@ -1,17 +1,16 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-
-import { Content, DetailedEntry } from 'interfaces'
-import { AppState, AppThunk } from 'store'
-import { add } from 'store/query'
-import { selectGetScore, selectPathsByScore } from 'store/rating'
-import { selectShouldShowHiddenFiles } from 'store/settings'
+import { Content, DetailedEntry } from '~/interfaces'
+import { AppState, AppThunk } from '~/store'
+import { add } from '~/store/query'
+import { selectGetScore, selectPathsByScore } from '~/store/rating'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   selectCurrentDirectory,
   selectCurrentSortOption,
   selectZephySchema,
   selectZephyUrl,
-} from 'store/window'
-import { isHiddenFile } from 'utils/file'
+} from '~/store/window'
+import { isHiddenFile } from '~/utils/file'
 
 type State = {
   editing: string | undefined

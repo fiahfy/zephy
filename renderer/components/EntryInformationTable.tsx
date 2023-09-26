@@ -5,9 +5,12 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-
-import { DetailedEntry, Metadata } from 'interfaces'
-import { formatDateTime, formatDuration, formatFileSize } from 'utils/formatter'
+import { DetailedEntry, Metadata } from '~/interfaces'
+import {
+  formatDateTime,
+  formatDuration,
+  formatFileSize,
+} from '~/utils/formatter'
 
 const getTotalFileSize = (entries: DetailedEntry[]) =>
   entries

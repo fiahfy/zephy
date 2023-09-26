@@ -2,8 +2,7 @@ import { TreeItem, TreeItemContentProps, useTreeItem } from '@mui/x-tree-view'
 import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { ComponentProps, ReactNode, forwardRef } from 'react'
-
-import Outline from 'components/Outline'
+import Outline from '~/components/Outline'
 
 const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,

@@ -1,11 +1,10 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useRef } from 'react'
-
-import EntryInformation from 'components/EntryInformation'
-import Panel from 'components/Panel'
-import Preview from 'components/Preview'
-import { useAppSelector } from 'store'
-import { selectSelected } from 'store/explorer'
+import EntryInformation from '~/components/EntryInformation'
+import Panel from '~/components/Panel'
+import Preview from '~/components/Preview'
+import { useAppSelector } from '~/store'
+import { selectSelected } from '~/store/explorer'
 
 const Inspector = () => {
   const selected = useAppSelector(selectSelected)

@@ -9,10 +9,9 @@ import {
   useRef,
   useState,
 } from 'react'
-
-import ExplorerGridItem from 'components/ExplorerGridItem'
-import usePrevious from 'hooks/usePrevious'
-import { Content } from 'interfaces'
+import ExplorerGridItem from '~/components/ExplorerGridItem'
+import usePrevious from '~/hooks/usePrevious'
+import { Content } from '~/interfaces'
 
 const maxItemSize = 256
 

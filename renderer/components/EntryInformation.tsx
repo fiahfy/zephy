@@ -1,11 +1,10 @@
 import { Box, Typography } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
-
-import EntryInformationTable from 'components/EntryInformationTable'
-import { Metadata } from 'interfaces'
-import { useAppSelector } from 'store'
-import { selectSelectedContents } from 'store/explorer'
+import EntryInformationTable from '~/components/EntryInformationTable'
+import { Metadata } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectSelectedContents } from '~/store/explorer'
 
 const EntryInformation = () => {
   const entries = useAppSelector(selectSelectedContents)

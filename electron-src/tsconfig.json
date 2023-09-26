@@ -4,7 +4,11 @@
     // Type Checking
     "noUncheckedIndexedAccess": true,
     // Modules
+    "baseUrl": ".",
     "module": "commonjs",
+    "paths": {
+      "~/*": ["./*"]
+    },
     // Emit
     "noEmit": false,
     "outDir": "../main",

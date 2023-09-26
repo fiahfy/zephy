@@ -51,6 +51,7 @@
     "husky": "^8.0.3",
     "prettier": "^3.0.2",
     "rimraf": "^5.0.1",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.2.2"
   },
   "main": "main/index.js",
@@ -61,7 +62,7 @@
   },
   "scripts": {
     "build": "npm run build-renderer && npm run build-electron",
-    "build-electron": "tsc -p electron-src",
+    "build-electron": "tsc -p electron-src/tsconfig.json && tsc-alias -p electron-src/tsconfig.json",
     "build-renderer": "next build renderer",
     "clean": "rimraf dist main renderer/out renderer/.next",
     "dev": "npm run build-electron && electron .",
@@ -72,6 +73,6 @@
     "prepare": "husky install",
     "release": "npm run package -mlw",
     "test": "npm run format && npm run lint && npm run type-check",
-    "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
+    "type-check": "tsc -p renderer/tsconfig.json && tsc -p electron-src/tsconfig.json"
   }
 }

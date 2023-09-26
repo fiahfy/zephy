@@ -11,15 +11,14 @@ import {
   Typography,
 } from '@mui/material'
 import { ChangeEvent, useCallback } from 'react'
-
-import { Settings as SettingsType } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
+import { Settings as SettingsType } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldShowHiddenFiles,
   selectTheme,
   setShouldShowHiddenFiles,
   setTheme,
-} from 'store/settings'
+} from '~/store/settings'
 
 const options = [
   { label: 'Light', value: 'light' },

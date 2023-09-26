@@ -1,16 +1,15 @@
 import { CircularProgress } from '@mui/material'
 import { useCallback, useMemo } from 'react'
-
-import EntryIcon from 'components/EntryIcon'
-import EntryTreeItem from 'components/EntryTreeItem'
-import Icon from 'components/Icon'
-import useContextMenu from 'hooks/useContextMenu'
-import useDnd from 'hooks/useDnd'
-import { Entry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectShouldShowHiddenFiles } from 'store/settings'
-import { changeDirectory } from 'store/window'
-import { isHiddenFile } from 'utils/file'
+import EntryIcon from '~/components/EntryIcon'
+import EntryTreeItem from '~/components/EntryTreeItem'
+import Icon from '~/components/Icon'
+import useContextMenu from '~/hooks/useContextMenu'
+import useDnd from '~/hooks/useDnd'
+import { Entry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { changeDirectory } from '~/store/window'
+import { isHiddenFile } from '~/utils/file'
 
 const max = 100
 

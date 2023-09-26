@@ -28,16 +28,15 @@ import {
   useRef,
   useState,
 } from 'react'
-
-import Icon from 'components/Icon'
-import RoundedFilledTextField from 'components/mui/RoundedFilledTextField'
-import { useTrafficLights } from 'contexts/TrafficLightsContext'
-import useContextMenu from 'hooks/useContextMenu'
-import useLongPress from 'hooks/useLongPress'
-import { useAppDispatch, useAppSelector } from 'store'
-import { load, searchQuery, selectLoading, unselect } from 'store/explorer'
-import { selectIsFavorite, toggle } from 'store/favorite'
-import { remove, selectQueryHistories } from 'store/query'
+import Icon from '~/components/Icon'
+import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
+import { useTrafficLights } from '~/contexts/TrafficLightsContext'
+import useContextMenu from '~/hooks/useContextMenu'
+import useLongPress from '~/hooks/useLongPress'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { load, searchQuery, selectLoading, unselect } from '~/store/explorer'
+import { selectIsFavorite, toggle } from '~/store/favorite'
+import { remove, selectQueryHistories } from '~/store/query'
 import {
   back,
   changeDirectory,
@@ -53,7 +52,7 @@ import {
   selectZephySchema,
   selectZephyUrl,
   upward,
-} from 'store/window'
+} from '~/store/window'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)

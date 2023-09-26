@@ -7,15 +7,14 @@ import {
   useCallback,
   useMemo,
 } from 'react'
-
-import ExplorerGrid from 'components/ExplorerGrid'
-import ExplorerTable from 'components/ExplorerTable'
-import Outline from 'components/Outline'
-import useContextMenu from 'hooks/useContextMenu'
-import useDnd from 'hooks/useDnd'
-import usePreventClickOnDoubleClick from 'hooks/usePreventClickOnDoubleClick'
-import { Content } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
+import ExplorerGrid from '~/components/ExplorerGrid'
+import ExplorerTable from '~/components/ExplorerTable'
+import Outline from '~/components/Outline'
+import useContextMenu from '~/hooks/useContextMenu'
+import useDnd from '~/hooks/useDnd'
+import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
+import { Content } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   blur,
   focus,
@@ -33,7 +32,7 @@ import {
   selectSelectedContents,
   startEditing,
   unselect,
-} from 'store/explorer'
+} from '~/store/explorer'
 import {
   changeDirectory,
   selectCurrentDirectory,
@@ -43,8 +42,8 @@ import {
   selectZephySchema,
   setCurrentScrollTop,
   sort,
-} from 'store/window'
-import { selectIsFavorite } from 'store/favorite'
+} from '~/store/window'
+import { selectIsFavorite } from '~/store/favorite'
 
 const Explorer = () => {
   const contents = useAppSelector(selectContents)

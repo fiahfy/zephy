@@ -1,7 +1,6 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
 import { ReactNode, useCallback } from 'react'
-
-import { Content } from 'interfaces'
+import { Content } from '~/interfaces'
 
 type Key = keyof Content
 type Order = 'asc' | 'desc'

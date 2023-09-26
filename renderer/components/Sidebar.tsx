@@ -1,14 +1,13 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useCallback, useMemo } from 'react'
-
-import { useAppDispatch, useAppSelector } from 'store'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectGetSidebarWidth,
   selectIsSidebarHidden,
   setSidebarHidden,
   setSidebarWidth,
-} from 'store/window'
+} from '~/store/window'
 
 const minContentWidth = 64
 

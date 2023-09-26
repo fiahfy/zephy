@@ -4,9 +4,8 @@ import {
   createTheme,
 } from '@mui/material/styles'
 import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
-
-import { useAppSelector } from 'store'
-import { selectTheme } from 'store/settings'
+import { useAppSelector } from '~/store'
+import { selectTheme } from '~/store/settings'
 
 const ThemeContext = createContext<
   | {

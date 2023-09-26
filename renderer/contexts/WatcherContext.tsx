@@ -6,10 +6,9 @@ import {
   useEffect,
   useState,
 } from 'react'
-
-import { useAppDispatch, useAppSelector } from 'store'
-import { handle } from 'store/explorer'
-import { selectCurrentDirectory } from 'store/window'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { handle } from '~/store/explorer'
+import { selectCurrentDirectory } from '~/store/window'
 
 const WatcherContext = createContext<
   | {

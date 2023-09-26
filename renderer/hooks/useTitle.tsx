@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-
-import { useAppSelector } from 'store'
-import { getTitle, selectCurrentDirectory } from 'store/window'
+import { useAppSelector } from '~/store'
+import { getTitle, selectCurrentDirectory } from '~/store/window'
 
 const useTitle = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)

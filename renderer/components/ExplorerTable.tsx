@@ -8,11 +8,11 @@ import {
   useRef,
 } from 'react'
 
-import ExplorerTableCell from 'components/ExplorerTableCell'
-import ExplorerTableHeaderCell from 'components/ExplorerTableHeaderCell'
-import ExplorerTableRow from 'components/ExplorerTableRow'
-import usePrevious from 'hooks/usePrevious'
-import { Content } from 'interfaces'
+import ExplorerTableCell from '~/components/ExplorerTableCell'
+import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
+import ExplorerTableRow from '~/components/ExplorerTableRow'
+import usePrevious from '~/hooks/usePrevious'
+import { Content } from '~/interfaces'
 
 const headerHeight = 32
 const rowHeight = 20

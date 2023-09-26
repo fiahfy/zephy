@@ -1,6 +1,5 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-
-import { AppState } from 'store'
+import { AppState } from '~/store'
 
 type State = {
   ratings: { [path: string]: number }

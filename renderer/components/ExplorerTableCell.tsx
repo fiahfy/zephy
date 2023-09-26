@@ -1,20 +1,19 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
 import { SyntheticEvent, useCallback, useMemo } from 'react'
-
-import EntryIcon from 'components/EntryIcon'
-import NoOutlineRating from 'components/mui/NoOutlineRating'
-import ExplorerNameTextField from 'components/ExplorerNameTextField'
-import Outline from 'components/Outline'
-import useDnd from 'hooks/useDnd'
-import { Content } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
+import EntryIcon from '~/components/EntryIcon'
+import NoOutlineRating from '~/components/mui/NoOutlineRating'
+import ExplorerNameTextField from '~/components/ExplorerNameTextField'
+import Outline from '~/components/Outline'
+import useDnd from '~/hooks/useDnd'
+import { Content } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectIsEditing,
   selectIsSelected,
   selectSelectedContents,
-} from 'store/explorer'
-import { rate } from 'store/rating'
-import { formatDateTime, formatFileSize } from 'utils/formatter'
+} from '~/store/explorer'
+import { rate } from '~/store/rating'
+import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
 type Key = keyof Content
 

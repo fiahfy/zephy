@@ -1,8 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-
-import { Content } from 'interfaces'
-import { AppState, AppThunk } from 'store'
-import { selectWindowIndex } from 'store/windowIndex'
+import { Content } from '~/interfaces'
+import { AppState, AppThunk } from '~/store'
+import { selectWindowIndex } from '~/store/windowIndex'
 import { selectLoading } from './explorer'
 
 type History = {

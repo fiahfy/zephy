@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-
-import { useAppDispatch } from 'store'
+import { useAppDispatch } from '~/store'
 import {
   copy,
   moveToTrash,
@@ -10,8 +9,8 @@ import {
   select,
   selectAll,
   startEditing,
-} from 'store/explorer'
-import { add, remove } from 'store/favorite'
+} from '~/store/explorer'
+import { add, remove } from '~/store/favorite'
 import {
   changeDirectory,
   go,
@@ -19,7 +18,7 @@ import {
   setCurrentViewMode,
   setSidebarHidden,
   sort,
-} from 'store/window'
+} from '~/store/window'
 
 const useMessageListener = () => {
   const dispatch = useAppDispatch()

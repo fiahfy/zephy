@@ -6,11 +6,10 @@ import {
   useReducer,
   useRef,
 } from 'react'
-
-import useContextMenu from 'hooks/useContextMenu'
-import { Entry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { selectLoop, selectVolume, setLoop, setVolume } from 'store/preview'
+import useContextMenu from '~/hooks/useContextMenu'
+import { Entry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
 
 type State = {
   loading: boolean

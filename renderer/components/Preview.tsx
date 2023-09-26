@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
-
-import AudioPreview from 'components/AudioPreview'
-import DirectoryPreview from 'components/DirectoryPreview'
-import ImagePreview from 'components/ImagePreview'
-import EmptyPreview from 'components/EmptyPreview'
-import VideoPreview from 'components/VideoPreview'
-import { useAppSelector } from 'store'
-import { selectSelectedContents } from 'store/explorer'
-import { detectFileType } from 'utils/file'
+import AudioPreview from '~/components/AudioPreview'
+import DirectoryPreview from '~/components/DirectoryPreview'
+import ImagePreview from '~/components/ImagePreview'
+import EmptyPreview from '~/components/EmptyPreview'
+import VideoPreview from '~/components/VideoPreview'
+import { useAppSelector } from '~/store'
+import { selectSelectedContents } from '~/store/explorer'
+import { detectFileType } from '~/utils/file'
 const Preview = () => {
   const contents = useAppSelector(selectSelectedContents)
 

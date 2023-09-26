@@ -1,11 +1,10 @@
 import { Box, Typography } from '@mui/material'
 import { DragEvent, useCallback, useMemo, useState } from 'react'
-
-import { useDragGhost } from 'contexts/DragGhostContext'
-import { Entry } from 'interfaces'
-import { useAppDispatch, useAppSelector } from 'store'
-import { move } from 'store/explorer'
-import { selectCurrentDirectory } from 'store/window'
+import { useDragGhost } from '~/contexts/DragGhostContext'
+import { Entry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { move } from '~/store/explorer'
+import { selectCurrentDirectory } from '~/store/window'
 
 const mime = 'application/zephy.path-list'
 

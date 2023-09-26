@@ -1,19 +1,18 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-
-import { persistor, storageKey, store } from 'store'
-import { replace as replaceFavorite } from 'store/favorite'
-import { replace as replacePreview } from 'store/preview'
-import { replace as replaceQuery } from 'store/query'
-import { replace as replaceRating } from 'store/rating'
-import { replace as replaceSettings } from 'store/settings'
+import { persistor, storageKey, store } from '~/store'
+import { replace as replaceFavorite } from '~/store/favorite'
+import { replace as replacePreview } from '~/store/preview'
+import { replace as replaceQuery } from '~/store/query'
+import { replace as replaceRating } from '~/store/rating'
+import { replace as replaceSettings } from '~/store/settings'
 import {
   changeDirectory,
   initialize,
   replace as replaceWindow,
-} from 'store/window'
-import { set } from 'store/windowIndex'
+} from '~/store/window'
+import { set } from '~/store/windowIndex'
 
 type Props = { children: ReactNode }
 

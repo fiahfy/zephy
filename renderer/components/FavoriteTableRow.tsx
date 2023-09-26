@@ -1,9 +1,8 @@
 import { TableRow } from '@mui/material'
 import { FocusEvent, MouseEvent, ReactNode } from 'react'
-
-import Outline from 'components/Outline'
-import useDnd from 'hooks/useDnd'
-import { Entry } from 'interfaces'
+import Outline from '~/components/Outline'
+import useDnd from '~/hooks/useDnd'
+import { Entry } from '~/interfaces'
 
 type Props = {
   children: ReactNode

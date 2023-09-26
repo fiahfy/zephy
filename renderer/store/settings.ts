@@ -1,7 +1,6 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-
-import { Settings } from 'interfaces'
-import { AppState } from 'store'
+import { Settings } from '~/interfaces'
+import { AppState } from '~/store'
 
 type State = Settings
 

@@ -10,12 +10,11 @@ import {
   useMemo,
   useState,
 } from 'react'
-
-import ExplorerTreeItem from 'components/ExplorerTreeItem'
-import { useWatcher } from 'contexts/WatcherContext'
-import { Entry } from 'interfaces'
-import { useAppSelector } from 'store'
-import { selectCurrentDirectory, selectZephySchema } from 'store/window'
+import ExplorerTreeItem from '~/components/ExplorerTreeItem'
+import { useWatcher } from '~/contexts/WatcherContext'
+import { Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectCurrentDirectory, selectZephySchema } from '~/store/window'
 
 const getLoadedDirectories = (entry: Entry) => {
   const reducer = (acc: string[], entry: Entry): string[] => {

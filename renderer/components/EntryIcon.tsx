@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
-
-import Icon from 'components/Icon'
-import { Entry } from 'interfaces'
-import { detectFileType } from 'utils/file'
+import Icon from '~/components/Icon'
+import { Entry } from '~/interfaces'
+import { detectFileType } from '~/utils/file'
 
 const iconTypes = {
   audio: 'audio-file',

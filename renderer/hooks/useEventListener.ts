@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
-
-import { useAppDispatch } from 'store'
-import { back, forward, updateApplicationMenu } from 'store/window'
+import { useAppDispatch } from '~/store'
+import { back, forward, updateApplicationMenu } from '~/store/window'
 
 const useEventListener = () => {
   const dispatch = useAppDispatch()

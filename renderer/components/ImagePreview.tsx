@@ -1,4 +1,4 @@
-import { Entry } from 'interfaces'
+import { Entry } from '~/interfaces'
 
 type Props = {
   entry: Entry

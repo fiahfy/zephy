@@ -1,5 +1,5 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
-import { ContextMenuOption, ContextMenuParams } from './contextMenu'
+import { ContextMenuOption, ContextMenuParams } from '~/contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // TODO: rename funcs

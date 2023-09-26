@@ -1,8 +1,7 @@
 import { MouseEvent, useCallback } from 'react'
-
-import { ContextMenuOption, Entry } from 'interfaces'
-import { useAppSelector } from 'store'
-import { selectIsFavorite } from 'store/favorite'
+import { ContextMenuOption, Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectIsFavorite } from '~/store/favorite'
 
 const createMenuHandler = (options?: ContextMenuOption[]) => {
   return async (e: MouseEvent) => {
