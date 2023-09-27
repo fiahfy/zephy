@@ -15,6 +15,9 @@ const useEventListener = () => {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement && e.target.type === 'text') {
+        return
+      }
       switch (e.key) {
         case 'ArrowLeft':
           if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
