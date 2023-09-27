@@ -59,7 +59,8 @@ const Explorer = () => {
 
   const handleFocus = useCallback((e: FocusEvent) => {
     const isEditable =
-      e.target instanceof HTMLInputElement && e.target.type === 'text'
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
     window.electronAPI.applicationMenu.update({ isEditable })
   }, [])
 
