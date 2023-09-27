@@ -2,7 +2,6 @@ import { TreeItem, TreeItemContentProps, useTreeItem } from '@mui/x-tree-view'
 import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { ComponentProps, ReactNode, forwardRef } from 'react'
-import Outline from '~/components/Outline'
 
 const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,
@@ -55,11 +54,10 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
 type Props = ComponentProps<typeof TreeItem> & {
   LabelProps?: BoxProps
   icon: ReactNode
-  outlined?: boolean
 }
 
 const EntryTreeItem = (props: Props) => {
-  const { LabelProps, children, icon, label, outlined, ...others } = props
+  const { LabelProps, children, icon, label, sx, ...others } = props
 
   return (
     <TreeItem
@@ -82,14 +80,13 @@ const EntryTreeItem = (props: Props) => {
           >
             {label}
           </Typography>
-          {outlined && <Outline />}
         </Box>
       }
       // @see https://github.com/mui/material-ui/issues/29518#issuecomment-1601920296
       onFocusCapture={(e) => e.stopPropagation()}
       sx={{
-        position: 'relative',
         '.MuiTreeItem-label': { position: 'static!important' },
+        ...sx,
       }}
     >
       {children}

@@ -2,7 +2,6 @@ import { Box } from '@mui/material'
 import { FocusEvent, createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
-import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselect } from '~/store/explorer'
@@ -21,7 +20,7 @@ const Explorer = () => {
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
-  const { createCurrentDirectoryDroppableBinder, dropping } = useDnd()
+  const { createCurrentDirectoryDroppableBinder, droppableStyle } = useDnd()
 
   const handleClick = useCallback(() => {
     dispatch(unselect())
@@ -70,11 +69,10 @@ const Explorer = () => {
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onFocus={handleFocus}
-      sx={{ height: '100%', position: 'relative' }}
+      sx={{ height: '100%', ...droppableStyle }}
       {...createCurrentDirectoryDroppableBinder()}
     >
       {createElement(currentViewMode === 'list' ? ExplorerTable : ExplorerGrid)}
-      {dropping && <Outline />}
     </Box>
   )
 }

@@ -1,7 +1,6 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from '~/components/EntryIcon'
-import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
@@ -45,7 +44,8 @@ const DirectoryPreviewItem = (props: Props) => {
   const appDispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
+    useDnd()
 
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
     loading: false,
@@ -110,6 +110,7 @@ const DirectoryPreviewItem = (props: Props) => {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },
+        ...droppableStyle,
       }}
       tabIndex={0}
       {...createDraggableBinder(entry)}
@@ -162,7 +163,6 @@ const DirectoryPreviewItem = (props: Props) => {
           position: 'absolute',
         }}
       />
-      {dropping && <Outline />}
     </ImageListItem>
   )
 }

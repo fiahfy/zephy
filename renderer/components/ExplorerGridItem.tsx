@@ -12,7 +12,6 @@ import {
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -63,7 +62,8 @@ const ExplorerGridItem = (props: Props) => {
   const { focused, onClick, onContextMenu, onDoubleClick, selected } =
     useExplorerItem(content)
 
-  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
+    useDnd()
 
   const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: 0,
@@ -185,6 +185,7 @@ const ExplorerGridItem = (props: Props) => {
             },
           },
         },
+        ...droppableStyle,
       }}
       {...createDraggableBinder(dragContents)}
       {...createDroppableBinder(content)}
@@ -286,7 +287,6 @@ const ExplorerGridItem = (props: Props) => {
           position: 'absolute',
         }}
       />
-      {dropping && <Outline />}
     </ImageListItem>
   )
 }

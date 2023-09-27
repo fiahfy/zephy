@@ -24,7 +24,8 @@ const ExplorerTreeItem = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
+    useDnd()
 
   const over = useMemo(
     () =>
@@ -55,7 +56,7 @@ const ExplorerTreeItem = (props: Props) => {
       icon={<EntryIcon entry={entry} />}
       label={entry.name}
       nodeId={entry.path}
-      outlined={dropping}
+      sx={droppableStyle}
       {...createDraggableBinder(entry)}
       {...createDroppableBinder(entry)}
     >

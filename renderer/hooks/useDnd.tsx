@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { DragEvent, useCallback, useMemo, useState } from 'react'
 import { useDragGhost } from '~/contexts/DragGhostContext'
+import { useTheme } from '~/contexts/ThemeContext'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { move } from '~/store/explorer'
@@ -29,9 +30,31 @@ const useDnd = () => {
 
   const { render } = useDragGhost()
 
+  const { theme } = useTheme()
+
   const [enterCount, setEnterCount] = useState(0)
 
   const dropping = useMemo(() => enterCount > 0, [enterCount])
+
+  const droppableStyle = useMemo(
+    () => ({
+      position: 'relative',
+      ...(dropping
+        ? {
+            '::before': {
+              border: `${theme.spacing(0.25)} solid ${
+                theme.palette.primary.main
+              }`,
+              content: '""',
+              inset: 0,
+              pointerEvents: 'none',
+              position: 'absolute',
+            },
+          }
+        : {}),
+    }),
+    [dropping, theme],
+  )
 
   const createDraggableBinder = useCallback(
     (entries?: Entry | Entry[]) => {
@@ -119,7 +142,7 @@ const useDnd = () => {
     createCurrentDirectoryDroppableBinder,
     createDraggableBinder,
     createDroppableBinder,
-    dropping,
+    droppableStyle,
   }
 }
 

@@ -1,6 +1,5 @@
 import { TableRow } from '@mui/material'
 import { FocusEvent, ReactNode, useCallback } from 'react'
-import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
@@ -21,7 +20,7 @@ const FavoriteTableRow = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { createDroppableBinder, dropping } = useDnd()
+  const { createDroppableBinder, droppableStyle } = useDnd()
 
   const handleClick = useCallback(
     () => dispatch(changeDirectory(entry.path)),
@@ -38,17 +37,16 @@ const FavoriteTableRow = (props: Props) => {
       sx={{
         cursor: 'pointer',
         display: 'flex',
-        position: 'relative',
         width: '100%',
         '&:focus-visible': {
           outline: '-webkit-focus-ring-color auto 1px',
         },
+        ...droppableStyle,
       }}
       tabIndex={0}
       {...createDroppableBinder(entry)}
     >
       {children}
-      {dropping && <Outline />}
     </TableRow>
   )
 }

@@ -3,7 +3,6 @@ import { SyntheticEvent, useCallback, useMemo } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -33,7 +32,8 @@ const ExplorerTableCell = (props: Props) => {
   const selectedContents = useAppSelector(selectSelectedContents)
   const dispatch = useAppDispatch()
 
-  const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
+  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
+    useDnd()
 
   const editing = useMemo(
     () => isEditing(content.path),
@@ -84,6 +84,7 @@ const ExplorerTableCell = (props: Props) => {
         px: 1,
         py: 0,
         width,
+        ...droppableStyle,
       }}
       {...(dataKey === 'name'
         ? {
@@ -124,7 +125,6 @@ const ExplorerTableCell = (props: Props) => {
           {formatDateTime(content.dateModified)}
         </Typography>
       )}
-      {dropping && <Outline />}
     </TableCell>
   )
 }
