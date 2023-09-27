@@ -9,23 +9,13 @@ import {
   useState,
 } from 'react'
 import ExplorerGridItem from '~/components/ExplorerGridItem'
+import useExplorerList from '~/hooks/useExplorerList'
 import usePrevious from '~/hooks/usePrevious'
 import { Content } from '~/interfaces'
 
 const maxItemSize = 256
 
-type Props = {
-  contents: Content[]
-  focused: string | undefined
-  loading: boolean
-  noDataText: string
-  onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
-  onKeyDownEnter: (e: KeyboardEvent) => void
-  onScrollEnd: (scrollTop: number) => void
-  scrollTop: number
-}
-
-const ExplorerGrid = (props: Props) => {
+const ExplorerGrid = () => {
   const {
     contents,
     focused,
@@ -35,19 +25,19 @@ const ExplorerGrid = (props: Props) => {
     onKeyDownEnter,
     onScrollEnd,
     scrollTop,
-  } = props
+  } = useExplorerList()
 
   const previousLoading = usePrevious(loading)
 
   const parentRef = useRef<HTMLDivElement>(null)
 
+  const [restoring, setRestoring] = useState(false)
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
-
   const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
   const rows = useMemo(
@@ -98,8 +88,14 @@ const ExplorerGrid = (props: Props) => {
   }, [onScrollEnd])
 
   useEffect(() => {
+    if (!previousLoading && loading) {
+      setRestoring(true)
+    }
     if (previousLoading && !loading) {
-      virtualizer.scrollToOffset(scrollTop)
+      setTimeout(() => {
+        virtualizer.scrollToOffset(scrollTop)
+        setRestoring(false)
+      })
     }
   }, [loading, previousLoading, scrollTop, virtualizer])
 
@@ -185,61 +181,60 @@ const ExplorerGrid = (props: Props) => {
           height: '100%',
           overflowX: 'hidden',
           overflowY: 'scroll',
+          visibility: restoring ? 'hidden' : 'visible',
         }}
       >
         {wrapperWidth > 0 && (
-          <>
-            <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
-              {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
-                const columns = rows[virtualRow.index] as Content[]
-                return (
-                  <Box
-                    key={virtualRow.index}
-                    sx={{
-                      display: 'flex',
-                      height: size,
-                      transform: `translateY(${
-                        virtualRow.start - rowIndex * virtualRow.size
-                      }px)`,
-                    }}
-                  >
-                    {columns.map((content) => (
-                      <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                        <ExplorerGridItem content={content} />
-                      </Box>
-                    ))}
-                  </Box>
-                )
-              })}
-            </Box>
-            {contents.length === 0 && (
-              <Box
-                sx={{
-                  alignItems: 'center',
-                  display: 'flex',
-                  height: '100%',
-                  inset: 0,
-                  justifyContent: 'center',
-                  position: 'absolute',
-                }}
-              >
-                <Typography variant="caption">{noDataText}</Typography>
-              </Box>
-            )}
-            {loading && (
-              <LinearProgress
-                sx={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </>
+          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+              const columns = rows[virtualRow.index] as Content[]
+              return (
+                <Box
+                  key={virtualRow.index}
+                  sx={{
+                    display: 'flex',
+                    height: size,
+                    transform: `translateY(${
+                      virtualRow.start - rowIndex * virtualRow.size
+                    }px)`,
+                  }}
+                >
+                  {columns.map((content) => (
+                    <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                      <ExplorerGridItem content={content} />
+                    </Box>
+                  ))}
+                </Box>
+              )
+            })}
+          </Box>
         )}
       </Box>
+      {contents.length === 0 && (
+        <Box
+          sx={{
+            alignItems: 'center',
+            display: 'flex',
+            height: '100%',
+            inset: 0,
+            justifyContent: 'center',
+            position: 'absolute',
+          }}
+        >
+          <Typography variant="caption">{noDataText}</Typography>
+        </Box>
+      )}
+      {loading && (
+        <LinearProgress
+          sx={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            zIndex: 1,
+          }}
+        />
+      )}
     </Box>
   )
 }

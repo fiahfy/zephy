@@ -1,10 +1,10 @@
 import { Box, LinearProgress, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { KeyboardEvent, useCallback, useEffect, useRef } from 'react'
-
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import ExplorerTableCell from '~/components/ExplorerTableCell'
 import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
 import ExplorerTableRow from '~/components/ExplorerTableRow'
+import useExplorerList from '~/hooks/useExplorerList'
 import usePrevious from '~/hooks/usePrevious'
 import { Content } from '~/interfaces'
 
@@ -46,18 +46,7 @@ const columns: ColumnType[] = [
   },
 ]
 
-type Props = {
-  contents: Content[]
-  focused: string | undefined
-  loading: boolean
-  noDataText: string
-  onKeyDownArrow: (e: KeyboardEvent, content: Content) => void
-  onKeyDownEnter: (e: KeyboardEvent) => void
-  onScrollEnd: (scrollTop: number) => void
-  scrollTop: number
-}
-
-const ExplorerTable = (props: Props) => {
+const ExplorerTable = () => {
   const {
     contents,
     focused,
@@ -67,11 +56,13 @@ const ExplorerTable = (props: Props) => {
     onKeyDownEnter,
     onScrollEnd,
     scrollTop,
-  } = props
+  } = useExplorerList()
 
   const previousLoading = usePrevious(loading)
 
   const parentRef = useRef<HTMLDivElement>(null)
+
+  const [restoring, setRestoring] = useState(false)
 
   const virtualizer = useVirtualizer({
     count: contents.length,
@@ -95,10 +86,16 @@ const ExplorerTable = (props: Props) => {
   }, [onScrollEnd])
 
   useEffect(() => {
-    if (previousLoading && !loading) {
-      virtualizer.scrollToOffset(scrollTop)
+    if (!previousLoading && loading) {
+      setRestoring(true)
     }
-  }, [loading, previousLoading, scrollTop, virtualizer])
+    if (previousLoading && !loading) {
+      setTimeout(() => {
+        virtualizer.scrollToOffset(scrollTop)
+        setRestoring(false)
+      })
+    }
+  }, [contents, loading, previousLoading, scrollTop, virtualizer])
 
   useEffect(() => {
     if (focused) {
@@ -185,6 +182,7 @@ const ExplorerTable = (props: Props) => {
           flexGrow: 1,
           overflowX: 'hidden',
           overflowY: 'scroll',
+          visibility: restoring ? 'hidden' : 'visible',
         }}
       >
         <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
