@@ -162,7 +162,7 @@ const ExplorerTreeView = () => {
         },
       }}
     >
-      {root && <ExplorerTreeItem entry={root} key={root.path} />}
+      {root && <ExplorerTreeItem entry={root} />}
     </TreeView>
   )
 }

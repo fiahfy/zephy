@@ -2,8 +2,8 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import Outline from '~/components/Outline'
-import useContextMenu from '~/hooks/useContextMenu'
 import useDnd from '~/hooks/useDnd'
+import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
@@ -44,7 +44,7 @@ const DirectoryPreviewItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { createEntryMenuHandler } = useContextMenu()
+  const { onContextMenu } = useEntryItem(entry)
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
   const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
@@ -92,18 +92,17 @@ const DirectoryPreviewItem = (props: Props) => {
   )
 
   const handleDoubleClick = useCallback(
-    async (entry: Entry) =>
+    async () =>
       entry.type === 'directory'
         ? appDispatch(changeDirectory(entry.path))
         : await window.electronAPI.openPath(entry.path),
-    [appDispatch],
+    [appDispatch, entry.path, entry.type],
   )
 
   return (
     <ImageListItem
-      key={entry.path}
-      onContextMenu={createEntryMenuHandler(entry)}
-      onDoubleClick={() => handleDoubleClick(entry)}
+      onContextMenu={onContextMenu}
+      onDoubleClick={handleDoubleClick}
       sx={{
         cursor: 'pointer',
         '&:hover': {
@@ -149,7 +148,11 @@ const DirectoryPreviewItem = (props: Props) => {
             p: 0,
           },
         }}
-        title={<Typography variant="caption">{entry.name}</Typography>}
+        title={
+          <Typography title={entry.name} variant="caption">
+            {entry.name}
+          </Typography>
+        }
       />
       <Box
         className="overlay"

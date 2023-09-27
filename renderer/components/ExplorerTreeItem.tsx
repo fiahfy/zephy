@@ -3,8 +3,8 @@ import { useCallback, useMemo } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import EntryTreeItem from '~/components/EntryTreeItem'
 import Icon from '~/components/Icon'
-import useContextMenu from '~/hooks/useContextMenu'
 import useDnd from '~/hooks/useDnd'
+import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
@@ -23,7 +23,7 @@ const ExplorerTreeItem = (props: Props) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const dispatch = useAppDispatch()
 
-  const { createEntryMenuHandler } = useContextMenu()
+  const { onContextMenu } = useEntryItem(entry)
   const { createDraggableBinder, createDroppableBinder, dropping } = useDnd()
 
   const over = useMemo(
@@ -49,14 +49,13 @@ const ExplorerTreeItem = (props: Props) => {
     <EntryTreeItem
       LabelProps={{
         onClick: handleClick,
-        onContextMenu: createEntryMenuHandler(entry),
+        onContextMenu: onContextMenu,
         onDoubleClick: handleDoubleClick,
       }}
       icon={<EntryIcon entry={entry} />}
       label={entry.name}
       nodeId={entry.path}
       outlined={dropping}
-      title={entry.name}
       {...createDraggableBinder(entry)}
       {...createDroppableBinder(entry)}
     >

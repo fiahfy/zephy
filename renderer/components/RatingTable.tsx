@@ -1,19 +1,11 @@
-import {
-  Rating,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@mui/material'
+import { Rating, Table, TableBody, TableCell, Typography } from '@mui/material'
 import { useCallback, useMemo, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '~/store'
+import RatingTableRow from '~/components/RatingTableRow'
+import { useAppSelector } from '~/store'
 import { selectPathsByScore } from '~/store/rating'
-import { goToRatings } from '~/store/window'
 
 const RatingTable = () => {
   const pathsByScore = useAppSelector(selectPathsByScore)
-  const dispatch = useAppDispatch()
 
   const [selected, setSelected] = useState<number[]>([])
 
@@ -28,34 +20,18 @@ const RatingTable = () => {
 
   const handleBlur = useCallback(() => setSelected([]), [])
 
-  const handleClick = useCallback(
-    (score: number) => dispatch(goToRatings(score)),
-    [dispatch],
-  )
-
   const handleFocus = useCallback((score: number) => setSelected([score]), [])
 
   return (
     <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>
       <TableBody sx={{ width: '100%' }}>
         {items.map((item) => (
-          <TableRow
-            hover
+          <RatingTableRow
             key={item.score}
             onBlur={() => handleBlur()}
-            onClick={() => handleClick(item.score)}
             onFocus={() => handleFocus(item.score)}
+            score={item.score}
             selected={selected.includes(item.score)}
-            sx={{
-              cursor: 'pointer',
-              display: 'flex',
-              width: '100%',
-              '&:focus-visible': {
-                outline: '-webkit-focus-ring-color auto 1px',
-              },
-            }}
-            tabIndex={0}
-            title={''}
           >
             <TableCell
               sx={{
@@ -79,7 +55,7 @@ const RatingTable = () => {
                 ({item.count})
               </Typography>
             </TableCell>
-          </TableRow>
+          </RatingTableRow>
         ))}
       </TableBody>
     </Table>

@@ -1,15 +1,16 @@
 import { TableRow } from '@mui/material'
-import { FocusEvent, MouseEvent, ReactNode } from 'react'
+import { FocusEvent, ReactNode, useCallback } from 'react'
 import Outline from '~/components/Outline'
 import useDnd from '~/hooks/useDnd'
+import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
+import { useAppDispatch } from '~/store'
+import { changeDirectory } from '~/store/window'
 
 type Props = {
   children: ReactNode
   entry: Entry
   onBlur: (e: FocusEvent) => void
-  onClick: (e: MouseEvent) => void
-  onContextMenu: (e: MouseEvent) => void
   onFocus: (e: FocusEvent) => void
   selected: boolean
 }
@@ -17,14 +18,23 @@ type Props = {
 const FavoriteTableRow = (props: Props) => {
   const { children, entry, ...others } = props
 
+  const dispatch = useAppDispatch()
+
+  const { onContextMenu } = useEntryItem(entry)
   const { createDroppableBinder, dropping } = useDnd()
+
+  const handleClick = useCallback(
+    () => dispatch(changeDirectory(entry.path)),
+    [dispatch, entry.path],
+  )
 
   return (
     <TableRow
       {...others}
       component="div"
       hover
-      key={entry.path}
+      onClick={handleClick}
+      onContextMenu={onContextMenu}
       sx={{
         cursor: 'pointer',
         display: 'flex',
@@ -35,7 +45,6 @@ const FavoriteTableRow = (props: Props) => {
         },
       }}
       tabIndex={0}
-      title={entry.name}
       {...createDroppableBinder(entry)}
     >
       {children}

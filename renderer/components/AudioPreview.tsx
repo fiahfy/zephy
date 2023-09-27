@@ -11,10 +11,10 @@ import {
   useRef,
   useState,
 } from 'react'
-import useContextMenu from '~/hooks/useContextMenu'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   entry: Entry
@@ -26,8 +26,6 @@ const AudioPreview = (props: Props) => {
   const loop = useAppSelector(selectLoop)
   const volume = useAppSelector(selectVolume)
   const dispatch = useAppDispatch()
-
-  const { createMenuHandler } = useContextMenu()
 
   const ref = useRef<HTMLAudioElement>(null)
   const [paused, setPaused] = useState(true)
@@ -77,7 +75,7 @@ const AudioPreview = (props: Props) => {
 
   const handleContextMenu = useMemo(
     () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
-    [createMenuHandler, loop],
+    [loop],
   )
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

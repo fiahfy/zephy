@@ -1,5 +1,4 @@
 import { MouseEvent, useMemo } from 'react'
-import useContextMenu from '~/hooks/useContextMenu'
 import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -20,6 +19,7 @@ import {
   selectCurrentDirectory,
   selectZephySchema,
 } from '~/store/window'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 const useExplorerItem = (content: Content) => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
@@ -73,8 +73,6 @@ const useExplorerItem = (content: Content) => {
         : await window.electronAPI.openPath(content.path)
     },
   )
-
-  const { createMenuHandler } = useContextMenu()
 
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
@@ -136,7 +134,6 @@ const useExplorerItem = (content: Content) => {
   }, [
     content.path,
     content.type,
-    createMenuHandler,
     currentDirectory,
     isFavorite,
     selectedContents,

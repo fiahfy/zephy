@@ -85,7 +85,6 @@ const ExplorerTableCell = (props: Props) => {
         py: 0,
         width,
       }}
-      title={dataKey === 'name' ? content.name : undefined}
       {...(dataKey === 'name'
         ? {
             ...createDraggableBinder(dragContents),
@@ -108,7 +107,7 @@ const ExplorerTableCell = (props: Props) => {
               <ExplorerNameTextField content={content} />
             </Box>
           ) : (
-            <Typography noWrap variant="caption">
+            <Typography noWrap title={content.name} variant="caption">
               {content.name}
             </Typography>
           )}

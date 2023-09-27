@@ -31,7 +31,6 @@ import {
 import Icon from '~/components/Icon'
 import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import { useTrafficLights } from '~/contexts/TrafficLightsContext'
-import useContextMenu from '~/hooks/useContextMenu'
 import useLongPress from '~/hooks/useLongPress'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load, searchQuery, selectLoading, unselect } from '~/store/explorer'
@@ -53,6 +52,7 @@ import {
   selectZephyUrl,
   upward,
 } from '~/store/window'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
@@ -72,8 +72,6 @@ const AddressBar = () => {
 
   const { visible } = useTrafficLights()
 
-  const { createMenuHandler } = useContextMenu()
-
   const backHistoryMenuHandler = useMemo(
     () =>
       createMenuHandler(
@@ -85,7 +83,7 @@ const AddressBar = () => {
           },
         })),
       ),
-    [backHistories, createMenuHandler],
+    [backHistories],
   )
   const forwardHistoryMenuHandler = useMemo(
     () =>
@@ -98,7 +96,7 @@ const AddressBar = () => {
           },
         })),
       ),
-    [createMenuHandler, forwardHistories],
+    [forwardHistories],
   )
 
   const bindBack = useLongPress(backHistoryMenuHandler)
@@ -211,7 +209,6 @@ const AddressBar = () => {
         { id: 'settings' },
       ]),
     [
-      createMenuHandler,
       currentDirectory,
       currentSortOption.orderBy,
       currentViewMode,

@@ -6,10 +6,10 @@ import Inspector from '~/components/Inspector'
 import Navigator from '~/components/Navigator'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
-import useContextMenu from '~/hooks/useContextMenu'
 import useEventListener from '~/hooks/useEventListener'
 import useMessageListener from '~/hooks/useMessageListener'
 import useTitle from '~/hooks/useTitle'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   children: ReactNode
@@ -18,15 +18,11 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props
 
-  const { createMenuHandler } = useContextMenu()
   useEventListener()
   useMessageListener()
   const title = useTitle()
 
-  const handleContextMenu = useMemo(
-    () => createMenuHandler([]),
-    [createMenuHandler],
-  )
+  const handleContextMenu = useMemo(() => createMenuHandler(), [])
 
   return (
     <Box

@@ -75,7 +75,11 @@ const EntryTreeItem = (props: Props) => {
           }}
         >
           {icon}
-          <Typography noWrap variant="caption">
+          <Typography
+            noWrap
+            title={typeof label === 'string' ? label : undefined}
+            variant="caption"
+          >
             {label}
           </Typography>
           {outlined && <Outline />}

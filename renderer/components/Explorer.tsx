@@ -3,7 +3,6 @@ import { FocusEvent, createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
 import Outline from '~/components/Outline'
-import useContextMenu from '~/hooks/useContextMenu'
 import useDnd from '~/hooks/useDnd'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselect } from '~/store/explorer'
@@ -13,6 +12,7 @@ import {
   selectCurrentViewMode,
   selectZephySchema,
 } from '~/store/window'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 const Explorer = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
@@ -21,7 +21,6 @@ const Explorer = () => {
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
-  const { createMenuHandler } = useContextMenu()
   const { createCurrentDirectoryDroppableBinder, dropping } = useDnd()
 
   const handleClick = useCallback(() => {
@@ -51,13 +50,7 @@ const Explorer = () => {
           params: { orderBy: currentSortOption.orderBy },
         },
       ]),
-    [
-      createMenuHandler,
-      currentDirectory,
-      currentSortOption.orderBy,
-      currentViewMode,
-      zephySchema,
-    ],
+    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
   )
 
   const handleBlur = useCallback(

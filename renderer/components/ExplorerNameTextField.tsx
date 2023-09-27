@@ -8,10 +8,10 @@ import {
   useState,
 } from 'react'
 import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
-import useContextMenu from '~/hooks/useContextMenu'
 import { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { finishEditing, rename } from '~/store/explorer'
+import { createMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   content: Content
@@ -21,8 +21,6 @@ const ExplorerNameTextField = (props: Props) => {
   const { content } = props
 
   const dispatch = useAppDispatch()
-
-  const { createMenuHandler } = useContextMenu()
 
   const [name, setName] = useState(content.name)
   const ref = useRef<HTMLInputElement>(null)
@@ -72,10 +70,7 @@ const ExplorerNameTextField = (props: Props) => {
     [dispatch, finish],
   )
 
-  const handleContextMenu = useMemo(
-    () => createMenuHandler([]),
-    [createMenuHandler],
-  )
+  const handleContextMenu = useMemo(() => createMenuHandler(), [])
 
   return (
     <DenseOutlineTextField
