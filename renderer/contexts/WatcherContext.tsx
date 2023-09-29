@@ -10,12 +10,14 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { handle } from '~/store/explorer'
 import { selectCurrentDirectory } from '~/store/window'
 
+type EventType = 'create' | 'update' | 'delete'
+
 const WatcherContext = createContext<
   | {
       watch: (
         paths: string[],
         callback: (
-          eventType: 'create' | 'update' | 'delete',
+          eventType: EventType,
           directoryPath: string,
           filePath: string,
         ) => void,
@@ -36,7 +38,7 @@ export const WatcherProvider = (props: Props) => {
   const [callback, setCallback] =
     useState<
       () => (
-        eventType: 'create' | 'update' | 'delete',
+        eventType: EventType,
         directoryPath: string,
         filePath: string,
       ) => void
@@ -67,7 +69,7 @@ export const WatcherProvider = (props: Props) => {
     (
       paths: string[],
       callback: (
-        eventType: 'create' | 'update' | 'delete',
+        eventType: EventType,
         directoryPath: string,
         filePath: string,
       ) => void,

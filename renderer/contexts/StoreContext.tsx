@@ -47,11 +47,11 @@ export const StoreProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      const details = await window.electronAPI.window.getDetails()
-      if (!details) {
+      const data = await window.electronAPI.window.restore()
+      if (!data) {
         return
       }
-      const { index, params, restored } = details
+      const { index, params, restored } = data
       dispatch(set(index))
       const directory = params?.directory
       if (!restored && directory) {

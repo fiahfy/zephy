@@ -50,7 +50,7 @@ export interface IElectronAPI {
     ) => Promise<void>
   }
   window: {
-    getDetails: () => Promise<
+    restore: () => Promise<
       | { index: number; params: { directory?: string }; restored: boolean }
       | undefined
     >

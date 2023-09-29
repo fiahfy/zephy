@@ -12,14 +12,9 @@ import {
   moveEntries,
   renameEntry,
 } from '~/utils/file'
+import createWatcher from '~/watcher'
 
-const registerHandlers = (
-  notify: (
-    eventType: 'create' | 'delete',
-    directoryPath: string,
-    filePath: string,
-  ) => void,
-) => {
+const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
     basename(path),
   )
@@ -89,7 +84,7 @@ const registerHandlers = (
         paths.map(async (path) => {
           await shell.trashItem(path)
           // notify event manually because chokidar doesn't detect trashItem event
-          notify('delete', dirname(path), path)
+          watcher.notify('delete', dirname(path), path)
         }),
       ),
   )

@@ -81,7 +81,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
   },
   window: {
-    getDetails: () => ipcRenderer.invoke('window-get-details'),
+    restore: () => ipcRenderer.invoke('window-restore'),
     open: (params: { directory: string }) =>
       ipcRenderer.invoke('window-open', params),
   },

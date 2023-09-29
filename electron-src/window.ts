@@ -11,26 +11,25 @@ const windowManager = <T>(
 
   let visibilities: boolean[] = []
 
-  const detailsMap: {
+  const dataMap: {
     [id: number]: { index: number; params?: T; restored: boolean }
   } = {}
 
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
-  // TODO: refactor
-  ipcMain.handle('window-get-details', (event: IpcMainInvokeEvent) => {
+  ipcMain.handle('window-restore', (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
     if (!windowId) {
       return undefined
     }
-    const details = detailsMap[windowId]
-    if (!details) {
+    const data = dataMap[windowId]
+    if (!data) {
       return undefined
     }
-    const result = { ...details }
-    details.restored = true
-    return result
+    const duplicated = { ...data }
+    data.restored = true
+    return duplicated
   })
   ipcMain.handle('window-open', (_event: IpcMainInvokeEvent, params?: T) =>
     create(params),
@@ -44,9 +43,9 @@ const windowManager = <T>(
   const restoreVisibilities = async () => {
     try {
       const json = await readFile(savedPath, 'utf8')
-      const restored = JSON.parse(json)
-      if (isVisibilities(restored)) {
-        visibilities = restored
+      const data = JSON.parse(json)
+      if (isVisibilities(data)) {
+        visibilities = data
       }
     } catch (e) {
       // noop
@@ -75,10 +74,10 @@ const windowManager = <T>(
     })
     windowState.manage(browserWindow)
 
-    detailsMap[browserWindow.id] = { index, params, restored: false }
+    dataMap[browserWindow.id] = { index, params, restored: false }
 
     browserWindow.on('close', () => {
-      delete detailsMap[browserWindow.id]
+      delete dataMap[browserWindow.id]
       visibilities[index] = false
     })
 

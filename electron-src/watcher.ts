@@ -2,14 +2,16 @@ import chokidar, { FSWatcher } from 'chokidar'
 import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from 'electron'
 import { dirname } from 'node:path'
 
+type EventType = 'create' | 'update' | 'delete'
+
 const createWatcher = () => {
   const watchers: { [key: string]: FSWatcher } = {}
 
   const createHandler = (
-    eventType: 'create' | 'update' | 'delete',
+    eventType: EventType,
     directoryPaths: string[],
     callback: (
-      eventType: 'create' | 'update' | 'delete',
+      eventType: EventType,
       directoryPath: string,
       filePath: string,
     ) => void,
@@ -34,7 +36,7 @@ const createWatcher = () => {
     id: number,
     directoryPaths: string[],
     callback: (
-      eventType: 'create' | 'update' | 'delete',
+      eventType: EventType,
       directoryPath: string,
       filePath: string,
     ) => void,
@@ -56,7 +58,7 @@ const createWatcher = () => {
     browserWindow.on('close', () => close(browserWindow.webContents.id))
 
   const notify = (
-    eventType: 'create' | 'update' | 'delete',
+    eventType: EventType,
     directoryPath: string,
     filePath: string,
   ) => {
