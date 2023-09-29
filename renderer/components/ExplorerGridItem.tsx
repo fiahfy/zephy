@@ -82,7 +82,9 @@ const ExplorerGridItem = (props: Props) => {
         }
 
         try {
-          const entries = await window.electronAPI.getEntries(content.path)
+          const entries = await window.electronAPI.entry.getEntries(
+            content.path,
+          )
           return entries
             .filter(
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
@@ -93,7 +95,7 @@ const ExplorerGridItem = (props: Props) => {
           return []
         }
       })()
-      const thumbnail = await window.electronAPI.createThumbnailUrl(paths)
+      const thumbnail = await window.electronAPI.entry.createThumbnailUrl(paths)
       if (unmounted) {
         return
       }

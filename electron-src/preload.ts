@@ -3,34 +3,6 @@ import { ApplicationMenuParams } from '~/applicationMenu'
 import { ContextMenuParams } from '~/contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // TODO: rename funcs
-  basename: (path: string) => ipcRenderer.invoke('basename', path),
-  copyEntries: (paths: string[]) => ipcRenderer.invoke('copy-entries', paths),
-  createDirectory: (directoryPath: string) =>
-    ipcRenderer.invoke('create-directory', directoryPath),
-  createThumbnailUrl: (paths: string | string[]) =>
-    ipcRenderer.invoke('create-thumbnail-url', paths),
-  dirname: (path: string) => ipcRenderer.invoke('dirname', path),
-  getDetailedEntries: (directoryPath: string) =>
-    ipcRenderer.invoke('get-detailed-entries', directoryPath),
-  getDetailedEntriesForPaths: (paths: string[]) =>
-    ipcRenderer.invoke('get-detailed-entries-for-paths', paths),
-  getDetailedEntry: (path: string) =>
-    ipcRenderer.invoke('get-detailed-entry', path),
-  getEntries: (directoryPath: string) =>
-    ipcRenderer.invoke('get-entries', directoryPath),
-  getEntryHierarchy: (path?: string) =>
-    ipcRenderer.invoke('get-entry-hierarchy', path),
-  getMetadata: (path: string) => ipcRenderer.invoke('get-metadata', path),
-  isDarwin: () => ipcRenderer.invoke('is-darwin'),
-  moveEntries: (paths: string[], directoryPath: string) =>
-    ipcRenderer.invoke('move-entries', paths, directoryPath),
-  openPath: (path: string) => ipcRenderer.invoke('open-path', path),
-  pasteEntries: (directoryPath: string) =>
-    ipcRenderer.invoke('paste-entries', directoryPath),
-  renameEntry: (path: string, newName: string) =>
-    ipcRenderer.invoke('rename-entry', path, newName),
-  trashEntries: (paths: string[]) => ipcRenderer.invoke('trash-entries', paths),
   applicationMenu: {
     update: (params: ApplicationMenuParams) =>
       ipcRenderer.invoke('application-menu-update', params),
@@ -38,6 +10,34 @@ contextBridge.exposeInMainWorld('electronAPI', {
   contextMenu: {
     show: (params: ContextMenuParams) =>
       ipcRenderer.invoke('context-menu-show', params),
+  },
+  entry: {
+    copy: (paths: string[]) => ipcRenderer.invoke('entry-copy', paths),
+    createDirectory: (directoryPath: string) =>
+      ipcRenderer.invoke('entry-create-directory', directoryPath),
+    createThumbnailUrl: (paths: string | string[]) =>
+      ipcRenderer.invoke('entry-create-thumbnail-url', paths),
+    getDetailedEntries: (directoryPath: string) =>
+      ipcRenderer.invoke('entry-get-detailed-entries', directoryPath),
+    getDetailedEntriesForPaths: (paths: string[]) =>
+      ipcRenderer.invoke('entry-get-detailed-entries-for-paths', paths),
+    getDetailedEntry: (path: string) =>
+      ipcRenderer.invoke('entry-get-detailed-entry', path),
+    getEntries: (directoryPath: string) =>
+      ipcRenderer.invoke('entry-get-entries', directoryPath),
+    getEntryHierarchy: (path?: string) =>
+      ipcRenderer.invoke('entry-get-entry-hierarchy', path),
+    getMetadata: (path: string) =>
+      ipcRenderer.invoke('entry-get-metadata', path),
+    move: (paths: string[], directoryPath: string) =>
+      ipcRenderer.invoke('entry-move', paths, directoryPath),
+    moveToTrash: (paths: string[]) =>
+      ipcRenderer.invoke('entry-move-to-trash', paths),
+    open: (path: string) => ipcRenderer.invoke('entry-open', path),
+    paste: (directoryPath: string) =>
+      ipcRenderer.invoke('entry-paste', directoryPath),
+    rename: (path: string, newName: string) =>
+      ipcRenderer.invoke('entry-rename', path, newName),
   },
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => {
@@ -57,6 +57,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('message-send', listener)
       return () => ipcRenderer.removeListener('message-send', listener)
     },
+  },
+  node: {
+    basename: (path: string) => ipcRenderer.invoke('node-basename', path),
+    dirname: (path: string) => ipcRenderer.invoke('node-dirname', path),
+    isDarwin: () => ipcRenderer.invoke('node-is-darwin'),
   },
   watcher: {
     watch: (

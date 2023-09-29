@@ -33,7 +33,7 @@ export const TrafficLightsProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      const darwin = await window.electronAPI.isDarwin()
+      const darwin = await window.electronAPI.node.isDarwin()
       setDarwin(darwin)
       const fullscreen = await window.electronAPI.fullscreen.isEntered()
       setFullscreen(fullscreen)

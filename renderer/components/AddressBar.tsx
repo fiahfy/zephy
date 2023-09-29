@@ -163,7 +163,7 @@ const AddressBar = () => {
   }, [currentDirectory, dispatch])
 
   const handleClickFolder = useCallback(
-    async () => await window.electronAPI.openPath(currentDirectory),
+    async () => await window.electronAPI.entry.open(currentDirectory),
     [currentDirectory],
   )
 

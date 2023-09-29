@@ -251,11 +251,13 @@ export const load = (): AppThunk => async (dispatch, getState) => {
       if (url.pathname === 'ratings') {
         const pathsMap = selectPathsByScore(getState())
         const paths = pathsMap[Number(url.params.score ?? 0)] ?? []
-        entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
+        entries =
+          await window.electronAPI.entry.getDetailedEntriesForPaths(paths)
       }
     } else {
       const currentDirectory = selectCurrentDirectory(getState())
-      entries = await window.electronAPI.getDetailedEntries(currentDirectory)
+      entries =
+        await window.electronAPI.entry.getDetailedEntries(currentDirectory)
     }
     dispatch(loaded({ entries }))
   } catch (e) {
@@ -297,7 +299,7 @@ export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
     const { add } = explorerSlice.actions
-    const entry = await window.electronAPI.createDirectory(directoryPath)
+    const entry = await window.electronAPI.entry.createDirectory(directoryPath)
     dispatch(add([entry]))
     dispatch(select(entry.path))
     dispatch(startEditing(entry.path))
@@ -309,7 +311,7 @@ export const moveToTrash =
     const { remove } = explorerSlice.actions
     const selected = selectSelected(getState())
     const targetPaths = paths ?? selected
-    await window.electronAPI.trashEntries(targetPaths)
+    await window.electronAPI.entry.moveToTrash(targetPaths)
     dispatch(remove(targetPaths))
     dispatch(unselect())
   }
@@ -319,7 +321,7 @@ export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch) => {
     const { add, remove } = explorerSlice.actions
-    const entry = await window.electronAPI.renameEntry(path, newName)
+    const entry = await window.electronAPI.entry.rename(path, newName)
     dispatch(remove([path]))
     dispatch(add([entry]))
     dispatch(select(entry.path))
@@ -329,13 +331,13 @@ export const rename =
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {
-    await window.electronAPI.moveEntries(paths, directoryPath)
+    await window.electronAPI.entry.move(paths, directoryPath)
     dispatch(unselect())
   }
 
 export const copy = (): AppThunk => async (_, getState) => {
   const selected = selectSelected(getState())
-  await window.electronAPI.copyEntries(selected)
+  await window.electronAPI.entry.copy(selected)
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
@@ -344,7 +346,7 @@ export const paste = (): AppThunk => async (_, getState) => {
   if (zephySchema) {
     return
   }
-  await window.electronAPI.pasteEntries(currentDirectory)
+  await window.electronAPI.entry.paste(currentDirectory)
 }
 
 export const newWindow =
@@ -371,7 +373,7 @@ export const handle =
     switch (eventType) {
       case 'create':
       case 'update': {
-        const entry = await window.electronAPI.getDetailedEntry(filePath)
+        const entry = await window.electronAPI.entry.getDetailedEntry(filePath)
         return dispatch(add([entry]))
       }
       case 'delete':

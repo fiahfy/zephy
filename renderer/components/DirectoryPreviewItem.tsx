@@ -63,7 +63,7 @@ const DirectoryPreviewItem = (props: Props) => {
         }
 
         try {
-          const entries = await window.electronAPI.getEntries(entry.path)
+          const entries = await window.electronAPI.entry.getEntries(entry.path)
           return entries
             .filter(
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
@@ -74,7 +74,7 @@ const DirectoryPreviewItem = (props: Props) => {
           return []
         }
       })()
-      const thumbnail = await window.electronAPI.createThumbnailUrl(paths)
+      const thumbnail = await window.electronAPI.entry.createThumbnailUrl(paths)
       if (unmounted) {
         return
       }
@@ -95,7 +95,7 @@ const DirectoryPreviewItem = (props: Props) => {
     async () =>
       entry.type === 'directory'
         ? appDispatch(changeDirectory(entry.path))
-        : await window.electronAPI.openPath(entry.path),
+        : await window.electronAPI.entry.open(entry.path),
     [appDispatch, entry.path, entry.type],
   )
 

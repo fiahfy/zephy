@@ -15,70 +15,52 @@ import {
 import createWatcher from '~/watcher'
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.handle('basename', (_event: IpcMainInvokeEvent, path: string) =>
-    basename(path),
+  ipcMain.handle('entry-copy', (_event: IpcMainInvokeEvent, paths: string[]) =>
+    copy(paths),
   )
   ipcMain.handle(
-    'copy-entries',
-    (_event: IpcMainInvokeEvent, paths: string[]) => copy(paths),
-  )
-  ipcMain.handle(
-    'create-directory',
+    'entry-create-directory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       createDirectory(directoryPath),
   )
   ipcMain.handle(
-    'create-thumbnail-url',
+    'entry-create-thumbnail-url',
     (_event: IpcMainInvokeEvent, path: string) => createThumbnailUrl(path),
   )
-  ipcMain.handle('dirname', (_event: IpcMainInvokeEvent, path: string) =>
-    dirname(path),
-  )
   ipcMain.handle(
-    'get-detailed-entries',
+    'entry-get-detailed-entries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getDetailedEntries(directoryPath),
   )
   ipcMain.handle(
-    'get-detailed-entries-for-paths',
+    'entry-get-detailed-entries-for-paths',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
       getDetailedEntriesForPaths(paths),
   )
   ipcMain.handle(
-    'get-detailed-entry',
+    'entry-get-detailed-entry',
     (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path),
   )
   ipcMain.handle(
-    'get-entries',
+    'entry-get-entries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getEntries(directoryPath),
   )
   ipcMain.handle(
-    'get-entry-hierarchy',
+    'entry-get-entry-hierarchy',
     (_event: IpcMainInvokeEvent, path?: string) => getEntryHierarchy(path),
   )
-  ipcMain.handle('get-metadata', (_event: IpcMainInvokeEvent, path: string) =>
-    getMetadata(path),
-  )
-  ipcMain.handle('is-darwin', () => process.platform === 'darwin')
   ipcMain.handle(
-    'move-entries',
+    'entry-get-metadata',
+    (_event: IpcMainInvokeEvent, path: string) => getMetadata(path),
+  )
+  ipcMain.handle(
+    'entry-move',
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
   )
-  ipcMain.handle('open-path', (_event: IpcMainInvokeEvent, path: string) =>
-    shell.openPath(path),
-  )
-  ipcMain.handle('paste-entries', (_event: IpcMainInvokeEvent, directoryPath) =>
-    paste(directoryPath),
-  )
   ipcMain.handle(
-    'rename-entry',
-    (_event: IpcMainInvokeEvent, path: string, newName: string) =>
-      renameEntry(path, newName),
-  )
-  ipcMain.handle(
-    'trash-entries',
+    'entry-move-to-trash',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
       Promise.all(
         paths.map(async (path) => {
@@ -88,6 +70,24 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
         }),
       ),
   )
+  ipcMain.handle('entry-open', (_event: IpcMainInvokeEvent, path: string) =>
+    shell.openPath(path),
+  )
+  ipcMain.handle('entry-paste', (_event: IpcMainInvokeEvent, directoryPath) =>
+    paste(directoryPath),
+  )
+  ipcMain.handle(
+    'entry-rename',
+    (_event: IpcMainInvokeEvent, path: string, newName: string) =>
+      renameEntry(path, newName),
+  )
+  ipcMain.handle('node-basename', (_event: IpcMainInvokeEvent, path: string) =>
+    basename(path),
+  )
+  ipcMain.handle('node-dirname', (_event: IpcMainInvokeEvent, path: string) =>
+    dirname(path),
+  )
+  ipcMain.handle('node-is-darwin', () => process.platform === 'darwin')
 }
 
 export default registerHandlers

@@ -70,7 +70,7 @@ const useExplorerItem = (content: Content) => {
       }
       content.type === 'directory'
         ? dispatch(changeDirectory(content.path))
-        : await window.electronAPI.openPath(content.path)
+        : await window.electronAPI.entry.open(content.path)
     },
   )
 

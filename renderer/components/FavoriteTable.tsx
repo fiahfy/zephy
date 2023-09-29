@@ -16,9 +16,10 @@ const FavoriteTable = () => {
     ;(async () => {
       const entries = await (async () => {
         try {
-          const entries = await window.electronAPI.getDetailedEntriesForPaths(
-            favorites.map((favorite) => favorite.path),
-          )
+          const entries =
+            await window.electronAPI.entry.getDetailedEntriesForPaths(
+              favorites.map((favorite) => favorite.path),
+            )
           return entries.sort((a, b) => a.name.localeCompare(b.name))
         } catch (e) {
           return []

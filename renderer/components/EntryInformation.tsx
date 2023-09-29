@@ -23,7 +23,7 @@ const EntryInformation = () => {
       if (!entry?.path) {
         return
       }
-      const metadata = await window.electronAPI.getMetadata(entry.path)
+      const metadata = await window.electronAPI.entry.getMetadata(entry.path)
       if (unmounted) {
         return
       }

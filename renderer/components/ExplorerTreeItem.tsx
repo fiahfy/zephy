@@ -42,7 +42,7 @@ const ExplorerTreeItem = (props: Props) => {
 
   const handleDoubleClick = useCallback(async () => {
     if (entry.type === 'file') {
-      await window.electronAPI.openPath(entry.path)
+      await window.electronAPI.entry.open(entry.path)
     }
   }, [entry.path, entry.type])
 
