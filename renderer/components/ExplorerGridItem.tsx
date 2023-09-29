@@ -163,13 +163,19 @@ const ExplorerGridItem = (props: Props) => {
         cursor: 'pointer',
         height: '100%!important',
         width: '100%',
+        '::before': {
+          content: '""',
+          inset: 0,
+          pointerEvents: 'none',
+          position: 'absolute',
+        },
         '&:hover': {
-          '.overlay': {
+          '::before': {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },
         '&.selected': {
-          '.overlay': {
+          '::before': {
             backgroundColor: (theme) =>
               alpha(
                 theme.palette.primary.main,
@@ -177,7 +183,7 @@ const ExplorerGridItem = (props: Props) => {
               ),
           },
           '&:hover': {
-            '.overlay': {
+            '::before': {
               backgroundColor: (theme) =>
                 alpha(
                   theme.palette.primary.main,
@@ -280,14 +286,6 @@ const ExplorerGridItem = (props: Props) => {
             )}
           </Box>
         }
-      />
-      <Box
-        className="overlay"
-        sx={{
-          inset: 0,
-          pointerEvents: 'none',
-          position: 'absolute',
-        }}
       />
     </ImageListItem>
   )

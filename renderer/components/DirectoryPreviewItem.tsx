@@ -1,5 +1,13 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import pluralize from 'pluralize'
+import {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react'
+import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import EntryIcon from '~/components/EntryIcon'
 import useDnd from '~/hooks/useDnd'
 import useEntryItem from '~/hooks/useEntryItem'
@@ -8,16 +16,14 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
+import { rate, selectGetScore } from '~/store/rating'
 
-type State = {
-  loading: boolean
-  thumbnail?: string
-}
+type State = { itemCount: number; loading: boolean; thumbnail?: string }
 
 type Action =
   | {
       type: 'loaded'
-      payload?: string
+      payload: { itemCount: number; thumbnail?: string }
     }
   | { type: 'loading' }
 
@@ -25,11 +31,11 @@ const reducer = (_state: State, action: Action) => {
   switch (action.type) {
     case 'loaded':
       return {
+        ...action.payload,
         loading: false,
-        thumbnail: action.payload,
       }
     case 'loading':
-      return { loading: true, thumbnail: undefined }
+      return { itemCount: 0, loading: true, thumbnail: undefined }
   }
 }
 
@@ -40,6 +46,7 @@ type Props = {
 const DirectoryPreviewItem = (props: Props) => {
   const { entry } = props
 
+  const getScore = useAppSelector(selectGetScore)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
@@ -47,7 +54,8 @@ const DirectoryPreviewItem = (props: Props) => {
   const { createDraggableBinder, createDroppableBinder, droppableStyle } =
     useDnd()
 
-  const [{ loading, thumbnail }, dispatch] = useReducer(reducer, {
+  const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
+    itemCount: 0,
     loading: false,
     thumbnail: undefined,
   })
@@ -78,7 +86,10 @@ const DirectoryPreviewItem = (props: Props) => {
       if (unmounted) {
         return
       }
-      dispatch({ type: 'loaded', payload: thumbnail })
+      dispatch({
+        type: 'loaded',
+        payload: { itemCount: paths.length, thumbnail },
+      })
     })()
 
     return () => {
@@ -99,14 +110,42 @@ const DirectoryPreviewItem = (props: Props) => {
     [appDispatch, entry.path, entry.type],
   )
 
+  const handleChangeRating = useCallback(
+    (_e: SyntheticEvent, value: number | null) =>
+      appDispatch(rate({ path: entry.path, rating: value ?? 0 })),
+    [appDispatch, entry.path],
+  )
+
+  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
+  const rating = useMemo(
+    () => (
+      <NoOutlineRating
+        color="primary"
+        onChange={handleChangeRating}
+        onClick={(e) => e.stopPropagation()}
+        precision={0.5}
+        size="small"
+        sx={{ my: 0.25 }}
+        value={getScore(entry.path)}
+      />
+    ),
+    [entry.path, getScore, handleChangeRating],
+  )
+
   return (
     <ImageListItem
       onContextMenu={onContextMenu}
       onDoubleClick={handleDoubleClick}
       sx={{
         cursor: 'pointer',
+        '::before': {
+          content: '""',
+          inset: 0,
+          pointerEvents: 'none',
+          position: 'absolute',
+        },
         '&:hover': {
-          '.overlay': {
+          '::before': {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },
@@ -121,7 +160,7 @@ const DirectoryPreviewItem = (props: Props) => {
         <img
           src={thumbnail}
           style={{
-            aspectRatio: '16 / 9',
+            aspectRatio: '1 / 1',
             objectPosition: 'center top',
           }}
         />
@@ -129,7 +168,7 @@ const DirectoryPreviewItem = (props: Props) => {
         <Box
           sx={{
             alignItems: 'center',
-            aspectRatio: '16 / 9',
+            aspectRatio: '1 / 1',
             display: 'flex',
             justifyContent: 'center',
           }}
@@ -139,29 +178,64 @@ const DirectoryPreviewItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box ml={1} mr={0.5} sx={{ display: 'flex' }}>
+          <Box ml={1} mr={0.5} mt={-2.5}>
             <EntryIcon entry={entry} />
           </Box>
         }
         actionPosition="left"
+        subtitle={
+          <Box
+            sx={{
+              alignItems: 'end',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            {rating}
+            {!loading && entry.type === 'directory' && (
+              <Typography ml={1} noWrap variant="caption">
+                {pluralize('item', itemCount, true)}
+              </Typography>
+            )}
+          </Box>
+        }
         sx={{
           '.MuiImageListItemBar-titleWrap': {
+            overflow: 'visible',
             p: 0,
+            pb: 0.5,
+            pr: 1,
+            '.MuiImageListItemBar-title': {
+              overflow: 'visible',
+            },
           },
         }}
         title={
-          <Typography title={entry.name} variant="caption">
-            {entry.name}
-          </Typography>
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+              height: (theme) => theme.spacing(5),
+            }}
+          >
+            <Typography
+              sx={{
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                display: '-webkit-box',
+                lineHeight: 1.4,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'initial',
+                wordBreak: 'break-all',
+              }}
+              title={entry.name}
+              variant="caption"
+            >
+              {entry.name}
+            </Typography>
+          </Box>
         }
-      />
-      <Box
-        className="overlay"
-        sx={{
-          inset: 0,
-          pointerEvents: 'none',
-          position: 'absolute',
-        }}
       />
     </ImageListItem>
   )
