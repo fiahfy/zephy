@@ -77,7 +77,7 @@ const AddressBar = () => {
       createMenuHandler(
         backHistories.slice(0, 12).map((history, i) => ({
           id: 'go',
-          params: {
+          data: {
             offset: -(i + 1),
             title: history.title,
           },
@@ -90,7 +90,7 @@ const AddressBar = () => {
       createMenuHandler(
         forwardHistories.slice(0, 12).map((history, i) => ({
           id: 'go',
-          params: {
+          data: {
             offset: i + 1,
             title: history.title,
           },
@@ -187,23 +187,23 @@ const AddressBar = () => {
       createMenuHandler([
         {
           id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectory },
         },
         { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'view', data: { viewMode: currentViewMode } },
         { id: 'separator' },
         {
           id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
+          data: { orderBy: currentSortOption.orderBy },
         },
         { id: 'separator' },
         {
           id: 'toggleNavigator',
-          params: { hidden: isSidebarHidden('primary') },
+          data: { hidden: isSidebarHidden('primary') },
         },
         {
           id: 'toggleInspector',
-          params: { hidden: isSidebarHidden('secondary') },
+          data: { hidden: isSidebarHidden('secondary') },
         },
         { id: 'separator' },
         { id: 'settings' },
@@ -357,8 +357,7 @@ const AddressBar = () => {
           }}
         >
           <Autocomplete
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ListboxProps={{ sx: { typography: 'body2' } } as any}
+            ListboxProps={{ sx: { typography: 'body2' } }}
             freeSolo
             fullWidth
             inputValue={query}

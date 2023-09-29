@@ -26,14 +26,10 @@ export interface IElectronAPI {
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   trashEntries: (paths: string[]) => Promise<void>
   applicationMenu: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    update: (params: any) => Promise<void>
+    update: (params: ApplicationMenuParams) => Promise<void>
   }
   contextMenu: {
-    show: (
-      params: ContextMenuParams,
-      options: ContextMenuOption[],
-    ) => Promise<void>
+    show: (params: ContextMenuParams) => Promise<void>
   }
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => () => void
@@ -62,16 +58,20 @@ export interface IElectronAPI {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ApplicationMenuParams = any
+
+export type ContextMenuOption = {
+  id: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any
+}
 export type ContextMenuParams = {
   isEditable: boolean
   selectionText: string
   x: number
   y: number
-}
-export type ContextMenuOption = {
-  id: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params?: any
+  options: ContextMenuOption[]
 }
 
 export type Settings = {

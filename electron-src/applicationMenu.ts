@@ -33,6 +33,8 @@ type State = {
   viewMode: 'list' | 'thumbnail'
 }
 
+export type ApplicationMenuParams = Partial<State>
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send = (message: any) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
@@ -262,7 +264,7 @@ const registerApplicationMenu = () => {
 
   ipcMain.handle(
     'application-menu-update',
-    (_event: IpcMainInvokeEvent, params: Partial<State>) => {
+    (_event: IpcMainInvokeEvent, params: ApplicationMenuParams) => {
       state = { ...state, ...params }
       update()
     },

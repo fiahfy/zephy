@@ -32,21 +32,21 @@ const Explorer = () => {
       createMenuHandler([
         {
           id: 'newFolder',
-          params: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectory },
         },
         { id: 'separator' },
-        { id: 'cut', params: { paths: [] } },
-        { id: 'copy', params: { paths: [] } },
+        { id: 'cut', data: { paths: [] } },
+        { id: 'copy', data: { paths: [] } },
         {
           id: 'paste',
-          params: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectory },
         },
         { id: 'separator' },
-        { id: 'view', params: { viewMode: currentViewMode } },
+        { id: 'view', data: { viewMode: currentViewMode } },
         { id: 'separator' },
         {
           id: 'sortBy',
-          params: { orderBy: currentSortOption.orderBy },
+          data: { orderBy: currentSortOption.orderBy },
         },
       ]),
     [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],

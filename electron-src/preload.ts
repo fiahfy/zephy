@@ -1,5 +1,6 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
-import { ContextMenuOption, ContextMenuParams } from '~/contextMenu'
+import { ApplicationMenuParams } from '~/applicationMenu'
+import { ContextMenuParams } from '~/contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // TODO: rename funcs
@@ -31,13 +32,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('rename-entry', path, newName),
   trashEntries: (paths: string[]) => ipcRenderer.invoke('trash-entries', paths),
   applicationMenu: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    update: (params: any) =>
+    update: (params: ApplicationMenuParams) =>
       ipcRenderer.invoke('application-menu-update', params),
   },
   contextMenu: {
-    show: (params: ContextMenuParams, options: ContextMenuOption[]) =>
-      ipcRenderer.invoke('context-menu-show', params, options),
+    show: (params: ContextMenuParams) =>
+      ipcRenderer.invoke('context-menu-show', params),
   },
   fullscreen: {
     addListener: (callback: (fullscreen: boolean) => void) => {

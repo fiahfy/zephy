@@ -84,51 +84,51 @@ const useExplorerItem = (content: Content) => {
         ? [
             {
               id: directory ? 'openDirectory' : 'open',
-              params: { path },
+              data: { path },
             },
             ...(directory
               ? [
                   {
                     id: 'openDirectoryInNewWindow',
-                    params: { path },
+                    data: { path },
                   },
                 ]
               : []),
             {
               id: 'revealInFinder',
-              params: { path },
+              data: { path },
             },
             { id: 'separator' },
             {
               id: 'copyPath',
-              params: { path },
+              data: { path },
             },
             { id: 'separator' },
             ...(directory
               ? [
                   {
                     id: 'toggleFavorite',
-                    params: { path, favorite: isFavorite(path) },
+                    data: { path, favorite: isFavorite(path) },
                   },
                 ]
               : []),
             { id: 'separator' },
             {
               id: 'rename',
-              params: { path },
+              data: { path },
             },
           ]
         : []),
       {
         id: 'moveToTrash',
-        params: { paths },
+        data: { paths },
       },
       { id: 'separator' },
-      { id: 'cut', params: { paths } },
-      { id: 'copy', params: { paths } },
+      { id: 'cut', data: { paths } },
+      { id: 'copy', data: { paths } },
       {
         id: 'paste',
-        params: { path: zephySchema ? undefined : currentDirectory },
+        data: { path: zephySchema ? undefined : currentDirectory },
       },
     ])
   }, [

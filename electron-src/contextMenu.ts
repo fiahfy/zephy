@@ -9,25 +9,23 @@ import {
 } from 'electron'
 import { canPaste, copy, paste } from '~/utils/clipboard'
 
+export type ContextMenuItemOption = {
+  id: string
+  data?: any // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
 export type ContextMenuParams = {
   isEditable: boolean
   selectionText: string
   x: number
   y: number
-}
-export type ContextMenuOption = {
-  id: string
-  params?: any // eslint-disable-line @typescript-eslint/no-explicit-any
+  options: ContextMenuItemOption[]
 }
 
 const registerContextMenu = () => {
   ipcMain.handle(
     'context-menu-show',
-    (
-      event: IpcMainInvokeEvent,
-      params: ContextMenuParams,
-      options: ContextMenuOption[],
-    ) => {
+    (event: IpcMainInvokeEvent, params: ContextMenuParams) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const send = (message: any) => event.sender.send('message-send', message)
 
@@ -63,59 +61,57 @@ const registerContextMenu = () => {
 
       const actionCreators: {
         [id in string]: (
-          option: ContextMenuOption,
+          data: ContextMenuItemOption['data'],
         ) => MenuItemConstructorOptions
       } = {
-        copyPath: ({ params }) => ({
-          click: () => clipboard.writeText(params.path),
+        copyPath: ({ path }) => ({
+          click: () => clipboard.writeText(path),
           label: 'Copy Path',
         }),
-        go: ({ params }) => ({
-          click: () => send({ type: 'go', data: { offset: params.offset } }),
-          label: params.title,
+        go: ({ offset, title }) => ({
+          click: () => send({ type: 'go', data: { offset } }),
+          label: title,
         }),
-        loop: ({ params }) => ({
+        loop: ({ enabled }) => ({
           label: 'Loop',
-          checked: params.enabled,
+          checked: enabled,
           click: () =>
             send({
               type: 'changeLoop',
               data: {
-                enabled: !params.enabled,
+                enabled: !enabled,
               },
             }),
           type: 'checkbox',
         }),
-        moveToTrash: ({ params }) => ({
+        moveToTrash: ({ paths }) => ({
           accelerator: 'CmdOrCtrl+Backspace',
-          click: () =>
-            send({ type: 'moveToTrash', data: { paths: params.paths } }),
+          click: () => send({ type: 'moveToTrash', data: { paths } }),
           label: 'Move to Trash',
         }),
-        newFolder: ({ params }) => ({
-          click: () => send({ type: 'newFolder', data: { path: params.path } }),
-          enabled: !!params.path,
+        newFolder: ({ path }) => ({
+          click: () => send({ type: 'newFolder', data: { path } }),
+          enabled: !!path,
           label: 'New Folder',
         }),
-        open: ({ params }) => ({
-          click: () => shell.openPath(params.path),
+        open: ({ path }) => ({
+          click: () => shell.openPath(path),
           label: 'Open',
         }),
-        openDirectory: ({ params }) => ({
-          click: () =>
-            send({ type: 'changeDirectory', data: { path: params.path } }),
+        openDirectory: ({ path }) => ({
+          click: () => send({ type: 'changeDirectory', data: { path: path } }),
           label: 'Open',
         }),
-        openDirectoryInNewWindow: ({ params }) => ({
-          click: () => send({ type: 'newWindow', data: { path: params.path } }),
+        openDirectoryInNewWindow: ({ path }) => ({
+          click: () => send({ type: 'newWindow', data: { path: path } }),
           label: 'Open in New Window',
         }),
-        rename: ({ params }) => ({
-          click: () => send({ type: 'rename', data: { path: params.path } }),
+        rename: ({ path }) => ({
+          click: () => send({ type: 'rename', data: { path: path } }),
           label: 'Rename...',
         }),
-        revealInFinder: ({ params }) => ({
-          click: () => shell.showItemInFolder(params.path),
+        revealInFinder: ({ path }) => ({
+          click: () => shell.showItemInFolder(path),
           label: 'Reveal in Finder',
         }),
         settings: () => ({
@@ -123,7 +119,7 @@ const registerContextMenu = () => {
           click: () => send({ type: 'goToSettings' }),
           label: 'Settings',
         }),
-        sortBy: ({ params }) => ({
+        sortBy: ({ orderBy }) => ({
           label: 'Sort By',
           submenu: [
             { label: 'Name', orderBy: 'name' },
@@ -134,52 +130,52 @@ const registerContextMenu = () => {
             { label: 'Rating', orderBy: 'rating' },
           ].map((menu) => ({
             ...menu,
-            checked: menu.orderBy === params.orderBy,
+            checked: menu.orderBy === orderBy,
             click: () =>
               send({ type: 'sort', data: { orderBy: menu.orderBy } }),
             type: 'checkbox',
           })),
         }),
-        toggleFavorite: ({ params }) => ({
+        toggleFavorite: ({ favorite, path }) => ({
           click: () =>
             send({
-              type: params.favorite ? 'removeFromFavorites' : 'addToFavorites',
+              type: favorite ? 'removeFromFavorites' : 'addToFavorites',
               data: {
-                path: params.path,
+                path: path,
               },
             }),
-          label: params.favorite ? 'Remove from Favorites' : 'Add to Favorites',
+          label: favorite ? 'Remove from Favorites' : 'Add to Favorites',
         }),
-        toggleInspector: ({ params }) => ({
-          label: params.hidden ? 'Show Inspector' : 'Hide Inspector',
+        toggleInspector: ({ hidden }) => ({
+          label: hidden ? 'Show Inspector' : 'Hide Inspector',
           click: () =>
             send({
               type: 'changeSidebarHidden',
               data: {
                 variant: 'secondary',
-                hidden: !params.hidden,
+                hidden: !hidden,
               },
             }),
         }),
-        toggleNavigator: ({ params }) => ({
-          label: params.hidden ? 'Show Navigator' : 'Hide Navigator',
+        toggleNavigator: ({ hidden }) => ({
+          label: hidden ? 'Show Navigator' : 'Hide Navigator',
           click: () =>
             send({
               type: 'changeSidebarHidden',
               data: {
                 variant: 'primary',
-                hidden: !params.hidden,
+                hidden: !hidden,
               },
             }),
         }),
-        view: ({ params }) => ({
+        view: ({ viewMode }) => ({
           label: 'View',
           submenu: [
             { label: 'as List', viewMode: 'list' },
             { label: 'as Thumbnail', viewMode: 'thumbnail' },
           ].map((menu) => ({
             ...menu,
-            checked: menu.viewMode === params.viewMode,
+            checked: menu.viewMode === viewMode,
             click: () =>
               send({
                 type: 'changeViewMode',
@@ -195,24 +191,24 @@ const registerContextMenu = () => {
           enabled: false,
           label: 'Cut',
         }),
-        copy: ({ params }) => ({
+        copy: ({ paths }) => ({
           accelerator: 'CmdOrCtrl+C',
-          click: () => copy(params.paths),
-          enabled: params.paths.length > 0,
+          click: () => copy(paths),
+          enabled: paths.length > 0,
           label: 'Copy',
         }),
-        paste: ({ params }) => ({
+        paste: ({ path }) => ({
           accelerator: 'CmdOrCtrl+V',
-          click: () => paste(params.path),
-          enabled: !!params.path && canPaste(),
+          click: () => paste(path),
+          enabled: !!path && canPaste(),
           label: 'Paste',
         }),
         separator: () => defaultActions.separator,
       }
 
-      const actions = options.flatMap((option) => {
+      const actions = params.options.flatMap((option) => {
         const creator = actionCreators[option.id]
-        return creator ? creator(option) : []
+        return creator ? creator(option.data) : []
       })
 
       const template = [

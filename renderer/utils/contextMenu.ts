@@ -1,7 +1,7 @@
 import { MouseEvent } from 'react'
 import { ContextMenuOption } from '~/interfaces'
 
-export const createMenuHandler = (options?: ContextMenuOption[]) => {
+export const createMenuHandler = (options: ContextMenuOption[] = []) => {
   return async (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -14,8 +14,8 @@ export const createMenuHandler = (options?: ContextMenuOption[]) => {
     const selectionText = window.getSelection()?.toString() ?? ''
     const { clientX: x, clientY: y } = e
 
-    const params = { isEditable, selectionText, x, y }
+    const params = { isEditable, options, selectionText, x, y }
 
-    await window.electronAPI.contextMenu.show(params, options ?? [])
+    await window.electronAPI.contextMenu.show(params)
   }
 }

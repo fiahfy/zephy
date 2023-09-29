@@ -96,7 +96,7 @@ const VideoPreview = (props: Props) => {
   }, [entry.path])
 
   const handleContextMenu = useMemo(
-    () => createMenuHandler([{ id: 'loop', params: { enabled: loop } }]),
+    () => createMenuHandler([{ id: 'loop', data: { enabled: loop } }]),
     [loop],
   )
 
