@@ -44,5 +44,6 @@ yarn dev
 
 ## References
 
-- https://github.com/vercel/next.js/tree/canary/examples/with-electron-typescript
-- https://github.com/mui/material-ui/tree/master/examples/material-ui-nextjs-ts-v4-v5-migration
+- https://github.com/electron-vite/create-electron-vite
+- https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts
+- https://github.com/mui/material-ui/tree/master/examples/material-ui-vite-ts

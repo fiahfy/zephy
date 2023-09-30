@@ -1,7 +1,7 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
 import { basename, dirname } from 'node:path'
-import { copy, paste } from '~/utils/clipboard'
-import { createThumbnailUrl, getMetadata } from '~/utils/ffmpeg'
+import { copy, paste } from './utils/clipboard'
+import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
   createDirectory,
   getDetailedEntries,
@@ -11,8 +11,8 @@ import {
   getEntryHierarchy,
   moveEntries,
   renameEntry,
-} from '~/utils/file'
-import createWatcher from '~/watcher'
+} from './utils/file'
+import createWatcher from './watcher'
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('entry-copy', (_event: IpcMainInvokeEvent, paths: string[]) =>

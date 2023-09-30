@@ -1,5 +1,4 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
-import Head from 'next/head'
 import { ReactNode, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
@@ -34,12 +33,13 @@ const Layout = (props: Props) => {
         userSelect: 'none',
       }}
     >
-      <Head>
+      {/* TODO: fix this */}
+      {/* <Head>
         <title>{title}</title>
-      </Head>
+      </Head> */}
       <GlobalStyles
         styles={{
-          'html, body, #__next': {
+          'html, body, #root': {
             height: '100%',
           },
           '::-webkit-scrollbar': {

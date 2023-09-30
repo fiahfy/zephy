@@ -3,10 +3,14 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['@fiahfy/next'],
+  extends: ['@fiahfy/react'],
+  plugins: ['react-refresh'],
   rules: {
     'sort-imports': ['error', { ignoreDeclarationSort: true }],
     'react/jsx-sort-props': 'error',
-    '@next/next/no-html-link-for-pages': ['error', 'renderer/pages'],
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true },
+    ],
   },
 }

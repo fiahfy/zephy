@@ -16,15 +16,12 @@
     "chokidar": "^3.5.3",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "electron-is-dev": "^2.0.0",
-    "electron-next": "^3.1.5",
     "electron-window-state": "^5.0.3",
     "ffmpeg-static-electron": "^2.0.3",
     "ffprobe-static-electron": "^2.0.2",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.1.1",
     "mime": "^3.0.0",
-    "next": "13.4.7",
     "plist": "^3.1.0",
     "pluralize": "^8.0.0",
     "react": "^18.2.0",
@@ -33,9 +30,10 @@
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
-    "@fiahfy/eslint-config-next": "^0.0.21",
+    "@fiahfy/eslint-config-react": "^0.0.21",
     "@fiahfy/prettier-config": "^0.0.3",
     "@fiahfy/tsconfig": "^0.0.2",
+    "@rollup/plugin-alias": "^5.0.0",
     "@types/fluent-ffmpeg": "^2.1.21",
     "@types/mime": "^3.0.1",
     "@types/node": "^20.5.6",
@@ -44,28 +42,30 @@
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.2.7",
     "@types/react-redux": "^7.1.26",
+    "@vitejs/plugin-react": "^4.0.4",
     "babel-plugin-import": "^1.13.8",
     "electron": "^26.1.0",
     "electron-builder": "^24.6.3",
     "eslint": "^8.48.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
     "husky": "^8.0.3",
     "prettier": "^3.0.2",
-    "rimraf": "^5.0.1",
     "tsc-alias": "^1.8.8",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9",
+    "vite-plugin-electron": "^0.14.0",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-tsconfig-paths": "^4.2.1"
   },
-  "main": "main/index.js",
+  "main": "dist-electron/main.js",
   "private": true,
   "productName": "Zephy",
   "resolutions": {
     "@types/react": "^18.0.20"
   },
   "scripts": {
-    "build": "npm run build-renderer && npm run build-electron",
-    "build-electron": "tsc -p electron-src/tsconfig.json && tsc-alias -p electron-src/tsconfig.json",
-    "build-renderer": "next build renderer",
-    "clean": "rimraf dist main renderer/out renderer/.next",
-    "dev": "npm run build-electron && electron .",
+    "build": "tsc && vite build",
+    "dev": "vite",
     "format": "prettier -c --ignore-path .gitignore .",
     "lint": "eslint --ext .js,.ts,.tsx --ignore-path .gitignore .",
     "package": "npm run build && electron-builder",
@@ -73,6 +73,6 @@
     "prepare": "husky install",
     "release": "npm run package -mlw",
     "test": "npm run format && npm run lint && npm run type-check",
-    "type-check": "tsc -p renderer/tsconfig.json && tsc -p electron-src/tsconfig.json"
+    "type-check": "tsc"
   }
 }
