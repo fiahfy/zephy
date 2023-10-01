@@ -199,7 +199,6 @@ const ExplorerGridItem = (props: Props) => {
       {...createDroppableBinder(content)}
     >
       {thumbnail ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
         <Box

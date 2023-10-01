@@ -1,6 +1,6 @@
 import { clipboard } from 'electron'
 import { build, parse } from 'plist'
-import { copyEntries } from '~/utils/file'
+import { copyEntries } from './file'
 
 // @see https://github.com/electron/electron/issues/9035#issuecomment-359554116
 const format = 'NSFilenamesPboardType'

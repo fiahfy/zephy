@@ -1,11 +1,11 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
-import Head from 'next/head'
 import { ReactNode, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
 import Navigator from '~/components/Navigator'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
+import useCurrentTitle from '~/hooks/useCurrentTitle'
 import useEventListener from '~/hooks/useEventListener'
 import useMessageListener from '~/hooks/useMessageListener'
 import useTitle from '~/hooks/useTitle'
@@ -20,7 +20,8 @@ const Layout = (props: Props) => {
 
   useEventListener()
   useMessageListener()
-  const title = useTitle()
+  const title = useCurrentTitle()
+  useTitle(title)
 
   const handleContextMenu = useMemo(() => createMenuHandler(), [])
 
@@ -34,12 +35,13 @@ const Layout = (props: Props) => {
         userSelect: 'none',
       }}
     >
-      <Head>
+      {/* TODO: fix this */}
+      {/* <Head>
         <title>{title}</title>
-      </Head>
+      </Head> */}
       <GlobalStyles
         styles={{
-          'html, body, #__next': {
+          'html, body, #root': {
             height: '100%',
           },
           '::-webkit-scrollbar': {

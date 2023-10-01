@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAppSelector } from '~/store'
 import { getTitle, selectCurrentDirectory } from '~/store/window'
 
-const useTitle = () => {
+const useCurrentTitle = () => {
   const currentDirectory = useAppSelector(selectCurrentDirectory)
 
   const [title, setTitle] = useState('')
@@ -17,4 +17,4 @@ const useTitle = () => {
   return title
 }
 
-export default useTitle
+export default useCurrentTitle

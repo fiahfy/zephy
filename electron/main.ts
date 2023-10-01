@@ -1,18 +1,31 @@
 import { BrowserWindow, app } from 'electron'
-import isDev from 'electron-is-dev'
-import prepareNext from 'electron-next'
 import { State } from 'electron-window-state'
 import { join } from 'node:path'
-import registerApplicationMenu from '~/applicationMenu'
-import registerContextMenu from '~/contextMenu'
-import createFullscreenManager from '~/fullscreen'
-import registerHandlers from '~/handlers'
-import createWatcher from '~/watcher'
-import createWindowManager from '~/window'
+import registerApplicationMenu from './applicationMenu'
+import registerContextMenu from './contextMenu'
+import createFullscreenManager from './fullscreen'
+import registerHandlers from './handlers'
+import createWatcher from './watcher'
+import createWindowManager from './window'
+
+// The built directory structure
+//
+// ├─┬─┬ dist
+// │ │ └── index.html
+// │ │
+// │ ├─┬ dist-electron
+// │ │ ├── main.js
+// │ │ └── preload.js
+// │
+process.env.DIST = join(__dirname, '../dist')
+process.env.VITE_PUBLIC = app.isPackaged
+  ? process.env.DIST
+  : join(process.env.DIST, '../public')
+
+// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
+const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 app.whenReady().then(async () => {
-  await prepareNext('./renderer')
-
   const fullscreenManager = createFullscreenManager()
   const watcher = createWatcher()
 
@@ -22,19 +35,17 @@ app.whenReady().then(async () => {
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
-        webSecurity: !isDev,
+        webSecurity: !VITE_DEV_SERVER_URL,
       },
     })
 
-    if (isDev) {
-      browserWindow.loadURL('http://localhost:8000/')
+    if (VITE_DEV_SERVER_URL) {
+      browserWindow.loadURL(VITE_DEV_SERVER_URL)
       browserWindow.on('ready-to-show', () => {
         browserWindow.webContents.openDevTools()
       })
     } else {
-      const pathname = join(__dirname, '../renderer/out/index.html')
-      const url = `file://${pathname}`
-      browserWindow.loadURL(url)
+      browserWindow.loadFile(join(process.env.DIST, 'index.html'))
     }
 
     fullscreenManager.register(browserWindow)
@@ -59,6 +70,9 @@ app.whenReady().then(async () => {
     createWindow()
   }
 
+  // Quit when all windows are closed, except on macOS. There, it's common
+  // for applications and their menu bar to stay active until the user quits
+  // explicitly with Cmd + Q.
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit()
@@ -66,6 +80,8 @@ app.whenReady().then(async () => {
   })
 
   app.on('activate', () => {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }
