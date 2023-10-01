@@ -26,6 +26,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </StoreProvider>
   </React.StrictMode>,
 )
-
-// Remove Preload scripts loading
-postMessage({ payload: 'removeLoading' }, '*')
