@@ -63,10 +63,10 @@
     "dev": "vite",
     "format": "prettier -c --ignore-path .gitignore .",
     "lint": "eslint --ext .js,.ts,.tsx --ignore-path .gitignore .",
-    "package": "npm run build && electron-builder",
+    "package": "electron-builder",
     "package-dir": "npm run package --dir",
     "prepare": "husky install",
-    "release": "npm run package",
+    "release": "electron-builder",
     "test": "npm run format && npm run lint && npm run type-check",
     "type-check": "tsc"
   }
