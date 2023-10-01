@@ -153,6 +153,7 @@ const ExplorerTreeView = () => {
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
       expanded={expanded}
+      multiSelect
       onNodeSelect={handleSelect}
       onNodeToggle={handleToggle}
       selected={selected}
