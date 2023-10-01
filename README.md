@@ -21,7 +21,6 @@
 - [ ] Change Thumbnail Size
 - [ ] Text Preview
 - [ ] Use Electron Forge
-- [ ] Use vite or Next.js App Router
 
 ## Screenshots
 
