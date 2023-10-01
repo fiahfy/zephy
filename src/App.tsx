@@ -7,30 +7,28 @@ import Navigator from '~/components/Navigator'
 import Settings from '~/components/Settings'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
-import useCurrentTitle from '~/hooks/useCurrentTitle'
 import useEventListener from '~/hooks/useEventListener'
 import useMessageListener from '~/hooks/useMessageListener'
 import useTitle from '~/hooks/useTitle'
 import { createMenuHandler } from '~/utils/contextMenu'
 import { useAppSelector } from '~/store'
-import { selectCurrentDirectory } from '~/store/window'
+import { selectCurrentHistory } from '~/store/window'
 
 const App = () => {
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentHistory = useAppSelector(selectCurrentHistory)
 
   useEventListener()
   useMessageListener()
-  const title = useCurrentTitle()
-  useTitle(title)
+  useTitle(currentHistory.title)
 
   const Component = useMemo(() => {
-    switch (currentDirectory) {
+    switch (currentHistory.directory) {
       case 'zephy://settings':
         return Settings
       default:
         return Explorer
     }
-  }, [currentDirectory])
+  }, [currentHistory.directory])
 
   const handleContextMenu = useMemo(() => createMenuHandler(), [])
 

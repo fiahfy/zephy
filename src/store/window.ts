@@ -89,7 +89,7 @@ const buildZephyUrl = (
   }
 }
 
-export const getTitle = async (path: string) => {
+const getTitle = async (path: string) => {
   const url = parseZephyUrl(path)
   if (url) {
     switch (url.pathname) {
@@ -360,7 +360,11 @@ export const selectViewMode = createSelector(
 export const selectCurrentHistory = createSelector(
   selectHistory,
   (history) =>
-    history.histories[history.index] ?? { directory: '', scrollTop: 0 },
+    history.histories[history.index] ?? {
+      directory: '',
+      scrollTop: 0,
+      title: '',
+    },
 )
 
 export const selectCanBack = createSelector(
@@ -482,7 +486,6 @@ export const changeDirectory =
         }
       }
     }
-    // TODO: fix this
     const title = await getTitle(path)
     dispatch(changeDirectory({ index, path, title }))
     dispatch(updateApplicationMenu())
