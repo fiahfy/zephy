@@ -1,6 +1,6 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectGetSidebarWidth,
@@ -48,10 +48,20 @@ const Sidebar = (props: Props) => {
     [isSidebarHidden, variant],
   )
 
-  const oppositeWidth = useMemo(
-    () => getSidebarWidth(variant === 'primary' ? 'secondary' : 'primary'),
-    [getSidebarWidth, variant],
-  )
+  const oppositeWidth = useMemo(() => {
+    const opposite = variant === 'primary' ? 'secondary' : 'primary'
+    return isSidebarHidden(opposite) ? 0 : getSidebarWidth(opposite)
+  }, [getSidebarWidth, isSidebarHidden, variant])
+
+  useEffect(() => {
+    const handler = () => {
+      if (width + minContentWidth > window.innerWidth) {
+        dispatch(setSidebarWidth(variant, window.innerWidth - minContentWidth))
+      }
+    }
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [dispatch, variant, width])
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
