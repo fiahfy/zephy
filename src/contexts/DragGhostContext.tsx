@@ -3,12 +3,11 @@ import {
   RefObject,
   createContext,
   useCallback,
-  useContext,
   useRef,
   useState,
 } from 'react'
 
-const DragGhostContext = createContext<
+export const DragGhostContext = createContext<
   | {
       render: (node: ReactNode) => RefObject<HTMLDivElement>
     }
@@ -38,12 +37,4 @@ export const DragGhostProvider = (props: Props) => {
       </div>
     </DragGhostContext.Provider>
   )
-}
-
-export const useDragGhost = () => {
-  const context = useContext(DragGhostContext)
-  if (!context) {
-    throw new Error('useDragGhost must be used within a Provider')
-  }
-  return context
 }

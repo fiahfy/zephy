@@ -1,13 +1,6 @@
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { ReactNode, createContext, useEffect, useMemo, useState } from 'react'
 
-const TrafficLightsContext = createContext<
+export const TrafficLightsContext = createContext<
   | {
       visible: boolean
     }
@@ -49,12 +42,4 @@ export const TrafficLightsProvider = (props: Props) => {
       {ready && children}
     </TrafficLightsContext.Provider>
   )
-}
-
-export const useTrafficLights = () => {
-  const context = useContext(TrafficLightsContext)
-  if (!context) {
-    throw new Error('useTrafficLights must be used within a Provider')
-  }
-  return context
 }

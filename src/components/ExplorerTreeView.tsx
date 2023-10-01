@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
-import { useWatcher } from '~/contexts/WatcherContext'
+import useWatcher from '~/hooks/useWatcher'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectCurrentDirectory, selectZephySchema } from '~/store/window'

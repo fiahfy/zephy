@@ -3,11 +3,11 @@ import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
 } from '@mui/material/styles'
-import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
+import { ReactNode, createContext, useEffect, useMemo } from 'react'
 import { useAppSelector } from '~/store'
 import { selectTheme } from '~/store/settings'
 
-const ThemeContext = createContext<
+export const ThemeContext = createContext<
   | {
       theme: Theme
     }
@@ -78,12 +78,4 @@ export const ThemeProvider = (props: Props) => {
       </MuiThemeProvider>
     </ThemeContext.Provider>
   )
-}
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext)
-  if (!context) {
-    throw new Error('useTheme must be used within a Provider')
-  }
-  return context
 }

@@ -2,7 +2,6 @@ import {
   ReactNode,
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useState,
 } from 'react'
@@ -12,7 +11,7 @@ import { selectCurrentDirectory } from '~/store/window'
 
 type EventType = 'create' | 'update' | 'delete'
 
-const WatcherContext = createContext<
+export const WatcherContext = createContext<
   | {
       watch: (
         paths: string[],
@@ -85,12 +84,4 @@ export const WatcherProvider = (props: Props) => {
   return (
     <WatcherContext.Provider value={value}>{children}</WatcherContext.Provider>
   )
-}
-
-export const useWatcher = () => {
-  const context = useContext(WatcherContext)
-  if (!context) {
-    throw new Error('useWatcher must be used within a Provider')
-  }
-  return context
 }
