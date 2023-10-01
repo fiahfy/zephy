@@ -16,9 +16,13 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              // @see https://github.com/paulmillr/chokidar/issues/1000
-              // @see https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/712
-              external: ['fsevents'],
+              external: [
+                'ffmpeg-static-electron',
+                'ffprobe-static-electron',
+                // @see https://github.com/paulmillr/chokidar/issues/1000
+                // @see https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/712
+                'fsevents',
+              ],
               // @see https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/1210#issuecomment-1614992707
               plugins: [
                 alias({

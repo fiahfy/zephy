@@ -1,6 +1,6 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
-import { ApplicationMenuParams } from '~/applicationMenu'
-import { ContextMenuParams } from '~/contextMenu'
+import { ApplicationMenuParams } from './applicationMenu'
+import { ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   applicationMenu: {
@@ -93,6 +93,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 })
 
 // TODO: fix this
+/* eslint-disable @typescript-eslint/no-explicit-any,react-hooks/rules-of-hooks */
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))

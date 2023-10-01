@@ -1,20 +1,9 @@
-import { useEffect, useState } from 'react'
-import { useAppSelector } from '~/store'
-import { getTitle, selectCurrentDirectory } from '~/store/window'
+import { useEffect } from 'react'
 
-const useTitle = () => {
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
-
-  const [title, setTitle] = useState('')
-
+const useTitle = (title: string) => {
   useEffect(() => {
-    ;(async () => {
-      const title = await getTitle(currentDirectory)
-      setTitle(title)
-    })()
-  }, [currentDirectory])
-
-  return title
+    document.title = title
+  }, [title])
 }
 
 export default useTitle

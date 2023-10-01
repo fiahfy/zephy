@@ -482,6 +482,7 @@ export const changeDirectory =
         }
       }
     }
+    // TODO: fix this
     const title = await getTitle(path)
     dispatch(changeDirectory({ index, path, title }))
     dispatch(updateApplicationMenu())

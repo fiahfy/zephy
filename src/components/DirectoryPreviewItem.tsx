@@ -156,7 +156,6 @@ const DirectoryPreviewItem = (props: Props) => {
       {...createDroppableBinder(entry)}
     >
       {thumbnail ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={thumbnail}
           style={{
