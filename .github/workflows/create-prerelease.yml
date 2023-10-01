@@ -1,4 +1,4 @@
-name: Create Release from Branch
+name: Create Pre-release
 
 on:
   workflow_dispatch:
@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 20
       - run: yarn
-      - run: yarn package -p always
+      - run: yarn release -m
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EP_PRE_RELEASE: true
