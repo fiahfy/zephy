@@ -20,7 +20,7 @@ const Explorer = () => {
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
-  const { createCurrentDirectoryDroppableBinder, droppableStyle } = useDnd()
+  const { createDroppableBinder, droppableStyle } = useDnd()
 
   const handleClick = useCallback(() => {
     dispatch(unselect())
@@ -71,9 +71,16 @@ const Explorer = () => {
       onContextMenu={handleContextMenu}
       onFocus={handleFocus}
       sx={{ height: '100%', ...droppableStyle }}
-      {...createCurrentDirectoryDroppableBinder()}
+      {...createDroppableBinder({
+        path: currentDirectory,
+        name: '',
+        type: 'directory',
+        url: '',
+      })}
     >
-      {createElement(currentViewMode === 'list' ? ExplorerTable : ExplorerGrid)}
+      {createElement(
+        currentViewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
+      )}
     </Box>
   )
 }

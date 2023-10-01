@@ -3,9 +3,8 @@ import { DragEvent, useCallback, useMemo, useState } from 'react'
 import useDragGhost from '~/hooks/useDragGhost'
 import useTheme from '~/hooks/useTheme'
 import { Entry } from '~/interfaces'
-import { useAppDispatch, useAppSelector } from '~/store'
+import { useAppDispatch } from '~/store'
 import { move } from '~/store/explorer'
-import { selectCurrentDirectory } from '~/store/window'
 
 const mime = 'application/zephy.path-list'
 
@@ -24,8 +23,6 @@ const setPaths = (e: DragEvent, paths: string[]) =>
   e.dataTransfer.setData(mime, JSON.stringify(paths))
 
 const useDnd = () => {
-  // TODO: remove this
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
   const dispatch = useAppDispatch()
 
   const { render } = useDragGhost()
@@ -87,18 +84,19 @@ const useDnd = () => {
           if (ref.current) {
             e.dataTransfer.setDragImage(ref.current, 0, 0)
           }
-          setPaths(
-            e,
-            es.map((e) => e.path),
-          )
+          const paths = es.map((e) => e.path)
+          setPaths(e, paths)
         },
       }
     },
     [render],
   )
 
-  const getDroppableBinder = useCallback(
-    (path: string) => {
+  const createDroppableBinder = useCallback(
+    (entry: Entry) => {
+      if (entry.type !== 'directory') {
+        return {}
+      }
       return {
         onDragEnter: (e: DragEvent) => {
           e.preventDefault()
@@ -120,26 +118,14 @@ const useDnd = () => {
           e.stopPropagation()
           setEnterCount(0)
           const paths = getPaths(e)
-          dispatch(move(paths, path))
+          dispatch(move(paths, entry.path))
         },
       }
     },
     [dispatch],
   )
 
-  const createDroppableBinder = useCallback(
-    (entry: Entry) =>
-      entry.type === 'directory' ? getDroppableBinder(entry.path) : {},
-    [getDroppableBinder],
-  )
-
-  const createCurrentDirectoryDroppableBinder = useCallback(
-    () => getDroppableBinder(currentDirectory),
-    [currentDirectory, getDroppableBinder],
-  )
-
   return {
-    createCurrentDirectoryDroppableBinder,
     createDraggableBinder,
     createDroppableBinder,
     droppableStyle,
