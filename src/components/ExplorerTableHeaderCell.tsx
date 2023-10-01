@@ -1,5 +1,5 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
-import { useCallback } from 'react'
+import { MouseEvent, useCallback } from 'react'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectCurrentSortOption, sort } from '~/store/window'
@@ -20,7 +20,10 @@ const ExplorerTableHeaderCell = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const handleClick = useCallback(
-    () => dispatch(sort(dataKey)),
+    (e: MouseEvent) => {
+      e.stopPropagation()
+      dispatch(sort(dataKey))
+    },
     [dataKey, dispatch],
   )
 

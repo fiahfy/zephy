@@ -224,7 +224,7 @@ const registerContextMenu = () => {
 
       const menu = Menu.buildFromTemplate(template)
       const window = BrowserWindow.fromWebContents(event.sender)
-      window && menu.popup({ window })
+      window && menu.popup({ window, x: params.x, y: params.y })
     },
   )
 }
