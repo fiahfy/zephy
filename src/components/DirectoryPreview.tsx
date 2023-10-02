@@ -1,6 +1,6 @@
-import { ImageList, ImageListItem } from '@mui/material'
+import { Box, ImageList, ImageListItem } from '@mui/material'
 import pluralize from 'pluralize'
-import { useEffect, useMemo, useReducer } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import DirectoryPreviewItem from '~/components/DirectoryPreviewItem'
 import EmptyPreview from '~/components/EmptyPreview'
 import { Entry } from '~/interfaces'
@@ -8,7 +8,8 @@ import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
 
-const max = 100
+const maxItems = 100
+const maxItemSize = 256
 
 type State = {
   loading: boolean
@@ -48,7 +49,31 @@ const DirectoryPreview = (props: Props) => {
     entries: [],
   })
 
-  const over = useMemo(() => entries.length - max, [entries])
+  const ref = useRef<HTMLDivElement>(null)
+
+  const [wrapperWidth, setWrapperWidth] = useState(0)
+
+  const columns = useMemo(
+    () => Math.ceil(wrapperWidth / maxItemSize) || 1,
+    [wrapperWidth],
+  )
+  const over = useMemo(() => entries.length - maxItems, [entries])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      const entry = entries[0]
+      if (entry) {
+        setWrapperWidth(entry.contentRect.width)
+      }
+    }
+    const observer = new ResizeObserver(handleResize)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     let unmounted = false
@@ -79,14 +104,14 @@ const DirectoryPreview = (props: Props) => {
   }, [entry.path, shouldShowHiddenFiles])
 
   return (
-    <>
+    <Box ref={ref}>
       {loading ? (
         <EmptyPreview message="Loading..." />
       ) : (
         <>
           {entries.length > 0 ? (
-            <ImageList cols={1} gap={1} sx={{ m: 0 }}>
-              {entries.slice(0, max).map((entry) => (
+            <ImageList cols={columns} gap={1} sx={{ m: 0 }}>
+              {entries.slice(0, maxItems).map((entry) => (
                 <DirectoryPreviewItem entry={entry} key={entry.path} />
               ))}
               {over > 0 && (
@@ -102,7 +127,7 @@ const DirectoryPreview = (props: Props) => {
           )}
         </>
       )}
-    </>
+    </Box>
   )
 }
 
