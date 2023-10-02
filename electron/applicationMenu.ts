@@ -9,27 +9,18 @@ import {
 } from 'electron'
 
 type State = {
+  canBack: boolean
+  canForward: boolean
+  inspectorHidden: boolean
   isEditable: boolean
-  sidebar: {
-    primary: {
-      hidden: boolean
-      width: number
-    }
-    secondary: {
-      hidden: boolean
-      width: number
-    }
-  }
-  sortOption: {
-    order: 'asc' | 'desc'
-    orderBy:
-      | 'name'
-      | 'dateLastOpened'
-      | 'dateModified'
-      | 'dateCreated'
-      | 'size'
-      | 'rating'
-  }
+  navigatorHidden: boolean
+  orderBy:
+    | 'name'
+    | 'dateLastOpened'
+    | 'dateModified'
+    | 'dateCreated'
+    | 'size'
+    | 'rating'
   viewMode: 'list' | 'thumbnail'
 }
 
@@ -45,18 +36,12 @@ const registerApplicationMenu = () => {
   const isMac = process.platform === 'darwin'
 
   let state: State = {
+    canBack: false,
+    canForward: false,
+    inspectorHidden: false,
     isEditable: false,
-    sidebar: {
-      primary: {
-        hidden: false,
-        width: 0,
-      },
-      secondary: {
-        hidden: false,
-        width: 0,
-      },
-    },
-    sortOption: { order: 'asc', orderBy: 'name' },
+    navigatorHidden: false,
+    orderBy: 'name',
     viewMode: 'list',
   }
 
@@ -128,8 +113,10 @@ const registerApplicationMenu = () => {
                 { role: 'selectAll' },
               ]
             : [
+                // TODO: implement
                 {
                   accelerator: 'CmdOrCtrl+X',
+                  click: () => undefined,
                   enabled: false,
                   label: 'Cut',
                 },
@@ -188,7 +175,7 @@ const registerApplicationMenu = () => {
               { label: 'Rating', orderBy: 'rating' },
             ].map((menu) => ({
               ...menu,
-              checked: menu.orderBy === state.sortOption.orderBy,
+              checked: menu.orderBy === state.orderBy,
               click: () =>
                 send({ type: 'sort', data: { orderBy: menu.orderBy } }),
               type: 'checkbox',
@@ -196,28 +183,24 @@ const registerApplicationMenu = () => {
           },
           { type: 'separator' },
           {
-            label: state.sidebar.primary.hidden
-              ? 'Show Navigator'
-              : 'Hide Navigator',
+            label: state.navigatorHidden ? 'Show Navigator' : 'Hide Navigator',
             click: () =>
               send({
                 type: 'changeSidebarHidden',
                 data: {
                   variant: 'primary',
-                  hidden: !state.sidebar.primary.hidden,
+                  hidden: !state.navigatorHidden,
                 },
               }),
           },
           {
-            label: state.sidebar.secondary.hidden
-              ? 'Show Inspector'
-              : 'Hide Inspector',
+            label: state.inspectorHidden ? 'Show Inspector' : 'Hide Inspector',
             click: () =>
               send({
                 type: 'changeSidebarHidden',
                 data: {
                   variant: 'secondary',
-                  hidden: !state.sidebar.secondary.hidden,
+                  hidden: !state.inspectorHidden,
                 },
               }),
           },
@@ -227,6 +210,23 @@ const registerApplicationMenu = () => {
           { role: 'toggleDevTools' },
           { type: 'separator' },
           { role: 'togglefullscreen' },
+        ],
+      } as MenuItemConstructorOptions,
+      {
+        label: 'Go',
+        submenu: [
+          {
+            accelerator: 'CmdOrCtrl+[',
+            click: () => send({ type: 'back' }),
+            enabled: state.canBack,
+            label: 'Back',
+          },
+          {
+            accelerator: 'CmdOrCtrl+]',
+            click: () => send({ type: 'forward' }),
+            enabled: state.canForward,
+            label: 'Forward',
+          },
         ],
       } as MenuItemConstructorOptions,
       // { role: 'windowMenu' }

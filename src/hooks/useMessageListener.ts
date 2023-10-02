@@ -12,7 +12,9 @@ import {
 } from '~/store/explorer'
 import { add, remove } from '~/store/favorite'
 import {
+  back,
   changeDirectory,
+  forward,
   go,
   goToSettings,
   setCurrentViewMode,
@@ -29,6 +31,8 @@ const useMessageListener = () => {
       switch (type) {
         case 'addToFavorites':
           return dispatch(add(data.path))
+        case 'back':
+          return dispatch(back())
         case 'changeDirectory':
           return dispatch(changeDirectory(data.path))
         case 'changeSidebarHidden':
@@ -37,6 +41,8 @@ const useMessageListener = () => {
           return dispatch(setCurrentViewMode(data.viewMode))
         case 'copy':
           return dispatch(copy())
+        case 'forward':
+          return dispatch(forward())
         case 'go':
           return dispatch(go(data.offset))
         case 'goToSettings':

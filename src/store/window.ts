@@ -460,6 +460,7 @@ export const go =
     const { go } = windowSlice.actions
     const index = selectWindowIndex(getState())
     dispatch(go({ index, offset }))
+    dispatch(updateApplicationMenu())
   }
 
 export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
@@ -544,12 +545,17 @@ export const setCurrentViewMode =
   }
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
-  const viewMode = selectCurrentViewMode(getState())
-  const sortOption = selectCurrentSortOption(getState())
+  const canBack = selectCanBack(getState())
+  const canForward = selectCanForward(getState())
   const sidebar = selectSidebar(getState())
+  const sortOption = selectCurrentSortOption(getState())
+  const viewMode = selectCurrentViewMode(getState())
   await window.electronAPI.applicationMenu.update({
-    sidebar,
-    sortOption,
+    canBack,
+    canForward,
+    inspectorHidden: sidebar.primary.hidden,
+    navigatorHidden: sidebar.secondary.hidden,
+    orderBy: sortOption.orderBy,
     viewMode,
   })
 }
