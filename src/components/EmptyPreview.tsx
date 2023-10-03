@@ -1,11 +1,13 @@
 import { Box, Typography } from '@mui/material'
+import { ComponentProps } from 'react'
 
 type Props = {
   message: string
+  sx?: ComponentProps<typeof Box>['sx']
 }
 
 const EmptyPreview = (props: Props) => {
-  const { message } = props
+  const { message, sx } = props
 
   return (
     <Box
@@ -14,6 +16,7 @@ const EmptyPreview = (props: Props) => {
         aspectRatio: '16 / 9',
         display: 'flex',
         justifyContent: 'center',
+        ...sx,
       }}
     >
       <Typography variant="caption">{message}</Typography>

@@ -58,6 +58,10 @@ const DirectoryPreview = (props: Props) => {
     [wrapperWidth],
   )
   const over = useMemo(() => entries.length - maxItems, [entries])
+  const noDataText = useMemo(
+    () => (loading ? 'Loading...' : 'No items'),
+    [loading],
+  )
 
   useEffect(() => {
     const el = ref.current
@@ -105,27 +109,23 @@ const DirectoryPreview = (props: Props) => {
 
   return (
     <Box ref={ref}>
-      {loading ? (
-        <EmptyPreview message="Loading..." />
-      ) : (
-        <>
-          {entries.length > 0 ? (
-            <ImageList cols={columns} gap={1} sx={{ m: 0 }}>
-              {entries.slice(0, maxItems).map((entry) => (
-                <DirectoryPreviewItem entry={entry} key={entry.path} />
-              ))}
-              {over > 0 && (
-                <ImageListItem>
-                  <EmptyPreview
-                    message={`Other ${pluralize('item', over, true)}`}
-                  />
-                </ImageListItem>
-              )}
-            </ImageList>
-          ) : (
-            <EmptyPreview message="No items" />
+      {entries.length > 0 ? (
+        // TODO: use virtualizer
+        <ImageList cols={columns} gap={1} sx={{ m: 0 }}>
+          {entries.slice(0, maxItems).map((entry) => (
+            <DirectoryPreviewItem entry={entry} key={entry.path} />
+          ))}
+          {over > 0 && (
+            <ImageListItem cols={columns}>
+              <EmptyPreview
+                message={`Other ${pluralize('item', over, true)}`}
+                sx={{ aspectRatio: `${columns} / 1` }}
+              />
+            </ImageListItem>
           )}
-        </>
+        </ImageList>
+      ) : (
+        <EmptyPreview message={noDataText} />
       )}
     </Box>
   )
