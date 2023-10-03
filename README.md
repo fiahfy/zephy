@@ -1,6 +1,6 @@
 # Zephy
 
-![badge](https://github.com/fiahfy/zephy/workflows/Electron/badge.svg)
+[![Create Release](https://github.com/fiahfy/zephy/actions/workflows/create-release.yml/badge.svg)](https://github.com/fiahfy/zephy/actions/workflows/create-release.yml)
 
 > Simple Media File Manager based on Electron.
 
