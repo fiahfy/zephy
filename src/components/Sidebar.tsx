@@ -9,7 +9,7 @@ import {
   setSidebarWidth,
 } from '~/store/window'
 
-const minContentWidth = 64
+const minContentWidth = 100
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -100,49 +100,43 @@ const Sidebar = (props: Props) => {
       style={{ width }}
       variant="permanent"
     >
-      {!hidden && (
-        <>
-          <Toolbar
-            sx={{
-              flexShrink: 0,
-              minHeight: (theme) =>
-                `${theme.mixins.addressBar.height}!important`,
-            }}
-          />
-          <Box
-            sx={{
-              flexGrow: 1,
-              overflow: 'auto',
-              [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
-                theme.spacing(0.625),
-            }}
-          >
-            {children}
-          </Box>
-          <Toolbar
-            sx={{
-              flexShrink: 0,
-              minHeight: (theme) =>
-                `${theme.mixins.statusBar.height}!important`,
-            }}
-          />
-          <Box
-            onMouseDown={handleMouseDown}
-            sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'light'
-                  ? theme.palette.grey[100]
-                  : theme.palette.grey[900],
-              bottom: 0,
-              cursor: 'col-resize',
-              position: 'absolute',
-              top: 0,
-              width: (theme) => theme.spacing(0.625),
-              [position === 'left' ? 'right' : 'left']: 0,
-            }}
-          />
-        </>
-      )}
+      <Toolbar
+        sx={{
+          flexShrink: 0,
+          minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
+        }}
+      />
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflow: 'auto',
+          [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
+            theme.spacing(0.625),
+        }}
+      >
+        {children}
+      </Box>
+      <Toolbar
+        sx={{
+          flexShrink: 0,
+          minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
+        }}
+      />
+      <Box
+        onMouseDown={handleMouseDown}
+        sx={{
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'light'
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
+          bottom: 0,
+          cursor: 'col-resize',
+          position: 'absolute',
+          top: 0,
+          width: (theme) => theme.spacing(0.625),
+          [position === 'left' ? 'right' : 'left']: 0,
+        }}
+      />
     </Drawer>
   )
 }

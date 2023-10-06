@@ -39,7 +39,7 @@ const ExplorerTableHeaderCell = (props: Props) => {
         flexGrow: width ? 0 : 1,
         flexShrink: width ? 0 : 1,
         height,
-        minWidth: 0,
+        minWidth: width ? 0 : 100,
         px: 1,
         py: 0,
         width,

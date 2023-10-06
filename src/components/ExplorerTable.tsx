@@ -165,7 +165,7 @@ const ExplorerTable = () => {
       }}
       tabIndex={0}
     >
-      <Box sx={{ display: 'flex', pr: '10px' }}>
+      <Box sx={{ display: 'flex', overflowX: 'hidden', pr: '10px' }}>
         {columns.map((column) => (
           <ExplorerTableHeaderCell
             dataKey={column.key}

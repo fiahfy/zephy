@@ -274,13 +274,16 @@ const AddressBar = () => {
       >
         <Box sx={{ flex: '1 1 0' }} />
         <Box
-          sx={{
+          sx={(theme) => ({
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
             display: 'flex',
             flex: '6 1 0',
+            [theme.breakpoints.down('sm')]: {
+              flex: '12 1 0',
+            },
             gap: 0.5,
-          }}
+          })}
         >
           <IconButton
             disabled={loading || !canBack}
@@ -348,13 +351,16 @@ const AddressBar = () => {
         </Box>
         <Box sx={{ flex: '1 1 0' }} />
         <Box
-          sx={{
+          sx={(theme) => ({
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
             display: 'flex',
             flex: '3 1 0',
+            [theme.breakpoints.down('sm')]: {
+              flex: '6 1 0',
+            },
             gap: 1,
-          }}
+          })}
         >
           <Autocomplete
             ListboxProps={{ sx: { typography: 'body2' } }}

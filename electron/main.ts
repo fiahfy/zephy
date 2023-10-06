@@ -32,6 +32,8 @@ app.whenReady().then(async () => {
   const baseCreateWindow = (state: State) => {
     const browserWindow = new BrowserWindow({
       ...state,
+      minHeight: 350,
+      minWidth: 550,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
