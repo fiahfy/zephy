@@ -226,13 +226,7 @@ const ExplorerGrid = () => {
       )}
       {loading && (
         <LinearProgress
-          sx={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            zIndex: 1,
-          }}
+          sx={{ inset: '0 0 auto', position: 'absolute', zIndex: 1 }}
         />
       )}
     </Box>

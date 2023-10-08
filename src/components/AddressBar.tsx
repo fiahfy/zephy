@@ -430,7 +430,7 @@ const AddressBar = () => {
           </IconButton>
         </Box>
       </Toolbar>
-      <Divider sx={{ bottom: 0, position: 'absolute', width: '100%' }} />
+      <Divider sx={{ inset: 'auto 0 0', position: 'absolute' }} />
     </AppBar>
   )
 }

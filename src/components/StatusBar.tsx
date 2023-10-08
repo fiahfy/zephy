@@ -41,7 +41,7 @@ const StatusBar = () => {
           {message}
         </Typography>
       </Toolbar>
-      <Divider sx={{ top: 0, position: 'absolute', width: '100%' }} />
+      <Divider sx={{ inset: '0 0 auto', position: 'absolute' }} />
     </AppBar>
   )
 }
