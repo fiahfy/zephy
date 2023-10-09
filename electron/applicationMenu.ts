@@ -79,6 +79,7 @@ const registerApplicationMenu = () => {
         submenu: [
           {
             accelerator: 'CmdOrCtrl+N',
+            // TODO: open window if opened window is not found
             click: () => send({ type: 'newWindow' }),
             label: 'New Window',
           },
