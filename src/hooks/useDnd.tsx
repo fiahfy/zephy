@@ -11,12 +11,14 @@ const mime = 'application/zephy.path-list'
 const getPaths = (e: DragEvent) => {
   try {
     const json = e.dataTransfer.getData(mime)
-    return JSON.parse(json)
+    return JSON.parse(json) as string[]
   } catch (e) {
     // noop
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return Array.from(e.dataTransfer.files).map((file) => (file as any).path)
+  return Array.from(e.dataTransfer.files).map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (file) => (file as any).path,
+  ) as string[]
 }
 
 const setPaths = (e: DragEvent, paths: string[]) =>
