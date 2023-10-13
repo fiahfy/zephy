@@ -22,7 +22,7 @@ export type ContextMenuParams = {
   options: ContextMenuItemOption[]
 }
 
-const registerContextMenu = () => {
+const registerContextMenu = (createWindow: (directoryPath: string) => void) => {
   ipcMain.handle(
     'context-menu-show',
     (event: IpcMainInvokeEvent, params: ContextMenuParams) => {
@@ -103,7 +103,7 @@ const registerContextMenu = () => {
           label: 'Open',
         }),
         openDirectoryInNewWindow: ({ path }) => ({
-          click: () => send({ type: 'newWindow', data: { path: path } }),
+          click: () => createWindow(path),
           label: 'Open in New Window',
         }),
         rename: ({ path }) => ({

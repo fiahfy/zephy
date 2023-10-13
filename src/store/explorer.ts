@@ -349,15 +349,6 @@ export const paste = (): AppThunk => async (_, getState) => {
   await window.electronAPI.entry.paste(currentDirectory)
 }
 
-export const newWindow =
-  (directory?: string): AppThunk =>
-  async (_, getState) => {
-    const currentDirectory = selectCurrentDirectory(getState())
-    await window.electronAPI.window.open({
-      directory: directory ?? currentDirectory,
-    })
-  }
-
 export const handle =
   (
     eventType: 'create' | 'update' | 'delete',

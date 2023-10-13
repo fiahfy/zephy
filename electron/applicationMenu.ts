@@ -32,7 +32,7 @@ const send = (message: any) => {
   activeWindow?.webContents.send('message-send', message)
 }
 
-const registerApplicationMenu = () => {
+const registerApplicationMenu = (createWindow: () => void) => {
   const isMac = process.platform === 'darwin'
 
   let state: State = {
@@ -79,8 +79,7 @@ const registerApplicationMenu = () => {
         submenu: [
           {
             accelerator: 'CmdOrCtrl+N',
-            // TODO: open window if opened window is not found
-            click: () => send({ type: 'newWindow' }),
+            click: () => createWindow(),
             label: 'New Window',
           },
           ...[isMac ? { role: 'close' } : { role: 'quit' }],

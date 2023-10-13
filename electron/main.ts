@@ -58,13 +58,13 @@ app.whenReady().then(async () => {
 
   const windowManager = createWindowManager(baseCreateWindow)
 
-  const createWindow = () => {
-    const directory = app.getPath('home')
-    windowManager.create({ directory })
+  const createWindow = (directoryPath?: string) => {
+    const path = directoryPath ?? app.getPath('home')
+    windowManager.create({ directory: path })
   }
 
-  registerApplicationMenu()
-  registerContextMenu()
+  registerApplicationMenu(createWindow)
+  registerContextMenu(createWindow)
   registerHandlers(watcher)
 
   const browserWindows = await windowManager.restore()
