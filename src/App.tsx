@@ -22,13 +22,13 @@ const App = () => {
   useTitle(currentHistory.title)
 
   const Component = useMemo(() => {
-    switch (currentHistory.directory) {
+    switch (currentHistory.directoryPath) {
       case 'zephy://settings':
         return Settings
       default:
         return Explorer
     }
-  }, [currentHistory.directory])
+  }, [currentHistory.directoryPath])
 
   const handleContextMenu = useMemo(() => createMenuHandler(), [])
 

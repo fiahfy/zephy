@@ -52,10 +52,10 @@ export interface IElectronAPI {
   }
   window: {
     restore: () => Promise<
-      | { index: number; params: { directory?: string }; restored: boolean }
+      | { index: number; params: { directoryPath?: string }; restored: boolean }
       | undefined
     >
-    open: (params: { directory: string }) => Promise<void>
+    open: (params: { directoryPath: string }) => Promise<void>
   }
 }
 

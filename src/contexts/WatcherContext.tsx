@@ -7,14 +7,14 @@ import {
 } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { handle } from '~/store/explorer'
-import { selectCurrentDirectory } from '~/store/window'
+import { selectCurrentDirectoryPath } from '~/store/window'
 
 type EventType = 'create' | 'update' | 'delete'
 
 export const WatcherContext = createContext<
   | {
       watch: (
-        paths: string[],
+        directoryPaths: string[],
         callback: (
           eventType: EventType,
           directoryPath: string,
@@ -30,7 +30,7 @@ type Props = { children: ReactNode }
 export const WatcherProvider = (props: Props) => {
   const { children } = props
 
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const dispatch = useAppDispatch()
 
   const [directoryPaths, setDirectoryPaths] = useState<string[]>([])
@@ -44,15 +44,15 @@ export const WatcherProvider = (props: Props) => {
     >()
 
   useEffect(() => {
-    const paths = directoryPaths.includes(currentDirectory)
+    const uniqueDirectoryPaths = directoryPaths.includes(currentDirectoryPath)
       ? directoryPaths
-      : [...directoryPaths, currentDirectory]
+      : [...directoryPaths, currentDirectoryPath]
     window.electronAPI.watcher.watch(
-      paths,
+      uniqueDirectoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
-          currentDirectory,
+          currentDirectoryPath,
           directoryPaths,
           eventType,
           directoryPath,
@@ -62,18 +62,18 @@ export const WatcherProvider = (props: Props) => {
         dispatch(handle(eventType, directoryPath, filePath))
       },
     )
-  }, [callback, currentDirectory, directoryPaths, dispatch])
+  }, [callback, currentDirectoryPath, directoryPaths, dispatch])
 
   const watch = useCallback(
     (
-      paths: string[],
+      directoryPaths: string[],
       callback: (
         eventType: EventType,
         directoryPath: string,
         filePath: string,
       ) => void,
     ) => {
-      setDirectoryPaths(paths)
+      setDirectoryPaths(directoryPaths)
       setCallback(() => () => callback)
     },
     [],

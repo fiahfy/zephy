@@ -5,7 +5,7 @@ import { selectWindowIndex } from '~/store/windowIndex'
 import { selectLoading } from './explorer'
 
 type History = {
-  directory: string
+  directoryPath: string
   scrollTop: number
   title: string
 }
@@ -26,13 +26,13 @@ type SortOption = {
 }
 
 type SortingState = {
-  [path: string]: SortOption
+  [directoryPath: string]: SortOption
 }
 
 type ViewMode = 'list' | 'thumbnail'
 
 type ViewModeState = {
-  [path: string]: ViewMode
+  [directoryPath: string]: ViewMode
 }
 
 type WindowState = {
@@ -58,8 +58,8 @@ const defaultOrders = {
   rating: 'desc',
 } as const
 
-const parseZephyUrl = (input: string) => {
-  const match = input.match(/^zephy:\/\/([^/]+)(?:\/([^/]+))?$/)
+const parseZephyUrl = (url: string) => {
+  const match = url.match(/^zephy:\/\/([^/]+)(?:\/([^/]+))?$/)
   if (!match || !match[1]) {
     return undefined
   }
@@ -90,9 +90,9 @@ const buildZephyUrl = (
 }
 
 const getTitle = async (path: string) => {
-  const url = parseZephyUrl(path)
-  if (url) {
-    switch (url.pathname) {
+  const parsed = parseZephyUrl(path)
+  if (parsed) {
+    switch (parsed.pathname) {
       case 'ratings':
         return 'Ratings'
       case 'settings':
@@ -184,22 +184,26 @@ export const windowSlice = createSlice({
     },
     changeDirectory(
       state,
-      action: PayloadAction<{ index: number; path: string; title: string }>,
+      action: PayloadAction<{
+        index: number
+        directoryPath: string
+        title: string
+      }>,
     ) {
-      const { index, path, title } = action.payload
+      const { index, directoryPath, title } = action.payload
       const windowState = state[index]
       if (!windowState) {
         return state
       }
-      const lastHistory =
-        windowState.history.histories[windowState.history.index]?.directory
-      if (path === lastHistory) {
+      const currentDirectoryPath =
+        windowState.history.histories[windowState.history.index]?.directoryPath
+      if (directoryPath === currentDirectoryPath) {
         return
       }
       const historyIndex = windowState.history.index + 1
       const histories = [
         ...windowState.history.histories.slice(0, historyIndex),
-        { directory: path, scrollTop: 0, title },
+        { directoryPath, scrollTop: 0, title },
       ]
       return {
         ...state,
@@ -259,16 +263,16 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         index: number
-        path: string
+        directoryPath: string
         orderBy: SortOption['orderBy']
       }>,
     ) {
-      const { index, path, orderBy } = action.payload
+      const { index, directoryPath, orderBy } = action.payload
       const windowState = state[index]
       if (!windowState) {
         return state
       }
-      const option = windowState.sorting[path]
+      const option = windowState.sorting[directoryPath]
       const newOrder =
         option && option.orderBy === orderBy
           ? option.order === 'desc'
@@ -281,7 +285,7 @@ export const windowSlice = createSlice({
           ...windowState,
           sorting: {
             ...windowState.sorting,
-            [path]: {
+            [directoryPath]: {
               order: newOrder,
               orderBy,
             },
@@ -293,11 +297,11 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         index: number
-        path: string
+        directoryPath: string
         viewMode: ViewMode
       }>,
     ) {
-      const { index, path, viewMode } = action.payload
+      const { index, directoryPath, viewMode } = action.payload
       const windowState = state[index]
       if (!windowState) {
         return state
@@ -308,7 +312,7 @@ export const windowSlice = createSlice({
           ...windowState,
           viewMode: {
             ...windowState.viewMode,
-            [path]: viewMode,
+            [directoryPath]: viewMode,
           },
         },
       }
@@ -361,7 +365,7 @@ export const selectCurrentHistory = createSelector(
   selectHistory,
   (history) =>
     history.histories[history.index] ?? {
-      directory: '',
+      directoryPath: '',
       scrollTop: 0,
       title: '',
     },
@@ -385,9 +389,9 @@ export const selectForwardHistories = createSelector(selectHistory, (history) =>
   history.histories.slice(history.index + 1),
 )
 
-export const selectCurrentDirectory = createSelector(
+export const selectCurrentDirectoryPath = createSelector(
   selectCurrentHistory,
-  (currentHistory) => currentHistory.directory,
+  (currentHistory) => currentHistory.directoryPath,
 )
 
 export const selectCurrentScrollTop = createSelector(
@@ -396,8 +400,8 @@ export const selectCurrentScrollTop = createSelector(
 )
 
 export const selectZephyUrl = createSelector(
-  selectCurrentDirectory,
-  (currentDirectory) => parseZephyUrl(currentDirectory),
+  selectCurrentDirectoryPath,
+  (currentDirectoryPath) => parseZephyUrl(currentDirectoryPath),
 )
 
 export const selectZephySchema = createSelector(
@@ -407,15 +411,16 @@ export const selectZephySchema = createSelector(
 
 export const selectCurrentSortOption = createSelector(
   selectSorting,
-  selectCurrentDirectory,
-  (sorting, currentDirectory) =>
-    sorting[currentDirectory] ?? ({ order: 'asc', orderBy: 'name' } as const),
+  selectCurrentDirectoryPath,
+  (sorting, currentDirectoryPath) =>
+    sorting[currentDirectoryPath] ??
+    ({ order: 'asc', orderBy: 'name' } as const),
 )
 
 export const selectCurrentViewMode = createSelector(
   selectViewMode,
-  selectCurrentDirectory,
-  (viewMode, currentDirectory) => viewMode[currentDirectory] ?? 'list',
+  selectCurrentDirectoryPath,
+  (viewMode, currentDirectoryPath) => viewMode[currentDirectoryPath] ?? 'list',
 )
 
 export const selectIsSidebarHidden = createSelector(
@@ -430,7 +435,7 @@ export const selectGetSidebarWidth = createSelector(
 
 export const selectGetViewMode = createSelector(
   selectViewMode,
-  (viewMode) => (path: string) => viewMode[path],
+  (viewMode) => (directoryPath: string) => viewMode[directoryPath],
 )
 
 export const setSidebarHidden =
@@ -468,7 +473,7 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const changeDirectory =
-  (path: string): AppThunk =>
+  (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const loading = selectLoading(getState())
     if (loading) {
@@ -477,25 +482,27 @@ export const changeDirectory =
     const { changeDirectory, setViewMode } = windowSlice.actions
     const index = selectWindowIndex(getState())
     // inherit view mode if the path is a child of the current directory
-    const currentDirectory = selectCurrentDirectory(getState())
-    if (path.startsWith(currentDirectory)) {
-      const viewMode = selectGetViewMode(getState())(path)
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    if (directoryPath.startsWith(currentDirectoryPath)) {
+      const viewMode = selectGetViewMode(getState())(directoryPath)
       if (!viewMode) {
         const currentViewMode = selectCurrentViewMode(getState())
         if (currentViewMode !== 'list') {
-          dispatch(setViewMode({ index, path, viewMode: currentViewMode }))
+          dispatch(
+            setViewMode({ index, directoryPath, viewMode: currentViewMode }),
+          )
         }
       }
     }
-    const title = await getTitle(path)
-    dispatch(changeDirectory({ index, path, title }))
+    const title = await getTitle(directoryPath)
+    dispatch(changeDirectory({ index, directoryPath, title }))
     dispatch(updateApplicationMenu())
   }
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
-  const currentDirectory = selectCurrentDirectory(getState())
-  const path = await window.electronAPI.node.dirname(currentDirectory)
-  dispatch(changeDirectory(path))
+  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+  const parentPath = await window.electronAPI.node.dirname(currentDirectoryPath)
+  dispatch(changeDirectory(parentPath))
 }
 
 export const goToRatings =
@@ -523,11 +530,11 @@ export const sort =
   async (dispatch, getState) => {
     const { sort } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    const currentDirectory = selectCurrentDirectory(getState())
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     dispatch(
       sort({
         index,
-        path: currentDirectory,
+        directoryPath: currentDirectoryPath,
         orderBy,
       }),
     )
@@ -539,8 +546,10 @@ export const setCurrentViewMode =
   async (dispatch, getState) => {
     const { setViewMode } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    const currentDirectory = selectCurrentDirectory(getState())
-    dispatch(setViewMode({ index, path: currentDirectory, viewMode }))
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    dispatch(
+      setViewMode({ index, directoryPath: currentDirectoryPath, viewMode }),
+    )
     dispatch(updateApplicationMenu())
   }
 

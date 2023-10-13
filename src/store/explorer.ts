@@ -5,7 +5,7 @@ import { add } from '~/store/query'
 import { selectGetScore, selectPathsByScore } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
-  selectCurrentDirectory,
+  selectCurrentDirectoryPath,
   selectCurrentSortOption,
   selectZephySchema,
   selectZephyUrl,
@@ -255,9 +255,9 @@ export const load = (): AppThunk => async (dispatch, getState) => {
           await window.electronAPI.entry.getDetailedEntriesForPaths(paths)
       }
     } else {
-      const currentDirectory = selectCurrentDirectory(getState())
+      const currentDirectoryPath = selectCurrentDirectoryPath(getState())
       entries =
-        await window.electronAPI.entry.getDetailedEntries(currentDirectory)
+        await window.electronAPI.entry.getDetailedEntries(currentDirectoryPath)
     }
     dispatch(loaded({ entries }))
   } catch (e) {
@@ -341,12 +341,12 @@ export const copy = (): AppThunk => async (_, getState) => {
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
-  const currentDirectory = selectCurrentDirectory(getState())
+  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
   const zephySchema = selectZephySchema(getState())
   if (zephySchema) {
     return
   }
-  await window.electronAPI.entry.paste(currentDirectory)
+  await window.electronAPI.entry.paste(currentDirectoryPath)
 }
 
 export const handle =
@@ -356,8 +356,8 @@ export const handle =
     filePath: string,
   ): AppThunk =>
   async (dispatch, getState) => {
-    const currentDirectory = selectCurrentDirectory(getState())
-    if (directoryPath !== currentDirectory) {
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    if (directoryPath !== currentDirectoryPath) {
       return
     }
     const { add, remove } = explorerSlice.actions

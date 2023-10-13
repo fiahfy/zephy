@@ -43,7 +43,7 @@ import {
   selectBackHistories,
   selectCanBack,
   selectCanForward,
-  selectCurrentDirectory,
+  selectCurrentDirectoryPath,
   selectCurrentSortOption,
   selectCurrentViewMode,
   selectForwardHistories,
@@ -58,10 +58,10 @@ const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
-  const favorite = useAppSelector(selectIsFavorite)(currentDirectory)
+  const favorite = useAppSelector(selectIsFavorite)(currentDirectoryPath)
   const forwardHistories = useAppSelector(selectForwardHistories)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const loading = useAppSelector(selectLoading)
@@ -131,10 +131,10 @@ const AddressBar = () => {
   }, [dispatch, search])
 
   useEffect(() => {
-    setDirectory(currentDirectory)
+    setDirectory(currentDirectoryPath)
     dispatch(load())
     dispatch(unselect())
-  }, [currentDirectory, dispatch])
+  }, [currentDirectoryPath, dispatch])
 
   const directoryIconType = useMemo(() => {
     if (zephyUrl) {
@@ -158,18 +158,18 @@ const AddressBar = () => {
   )
 
   const handleClickRefresh = useCallback(async () => {
-    setDirectory(currentDirectory)
+    setDirectory(currentDirectoryPath)
     dispatch(load())
-  }, [currentDirectory, dispatch])
+  }, [currentDirectoryPath, dispatch])
 
   const handleClickFolder = useCallback(
-    async () => await window.electronAPI.entry.open(currentDirectory),
-    [currentDirectory],
+    async () => await window.electronAPI.entry.open(currentDirectoryPath),
+    [currentDirectoryPath],
   )
 
   const handleClickFavorite = useCallback(
-    () => dispatch(toggle(currentDirectory)),
-    [currentDirectory, dispatch],
+    () => dispatch(toggle(currentDirectoryPath)),
+    [currentDirectoryPath, dispatch],
   )
 
   const handleClickSearch = useCallback(() => search(query), [query, search])
@@ -187,7 +187,7 @@ const AddressBar = () => {
       createMenuHandler([
         {
           id: 'newFolder',
-          data: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
         { id: 'separator' },
         { id: 'view', data: { viewMode: currentViewMode } },
@@ -209,7 +209,7 @@ const AddressBar = () => {
         { id: 'settings' },
       ]),
     [
-      currentDirectory,
+      currentDirectoryPath,
       currentSortOption.orderBy,
       currentViewMode,
       isSidebarHidden,

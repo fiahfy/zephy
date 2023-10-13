@@ -6,7 +6,7 @@ import useDnd from '~/hooks/useDnd'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselect } from '~/store/explorer'
 import {
-  selectCurrentDirectory,
+  selectCurrentDirectoryPath,
   selectCurrentSortOption,
   selectCurrentViewMode,
   selectZephySchema,
@@ -14,7 +14,7 @@ import {
 import { createMenuHandler } from '~/utils/contextMenu'
 
 const Explorer = () => {
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
   const zephySchema = useAppSelector(selectZephySchema)
@@ -32,14 +32,14 @@ const Explorer = () => {
       createMenuHandler([
         {
           id: 'newFolder',
-          data: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
         { id: 'separator' },
         { id: 'cut', data: { paths: [] } },
         { id: 'copy', data: { paths: [] } },
         {
           id: 'paste',
-          data: { path: zephySchema ? undefined : currentDirectory },
+          data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
         { id: 'separator' },
         { id: 'view', data: { viewMode: currentViewMode } },
@@ -49,7 +49,12 @@ const Explorer = () => {
           data: { orderBy: currentSortOption.orderBy },
         },
       ]),
-    [currentDirectory, currentSortOption.orderBy, currentViewMode, zephySchema],
+    [
+      currentDirectoryPath,
+      currentSortOption.orderBy,
+      currentViewMode,
+      zephySchema,
+    ],
   )
 
   const handleBlur = useCallback(
@@ -72,7 +77,7 @@ const Explorer = () => {
       onFocus={handleFocus}
       sx={{ height: '100%', ...droppableStyle }}
       {...createDroppableBinder({
-        path: currentDirectory,
+        path: currentDirectoryPath,
         name: '',
         type: 'directory',
         url: '',

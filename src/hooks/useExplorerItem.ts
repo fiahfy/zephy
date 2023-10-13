@@ -16,13 +16,13 @@ import {
 import { selectIsFavorite } from '~/store/favorite'
 import {
   changeDirectory,
-  selectCurrentDirectory,
+  selectCurrentDirectoryPath,
   selectZephySchema,
 } from '~/store/window'
 import { createMenuHandler } from '~/utils/contextMenu'
 
 const useExplorerItem = (content: Content) => {
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const isEditing = useAppSelector(selectIsEditing)
   const isFavorite = useAppSelector(selectIsFavorite)
   const isFocused = useAppSelector(selectIsFocused)
@@ -128,13 +128,13 @@ const useExplorerItem = (content: Content) => {
       { id: 'copy', data: { paths } },
       {
         id: 'paste',
-        data: { path: zephySchema ? undefined : currentDirectory },
+        data: { path: zephySchema ? undefined : currentDirectoryPath },
       },
     ])
   }, [
     content.path,
     content.type,
-    currentDirectory,
+    currentDirectoryPath,
     isFavorite,
     selectedContents,
     zephySchema,

@@ -60,7 +60,7 @@ app.whenReady().then(async () => {
 
   const createWindow = (directoryPath?: string) => {
     const path = directoryPath ?? app.getPath('home')
-    windowManager.create({ directory: path })
+    windowManager.create({ directoryPath: path })
   }
 
   registerApplicationMenu(createWindow)

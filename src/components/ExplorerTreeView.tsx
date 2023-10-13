@@ -14,7 +14,7 @@ import ExplorerTreeItem from '~/components/ExplorerTreeItem'
 import useWatcher from '~/hooks/useWatcher'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectCurrentDirectory, selectZephySchema } from '~/store/window'
+import { selectCurrentDirectoryPath, selectZephySchema } from '~/store/window'
 
 const getLoadedDirectories = (entry: Entry) => {
   const reducer = (acc: string[], entry: Entry): string[] => {
@@ -27,7 +27,7 @@ const getLoadedDirectories = (entry: Entry) => {
 }
 
 const ExplorerTreeView = () => {
-  const currentDirectory = useAppSelector(selectCurrentDirectory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const zephySchema = useAppSelector(selectZephySchema)
 
   const { watch } = useWatcher()
@@ -41,13 +41,13 @@ const ExplorerTreeView = () => {
   useEffect(() => {
     ;(async () => {
       const entry = await window.electronAPI.entry.getEntryHierarchy(
-        zephySchema ? undefined : currentDirectory,
+        zephySchema ? undefined : currentDirectoryPath,
       )
       const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setRoot(entry)
     })()
-  }, [currentDirectory, zephySchema])
+  }, [currentDirectoryPath, zephySchema])
 
   useEffect(
     () =>
