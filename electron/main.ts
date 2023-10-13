@@ -3,8 +3,8 @@ import { State } from 'electron-window-state'
 import { join } from 'node:path'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
-import createFullscreenManager from './fullscreen'
 import registerHandlers from './handlers'
+import createTrafficLightsManager from './trafficLights'
 import createWatcher from './watcher'
 import createWindowManager from './window'
 
@@ -26,7 +26,7 @@ process.env.VITE_PUBLIC = app.isPackaged
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 app.whenReady().then(async () => {
-  const fullscreenManager = createFullscreenManager()
+  const trafficLightsManager = createTrafficLightsManager()
   const watcher = createWatcher()
 
   const baseCreateWindow = (state: State) => {
@@ -50,7 +50,7 @@ app.whenReady().then(async () => {
       browserWindow.loadFile(join(process.env.DIST, 'index.html'))
     }
 
-    fullscreenManager.register(browserWindow)
+    trafficLightsManager.register(browserWindow)
     watcher.register(browserWindow)
 
     return browserWindow

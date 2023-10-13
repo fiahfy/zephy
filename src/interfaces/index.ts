@@ -27,18 +27,18 @@ export interface IElectronAPI {
     paste: (directoryPath: string) => Promise<void>
     rename: (path: string, newName: string) => Promise<DetailedEntry>
   }
-  fullscreen: {
-    addListener: (callback: (fullscreen: boolean) => void) => () => void
-    isEntered: () => Promise<boolean>
-  }
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => () => void
   }
+  // TODO: Remove this
   node: {
     basename: (path: string) => Promise<string>
     dirname: (path: string) => Promise<string>
-    isDarwin: () => Promise<boolean>
+  }
+  trafficLights: {
+    addListener: (callback: (visible: boolean) => void) => () => void
+    isVisible: () => Promise<boolean>
   }
   watcher: {
     watch: (
@@ -52,7 +52,7 @@ export interface IElectronAPI {
   }
   window: {
     restore: () => Promise<
-      | { index: number; params: { directoryPath?: string }; restored: boolean }
+      | { index: number; params?: { directoryPath: string }; restored: boolean }
       | undefined
     >
     open: (params: { directoryPath: string }) => Promise<void>

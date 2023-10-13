@@ -39,15 +39,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     rename: (path: string, newName: string) =>
       ipcRenderer.invoke('entry-rename', path, newName),
   },
-  fullscreen: {
-    addListener: (callback: (fullscreen: boolean) => void) => {
-      const listener = (_event: IpcRendererEvent, fullscreen: boolean) =>
-        callback(fullscreen)
-      ipcRenderer.on('fullscreen-send', listener)
-      return () => ipcRenderer.removeListener('fullscreen-send', listener)
-    },
-    isEntered: () => ipcRenderer.invoke('fullscreen-is-entered'),
-  },
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => {
@@ -61,7 +52,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   node: {
     basename: (path: string) => ipcRenderer.invoke('node-basename', path),
     dirname: (path: string) => ipcRenderer.invoke('node-dirname', path),
-    isDarwin: () => ipcRenderer.invoke('node-is-darwin'),
+  },
+  trafficLights: {
+    addListener: (callback: (visible: boolean) => void) => {
+      const listener = (_event: IpcRendererEvent, visible: boolean) =>
+        callback(visible)
+      ipcRenderer.on('traffic-lights-send', listener)
+      return () => ipcRenderer.removeListener('traffic-lights-send', listener)
+    },
+    isVisible: () => ipcRenderer.invoke('traffic-lights-is-visible'),
   },
   watcher: {
     watch: (

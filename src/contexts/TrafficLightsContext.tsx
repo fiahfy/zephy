@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useEffect, useMemo, useState } from 'react'
+import { ReactNode, createContext, useEffect, useState } from 'react'
 
 export const TrafficLightsContext = createContext<
   | {
@@ -13,23 +13,18 @@ export const TrafficLightsProvider = (props: Props) => {
   const { children } = props
 
   const [ready, setReady] = useState(false)
-  const [darwin, setDarwin] = useState(false)
-  const [fullscreen, setFullscreen] = useState(false)
-
-  const visible = useMemo(() => darwin && !fullscreen, [darwin, fullscreen])
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const removeListener =
-      window.electronAPI.fullscreen.addListener(setFullscreen)
+      window.electronAPI.trafficLights.addListener(setVisible)
     return () => removeListener()
   }, [])
 
   useEffect(() => {
     ;(async () => {
-      const darwin = await window.electronAPI.node.isDarwin()
-      setDarwin(darwin)
-      const fullscreen = await window.electronAPI.fullscreen.isEntered()
-      setFullscreen(fullscreen)
+      const visible = await window.electronAPI.trafficLights.isVisible()
+      setVisible(visible)
       // for initial rendering
       setReady(true)
     })()
