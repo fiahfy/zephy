@@ -21,6 +21,7 @@ export interface IElectronAPI {
     getEntries: (directoryPath: string) => Promise<Entry[]>
     getEntryHierarchy: (path?: string) => Promise<Entry>
     getMetadata: (path: string) => Promise<Metadata | undefined>
+    getParent: (path: string) => Promise<DetailedEntry>
     move: (paths: string[], directoryPath: string) => Promise<DetailedEntry[]>
     moveToTrash: (paths: string[]) => Promise<void>
     open: (path: string) => Promise<void>
@@ -30,11 +31,6 @@ export interface IElectronAPI {
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => () => void
-  }
-  // TODO: Remove this
-  node: {
-    basename: (path: string) => Promise<string>
-    dirname: (path: string) => Promise<string>
   }
   trafficLights: {
     addListener: (callback: (visible: boolean) => void) => () => void

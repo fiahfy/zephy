@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
-import { basename, dirname } from 'node:path'
+import { dirname } from 'node:path'
 import { copy, paste } from './utils/clipboard'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
@@ -55,6 +55,13 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, path: string) => getMetadata(path),
   )
   ipcMain.handle(
+    'entry-get-parent',
+    (_event: IpcMainInvokeEvent, path: string) => {
+      const parentPath = dirname(path)
+      return getDetailedEntry(parentPath)
+    },
+  )
+  ipcMain.handle(
     'entry-move',
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
@@ -81,13 +88,6 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName),
   )
-  ipcMain.handle('node-basename', (_event: IpcMainInvokeEvent, path: string) =>
-    basename(path),
-  )
-  ipcMain.handle('node-dirname', (_event: IpcMainInvokeEvent, path: string) =>
-    dirname(path),
-  )
-  ipcMain.handle('node-is-darwin', () => process.platform === 'darwin')
 }
 
 export default registerHandlers

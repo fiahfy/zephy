@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('entry-get-entry-hierarchy', path),
     getMetadata: (path: string) =>
       ipcRenderer.invoke('entry-get-metadata', path),
+    getParent: (path: string) => ipcRenderer.invoke('entry-get-parent', path),
     move: (paths: string[], directoryPath: string) =>
       ipcRenderer.invoke('entry-move', paths, directoryPath),
     moveToTrash: (paths: string[]) =>
@@ -48,10 +49,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('message-send', listener)
       return () => ipcRenderer.removeListener('message-send', listener)
     },
-  },
-  node: {
-    basename: (path: string) => ipcRenderer.invoke('node-basename', path),
-    dirname: (path: string) => ipcRenderer.invoke('node-dirname', path),
   },
   trafficLights: {
     addListener: (callback: (visible: boolean) => void) => {

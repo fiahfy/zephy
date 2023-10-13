@@ -99,7 +99,8 @@ const getTitle = async (path: string) => {
         return 'Settings'
     }
   } else {
-    return await window.electronAPI.node.basename(path)
+    const entry = await window.electronAPI.entry.getDetailedEntry(path)
+    return entry.name
   }
 }
 
@@ -501,8 +502,8 @@ export const changeDirectory =
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
   const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-  const parentPath = await window.electronAPI.node.dirname(currentDirectoryPath)
-  dispatch(changeDirectory(parentPath))
+  const parent = await window.electronAPI.entry.getParent(currentDirectoryPath)
+  dispatch(changeDirectory(parent.path))
 }
 
 export const goToRatings =
