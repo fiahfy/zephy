@@ -58,34 +58,37 @@ const defaultOrders = {
   rating: 'desc',
 } as const
 
+const buildZephyUrl = (
+  inputs:
+    | { pathname: 'ratings'; params: { score: number } }
+    | { pathname: 'settings' },
+) => {
+  switch (inputs.pathname) {
+    case 'ratings':
+      return `zephy://ratings/${inputs.params.score}`
+    case 'settings':
+      return 'zephy://settings'
+  }
+}
+
 const parseZephyUrl = (url: string) => {
-  const match = url.match(/^zephy:\/\/([^/]+)(?:\/([^/]+))?$/)
-  if (!match || !match[1]) {
+  if (!url.startsWith('zephy://')) {
     return undefined
   }
-  switch (match[1]) {
-    case 'ratings':
+  const u = new URL(url)
+  const path = u.pathname.split('/')[2]
+  switch (path) {
+    case 'ratings': {
+      const score = Number(u.pathname.split('/')[3] ?? '')
       return {
         pathname: 'ratings' as const,
-        params: { score: Number(match[2] ?? 0) },
+        params: { score },
       }
+    }
     case 'settings':
       return { pathname: 'settings' as const }
     default:
       return undefined
-  }
-}
-
-const buildZephyUrl = (
-  url:
-    | { pathname: 'ratings'; params: { score: number } }
-    | { pathname: 'settings' },
-) => {
-  switch (url.pathname) {
-    case 'ratings':
-      return `zephy://ratings/${url.params.score}`
-    case 'settings':
-      return 'zephy://settings'
   }
 }
 

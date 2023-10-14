@@ -4,6 +4,7 @@ import {
   Menu,
   MenuItemConstructorOptions,
   app,
+  dialog,
   ipcMain,
   shell,
 } from 'electron'
@@ -32,7 +33,9 @@ const send = (message: any) => {
   activeWindow?.webContents.send('message-send', message)
 }
 
-const registerApplicationMenu = (createWindow: () => void) => {
+const registerApplicationMenu = (
+  createWindow: (directoryPath?: string) => void,
+) => {
   const isMac = process.platform === 'darwin'
 
   let state: State = {
@@ -81,6 +84,19 @@ const registerApplicationMenu = (createWindow: () => void) => {
             accelerator: 'CmdOrCtrl+N',
             click: () => createWindow(),
             label: 'New Window',
+          },
+          {
+            accelerator: 'CmdOrCtrl+O',
+            click: async () => {
+              const { filePaths } = await dialog.showOpenDialog({
+                properties: ['openDirectory'],
+              })
+              const directoryPath = filePaths[0]
+              if (directoryPath) {
+                createWindow(directoryPath)
+              }
+            },
+            label: 'Open...',
           },
           ...[isMac ? { role: 'close' } : { role: 'quit' }],
           { type: 'separator' },
