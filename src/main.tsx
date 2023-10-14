@@ -8,20 +8,20 @@ import App from '~/App'
 import { DragGhostProvider } from '~/contexts/DragGhostContext'
 import { StoreProvider } from '~/contexts/StoreContext'
 import { ThemeProvider } from '~/contexts/ThemeContext'
-import { TrafficLightsProvider } from '~/contexts/TrafficLightsContext'
+import { TrafficLightProvider } from '~/contexts/TrafficLightContext'
 import { WatcherProvider } from '~/contexts/WatcherContext'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <StoreProvider>
       <ThemeProvider>
-        <TrafficLightsProvider>
+        <TrafficLightProvider>
           <DragGhostProvider>
             <WatcherProvider>
               <App />
             </WatcherProvider>
           </DragGhostProvider>
-        </TrafficLightsProvider>
+        </TrafficLightProvider>
       </ThemeProvider>
     </StoreProvider>
   </React.StrictMode>,

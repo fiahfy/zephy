@@ -31,7 +31,7 @@ import {
 import Icon from '~/components/Icon'
 import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
-import useTrafficLights from '~/hooks/useTrafficLights'
+import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load, searchQuery, selectLoading, unselect } from '~/store/explorer'
 import { selectIsFavorite, toggle } from '~/store/favorite'
@@ -70,7 +70,7 @@ const AddressBar = () => {
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
-  const { visible } = useTrafficLights()
+  const { visible } = useTrafficLight()
 
   const backHistoryMenuHandler = useMemo(
     () =>

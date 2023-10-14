@@ -68,5 +68,8 @@
     "release": "electron-builder",
     "test": "npm run format && npm run lint && npm run type-check",
     "type-check": "tsc"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

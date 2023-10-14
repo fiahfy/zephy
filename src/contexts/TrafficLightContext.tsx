@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useEffect, useState } from 'react'
 
-export const TrafficLightsContext = createContext<
+export const TrafficLightContext = createContext<
   | {
       visible: boolean
     }
@@ -9,7 +9,7 @@ export const TrafficLightsContext = createContext<
 
 type Props = { children: ReactNode }
 
-export const TrafficLightsProvider = (props: Props) => {
+export const TrafficLightProvider = (props: Props) => {
   const { children } = props
 
   const [ready, setReady] = useState(false)
@@ -17,13 +17,13 @@ export const TrafficLightsProvider = (props: Props) => {
 
   useEffect(() => {
     const removeListener =
-      window.electronAPI.trafficLights.addListener(setVisible)
+      window.electronAPI.trafficLight.addListener(setVisible)
     return () => removeListener()
   }, [])
 
   useEffect(() => {
     ;(async () => {
-      const visible = await window.electronAPI.trafficLights.isVisible()
+      const visible = await window.electronAPI.trafficLight.isVisible()
       setVisible(visible)
       // for initial rendering
       setReady(true)
@@ -33,8 +33,8 @@ export const TrafficLightsProvider = (props: Props) => {
   const value = { visible }
 
   return (
-    <TrafficLightsContext.Provider value={value}>
+    <TrafficLightContext.Provider value={value}>
       {ready && children}
-    </TrafficLightsContext.Provider>
+    </TrafficLightContext.Provider>
   )
 }

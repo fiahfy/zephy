@@ -3,6 +3,8 @@
 // example, to import the interface below do:
 //
 // import User from 'path/to/interfaces';
+import { Operations as TrafficLightOperations } from 'electron-traffic-light/preload'
+import { Operations as WindowOperations } from 'electron-window/preload'
 
 export interface IElectronAPI {
   applicationMenu: {
@@ -32,10 +34,7 @@ export interface IElectronAPI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => () => void
   }
-  trafficLights: {
-    addListener: (callback: (visible: boolean) => void) => () => void
-    isVisible: () => Promise<boolean>
-  }
+  trafficLight: TrafficLightOperations
   watcher: {
     watch: (
       directoryPaths: string[],
@@ -46,13 +45,7 @@ export interface IElectronAPI {
       ) => void,
     ) => Promise<void>
   }
-  window: {
-    restore: () => Promise<
-      | { index: number; params?: { directoryPath: string }; restored: boolean }
-      | undefined
-    >
-    open: (params: { directoryPath: string }) => Promise<void>
-  }
+  window: WindowOperations<{ directoryPath: string }>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

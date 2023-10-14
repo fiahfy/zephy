@@ -1,12 +1,11 @@
 import { BrowserWindow, app } from 'electron'
-import { State } from 'electron-window-state'
+import { createManager as createTrafficLightManager } from 'electron-traffic-light'
+import { State, createManager as createWindowManager } from 'electron-window'
 import { join } from 'node:path'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
 import registerHandlers from './handlers'
-import createTrafficLightsManager from './trafficLights'
 import createWatcher from './watcher'
-import createWindowManager from './window'
 
 // The built directory structure
 //
@@ -26,7 +25,7 @@ process.env.VITE_PUBLIC = app.isPackaged
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 app.whenReady().then(async () => {
-  const trafficLightsManager = createTrafficLightsManager()
+  const trafficLightManager = createTrafficLightManager()
   const watcher = createWatcher()
 
   const baseCreateWindow = (state: State) => {
@@ -50,8 +49,8 @@ app.whenReady().then(async () => {
       browserWindow.loadFile(join(process.env.DIST, 'index.html'))
     }
 
-    trafficLightsManager.register(browserWindow)
-    watcher.register(browserWindow)
+    trafficLightManager.handle(browserWindow)
+    watcher.handle(browserWindow)
 
     return browserWindow
   }

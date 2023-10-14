@@ -51,10 +51,10 @@ export const StoreProvider = (props: Props) => {
       if (!data) {
         return
       }
-      const { index, params, restored } = data
+      const { index, params } = data
       dispatch(set(index))
       const directoryPath = params?.directoryPath
-      if (!restored && directoryPath) {
+      if (directoryPath) {
         dispatch(initialize({ index }))
         dispatch(changeDirectory(directoryPath))
       }

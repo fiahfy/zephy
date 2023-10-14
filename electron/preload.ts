@@ -1,4 +1,6 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import { exposeOperations as exposeTrafficLightOperations } from 'electron-traffic-light/preload'
+import { exposeOperations as exposeWindowOperations } from 'electron-window/preload'
 import { ApplicationMenuParams } from './applicationMenu'
 import { ContextMenuParams } from './contextMenu'
 
@@ -50,15 +52,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return () => ipcRenderer.removeListener('message-send', listener)
     },
   },
-  trafficLights: {
-    addListener: (callback: (visible: boolean) => void) => {
-      const listener = (_event: IpcRendererEvent, visible: boolean) =>
-        callback(visible)
-      ipcRenderer.on('traffic-lights-send', listener)
-      return () => ipcRenderer.removeListener('traffic-lights-send', listener)
-    },
-    isVisible: () => ipcRenderer.invoke('traffic-lights-is-visible'),
-  },
+  trafficLight: exposeTrafficLightOperations(),
   watcher: {
     watch: (
       directoryPaths: string[],
@@ -81,9 +75,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return ipcRenderer.invoke('watcher-watch', directoryPaths)
     },
   },
-  window: {
-    restore: () => ipcRenderer.invoke('window-restore'),
-    open: (params: { directoryPath: string }) =>
-      ipcRenderer.invoke('window-open', params),
-  },
+  window: exposeWindowOperations(),
 })

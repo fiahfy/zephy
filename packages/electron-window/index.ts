@@ -1,24 +1,27 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
-import windowStateKeeper, { State } from 'electron-window-state'
+import windowStateKeeper, { State as _State } from 'electron-window-state'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const windowManager = <T>(
+export type State = _State
+
+export const createManager = <T>(
   baseCreateWindow: (state: State) => BrowserWindow,
 ) => {
+  const channelPrefix = 'electron-window'
   const savedDirectoryPath = app.getPath('userData')
   const savedPath = join(savedDirectoryPath, 'window-state.json')
 
   let visibilities: boolean[] = []
 
   const dataMap: {
-    [id: number]: { index: number; params?: T; restored: boolean }
+    [id: number]: { index: number; params?: T }
   } = {}
 
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
-  ipcMain.handle('window-restore', (event: IpcMainInvokeEvent) => {
+  ipcMain.handle(`${channelPrefix}-restore`, (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
     if (!windowId) {
       return undefined
@@ -28,11 +31,12 @@ const windowManager = <T>(
       return undefined
     }
     const duplicated = { ...data }
-    data.restored = true
+    delete data.params
     return duplicated
   })
-  ipcMain.handle('window-open', (_event: IpcMainInvokeEvent, params?: T) =>
-    create(params),
+  ipcMain.handle(
+    `${channelPrefix}-open`,
+    (_event: IpcMainInvokeEvent, params?: T) => create(params),
   )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +78,7 @@ const windowManager = <T>(
     })
     windowState.manage(browserWindow)
 
-    dataMap[browserWindow.id] = { index, params, restored: false }
+    dataMap[browserWindow.id] = { index, ...(params ? { params } : {}) }
 
     browserWindow.on('close', () => {
       delete dataMap[browserWindow.id]
@@ -124,5 +128,3 @@ const windowManager = <T>(
     save,
   }
 }
-
-export default windowManager

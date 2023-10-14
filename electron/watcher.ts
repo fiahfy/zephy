@@ -54,7 +54,7 @@ const createWatcher = () => {
       .on('change', createHandler('update', directoryPaths, callback))
   }
 
-  const register = (browserWindow: BrowserWindow) =>
+  const handle = (browserWindow: BrowserWindow) =>
     browserWindow.on('close', () => close(browserWindow.webContents.id))
 
   const notify = (
@@ -89,7 +89,7 @@ const createWatcher = () => {
       ),
   )
 
-  return { notify, register }
+  return { handle, notify }
 }
 
 export default createWatcher
