@@ -20,6 +20,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # clear disk space because building nsis is failing
       - run: rm -rf dist
+      - run: yarn build
       - run: yarn release -w
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
