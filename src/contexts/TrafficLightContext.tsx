@@ -1,7 +1,14 @@
-import { ReactNode, createContext, useEffect, useState } from 'react'
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 
 export const TrafficLightContext = createContext<
   | {
+      setVisible: (visible: boolean) => Promise<void>
       visible: boolean
     }
   | undefined
@@ -30,7 +37,12 @@ export const TrafficLightProvider = (props: Props) => {
     })()
   }, [])
 
-  const value = { visible }
+  const changeVisible = useCallback(
+    (visible: boolean) => window.electronAPI.trafficLight.setVisible(visible),
+    [],
+  )
+
+  const value = { setVisible: changeVisible, visible }
 
   return (
     <TrafficLightContext.Provider value={value}>

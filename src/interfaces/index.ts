@@ -34,7 +34,6 @@ export interface IElectronAPI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addListener: (callback: (message: any) => void) => () => void
   }
-  trafficLight: TrafficLightOperations
   watcher: {
     watch: (
       directoryPaths: string[],
@@ -45,6 +44,7 @@ export interface IElectronAPI {
       ) => void,
     ) => Promise<void>
   }
+  trafficLight: TrafficLightOperations
   window: WindowOperations<{ directoryPath: string }>
 }
 

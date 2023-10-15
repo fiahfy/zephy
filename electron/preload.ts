@@ -52,7 +52,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return () => ipcRenderer.removeListener('message-send', listener)
     },
   },
-  trafficLight: exposeTrafficLightOperations(),
   watcher: {
     watch: (
       directoryPaths: string[],
@@ -75,5 +74,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return ipcRenderer.invoke('watcher-watch', directoryPaths)
     },
   },
+  trafficLight: exposeTrafficLightOperations(),
   window: exposeWindowOperations(),
 })
