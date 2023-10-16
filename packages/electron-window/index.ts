@@ -1,4 +1,10 @@
-import { BrowserWindow, IpcMainInvokeEvent, app, ipcMain } from 'electron'
+import {
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  IpcMainInvokeEvent,
+  app,
+  ipcMain,
+} from 'electron'
 import windowStateKeeper, { State as _State } from 'electron-window-state'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -6,7 +12,7 @@ import { join } from 'node:path'
 export type State = _State
 
 export const createManager = <T>(
-  baseCreateWindow: (state: State) => BrowserWindow,
+  baseCreateWindow: (options: BrowserWindowConstructorOptions) => BrowserWindow,
 ) => {
   const channelPrefix = 'electron-window'
   const savedDirectoryPath = app.getPath('userData')
@@ -72,11 +78,8 @@ export const createManager = <T>(
       path: savedDirectoryPath,
       file: getWindowFile(index),
     })
-    const browserWindow = baseCreateWindow({
-      ...windowState,
-      ...(options ?? {}),
-    })
-    windowState.manage(browserWindow)
+
+    const browserWindow = baseCreateWindow(options ?? { ...windowState })
 
     dataMap[browserWindow.id] = { index, ...(params ? { params } : {}) }
 
@@ -85,13 +88,20 @@ export const createManager = <T>(
       visibilities[index] = false
     })
 
+    windowState.manage(browserWindow)
+
     return browserWindow
   }
 
-  const getNewWindowOptions = () => {
+  const getDefaultOptions = () => {
     const activeWindow = BrowserWindow.getFocusedWindow()
     if (!activeWindow) {
-      return {}
+      return {
+        height: 600,
+        width: 800,
+        x: 0,
+        y: 0,
+      }
     }
 
     const bounds = activeWindow.getBounds()
@@ -109,7 +119,7 @@ export const createManager = <T>(
       visibilities.length,
     )
     visibilities[index] = true
-    return createWindow(index, params, getNewWindowOptions())
+    return createWindow(index, params, getDefaultOptions())
   }
 
   const restore = async () => {

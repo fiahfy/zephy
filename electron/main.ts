@@ -1,6 +1,6 @@
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, BrowserWindowConstructorOptions, app } from 'electron'
 import { createManager as createTrafficLightManager } from 'electron-traffic-light'
-import { State, createManager as createWindowManager } from 'electron-window'
+import { createManager as createWindowManager } from 'electron-window'
 import { join } from 'node:path'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
@@ -27,9 +27,9 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 const trafficLightManager = createTrafficLightManager()
 const watcher = createWatcher()
 
-const baseCreateWindow = (state: State) => {
+const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
   const browserWindow = new BrowserWindow({
-    ...state,
+    ...options,
     minHeight: 350,
     minWidth: 550,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',

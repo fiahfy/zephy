@@ -37,12 +37,18 @@ export const createManager = () => {
   )
 
   const handle = (browserWindow: BrowserWindow) => {
-    browserWindow.on('resize', () => {
+    browserWindow.on('enter-full-screen', () =>
       browserWindow.webContents.send(
         `${channelPrefix}-send`,
         isVisible(browserWindow),
-      )
-    })
+      ),
+    )
+    browserWindow.on('leave-full-screen', () =>
+      browserWindow.webContents.send(
+        `${channelPrefix}-send`,
+        isVisible(browserWindow),
+      ),
+    )
   }
 
   return { handle }
