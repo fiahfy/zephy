@@ -22,7 +22,9 @@ export type ContextMenuParams = {
   options: ContextMenuItemOption[]
 }
 
-const registerContextMenu = (createWindow: (directoryPath: string) => void) => {
+const registerContextMenu = (
+  createWindow: (directoryPath?: string) => Promise<void>,
+) => {
   ipcMain.handle(
     'context-menu-show',
     (event: IpcMainInvokeEvent, params: ContextMenuParams) => {

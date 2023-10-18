@@ -6,7 +6,7 @@ import {
   ipcMain,
 } from 'electron'
 import windowStateKeeper, { State as _State } from 'electron-window-state'
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 export type State = _State
@@ -67,19 +67,31 @@ export const createManager = <T>(
     await writeFile(savedPath, json)
   }
 
-  const getWindowFile = (index: number) => `window-state_${index}.json`
+  const getWindowFilename = (index: number) => `window-state_${index}.json`
 
-  const createWindow = (
+  const deleteWindowFile = async (index: number) => {
+    try {
+      await unlink(join(savedDirectoryPath, getWindowFilename(index)))
+    } catch (e) {
+      // noop
+    }
+  }
+
+  const createWindow = async (
     index: number,
     params?: T,
     options?: Partial<State>,
   ) => {
+    if (options) {
+      await deleteWindowFile(index)
+    }
+
     const windowState = windowStateKeeper({
       path: savedDirectoryPath,
-      file: getWindowFile(index),
+      file: getWindowFilename(index),
     })
 
-    const browserWindow = baseCreateWindow(options ?? { ...windowState })
+    const browserWindow = baseCreateWindow({ ...windowState, ...options })
 
     dataMap[browserWindow.id] = { index, ...(params ? { params } : {}) }
 
@@ -125,8 +137,11 @@ export const createManager = <T>(
   const restore = async () => {
     await restoreVisibilities()
     return visibilities.reduce(
-      (acc, visible, index) => (visible ? [...acc, createWindow(index)] : acc),
-      [] as BrowserWindow[],
+      async (promise, visible, index) => {
+        const acc = await promise
+        return visible ? [...acc, await createWindow(index)] : acc
+      },
+      Promise.resolve([]) as Promise<BrowserWindow[]>,
     )
   }
 

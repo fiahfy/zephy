@@ -56,9 +56,9 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
 
 const windowManager = createWindowManager(baseCreateWindow)
 
-const createWindow = (directoryPath?: string) => {
+const createWindow = async (directoryPath?: string) => {
   const path = directoryPath ?? app.getPath('home')
-  windowManager.create({ directoryPath: path })
+  await windowManager.create({ directoryPath: path })
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -70,11 +70,11 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', () => {
+app.on('activate', async () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    await createWindow()
   }
 })
 
@@ -89,6 +89,6 @@ app.whenReady().then(async () => {
 
   const browserWindows = await windowManager.restore()
   if (browserWindows.length === 0) {
-    createWindow()
+    await createWindow()
   }
 })
