@@ -143,6 +143,7 @@ const ExplorerGridItem = (props: Props) => {
         color="primary"
         onChange={handleChangeRating}
         onClick={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
         precision={0.5}
         size="small"
         sx={{ my: 0.25 }}

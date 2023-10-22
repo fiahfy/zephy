@@ -62,6 +62,7 @@ const ExplorerTableCell = (props: Props) => {
       <NoOutlineRating
         onChange={handleChangeRating}
         onClick={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
         precision={0.5}
         size="small"
         value={content.rating}
