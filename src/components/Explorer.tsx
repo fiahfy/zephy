@@ -31,21 +31,21 @@ const Explorer = () => {
     () =>
       createMenuHandler([
         {
-          id: 'newFolder',
+          type: 'newFolder',
           data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
-        { id: 'separator' },
-        { id: 'cut', data: { paths: [] } },
-        { id: 'copy', data: { paths: [] } },
+        { type: 'separator' },
+        { type: 'cut', data: { paths: [] } },
+        { type: 'copy', data: { paths: [] } },
         {
-          id: 'paste',
+          type: 'paste',
           data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
-        { id: 'separator' },
-        { id: 'view', data: { viewMode: currentViewMode } },
-        { id: 'separator' },
+        { type: 'separator' },
+        { type: 'view', data: { viewMode: currentViewMode } },
+        { type: 'separator' },
         {
-          id: 'sortBy',
+          type: 'sortBy',
           data: { orderBy: currentSortOption.orderBy },
         },
       ]),

@@ -76,7 +76,7 @@ const AddressBar = () => {
     () =>
       createMenuHandler(
         backHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
+          type: 'go',
           data: {
             offset: -(i + 1),
             title: history.title,
@@ -89,7 +89,7 @@ const AddressBar = () => {
     () =>
       createMenuHandler(
         forwardHistories.slice(0, 12).map((history, i) => ({
-          id: 'go',
+          type: 'go',
           data: {
             offset: i + 1,
             title: history.title,
@@ -186,27 +186,27 @@ const AddressBar = () => {
     () =>
       createMenuHandler([
         {
-          id: 'newFolder',
+          type: 'newFolder',
           data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
-        { id: 'separator' },
-        { id: 'view', data: { viewMode: currentViewMode } },
-        { id: 'separator' },
+        { type: 'separator' },
+        { type: 'view', data: { viewMode: currentViewMode } },
+        { type: 'separator' },
         {
-          id: 'sortBy',
+          type: 'sortBy',
           data: { orderBy: currentSortOption.orderBy },
         },
-        { id: 'separator' },
+        { type: 'separator' },
         {
-          id: 'toggleNavigator',
+          type: 'toggleNavigator',
           data: { hidden: isSidebarHidden('primary') },
         },
         {
-          id: 'toggleInspector',
+          type: 'toggleInspector',
           data: { hidden: isSidebarHidden('secondary') },
         },
-        { id: 'separator' },
-        { id: 'settings' },
+        { type: 'separator' },
+        { type: 'settings' },
       ]),
     [
       currentDirectoryPath,

@@ -12,38 +12,38 @@ const useEntryItem = (entry: Entry) => {
     const path = entry.path
     return createMenuHandler([
       {
-        id: directory ? 'openDirectory' : 'open',
+        type: directory ? 'openDirectory' : 'open',
         data: { path },
       },
       ...(directory
         ? [
             {
-              id: 'openDirectoryInNewWindow',
+              type: 'openDirectoryInNewWindow',
               data: { path },
             },
           ]
         : []),
       {
-        id: 'revealInFinder',
+        type: 'revealInFinder',
         data: { path },
       },
-      { id: 'separator' },
+      { type: 'separator' },
       {
-        id: 'copyPath',
+        type: 'copyPath',
         data: { path },
       },
-      { id: 'separator' },
+      { type: 'separator' },
       ...(directory
         ? [
             {
-              id: 'toggleFavorite',
+              type: 'toggleFavorite',
               data: { path, favorite: isFavorite(path) },
             },
           ]
         : []),
-      { id: 'separator' },
+      { type: 'separator' },
       {
-        id: 'moveToTrash',
+        type: 'moveToTrash',
         data: { paths: [path] },
       },
     ])

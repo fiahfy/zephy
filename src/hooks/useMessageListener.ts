@@ -48,7 +48,6 @@ const useMessageListener = () => {
           return dispatch(goToSettings())
         case 'moveToTrash':
           return dispatch(moveToTrash(data?.paths))
-
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'removeFromFavorites':

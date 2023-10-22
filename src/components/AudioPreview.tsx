@@ -74,7 +74,7 @@ const AudioPreview = (props: Props) => {
   }, [])
 
   const handleContextMenu = useMemo(
-    () => createMenuHandler([{ id: 'loop', data: { enabled: loop } }]),
+    () => createMenuHandler([{ type: 'loop', data: { enabled: loop } }]),
     [loop],
   )
 

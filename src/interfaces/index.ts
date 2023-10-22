@@ -52,16 +52,16 @@ export interface IElectronAPI {
 export type ApplicationMenuParams = any
 
 export type ContextMenuOption = {
-  id: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any
+  type: string
 }
 export type ContextMenuParams = {
   isEditable: boolean
+  options: ContextMenuOption[]
   selectionText: string
   x: number
   y: number
-  options: ContextMenuOption[]
 }
 
 export type Settings = {
