@@ -1,37 +1,39 @@
 import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from 'electron'
 
 export const createManager = () => {
-  const channelPrefix = 'electron-traffic-light'
   const isMac = process.platform === 'darwin'
 
-  const isVisible = (browserWindow: BrowserWindow) => {
+  const getVisibility = (browserWindow: BrowserWindow) => {
     const isFullScreen = browserWindow.isFullScreen()
-    const visible = visibilities[browserWindow.id] ?? true
-    return isMac && !isFullScreen && visible
+    const visibility = visibilities[browserWindow.id] ?? true
+    return isMac && !isFullScreen && visibility
   }
 
   const visibilities: { [id: number]: boolean } = {}
 
-  ipcMain.handle(`${channelPrefix}-is-visible`, (event: IpcMainInvokeEvent) => {
+  ipcMain.handle('getTrafficLightVisibility', (event: IpcMainInvokeEvent) => {
     const browserWindow = BrowserWindow.fromWebContents(event.sender)
     if (!browserWindow) {
       return false
     }
-    return isVisible(browserWindow)
+    return getVisibility(browserWindow)
   })
 
   ipcMain.handle(
-    `${channelPrefix}-set-visible`,
-    (event: IpcMainInvokeEvent, visible: boolean) => {
+    'setTrafficLightVisibility',
+    (event: IpcMainInvokeEvent, visibility: boolean) => {
+      if (!isMac) {
+        return
+      }
       const browserWindow = BrowserWindow.fromWebContents(event.sender)
       if (!browserWindow) {
         return
       }
-      visibilities[browserWindow.id] = visible
-      browserWindow.setWindowButtonVisibility(visible)
+      visibilities[browserWindow.id] = visibility
+      browserWindow.setWindowButtonVisibility(visibility)
       browserWindow.webContents.send(
-        `${channelPrefix}-send`,
-        isVisible(browserWindow),
+        'sendTrafficLightVisibility',
+        getVisibility(browserWindow),
       )
     },
   )
@@ -39,14 +41,14 @@ export const createManager = () => {
   const handle = (browserWindow: BrowserWindow) => {
     browserWindow.on('enter-full-screen', () =>
       browserWindow.webContents.send(
-        `${channelPrefix}-send`,
-        isVisible(browserWindow),
+        'sendTrafficLightVisibility',
+        getVisibility(browserWindow),
       ),
     )
     browserWindow.on('leave-full-screen', () =>
       browserWindow.webContents.send(
-        `${channelPrefix}-send`,
-        isVisible(browserWindow),
+        'sendTrafficLightVisibility',
+        getVisibility(browserWindow),
       ),
     )
   }

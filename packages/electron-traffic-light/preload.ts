@@ -1,22 +1,25 @@
 import { IpcRendererEvent, ipcRenderer } from 'electron'
 
 export type Operations = {
-  addListener: (callback: (visible: boolean) => void) => () => void
-  isVisible: () => Promise<boolean>
-  setVisible: (visible: boolean) => Promise<void>
+  addTrafficLightListener: (
+    callback: (visibility: boolean) => void,
+  ) => () => void
+  getTrafficLightVisibility: () => Promise<boolean>
+  setTrafficLightVisibility: (visibility: boolean) => Promise<void>
 }
 
 export const exposeOperations = () => {
-  const channelPrefix = 'electron-traffic-light'
   return {
-    addListener: (callback: (visible: boolean) => void) => {
-      const listener = (_event: IpcRendererEvent, visible: boolean) =>
-        callback(visible)
-      ipcRenderer.on(`${channelPrefix}-send`, listener)
-      return () => ipcRenderer.removeListener(`${channelPrefix}-send`, listener)
+    addTrafficLightListener: (callback: (visibility: boolean) => void) => {
+      const listener = (_event: IpcRendererEvent, visibility: boolean) =>
+        callback(visibility)
+      ipcRenderer.on('sendTrafficLightVisibility', listener)
+      return () =>
+        ipcRenderer.removeListener('sendTrafficLightVisibility', listener)
     },
-    isVisible: () => ipcRenderer.invoke(`${channelPrefix}-is-visible`),
-    setVisible: (visible: boolean) =>
-      ipcRenderer.invoke(`${channelPrefix}-set-visible`, visible),
+    getTrafficLightVisibility: () =>
+      ipcRenderer.invoke('getTrafficLightVisibility'),
+    setTrafficLightVisibility: (visibility: boolean) =>
+      ipcRenderer.invoke('setTrafficLightVisibility', visibility),
   }
 }

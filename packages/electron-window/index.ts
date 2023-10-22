@@ -14,7 +14,6 @@ export type State = _State
 export const createManager = <T>(
   baseCreateWindow: (options: BrowserWindowConstructorOptions) => BrowserWindow,
 ) => {
-  const channelPrefix = 'electron-window'
   const savedDirectoryPath = app.getPath('userData')
   const savedPath = join(savedDirectoryPath, 'window-state.json')
 
@@ -27,7 +26,7 @@ export const createManager = <T>(
   const getWindowId = (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.id
 
-  ipcMain.handle(`${channelPrefix}-restore`, (event: IpcMainInvokeEvent) => {
+  ipcMain.handle('restoreWindow', (event: IpcMainInvokeEvent) => {
     const windowId = getWindowId(event)
     if (!windowId) {
       return undefined
@@ -40,15 +39,14 @@ export const createManager = <T>(
     delete data.params
     return duplicated
   })
-  ipcMain.handle(
-    `${channelPrefix}-open`,
-    (_event: IpcMainInvokeEvent, params?: T) => create(params),
+  ipcMain.handle('openWindow', (_event: IpcMainInvokeEvent, params?: T) =>
+    create(params),
   )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isVisibilities = (visibilities: any): visibilities is boolean[] =>
     Array.isArray(visibilities) &&
-    visibilities.every((visible: unknown) => typeof visible === 'boolean')
+    visibilities.every((visibility: unknown) => typeof visibility === 'boolean')
 
   const restoreVisibilities = async () => {
     try {
@@ -127,7 +125,7 @@ export const createManager = <T>(
 
   const create = (params?: T) => {
     const index = visibilities.reduce(
-      (acc, visible, index) => (visible ? acc : Math.min(index, acc)),
+      (acc, visibility, index) => (visibility ? acc : Math.min(index, acc)),
       visibilities.length,
     )
     visibilities[index] = true
@@ -137,9 +135,9 @@ export const createManager = <T>(
   const restore = async () => {
     await restoreVisibilities()
     return visibilities.reduce(
-      async (promise, visible, index) => {
+      async (promise, visibility, index) => {
         const acc = await promise
-        return visible ? [...acc, await createWindow(index)] : acc
+        return visibility ? [...acc, await createWindow(index)] : acc
       },
       Promise.resolve([]) as Promise<BrowserWindow[]>,
     )

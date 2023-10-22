@@ -64,6 +64,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     )
     return ipcRenderer.invoke('watchDirectories', directoryPaths)
   },
-  trafficLight: exposeTrafficLightOperations(),
-  window: exposeWindowOperations(),
+  ...exposeTrafficLightOperations(),
+  ...exposeWindowOperations(),
 })

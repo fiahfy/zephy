@@ -1,15 +1,13 @@
 import { ipcRenderer } from 'electron'
 
 export type Operations<T> = {
-  restore: () => Promise<{ index: number; params?: T }>
-  open: (params?: T) => Promise<void>
+  restoreWindow: () => Promise<{ index: number; params?: T }>
+  openWindow: (params?: T) => Promise<void>
 }
 
-export const exposeOperations = () => {
-  const channelPrefix = 'electron-window'
+export const exposeOperations = <T>() => {
   return {
-    restore: () => ipcRenderer.invoke(`${channelPrefix}-restore`),
-    open: (params: { directoryPath: string }) =>
-      ipcRenderer.invoke(`${channelPrefix}-open`, params),
+    restoreWindow: () => ipcRenderer.invoke('restoreWindow'),
+    openWindow: (params: T) => ipcRenderer.invoke('openWindow', params),
   }
 }

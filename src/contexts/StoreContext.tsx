@@ -47,7 +47,7 @@ export const StoreProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      const data = await window.electronAPI.window.restore()
+      const data = await window.electronAPI.restoreWindow()
       if (!data) {
         return
       }

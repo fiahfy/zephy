@@ -20,29 +20,29 @@ export const TrafficLightProvider = (props: Props) => {
   const { children } = props
 
   const [ready, setReady] = useState(false)
-  const [visible, setVisible] = useState(false)
+  const [visibility, setVisibility] = useState(false)
 
   useEffect(() => {
     const removeListener =
-      window.electronAPI.trafficLight.addListener(setVisible)
+      window.electronAPI.addTrafficLightListener(setVisibility)
     return () => removeListener()
   }, [])
 
   useEffect(() => {
     ;(async () => {
-      const visible = await window.electronAPI.trafficLight.isVisible()
-      setVisible(visible)
+      const visibility = await window.electronAPI.getTrafficLightVisibility()
+      setVisibility(visibility)
       // for initial rendering
       setReady(true)
     })()
   }, [])
 
-  const changeVisible = useCallback(
-    (visible: boolean) => window.electronAPI.trafficLight.setVisible(visible),
+  const setVisible = useCallback(
+    (visible: boolean) => window.electronAPI.setTrafficLightVisibility(visible),
     [],
   )
 
-  const value = { setVisible: changeVisible, visible }
+  const value = { setVisible, visible: visibility }
 
   return (
     <TrafficLightContext.Provider value={value}>

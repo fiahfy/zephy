@@ -6,7 +6,7 @@
 import { Operations as TrafficLightOperations } from 'electron-traffic-light/preload'
 import { Operations as WindowOperations } from 'electron-window/preload'
 
-export interface IElectronAPI {
+export type IElectronAPI = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMessageListener: (callback: (message: any) => void) => () => void
   copyEntries: (paths: string[]) => Promise<void>
@@ -37,9 +37,8 @@ export interface IElectronAPI {
       filePath: string,
     ) => void,
   ) => Promise<void>
-  trafficLight: TrafficLightOperations
-  window: WindowOperations<{ directoryPath: string }>
-}
+} & TrafficLightOperations &
+  WindowOperations<{ directoryPath: string }>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApplicationMenuParams = any
