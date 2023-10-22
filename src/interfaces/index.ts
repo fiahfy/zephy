@@ -7,28 +7,29 @@ import { Operations as TrafficLightOperations } from 'electron-traffic-light/pre
 import { Operations as WindowOperations } from 'electron-window/preload'
 
 export interface IElectronAPI {
+  copyEntries: (paths: string[]) => Promise<void>
+  createDirectory: (directoryPath: string) => Promise<DetailedEntry>
+  createEntryThumbnailUrl: (paths: string | string[]) => Promise<string>
+  getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
+  getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
+  getDetailedEntry: (path: string) => Promise<DetailedEntry>
+  getEntries: (directoryPath: string) => Promise<Entry[]>
+  getEntryHierarchy: (path?: string) => Promise<Entry>
+  getEntryMetadata: (path: string) => Promise<Metadata | undefined>
+  getParentEntry: (path: string) => Promise<DetailedEntry>
+  moveEntries: (
+    paths: string[],
+    directoryPath: string,
+  ) => Promise<DetailedEntry[]>
+  moveEntriesToTrash: (paths: string[]) => Promise<void>
+  openEntry: (path: string) => Promise<void>
+  pasteEntries: (directoryPath: string) => Promise<void>
+  renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   applicationMenu: {
     update: (params: ApplicationMenuParams) => Promise<void>
   }
   contextMenu: {
     show: (params: ContextMenuParams) => Promise<void>
-  }
-  entry: {
-    copy: (paths: string[]) => Promise<void>
-    createDirectory: (directoryPath: string) => Promise<DetailedEntry>
-    createThumbnailUrl: (paths: string | string[]) => Promise<string>
-    getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
-    getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
-    getDetailedEntry: (path: string) => Promise<DetailedEntry>
-    getEntries: (directoryPath: string) => Promise<Entry[]>
-    getEntryHierarchy: (path?: string) => Promise<Entry>
-    getMetadata: (path: string) => Promise<Metadata | undefined>
-    getParent: (path: string) => Promise<DetailedEntry>
-    move: (paths: string[], directoryPath: string) => Promise<DetailedEntry[]>
-    moveToTrash: (paths: string[]) => Promise<void>
-    open: (path: string) => Promise<void>
-    paste: (directoryPath: string) => Promise<void>
-    rename: (path: string, newName: string) => Promise<DetailedEntry>
   }
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

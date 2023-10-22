@@ -86,7 +86,7 @@ const DirectoryPreview = (props: Props) => {
       dispatch({ type: 'loading' })
       const entries = await (async () => {
         try {
-          const entries = await window.electronAPI.entry.getEntries(entry.path)
+          const entries = await window.electronAPI.getEntries(entry.path)
           return entries
             .filter(
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),

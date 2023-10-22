@@ -5,6 +5,33 @@ import { ApplicationMenuParams } from './applicationMenu'
 import { ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  copyEntries: (paths: string[]) => ipcRenderer.invoke('copyEntries', paths),
+  createDirectory: (directoryPath: string) =>
+    ipcRenderer.invoke('createDirectory', directoryPath),
+  createEntryThumbnailUrl: (paths: string | string[]) =>
+    ipcRenderer.invoke('createEntryThumbnailUrl', paths),
+  getDetailedEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('getDetailedEntries', directoryPath),
+  getDetailedEntriesForPaths: (paths: string[]) =>
+    ipcRenderer.invoke('getDetailedEntriesForPaths', paths),
+  getDetailedEntry: (path: string) =>
+    ipcRenderer.invoke('getDetailedEntry', path),
+  getEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('getEntries', directoryPath),
+  getEntryHierarchy: (path?: string) =>
+    ipcRenderer.invoke('getEntryHierarchy', path),
+  getEntryMetadata: (path: string) =>
+    ipcRenderer.invoke('getEntryMetadata', path),
+  getParentEntry: (path: string) => ipcRenderer.invoke('getParentEntry', path),
+  moveEntries: (paths: string[], directoryPath: string) =>
+    ipcRenderer.invoke('moveEntries', paths, directoryPath),
+  moveEntriesToTrash: (paths: string[]) =>
+    ipcRenderer.invoke('moveEntriesToTrash', paths),
+  openEntry: (path: string) => ipcRenderer.invoke('openEntry', path),
+  pasteEntries: (directoryPath: string) =>
+    ipcRenderer.invoke('pasteEntries', directoryPath),
+  renameEntry: (path: string, newName: string) =>
+    ipcRenderer.invoke('renameEntry', path, newName),
   applicationMenu: {
     update: (params: ApplicationMenuParams) =>
       ipcRenderer.invoke('application-menu-update', params),
@@ -12,35 +39,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   contextMenu: {
     show: (params: ContextMenuParams) =>
       ipcRenderer.invoke('context-menu-show', params),
-  },
-  entry: {
-    copy: (paths: string[]) => ipcRenderer.invoke('entry-copy', paths),
-    createDirectory: (directoryPath: string) =>
-      ipcRenderer.invoke('entry-create-directory', directoryPath),
-    createThumbnailUrl: (paths: string | string[]) =>
-      ipcRenderer.invoke('entry-create-thumbnail-url', paths),
-    getDetailedEntries: (directoryPath: string) =>
-      ipcRenderer.invoke('entry-get-detailed-entries', directoryPath),
-    getDetailedEntriesForPaths: (paths: string[]) =>
-      ipcRenderer.invoke('entry-get-detailed-entries-for-paths', paths),
-    getDetailedEntry: (path: string) =>
-      ipcRenderer.invoke('entry-get-detailed-entry', path),
-    getEntries: (directoryPath: string) =>
-      ipcRenderer.invoke('entry-get-entries', directoryPath),
-    getEntryHierarchy: (path?: string) =>
-      ipcRenderer.invoke('entry-get-entry-hierarchy', path),
-    getMetadata: (path: string) =>
-      ipcRenderer.invoke('entry-get-metadata', path),
-    getParent: (path: string) => ipcRenderer.invoke('entry-get-parent', path),
-    move: (paths: string[], directoryPath: string) =>
-      ipcRenderer.invoke('entry-move', paths, directoryPath),
-    moveToTrash: (paths: string[]) =>
-      ipcRenderer.invoke('entry-move-to-trash', paths),
-    open: (path: string) => ipcRenderer.invoke('entry-open', path),
-    paste: (directoryPath: string) =>
-      ipcRenderer.invoke('entry-paste', directoryPath),
-    rename: (path: string, newName: string) =>
-      ipcRenderer.invoke('entry-rename', path, newName),
   },
   message: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -57,7 +57,7 @@ const useExplorerList = () => {
       }
       content.type === 'directory'
         ? dispatch(changeDirectory(content.path))
-        : await window.electronAPI.entry.open(content.path)
+        : await window.electronAPI.openEntry(content.path)
     },
     [dispatch, selectedContents],
   )

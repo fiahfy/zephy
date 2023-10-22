@@ -15,59 +15,59 @@ import {
 import createWatcher from './watcher'
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.handle('entry-copy', (_event: IpcMainInvokeEvent, paths: string[]) =>
+  ipcMain.handle('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
     copy(paths),
   )
   ipcMain.handle(
-    'entry-create-directory',
+    'createDirectory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       createDirectory(directoryPath),
   )
   ipcMain.handle(
-    'entry-create-thumbnail-url',
+    'createEntryThumbnailUrl',
     (_event: IpcMainInvokeEvent, path: string) => createThumbnailUrl(path),
   )
   ipcMain.handle(
-    'entry-get-detailed-entries',
+    'getDetailedEntries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getDetailedEntries(directoryPath),
   )
   ipcMain.handle(
-    'entry-get-detailed-entries-for-paths',
+    'getDetailedEntriesForPaths',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
       getDetailedEntriesForPaths(paths),
   )
   ipcMain.handle(
-    'entry-get-detailed-entry',
+    'getDetailedEntry',
     (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path),
   )
   ipcMain.handle(
-    'entry-get-entries',
+    'getEntries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getEntries(directoryPath),
   )
   ipcMain.handle(
-    'entry-get-entry-hierarchy',
+    'getEntryHierarchy',
     (_event: IpcMainInvokeEvent, path?: string) => getEntryHierarchy(path),
   )
   ipcMain.handle(
-    'entry-get-metadata',
+    'getEntryMetadata',
     (_event: IpcMainInvokeEvent, path: string) => getMetadata(path),
   )
   ipcMain.handle(
-    'entry-get-parent',
+    'getParentEntry',
     (_event: IpcMainInvokeEvent, path: string) => {
       const parentPath = dirname(path)
       return getDetailedEntry(parentPath)
     },
   )
   ipcMain.handle(
-    'entry-move',
+    'moveEntries',
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
   )
   ipcMain.handle(
-    'entry-move-to-trash',
+    'moveEntriesToTrash',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
       Promise.all(
         paths.map(async (path) => {
@@ -77,14 +77,14 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
         }),
       ),
   )
-  ipcMain.handle('entry-open', (_event: IpcMainInvokeEvent, path: string) =>
+  ipcMain.handle('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
   )
-  ipcMain.handle('entry-paste', (_event: IpcMainInvokeEvent, directoryPath) =>
+  ipcMain.handle('pasteEntries', (_event: IpcMainInvokeEvent, directoryPath) =>
     paste(directoryPath),
   )
   ipcMain.handle(
-    'entry-rename',
+    'renameEntry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName),
   )

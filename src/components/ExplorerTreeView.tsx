@@ -40,7 +40,7 @@ const ExplorerTreeView = () => {
 
   useEffect(() => {
     ;(async () => {
-      const entry = await window.electronAPI.entry.getEntryHierarchy(
+      const entry = await window.electronAPI.getEntryHierarchy(
         zephySchema ? undefined : currentDirectoryPath,
       )
       const expanded = getLoadedDirectories(entry)
@@ -55,7 +55,7 @@ const ExplorerTreeView = () => {
         const entry =
           eventType === 'delete'
             ? undefined
-            : await window.electronAPI.entry.getDetailedEntry(filePath)
+            : await window.electronAPI.getDetailedEntry(filePath)
 
         const mapper = (e: Entry): Entry => {
           if (e.type === 'directory') {
@@ -125,7 +125,7 @@ const ExplorerTreeView = () => {
       if (!entry || entry.type !== 'directory' || entry.children) {
         return
       }
-      const children = await window.electronAPI.entry.getEntries(entry.path)
+      const children = await window.electronAPI.getEntries(entry.path)
       const mapper = (e: Entry): Entry => {
         if (e.type === 'directory') {
           if (e.path === entry.path) {
