@@ -302,6 +302,7 @@ export const newFolder =
     const entry = await window.electronAPI.entry.createDirectory(directoryPath)
     dispatch(add([entry]))
     dispatch(select(entry.path))
+    dispatch(focus(entry.path))
     dispatch(startEditing(entry.path))
   }
 
