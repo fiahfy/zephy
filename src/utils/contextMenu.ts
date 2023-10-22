@@ -16,6 +16,6 @@ export const createMenuHandler = (options: ContextMenuOption[] = []) => {
 
     const params = { isEditable, options, selectionText, x, y }
 
-    await window.electronAPI.contextMenu.show(params)
+    await window.electronAPI.showContextMenu(params)
   }
 }

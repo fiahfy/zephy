@@ -25,7 +25,7 @@ const useMessageListener = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    const removeListener = window.electronAPI.message.addListener((message) => {
+    const removeListener = window.electronAPI.addMessageListener((message) => {
       const { type, data } = message
       switch (type) {
         case 'addToFavorites':

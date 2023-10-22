@@ -47,7 +47,7 @@ export const WatcherProvider = (props: Props) => {
     const uniqueDirectoryPaths = directoryPaths.includes(currentDirectoryPath)
       ? directoryPaths
       : [...directoryPaths, currentDirectoryPath]
-    window.electronAPI.watcher.watch(
+    window.electronAPI.watchDirectories(
       uniqueDirectoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: remove logging

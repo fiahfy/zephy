@@ -5,6 +5,14 @@ import { ApplicationMenuParams } from './applicationMenu'
 import { ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addMessageListener: (callback: (message: any) => void) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const listener = (_event: IpcRendererEvent, message: any) =>
+      callback(message)
+    ipcRenderer.on('sendMessage', listener)
+    return () => ipcRenderer.removeListener('sendMessage', listener)
+  },
   copyEntries: (paths: string[]) => ipcRenderer.invoke('copyEntries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('createDirectory', directoryPath),
@@ -32,45 +40,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('pasteEntries', directoryPath),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('renameEntry', path, newName),
-  applicationMenu: {
-    update: (params: ApplicationMenuParams) =>
-      ipcRenderer.invoke('application-menu-update', params),
-  },
-  contextMenu: {
-    show: (params: ContextMenuParams) =>
-      ipcRenderer.invoke('context-menu-show', params),
-  },
-  message: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const listener = (_event: IpcRendererEvent, message: any) =>
-        callback(message)
-      ipcRenderer.on('message-send', listener)
-      return () => ipcRenderer.removeListener('message-send', listener)
-    },
-  },
-  watcher: {
-    watch: (
-      directoryPaths: string[],
-      callback: (
+  showContextMenu: (params: ContextMenuParams) =>
+    ipcRenderer.invoke('showContextMenu', params),
+  updateApplicationMenu: (params: ApplicationMenuParams) =>
+    ipcRenderer.invoke('updateApplicationMenu', params),
+  watchDirectories: (
+    directoryPaths: string[],
+    callback: (
+      eventType: 'create' | 'delete',
+      directoryPath: string,
+      filePath: string,
+    ) => void,
+  ) => {
+    ipcRenderer.removeAllListeners('notifyToWatcher')
+    ipcRenderer.on(
+      'notifyToWatcher',
+      (
+        _event: IpcRendererEvent,
         eventType: 'create' | 'delete',
         directoryPath: string,
         filePath: string,
-      ) => void,
-    ) => {
-      ipcRenderer.removeAllListeners('watcher-notify')
-      ipcRenderer.on(
-        'watcher-notify',
-        (
-          _event: IpcRendererEvent,
-          eventType: 'create' | 'delete',
-          directoryPath: string,
-          filePath: string,
-        ) => callback(eventType, directoryPath, filePath),
-      )
-      return ipcRenderer.invoke('watcher-watch', directoryPaths)
-    },
+      ) => callback(eventType, directoryPath, filePath),
+    )
+    return ipcRenderer.invoke('watchDirectories', directoryPaths)
   },
   trafficLight: exposeTrafficLightOperations(),
   window: exposeWindowOperations(),

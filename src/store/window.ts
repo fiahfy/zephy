@@ -563,7 +563,7 @@ export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const sidebar = selectSidebar(getState())
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())
-  await window.electronAPI.applicationMenu.update({
+  await window.electronAPI.updateApplicationMenu({
     canBack,
     canForward,
     inspectorHidden: sidebar.primary.hidden,

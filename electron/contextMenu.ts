@@ -26,10 +26,10 @@ const registerContextMenu = (
   createWindow: (directoryPath?: string) => Promise<void>,
 ) => {
   ipcMain.handle(
-    'context-menu-show',
+    'showContextMenu',
     (event: IpcMainInvokeEvent, params: ContextMenuParams) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const send = (message: any) => event.sender.send('message-send', message)
+      const send = (message: any) => event.sender.send('sendMessage', message)
 
       const defaultActions = {
         separator: { type: 'separator' as const },

@@ -31,7 +31,7 @@ const AudioPreview = (props: Props) => {
   const [paused, setPaused] = useState(true)
 
   useEffect(() => {
-    const removeListener = window.electronAPI.message.addListener((message) => {
+    const removeListener = window.electronAPI.addMessageListener((message) => {
       const { type, data } = message
       if (type !== 'changeLoop') {
         return

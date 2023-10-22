@@ -30,7 +30,7 @@ export type ApplicationMenuParams = Partial<State>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send = (message: any) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
-  activeWindow?.webContents.send('message-send', message)
+  activeWindow?.webContents.send('sendMessage', message)
 }
 
 const registerApplicationMenu = (
@@ -279,7 +279,7 @@ const registerApplicationMenu = (
   update()
 
   ipcMain.handle(
-    'application-menu-update',
+    'updateApplicationMenu',
     (_event: IpcMainInvokeEvent, params: ApplicationMenuParams) => {
       state = { ...state, ...params }
       update()

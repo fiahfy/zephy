@@ -7,6 +7,8 @@ import { Operations as TrafficLightOperations } from 'electron-traffic-light/pre
 import { Operations as WindowOperations } from 'electron-window/preload'
 
 export interface IElectronAPI {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addMessageListener: (callback: (message: any) => void) => () => void
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createEntryThumbnailUrl: (paths: string | string[]) => Promise<string>
@@ -25,26 +27,16 @@ export interface IElectronAPI {
   openEntry: (path: string) => Promise<void>
   pasteEntries: (directoryPath: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
-  applicationMenu: {
-    update: (params: ApplicationMenuParams) => Promise<void>
-  }
-  contextMenu: {
-    show: (params: ContextMenuParams) => Promise<void>
-  }
-  message: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addListener: (callback: (message: any) => void) => () => void
-  }
-  watcher: {
-    watch: (
-      directoryPaths: string[],
-      callback: (
-        eventType: 'create' | 'update' | 'delete',
-        directoryPath: string,
-        filePath: string,
-      ) => void,
-    ) => Promise<void>
-  }
+  showContextMenu: (params: ContextMenuParams) => Promise<void>
+  updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
+  watchDirectories: (
+    directoryPaths: string[],
+    callback: (
+      eventType: 'create' | 'update' | 'delete',
+      directoryPath: string,
+      filePath: string,
+    ) => void,
+  ) => Promise<void>
   trafficLight: TrafficLightOperations
   window: WindowOperations<{ directoryPath: string }>
 }

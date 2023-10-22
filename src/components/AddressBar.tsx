@@ -115,7 +115,7 @@ const AddressBar = () => {
   )
 
   useEffect(() => {
-    const removeListener = window.electronAPI.message.addListener((message) => {
+    const removeListener = window.electronAPI.addMessageListener((message) => {
       const { type } = message
       switch (type) {
         case 'find':

@@ -65,7 +65,7 @@ const createWatcher = () => {
     const windows = BrowserWindow.getAllWindows()
     windows.forEach((window) => {
       window.webContents.send(
-        'watcher-notify',
+        'notifyToWatcher',
         eventType,
         directoryPath,
         filePath,
@@ -74,14 +74,14 @@ const createWatcher = () => {
   }
 
   ipcMain.handle(
-    'watcher-watch',
+    'watchDirectories',
     (event: IpcMainInvokeEvent, directoryPaths: string[]) =>
       watch(
         event.sender.id,
         directoryPaths,
         (eventType, directoryPath, filePath) =>
           event.sender.send(
-            'watcher-notify',
+            'notifyToWatcher',
             eventType,
             directoryPath,
             filePath,

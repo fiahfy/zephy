@@ -58,7 +58,7 @@ const Explorer = () => {
   )
 
   const handleBlur = useCallback(
-    () => window.electronAPI.applicationMenu.update({ isEditable: true }),
+    () => window.electronAPI.updateApplicationMenu({ isEditable: true }),
     [],
   )
 
@@ -66,7 +66,7 @@ const Explorer = () => {
     const isEditable =
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement
-    window.electronAPI.applicationMenu.update({ isEditable })
+    window.electronAPI.updateApplicationMenu({ isEditable })
   }, [])
 
   return (
