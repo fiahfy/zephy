@@ -35,10 +35,10 @@ const Explorer = () => {
           data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
         { type: 'separator' },
-        { type: 'cut', data: { paths: [] } },
-        { type: 'copy', data: { paths: [] } },
+        { type: 'cutEntries', data: { paths: [] } },
+        { type: 'copyEntries', data: { paths: [] } },
         {
-          type: 'paste',
+          type: 'pasteEntries',
           data: { path: zephySchema ? undefined : currentDirectoryPath },
         },
         { type: 'separator' },

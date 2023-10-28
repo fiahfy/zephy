@@ -1,8 +1,8 @@
+import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import { exposeOperations as exposeTrafficLightOperations } from '@fiahfy/electron-traffic-light/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ApplicationMenuParams } from './applicationMenu'
-import { ContextMenuParams } from './contextMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,8 +40,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('pasteEntries', directoryPath),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('renameEntry', path, newName),
-  showContextMenu: (params: ContextMenuParams) =>
-    ipcRenderer.invoke('showContextMenu', params),
   updateApplicationMenu: (params: ApplicationMenuParams) =>
     ipcRenderer.invoke('updateApplicationMenu', params),
   watchDirectories: (
@@ -64,6 +62,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     )
     return ipcRenderer.invoke('watchDirectories', directoryPaths)
   },
+  ...exposeContextMenuOperations(),
   ...exposeTrafficLightOperations(),
   ...exposeWindowOperations(),
 })

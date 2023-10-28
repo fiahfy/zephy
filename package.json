@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@fiahfy/electron-context-menu": "^0.1.0",
     "@fiahfy/electron-traffic-light": "^0.0.1",
     "@fiahfy/electron-window": "^0.0.1",
     "@fontsource/roboto": "^5.0.8",

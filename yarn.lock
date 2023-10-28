@@ -540,6 +540,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.52.0.tgz#78fe5f117840f69dc4a353adf9b9cd926353378c"
   integrity sha512-mjZVbpaeMZludF2fsWLD0Z9gCref1Tk4i9+wddjRvpUNqqcndPkBD09N/Mapey0b3jaXbLm2kICwFv2E64QinA==
 
+"@fiahfy/electron-context-menu@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@fiahfy/electron-context-menu/-/electron-context-menu-0.1.0.tgz#fdc60427bd7915c4d28da0f623b9cf1066609456"
+  integrity sha512-t65RwN1kApl+UhS9myIAe3uWP/RhCGaZk4U2gD/du0kETPhAhsBxykkRLAsx3ME+upDjGwLXWPMPkLx+HtDV6w==
+
 "@fiahfy/electron-traffic-light@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@fiahfy/electron-traffic-light/-/electron-traffic-light-0.0.1.tgz#cfb1d1ea80d23cdf29402425f2f4c78751234613"
