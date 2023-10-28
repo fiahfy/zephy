@@ -1,5 +1,5 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Explorer from '~/components/Explorer'
 import Inspector from '~/components/Inspector'
@@ -7,19 +7,124 @@ import Navigator from '~/components/Navigator'
 import Settings from '~/components/Settings'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
-import useEventListener from '~/hooks/useEventListener'
-import useMessageListener from '~/hooks/useMessageListener'
 import useTitle from '~/hooks/useTitle'
+import { useAppDispatch, useAppSelector } from '~/store'
+import {
+  copy,
+  moveToTrash,
+  newFolder,
+  paste,
+  select,
+  selectAll,
+  startEditing,
+} from '~/store/explorer'
+import { add, remove } from '~/store/favorite'
+import {
+  back,
+  changeDirectory,
+  forward,
+  go,
+  goToSettings,
+  selectCurrentHistory,
+  setCurrentViewMode,
+  setSidebarHidden,
+  sort,
+  updateApplicationMenu,
+} from '~/store/window'
 import { createMenuHandler } from '~/utils/contextMenu'
-import { useAppSelector } from '~/store'
-import { selectCurrentHistory } from '~/store/window'
 
 const App = () => {
   const currentHistory = useAppSelector(selectCurrentHistory)
+  const dispatch = useAppDispatch()
 
-  useEventListener()
-  useMessageListener()
   useTitle(currentHistory.title)
+
+  useEffect(() => {
+    const removeListener = window.electronAPI.addMessageListener((message) => {
+      const { type, data } = message
+      switch (type) {
+        case 'addToFavorites':
+          return dispatch(add(data.path))
+        case 'back':
+          return dispatch(back())
+        case 'changeDirectory':
+          return dispatch(changeDirectory(data.path))
+        case 'changeSidebarHidden':
+          return dispatch(setSidebarHidden(data.variant, data.hidden))
+        case 'changeViewMode':
+          return dispatch(setCurrentViewMode(data.viewMode))
+        case 'copy':
+          return dispatch(copy())
+        case 'forward':
+          return dispatch(forward())
+        case 'go':
+          return dispatch(go(data.offset))
+        case 'goToSettings':
+          return dispatch(goToSettings())
+        case 'moveToTrash':
+          return dispatch(moveToTrash(data?.paths))
+        case 'newFolder':
+          return dispatch(newFolder(data.path))
+        case 'removeFromFavorites':
+          return dispatch(remove(data.path))
+        case 'rename':
+          dispatch(select(data.path))
+          dispatch(startEditing(data.path))
+          return
+        case 'paste':
+          return dispatch(paste())
+        case 'selectAll':
+          return dispatch(selectAll())
+        case 'sort':
+          return dispatch(sort(data.orderBy))
+      }
+    })
+    return () => removeListener()
+  }, [dispatch])
+
+  useEffect(() => {
+    const handler = () => dispatch(updateApplicationMenu())
+    window.addEventListener('focus', handler)
+    return () => window.removeEventListener('focus', handler)
+  }, [dispatch])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return
+      }
+      switch (e.key) {
+        case 'ArrowLeft':
+          if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+            return dispatch(back())
+          }
+          break
+        case 'ArrowRight':
+          if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+            return dispatch(forward())
+          }
+          break
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [dispatch])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      switch (e.button) {
+        case 3:
+          return dispatch(back())
+        case 4:
+          return dispatch(forward())
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [dispatch])
 
   const Component = useMemo(() => {
     switch (currentHistory.directoryPath) {
