@@ -9,7 +9,7 @@ import {
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type State = {
   loading: boolean
@@ -98,7 +98,7 @@ const VideoPreview = (props: Props) => {
   }, [entry.path])
 
   const handleContextMenu = useMemo(
-    () => createMenuHandler([{ type: 'loop', data: { enabled: loop } }]),
+    () => createContextMenuHandler([{ type: 'loop', data: { checked: loop } }]),
     [loop],
   )
 

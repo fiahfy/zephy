@@ -11,7 +11,7 @@ import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
 import { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { finishEditing, rename } from '~/store/explorer'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   content: Content
@@ -70,7 +70,7 @@ const ExplorerNameTextField = (props: Props) => {
     [dispatch, finish],
   )
 
-  const handleContextMenu = useMemo(() => createMenuHandler(), [])
+  const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
     <DenseOutlineTextField

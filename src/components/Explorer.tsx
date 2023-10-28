@@ -11,7 +11,7 @@ import {
   selectCurrentViewMode,
   selectZephySchema,
 } from '~/store/window'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const Explorer = () => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
@@ -29,7 +29,7 @@ const Explorer = () => {
 
   const handleContextMenu = useMemo(
     () =>
-      createMenuHandler([
+      createContextMenuHandler([
         {
           type: 'newFolder',
           data: { path: zephySchema ? undefined : currentDirectoryPath },

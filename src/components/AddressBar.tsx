@@ -52,7 +52,7 @@ import {
   selectZephyUrl,
   upward,
 } from '~/store/window'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
@@ -74,12 +74,12 @@ const AddressBar = () => {
 
   const backHistoryMenuHandler = useMemo(
     () =>
-      createMenuHandler(
+      createContextMenuHandler(
         backHistories.slice(0, 12).map((history, i) => ({
           type: 'go',
           data: {
+            label: history.title,
             offset: -(i + 1),
-            title: history.title,
           },
         })),
       ),
@@ -87,12 +87,12 @@ const AddressBar = () => {
   )
   const forwardHistoryMenuHandler = useMemo(
     () =>
-      createMenuHandler(
+      createContextMenuHandler(
         forwardHistories.slice(0, 12).map((history, i) => ({
           type: 'go',
           data: {
+            label: history.title,
             offset: i + 1,
-            title: history.title,
           },
         })),
       ),
@@ -184,7 +184,7 @@ const AddressBar = () => {
 
   const handleClickMore = useMemo(
     () =>
-      createMenuHandler([
+      createContextMenuHandler([
         {
           type: 'newFolder',
           data: { path: zephySchema ? undefined : currentDirectoryPath },

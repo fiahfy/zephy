@@ -14,20 +14,20 @@ const registerContextMenu = (
       click: () => clipboard.writeText(path),
       label: 'Copy Path',
     }),
-    go: (event, _params, { offset, title }) => ({
+    go: (event, _params, { label, offset }) => ({
       click: () => send(event, { type: 'go', data: { offset } }),
-      label: title,
+      label,
     }),
-    loop: (event, _params, { enabled }) => ({
-      label: 'Loop',
-      checked: enabled,
+    loop: (event, _params, { checked }) => ({
+      checked,
       click: () =>
         send(event, {
           type: 'changeLoop',
           data: {
-            enabled: !enabled,
+            enabled: !checked,
           },
         }),
+      label: 'Loop',
       type: 'checkbox',
     }),
     moveToTrash: (event, _params, { paths }) => ({
@@ -87,14 +87,11 @@ const registerContextMenu = (
       click: () =>
         send(event, {
           type: favorite ? 'removeFromFavorites' : 'addToFavorites',
-          data: {
-            path: path,
-          },
+          data: { path },
         }),
       label: favorite ? 'Remove from Favorites' : 'Add to Favorites',
     }),
     toggleInspector: (event, _params, { hidden }) => ({
-      label: hidden ? 'Show Inspector' : 'Hide Inspector',
       click: () =>
         send(event, {
           type: 'changeSidebarHidden',
@@ -103,9 +100,9 @@ const registerContextMenu = (
             hidden: !hidden,
           },
         }),
+      label: hidden ? 'Show Inspector' : 'Hide Inspector',
     }),
     toggleNavigator: (event, _params, { hidden }) => ({
-      label: hidden ? 'Show Navigator' : 'Hide Navigator',
       click: () =>
         send(event, {
           type: 'changeSidebarHidden',
@@ -114,6 +111,7 @@ const registerContextMenu = (
             hidden: !hidden,
           },
         }),
+      label: hidden ? 'Show Navigator' : 'Hide Navigator',
     }),
     view: (event, _params, { viewMode }) => ({
       label: 'View',

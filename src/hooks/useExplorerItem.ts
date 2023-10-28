@@ -19,7 +19,7 @@ import {
   selectCurrentDirectoryPath,
   selectZephySchema,
 } from '~/store/window'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const useExplorerItem = (content: Content) => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
@@ -79,7 +79,7 @@ const useExplorerItem = (content: Content) => {
     const path = content.path
     const selectedPaths = selectedContents.map((content) => content.path)
     const paths = selectedPaths.includes(path) ? selectedPaths : [path]
-    return createMenuHandler([
+    return createContextMenuHandler([
       ...(paths.length === 1
         ? [
             {

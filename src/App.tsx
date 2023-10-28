@@ -31,7 +31,7 @@ import {
   sort,
   updateApplicationMenu,
 } from '~/store/window'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const App = () => {
   const currentHistory = useAppSelector(selectCurrentHistory)
@@ -135,7 +135,7 @@ const App = () => {
     }
   }, [currentHistory.directoryPath])
 
-  const handleContextMenu = useMemo(() => createMenuHandler(), [])
+  const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
     <Box

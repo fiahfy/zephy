@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectIsFavorite } from '~/store/favorite'
-import { createMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const useEntryItem = (entry: Entry) => {
   const isFavorite = useAppSelector(selectIsFavorite)
@@ -10,7 +10,7 @@ const useEntryItem = (entry: Entry) => {
   const onContextMenu = useMemo(() => {
     const directory = entry.type === 'directory'
     const path = entry.path
-    return createMenuHandler([
+    return createContextMenuHandler([
       {
         type: directory ? 'openDirectory' : 'open',
         data: { path },

@@ -4,7 +4,7 @@ import {
 } from '@fiahfy/electron-context-menu/renderer'
 import { MouseEvent } from 'react'
 
-export const createMenuHandler = (options: ContextMenuOption[] = []) => {
+export const createContextMenuHandler = (options: ContextMenuOption[] = []) => {
   return async (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
