@@ -1,6 +1,6 @@
+import { createManager as createTrafficLightManager } from '@fiahfy/electron-traffic-light'
+import { createManager as createWindowManager } from '@fiahfy/electron-window'
 import { BrowserWindow, BrowserWindowConstructorOptions, app } from 'electron'
-import { createManager as createTrafficLightManager } from 'electron-traffic-light'
-import { createManager as createWindowManager } from 'electron-window'
 import { join } from 'node:path'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'

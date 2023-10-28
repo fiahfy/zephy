@@ -1,6 +1,6 @@
+import { exposeOperations as exposeTrafficLightOperations } from '@fiahfy/electron-traffic-light/preload'
+import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
-import { exposeOperations as exposeTrafficLightOperations } from 'electron-traffic-light/preload'
-import { exposeOperations as exposeWindowOperations } from 'electron-window/preload'
 import { ApplicationMenuParams } from './applicationMenu'
 import { ContextMenuParams } from './contextMenu'
 

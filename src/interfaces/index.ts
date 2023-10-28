@@ -3,8 +3,8 @@
 // example, to import the interface below do:
 //
 // import User from 'path/to/interfaces';
-import { Operations as TrafficLightOperations } from 'electron-traffic-light/preload'
-import { Operations as WindowOperations } from 'electron-window/preload'
+import { Operations as TrafficLightOperations } from '@fiahfy/electron-traffic-light/preload'
+import { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type IElectronAPI = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

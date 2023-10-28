@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@fiahfy/electron-traffic-light": "^0.0.1",
+    "@fiahfy/electron-window": "^0.0.1",
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.14",
     "@mui/material": "^5.14.14",
@@ -14,7 +16,6 @@
     "chokidar": "^3.5.3",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "electron-window-state": "^5.0.3",
     "ffmpeg-static-electron": "^2.0.3",
     "ffprobe-static-electron": "^2.0.2",
     "fluent-ffmpeg": "^2.1.2",
@@ -65,8 +66,5 @@
     "release": "electron-builder",
     "test": "npm run format && npm run lint && npm run type-check",
     "type-check": "tsc"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+  }
 }
