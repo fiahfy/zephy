@@ -133,7 +133,7 @@ const VideoPreview = (props: Props) => {
       poster={thumbnail}
       ref={ref}
       src={entry.url}
-      style={{ outline: 'none', width: '100%' }}
+      style={{ display: 'block', outline: 'none', width: '100%' }}
     />
   )
 }

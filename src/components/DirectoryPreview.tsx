@@ -1,14 +1,13 @@
-import { Box, ImageList, ImageListItem } from '@mui/material'
-import pluralize from 'pluralize'
+import { Box } from '@mui/material'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import DirectoryPreviewItem from '~/components/DirectoryPreviewItem'
-import EmptyPreview from '~/components/EmptyPreview'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
+import EmptyPreview from './EmptyPreview'
 
-const maxItems = 100
 const maxItemSize = 256
 
 type State = {
@@ -49,7 +48,7 @@ const DirectoryPreview = (props: Props) => {
     entries: [],
   })
 
-  const ref = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -57,14 +56,31 @@ const DirectoryPreview = (props: Props) => {
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
-  const over = useMemo(() => entries.length - maxItems, [entries])
+  const rows = useMemo(
+    () =>
+      entries.reduce(
+        (acc, _, i) =>
+          i % columns ? acc : [...acc, entries.slice(i, i + columns)],
+        [] as Entry[][],
+      ),
+    [columns, entries],
+  )
+  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
+
   const noDataText = useMemo(
     () => (loading ? 'Loading...' : 'No items'),
     [loading],
   )
 
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => size,
+    overscan: 5,
+  })
+
   useEffect(() => {
-    const el = ref.current
+    const el = parentRef.current
     if (!el) {
       return
     }
@@ -108,26 +124,42 @@ const DirectoryPreview = (props: Props) => {
   }, [entry.path, shouldShowHiddenFiles])
 
   return (
-    <Box ref={ref}>
-      {entries.length > 0 ? (
-        // TODO: use virtualizer
-        <ImageList cols={columns} gap={1} sx={{ m: 0 }}>
-          {entries.slice(0, maxItems).map((entry) => (
-            <DirectoryPreviewItem entry={entry} key={entry.path} />
-          ))}
-          {over > 0 && (
-            <ImageListItem cols={columns}>
-              <EmptyPreview
-                message={`Other ${pluralize('item', over, true)}`}
-                sx={{ aspectRatio: `${columns} / 1` }}
-              />
-            </ImageListItem>
-          )}
-        </ImageList>
-      ) : (
-        <EmptyPreview message={noDataText} />
-      )}
-    </Box>
+    <>
+      <Box
+        ref={parentRef}
+        sx={{
+          overflowX: 'hidden',
+          overflowY: 'scroll',
+        }}
+      >
+        {wrapperWidth > 0 && (
+          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+              const columns = rows[virtualRow.index] as Entry[]
+              return (
+                <Box
+                  key={virtualRow.index}
+                  sx={{
+                    display: 'flex',
+                    height: size,
+                    transform: `translateY(${
+                      virtualRow.start - rowIndex * virtualRow.size
+                    }px)`,
+                  }}
+                >
+                  {columns.map((entry) => (
+                    <Box key={entry.path} sx={{ p: 0.0625, width: size }}>
+                      <DirectoryPreviewItem entry={entry} />
+                    </Box>
+                  ))}
+                </Box>
+              )
+            })}
+          </Box>
+        )}
+      </Box>
+      {entries.length === 0 && <EmptyPreview message={noDataText} />}
+    </>
   )
 }
 

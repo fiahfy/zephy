@@ -38,8 +38,6 @@ const ExplorerGrid = () => {
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
-  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
-
   const rows = useMemo(
     () =>
       contents.reduce(
@@ -49,6 +47,7 @@ const ExplorerGrid = () => {
       ),
     [columns, contents],
   )
+  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
   const virtualizer = useVirtualizer({
     count: rows.length,

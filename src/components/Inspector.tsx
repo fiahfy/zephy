@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useRef } from 'react'
 import EntryInformation from '~/components/EntryInformation'
-import Panel from '~/components/Panel'
 import Preview from '~/components/Preview'
 import { useAppSelector } from '~/store'
 import { selectSelected } from '~/store/explorer'
@@ -19,18 +18,41 @@ const Inspector = () => {
   }, [selected])
 
   return (
-    <Box
-      ref={ref}
-      sx={{
-        height: '100%',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-      }}
-    >
+    <Box ref={ref} sx={{ height: '100%' }}>
       {selected.length > 0 ? (
-        <Panel footer={<EntryInformation />} title="Preview">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+          }}
+        >
+          <Typography
+            paragraph
+            sx={{
+              background: (theme) => theme.palette.background.default,
+              mb: 0,
+              position: 'sticky',
+              px: 1,
+              top: 0,
+              zIndex: 1,
+            }}
+            variant="overline"
+          >
+            Preview
+          </Typography>
           <Preview />
-        </Panel>
+          <Box
+            sx={{
+              background: (theme) => theme.palette.background.default,
+              bottom: 0,
+              position: 'sticky',
+              zIndex: 1,
+            }}
+          >
+            <EntryInformation />
+          </Box>
+        </Box>
       ) : (
         <Box
           sx={{
