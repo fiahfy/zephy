@@ -17,6 +17,7 @@
 ## TODOs
 
 - [ ] Copy & Move Duplicated Item
+- [ ] Show progress when copying & moving large files
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
 - [ ] Text Preview
