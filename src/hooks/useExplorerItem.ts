@@ -14,6 +14,7 @@ import {
   startEditing,
 } from '~/store/explorer'
 import { selectIsFavorite } from '~/store/favorite'
+import { openEntry } from '~/store/settings'
 import {
   changeDirectory,
   selectCurrentDirectoryPath,
@@ -70,7 +71,7 @@ const useExplorerItem = (content: Content) => {
       }
       content.type === 'directory'
         ? dispatch(changeDirectory(content.path))
-        : await window.electronAPI.openEntry(content.path)
+        : dispatch(openEntry(content.path))
     },
   )
 

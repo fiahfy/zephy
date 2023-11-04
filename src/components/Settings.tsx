@@ -14,8 +14,10 @@ import { ChangeEvent, useCallback } from 'react'
 import { Settings as SettingsType } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  selectShouldOpenWithVisty,
   selectShouldShowHiddenFiles,
   selectTheme,
+  setShouldOpenWithVisty,
   setShouldShowHiddenFiles,
   setTheme,
 } from '~/store/settings'
@@ -28,6 +30,7 @@ const options = [
 
 const Settings = () => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const shouldOpenWithVisty = useAppSelector(selectShouldOpenWithVisty)
   const theme = useAppSelector(selectTheme)
   const dispatch = useAppDispatch()
 
@@ -45,6 +48,14 @@ const Settings = () => {
       dispatch(setShouldShowHiddenFiles(value))
     },
     [dispatch],
+  )
+
+  const handleShouldOpenWithVisty = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.checked
+      dispatch(setShouldOpenWithVisty(value))
+    },
+    [],
   )
 
   return (
@@ -70,6 +81,38 @@ const Settings = () => {
               ))}
             </Select>
           </FormControl>
+        </Box>
+        <Box>
+          <Typography gutterBottom variant="subtitle2">
+            Behavior
+          </Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={shouldOpenWithVisty}
+                onChange={handleShouldOpenWithVisty}
+                size="small"
+              />
+            }
+            label={
+              <>
+                Open with{' '}
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.electronAPI.openUrl(
+                      'https://github.com/fiahfy/visty',
+                    )
+                  }}
+                >
+                  Visty
+                </a>{' '}
+                for Video and Audio Files
+              </>
+            }
+            slotProps={{ typography: { variant: 'body2' } }}
+          />
         </Box>
         <Box>
           <Typography gutterBottom variant="subtitle2">

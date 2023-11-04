@@ -26,6 +26,7 @@ export type IElectronAPI = {
   ) => Promise<DetailedEntry[]>
   moveEntriesToTrash: (paths: string[]) => Promise<void>
   openEntry: (path: string) => Promise<void>
+  openUrl: (url: string) => Promise<void>
   pasteEntries: (directoryPath: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
   updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
@@ -45,6 +46,7 @@ export type IElectronAPI = {
 export type ApplicationMenuParams = any
 
 export type Settings = {
+  shouldOpenWithVisty: boolean
   shouldShowHiddenFiles: boolean
   theme: 'light' | 'dark' | 'system'
 }

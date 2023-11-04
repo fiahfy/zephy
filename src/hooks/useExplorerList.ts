@@ -11,6 +11,7 @@ import {
   selectQuery,
   selectSelectedContents,
 } from '~/store/explorer'
+import { openEntry } from '~/store/settings'
 import {
   changeDirectory,
   selectCurrentScrollTop,
@@ -57,7 +58,7 @@ const useExplorerList = () => {
       }
       content.type === 'directory'
         ? dispatch(changeDirectory(content.path))
-        : await window.electronAPI.openEntry(content.path)
+        : dispatch(openEntry(content.path))
     },
     [dispatch, selectedContents],
   )

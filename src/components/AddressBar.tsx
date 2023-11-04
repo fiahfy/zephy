@@ -36,6 +36,7 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { load, searchQuery, selectLoading, unselect } from '~/store/explorer'
 import { selectIsFavorite, toggle } from '~/store/favorite'
 import { remove, selectQueryHistories } from '~/store/query'
+import { openEntry } from '~/store/settings'
 import {
   back,
   changeDirectory,
@@ -163,8 +164,8 @@ const AddressBar = () => {
   }, [currentDirectoryPath, dispatch])
 
   const handleClickFolder = useCallback(
-    async () => await window.electronAPI.openEntry(currentDirectoryPath),
-    [currentDirectoryPath],
+    async () => dispatch(openEntry(currentDirectoryPath)),
+    [currentDirectoryPath, dispatch],
   )
 
   const handleClickFavorite = useCallback(

@@ -80,6 +80,9 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
   )
+  ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
+    shell.openExternal(url),
+  )
   ipcMain.handle('pasteEntries', (_event: IpcMainInvokeEvent, directoryPath) =>
     paste(directoryPath),
   )

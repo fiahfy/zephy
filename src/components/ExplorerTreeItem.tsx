@@ -7,7 +7,7 @@ import useDnd from '~/hooks/useDnd'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 
@@ -42,9 +42,9 @@ const ExplorerTreeItem = (props: Props) => {
 
   const handleDoubleClick = useCallback(async () => {
     if (entry.type === 'file') {
-      await window.electronAPI.openEntry(entry.path)
+      dispatch(openEntry(entry.path))
     }
-  }, [entry.path, entry.type])
+  }, [dispatch, entry.path, entry.type])
 
   return (
     <EntryTreeItem

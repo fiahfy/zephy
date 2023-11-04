@@ -13,7 +13,7 @@ import useDnd from '~/hooks/useDnd'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 import { rate, selectGetScore } from '~/store/rating'
@@ -106,7 +106,7 @@ const DirectoryPreviewItem = (props: Props) => {
     async () =>
       entry.type === 'directory'
         ? appDispatch(changeDirectory(entry.path))
-        : await window.electronAPI.openEntry(entry.path),
+        : appDispatch(openEntry(entry.path)),
     [appDispatch, entry.path, entry.type],
   )
 
