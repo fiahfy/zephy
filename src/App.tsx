@@ -99,11 +99,13 @@ const App = () => {
       switch (e.key) {
         case 'ArrowLeft':
           if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+            e.preventDefault()
             return dispatch(back())
           }
           break
         case 'ArrowRight':
           if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+            e.preventDefault()
             return dispatch(forward())
           }
           break
@@ -117,8 +119,10 @@ const App = () => {
     const handler = (e: MouseEvent) => {
       switch (e.button) {
         case 3:
+          e.preventDefault()
           return dispatch(back())
         case 4:
+          e.preventDefault()
           return dispatch(forward())
       }
     }
