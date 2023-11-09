@@ -19,6 +19,7 @@ import {
   startEditing,
 } from '~/store/explorer'
 import { add, remove } from '~/store/favorite'
+import { openEntry } from '~/store/settings'
 import {
   back,
   changeDirectory,
@@ -65,6 +66,8 @@ const App = () => {
           return dispatch(moveToTrash(data?.paths))
         case 'newFolder':
           return dispatch(newFolder(data.path))
+        case 'openEntry':
+          return dispatch(openEntry(data.path))
         case 'removeFromFavorites':
           return dispatch(remove(data.path))
         case 'rename':

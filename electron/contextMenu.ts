@@ -40,8 +40,8 @@ const registerContextMenu = (
       enabled: !!path,
       label: 'New Folder',
     }),
-    open: (_event, _params, { path }) => ({
-      click: () => shell.openPath(path),
+    open: (event, _params, { path }) => ({
+      click: () => send(event, { type: 'openEntry', data: { path } }),
       label: 'Open',
     }),
     openDirectory: (event, _params, { path }) => ({
