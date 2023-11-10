@@ -55,7 +55,7 @@ const Settings = () => {
       const value = e.target.checked
       dispatch(setShouldOpenWithVisty(value))
     },
-    [],
+    [dispatch],
   )
 
   return (
