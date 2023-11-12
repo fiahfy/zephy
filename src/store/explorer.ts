@@ -115,7 +115,12 @@ export const explorerSlice = createSlice({
       const selected = paths
       return { ...state, selected }
     },
-    unselect(state) {
+    unselect(state, action: PayloadAction<string[]>) {
+      const paths = action.payload
+      const selected = state.selected.filter((p) => !paths.includes(p))
+      return { ...state, selected }
+    },
+    unselectAll(state) {
       return { ...state, selected: [] }
     },
   },
@@ -128,7 +133,7 @@ export const {
   blur,
   select,
   multiSelect,
-  unselect,
+  unselectAll,
 } = explorerSlice.actions
 
 export default explorerSlice.reducer
@@ -242,7 +247,8 @@ export const searchQuery =
   }
 
 export const load = (): AppThunk => async (dispatch, getState) => {
-  const { loading, loaded } = explorerSlice.actions
+  const { loaded, loading, unselectAll } = explorerSlice.actions
+  dispatch(unselectAll())
   dispatch(loading())
   try {
     let entries: DetailedEntry[] = []
@@ -297,7 +303,7 @@ export const selectAll = (): AppThunk => async (dispatch, getState) => {
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
-    const { add } = explorerSlice.actions
+    const { add, focus, select, startEditing } = explorerSlice.actions
     const entry = await window.electronAPI.createDirectory(directoryPath)
     dispatch(add([entry]))
     dispatch(select(entry.path))
@@ -308,19 +314,19 @@ export const newFolder =
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { remove } = explorerSlice.actions
+    const { remove, unselect } = explorerSlice.actions
     const selected = selectSelected(getState())
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
     dispatch(remove(targetPaths))
-    dispatch(unselect())
+    dispatch(unselect(targetPaths))
   }
 
 // TODO: update favorites and ratings
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch) => {
-    const { add, remove } = explorerSlice.actions
+    const { add, remove, select } = explorerSlice.actions
     const entry = await window.electronAPI.renameEntry(path, newName)
     dispatch(remove([path]))
     dispatch(add([entry]))
@@ -331,8 +337,9 @@ export const rename =
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {
+    const { unselect } = explorerSlice.actions
     await window.electronAPI.moveEntries(paths, directoryPath)
-    dispatch(unselect())
+    dispatch(unselect(paths))
   }
 
 export const copy = (): AppThunk => async (_, getState) => {

@@ -4,7 +4,7 @@ import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
 import useDnd from '~/hooks/useDnd'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { blur, unselect } from '~/store/explorer'
+import { blur, unselectAll } from '~/store/explorer'
 import {
   selectCurrentDirectoryPath,
   selectCurrentSortOption,
@@ -23,7 +23,7 @@ const Explorer = () => {
   const { createDroppableBinder, droppableStyle } = useDnd()
 
   const handleClick = useCallback(() => {
-    dispatch(unselect())
+    dispatch(unselectAll())
     dispatch(blur())
   }, [dispatch])
 

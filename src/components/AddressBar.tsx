@@ -33,7 +33,7 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { load, searchQuery, selectLoading, unselect } from '~/store/explorer'
+import { load, searchQuery, selectLoading } from '~/store/explorer'
 import { selectIsFavorite, toggle } from '~/store/favorite'
 import { remove, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
@@ -134,7 +134,6 @@ const AddressBar = () => {
   useEffect(() => {
     setDirectory(currentDirectoryPath)
     dispatch(load())
-    dispatch(unselect())
   }, [currentDirectoryPath, dispatch])
 
   const directoryIconType = useMemo(() => {
