@@ -1,20 +1,13 @@
 import { Box } from '@mui/material'
-import ExplorerTreeView from '~/components/ExplorerTreeView'
-import FavoriteTable from '~/components/FavoriteTable'
-import Panel from '~/components/Panel'
-import RatingTable from '~/components/RatingTable'
+import ExplorerPanel from '~/components/ExplorerPanel'
+import FavoritePanel from '~/components/FavoritePanel'
+import RatingPanel from '~/components/RatingPanel'
 
 const Navigator = () => (
   <Box sx={{ height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
-    <Panel title="Favorites">
-      <FavoriteTable />
-    </Panel>
-    <Panel title="Ratings">
-      <RatingTable />
-    </Panel>
-    <Panel title="Explorer">
-      <ExplorerTreeView />
-    </Panel>
+    <FavoritePanel />
+    <RatingPanel />
+    <ExplorerPanel />
   </Box>
 )
 

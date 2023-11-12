@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
+import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
@@ -26,7 +27,7 @@ const getLoadedDirectories = (entry: Entry) => {
   return [entry].reduce(reducer, [])
 }
 
-const ExplorerTreeView = () => {
+const ExplorerPanel = () => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const zephySchema = useAppSelector(selectZephySchema)
 
@@ -40,6 +41,9 @@ const ExplorerTreeView = () => {
 
   useEffect(() => {
     ;(async () => {
+      if (root) {
+        return
+      }
       const entry = await window.electronAPI.getEntryHierarchy(
         zephySchema ? undefined : currentDirectoryPath,
       )
@@ -47,7 +51,7 @@ const ExplorerTreeView = () => {
       setExpanded(expanded)
       setRoot(entry)
     })()
-  }, [currentDirectoryPath, zephySchema])
+  }, [currentDirectoryPath, root, zephySchema])
 
   useEffect(
     () =>
@@ -106,6 +110,8 @@ const ExplorerTreeView = () => {
     return [root].reduce(reducer, {})
   }, [root])
 
+  const handleClickRefresh = useCallback(() => setRoot(undefined), [])
+
   const handleSelect = useCallback(
     (_event: SyntheticEvent, nodeIds: string[] | string) =>
       setSelected(Array.isArray(nodeIds) ? nodeIds : [nodeIds]),
@@ -149,23 +155,25 @@ const ExplorerTreeView = () => {
   )
 
   return (
-    <TreeView
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
-      expanded={expanded}
-      multiSelect
-      onNodeSelect={handleSelect}
-      onNodeToggle={handleToggle}
-      selected={selected}
-      sx={{
-        '&:focus-visible .Mui-focused': {
-          outline: '-webkit-focus-ring-color auto 1px',
-        },
-      }}
-    >
-      {root && <ExplorerTreeItem entry={root} />}
-    </TreeView>
+    <Panel onClickRefresh={handleClickRefresh} title="Explorer">
+      <TreeView
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+        expanded={expanded}
+        multiSelect
+        onNodeSelect={handleSelect}
+        onNodeToggle={handleToggle}
+        selected={selected}
+        sx={{
+          '&:focus-visible .Mui-focused': {
+            outline: '-webkit-focus-ring-color auto 1px',
+          },
+        }}
+      >
+        {root && <ExplorerTreeItem entry={root} />}
+      </TreeView>
+    </Panel>
   )
 }
 
-export default ExplorerTreeView
+export default ExplorerPanel
