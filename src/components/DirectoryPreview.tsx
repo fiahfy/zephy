@@ -96,6 +96,12 @@ const DirectoryPreview = (props: Props) => {
   }, [])
 
   useEffect(() => {
+    if (!loading) {
+      virtualizer.scrollToOffset(0)
+    }
+  }, [loading, virtualizer])
+
+  useEffect(() => {
     let unmounted = false
 
     ;(async () => {
