@@ -25,9 +25,17 @@ import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
 import useExplorerItem from '~/hooks/useExplorerItem'
 
-type State = { itemCount: number; loading: boolean; thumbnail?: string }
+type State = {
+  itemCount?: number
+  status: 'error' | 'loaded' | 'loading' | 'waiting'
+  thumbnail?: string
+}
 
 type Action =
+  | {
+      type: 'error'
+      payload: { itemCount: number; thumbnail?: string }
+    }
   | {
       type: 'loaded'
       payload: { itemCount: number; thumbnail?: string }
@@ -36,13 +44,14 @@ type Action =
 
 const reducer = (_state: State, action: Action) => {
   switch (action.type) {
+    case 'error':
     case 'loaded':
       return {
         ...action.payload,
-        loading: false,
+        status: action.type,
       }
     case 'loading':
-      return { itemCount: 0, loading: true, thumbnail: undefined }
+      return { itemCount: undefined, status: action.type, thumbnail: undefined }
   }
 }
 
@@ -65,9 +74,9 @@ const ExplorerGridItem = (props: Props) => {
   const { createDraggableBinder, createDroppableBinder, droppableStyle } =
     useDnd()
 
-  const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
-    itemCount: 0,
-    loading: false,
+  const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
+    itemCount: undefined,
+    status: 'loading',
     thumbnail: undefined,
   })
 
@@ -94,11 +103,25 @@ const ExplorerGridItem = (props: Props) => {
         }
       })()
       const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
+      let success = true
+      if (thumbnail) {
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(undefined)
+            img.onerror = (e) => reject(e)
+            img.src = thumbnail
+          })
+        } catch (e) {
+          console.log(e)
+          success = false
+        }
+      }
       if (unmounted) {
         return
       }
       dispatch({
-        type: 'loaded',
+        type: success ? 'loaded' : 'error',
         payload: { itemCount: paths.length, thumbnail },
       })
     })()
@@ -108,10 +131,16 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [content.path, content.type, content.url, shouldShowHiddenFiles])
 
-  const message = useMemo(
-    () => (loading ? 'Loading...' : 'No preview'),
-    [loading],
-  )
+  const message = useMemo(() => {
+    switch (status) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load'
+      case 'loaded':
+        return 'No preview'
+    }
+  }, [status])
 
   const editing = useMemo(
     () => isEditing(content.path),
@@ -197,7 +226,7 @@ const ExplorerGridItem = (props: Props) => {
       {...createDraggableBinder(dragContents)}
       {...createDroppableBinder(content)}
     >
-      {thumbnail ? (
+      {status === 'loaded' && thumbnail ? (
         <img src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
         <Box
@@ -227,7 +256,7 @@ const ExplorerGridItem = (props: Props) => {
             }}
           >
             {rating}
-            {!loading && content.type === 'directory' && (
+            {itemCount !== undefined && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
                 {pluralize('item', itemCount, true)}
               </Typography>

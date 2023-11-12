@@ -18,9 +18,17 @@ import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 import { rate, selectGetScore } from '~/store/rating'
 
-type State = { itemCount: number; loading: boolean; thumbnail?: string }
+type State = {
+  itemCount?: number
+  status: 'error' | 'loaded' | 'loading' | 'waiting'
+  thumbnail?: string
+}
 
 type Action =
+  | {
+      type: 'error'
+      payload: { itemCount: number; thumbnail?: string }
+    }
   | {
       type: 'loaded'
       payload: { itemCount: number; thumbnail?: string }
@@ -29,13 +37,14 @@ type Action =
 
 const reducer = (_state: State, action: Action) => {
   switch (action.type) {
+    case 'error':
     case 'loaded':
       return {
         ...action.payload,
-        loading: false,
+        status: action.type,
       }
     case 'loading':
-      return { itemCount: 0, loading: true, thumbnail: undefined }
+      return { itemCount: undefined, status: action.type, thumbnail: undefined }
   }
 }
 
@@ -54,9 +63,9 @@ const DirectoryPreviewItem = (props: Props) => {
   const { createDraggableBinder, createDroppableBinder, droppableStyle } =
     useDnd()
 
-  const [{ itemCount, loading, thumbnail }, dispatch] = useReducer(reducer, {
-    itemCount: 0,
-    loading: false,
+  const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
+    itemCount: undefined,
+    status: 'loading',
     thumbnail: undefined,
   })
 
@@ -83,11 +92,25 @@ const DirectoryPreviewItem = (props: Props) => {
         }
       })()
       const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
+      let success = true
+      if (thumbnail) {
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(undefined)
+            img.onerror = (e) => reject(e)
+            img.src = thumbnail
+          })
+        } catch (e) {
+          console.log(e)
+          success = false
+        }
+      }
       if (unmounted) {
         return
       }
       dispatch({
-        type: 'loaded',
+        type: success ? 'loaded' : 'error',
         payload: { itemCount: paths.length, thumbnail },
       })
     })()
@@ -97,10 +120,16 @@ const DirectoryPreviewItem = (props: Props) => {
     }
   }, [entry.path, entry.type, entry.url, shouldShowHiddenFiles])
 
-  const message = useMemo(
-    () => (loading ? 'Loading...' : 'No preview'),
-    [loading],
-  )
+  const message = useMemo(() => {
+    switch (status) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load'
+      case 'loaded':
+        return 'No preview'
+    }
+  }, [status])
 
   const handleDoubleClick = useCallback(
     async () =>
@@ -156,7 +185,7 @@ const DirectoryPreviewItem = (props: Props) => {
       {...createDraggableBinder(entry)}
       {...createDroppableBinder(entry)}
     >
-      {thumbnail ? (
+      {status === 'loaded' && thumbnail ? (
         <img
           src={thumbnail}
           style={{
@@ -192,7 +221,7 @@ const DirectoryPreviewItem = (props: Props) => {
             }}
           >
             {rating}
-            {!loading && entry.type === 'directory' && (
+            {itemCount !== undefined && entry.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
                 {pluralize('item', itemCount, true)}
               </Typography>

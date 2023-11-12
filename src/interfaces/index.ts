@@ -12,7 +12,9 @@ export type IElectronAPI = {
   addMessageListener: (callback: (message: any) => void) => () => void
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
-  createEntryThumbnailUrl: (paths: string | string[]) => Promise<string>
+  createEntryThumbnailUrl: (
+    paths: string | string[],
+  ) => Promise<string | undefined>
   getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
