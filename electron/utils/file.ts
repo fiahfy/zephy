@@ -196,8 +196,8 @@ export const getEntryHierarchy = async (
   }
 
   entry = await dirnames.reduce(async (promise, _dirname, i) => {
-    const e = await promise
-    const targetEntry = dirnames
+    const acc = await promise
+    const entry = dirnames
       .slice(0, i + 1)
       .reduce(
         (acc, dirname) =>
@@ -206,17 +206,15 @@ export const getEntryHierarchy = async (
                 (entry) => entry.type === 'directory' && entry.name === dirname,
               ) as Directory)
             : undefined,
-        e as Directory | undefined,
+        acc as Directory | undefined,
       )
-    if (
-      targetEntry &&
-      targetEntry.type === 'directory' &&
-      i < dirnames.length
-    ) {
+    if (entry && entry.type === 'directory' && i < dirnames.length) {
       const path = dirnames.slice(0, i + 1).join(sep)
-      targetEntry.children = await getEntries(path)
+      const entries = await getEntries(path)
+      // limit entry size for performance issue
+      entry.children = entries.slice(0, 100)
     }
-    return e
+    return acc
   }, Promise.resolve(entry))
 
   return entry.children?.[0]

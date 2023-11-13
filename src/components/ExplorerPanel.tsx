@@ -41,9 +41,6 @@ const ExplorerPanel = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (root) {
-        return
-      }
       const entry = await window.electronAPI.getEntryHierarchy(
         zephySchema ? undefined : currentDirectoryPath,
       )
@@ -51,7 +48,7 @@ const ExplorerPanel = () => {
       setExpanded(expanded)
       setRoot(entry)
     })()
-  }, [currentDirectoryPath, root, zephySchema])
+  }, [currentDirectoryPath, zephySchema])
 
   useEffect(
     () =>
@@ -120,10 +117,11 @@ const ExplorerPanel = () => {
 
   const handleToggle = useCallback(
     async (_event: SyntheticEvent, nodeIds: string[]) => {
-      const expandedNodeId = nodeIds.filter(
-        (nodeId) => !expanded.includes(nodeId),
-      )[0]
       setExpanded(nodeIds)
+
+      const expandedNodeId = nodeIds.find(
+        (nodeId) => !expanded.includes(nodeId),
+      )
       if (!expandedNodeId) {
         return
       }
@@ -131,25 +129,32 @@ const ExplorerPanel = () => {
       if (!entry || entry.type !== 'directory' || entry.children) {
         return
       }
+
       const children = await window.electronAPI.getEntries(entry.path)
+
       const mapper = (e: Entry): Entry => {
-        if (e.type === 'directory') {
-          if (e.path === entry.path) {
-            return {
-              ...e,
-              children,
-            }
+        if (e.type === 'file') {
+          return e
+        }
+        if (e.path === entry.path) {
+          return {
+            ...e,
+            children,
           }
-          if (e.children) {
-            return {
-              ...e,
-              children: e.children.map(mapper),
-            }
+        }
+        if (e.children) {
+          return {
+            ...e,
+            children: e.children.map(mapper),
           }
         }
         return e
       }
-      setRoot((root) => (root ? mapper(root) : root))
+
+      setRoot((root) => {
+        const [newRoot] = (root ? [root] : []).map(mapper)
+        return newRoot
+      })
     },
     [entryMap, expanded],
   )
