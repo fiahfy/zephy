@@ -41,6 +41,9 @@ const ExplorerPanel = () => {
 
   useEffect(() => {
     ;(async () => {
+      if (root) {
+        return
+      }
       const entry = await window.electronAPI.getEntryHierarchy(
         zephySchema ? undefined : currentDirectoryPath,
       )
@@ -48,7 +51,7 @@ const ExplorerPanel = () => {
       setExpanded(expanded)
       setRoot(entry)
     })()
-  }, [currentDirectoryPath, zephySchema])
+  }, [currentDirectoryPath, root, zephySchema])
 
   useEffect(
     () =>
