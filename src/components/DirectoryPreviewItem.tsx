@@ -102,7 +102,6 @@ const DirectoryPreviewItem = (props: Props) => {
             img.src = thumbnail
           })
         } catch (e) {
-          console.log(e)
           success = false
         }
       }

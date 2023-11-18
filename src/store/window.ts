@@ -336,7 +336,7 @@ export const windowSlice = createSlice({
   },
 })
 
-export const { initialize, replace } = windowSlice.actions
+export const { replace } = windowSlice.actions
 
 export default windowSlice.reducer
 
@@ -441,6 +441,12 @@ export const selectGetViewMode = createSelector(
   selectViewMode,
   (viewMode) => (directoryPath: string) => viewMode[directoryPath],
 )
+
+export const initialize = (): AppThunk => async (dispatch, getState) => {
+  const { initialize } = windowSlice.actions
+  const index = selectWindowIndex(getState())
+  dispatch(initialize({ index }))
+}
 
 export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>

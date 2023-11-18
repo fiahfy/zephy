@@ -113,7 +113,6 @@ const ExplorerGridItem = (props: Props) => {
             img.src = thumbnail
           })
         } catch (e) {
-          console.log(e)
           success = false
         }
       }

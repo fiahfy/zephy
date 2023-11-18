@@ -21,6 +21,7 @@
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
 - [ ] Text Preview
+- [ ] Tabbed Browsing
 - [ ] Use Electron Forge
 
 ## Screenshots

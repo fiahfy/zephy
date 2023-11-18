@@ -55,7 +55,7 @@ export const StoreProvider = (props: Props) => {
       dispatch(set(index))
       const directoryPath = params?.directoryPath
       if (directoryPath) {
-        dispatch(initialize({ index }))
+        dispatch(initialize())
         dispatch(changeDirectory(directoryPath))
       }
       setInitialized(true)
