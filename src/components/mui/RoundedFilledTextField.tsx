@@ -8,14 +8,14 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
     '.MuiFilledInput-root': {
       borderRadius: 4,
       '&.Mui-focused': {
-        '&:after': {
+        '&::after': {
           opacity: 1,
         },
       },
-      '&:before': {
+      '&::before': {
         display: 'none',
       },
-      '&:after': {
+      '&::after': {
         border: `${theme.spacing(0.25)} solid ${theme.palette.primary.main}`,
         borderRadius: 4,
         content: '""',

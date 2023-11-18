@@ -7,6 +7,7 @@ import Navigator from '~/components/Navigator'
 import Settings from '~/components/Settings'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
+import TabBar from '~/components/TabBar'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -213,6 +214,7 @@ const App = () => {
             minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
           }}
         />
+        <TabBar />
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
           <Component />
         </Box>
