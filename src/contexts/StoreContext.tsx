@@ -9,7 +9,7 @@ import { replace as replaceRating } from '~/store/rating'
 import { replace as replaceSettings } from '~/store/settings'
 import {
   changeDirectory,
-  initialize,
+  newWindow,
   replace as replaceWindow,
 } from '~/store/window'
 import { set } from '~/store/windowIndex'
@@ -55,7 +55,7 @@ export const StoreProvider = (props: Props) => {
       dispatch(set(index))
       const directoryPath = params?.directoryPath
       if (directoryPath) {
-        dispatch(initialize())
+        dispatch(newWindow())
         dispatch(changeDirectory(directoryPath))
       }
       setInitialized(true)

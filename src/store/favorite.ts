@@ -15,6 +15,9 @@ export const favoriteSlice = createSlice({
   name: 'favorite',
   initialState,
   reducers: {
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
     add(state, action: PayloadAction<string>) {
       const favorites = [
         ...state.favorites.filter(
@@ -29,9 +32,6 @@ export const favoriteSlice = createSlice({
         (favorite) => favorite.path !== action.payload,
       )
       return { ...state, favorites }
-    },
-    replace(_state, action: PayloadAction<State>) {
-      return action.payload
     },
   },
 })

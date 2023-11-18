@@ -11,6 +11,9 @@ export const querySlice = createSlice({
   name: 'query',
   initialState,
   reducers: {
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
     add(state, action: PayloadAction<string>) {
       const query = action.payload
       if (!query) {
@@ -29,9 +32,6 @@ export const querySlice = createSlice({
       }
       const histories = state.histories.filter((history) => history !== query)
       return { ...state, histories }
-    },
-    replace(_state, action: PayloadAction<State>) {
-      return action.payload
     },
   },
 })

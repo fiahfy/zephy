@@ -24,9 +24,11 @@ import { openEntry } from '~/store/settings'
 import {
   back,
   changeDirectory,
+  closeCurrentTab,
   forward,
   go,
   goToSettings,
+  newTab,
   selectCurrentHistory,
   setCurrentViewMode,
   setSidebarHidden,
@@ -55,6 +57,8 @@ const App = () => {
           return dispatch(setSidebarHidden(data.variant, data.hidden))
         case 'changeViewMode':
           return dispatch(setCurrentViewMode(data.viewMode))
+        case 'closeTab':
+          return dispatch(closeCurrentTab())
         case 'copy':
           return dispatch(copy())
         case 'forward':
@@ -67,6 +71,8 @@ const App = () => {
           return dispatch(moveToTrash(data?.paths))
         case 'newFolder':
           return dispatch(newFolder(data.path))
+        case 'newTab':
+          return dispatch(newTab())
         case 'openEntry':
           return dispatch(openEntry(data.path))
         case 'removeFromFavorites':

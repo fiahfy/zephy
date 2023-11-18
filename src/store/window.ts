@@ -15,6 +15,10 @@ type HistoryState = {
   index: number
 }
 
+type TabState = {
+  history: HistoryState
+}
+
 type SidebarState = {
   hidden: boolean
   width: number
@@ -36,12 +40,13 @@ type ViewModeState = {
 }
 
 type WindowState = {
-  history: HistoryState
   sidebar: {
     primary: SidebarState
     secondary: SidebarState
   }
   sorting: SortingState
+  tabIndex: number
+  tabs: TabState[]
   viewMode: ViewModeState
 }
 
@@ -107,11 +112,7 @@ const getTitle = async (path: string) => {
   }
 }
 
-const defaultState: WindowState = {
-  history: {
-    histories: [],
-    index: -1,
-  },
+const defaultWindowState: WindowState = {
   sidebar: {
     primary: {
       hidden: false,
@@ -123,6 +124,15 @@ const defaultState: WindowState = {
     },
   },
   sorting: {},
+  tabIndex: 0,
+  tabs: [
+    {
+      history: {
+        histories: [],
+        index: -1,
+      },
+    },
+  ],
   viewMode: {},
 }
 
@@ -132,6 +142,242 @@ export const windowSlice = createSlice({
   name: 'window',
   initialState,
   reducers: {
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
+    newWindow(state, action: PayloadAction<{ index: number }>) {
+      const { index } = action.payload
+      return {
+        ...state,
+        [index]: {
+          ...defaultWindowState,
+        },
+      }
+    },
+    newTab(state, action: PayloadAction<{ index: number }>) {
+      const { index } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const newTabindex = window.tabIndex + 1
+      const tabs = [
+        ...window.tabs.slice(0, window.tabIndex + 1),
+        {
+          history: {
+            histories: [],
+            index: -1,
+          },
+        },
+        ...window.tabs.slice(window.tabIndex + 1),
+      ]
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabIndex: newTabindex,
+          tabs,
+        },
+      }
+    },
+    closeTab(
+      state,
+      action: PayloadAction<{ index: number; tabIndex: number }>,
+    ) {
+      const { index, tabIndex } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tabs = window.tabs.filter((_, i) => i !== tabIndex)
+      const newTabIndex = Math.min(window.tabIndex, tabs.length - 1)
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabIndex: newTabIndex,
+          tabs,
+        },
+      }
+    },
+    closeCurrentTab(state, action: PayloadAction<{ index: number }>) {
+      const { index } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tabs = window.tabs.filter((_, i) => i !== window.tabIndex)
+      const tabIndex = Math.min(window.tabIndex, tabs.length - 1)
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabIndex,
+          tabs,
+        },
+      }
+    },
+    changeTab(
+      state,
+      action: PayloadAction<{ index: number; tabIndex: number }>,
+    ) {
+      const { index, tabIndex } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabIndex,
+        },
+      }
+    },
+    changeDirectory(
+      state,
+      action: PayloadAction<{
+        index: number
+        directoryPath: string
+        title: string
+      }>,
+    ) {
+      const { index, directoryPath, title } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs[window.tabIndex]
+      if (!tab) {
+        return state
+      }
+      const currentDirectoryPath =
+        tab.history.histories[tab.history.index]?.directoryPath
+      if (directoryPath === currentDirectoryPath) {
+        return
+      }
+      const historyIndex = tab.history.index + 1
+      const histories = [
+        ...tab.history.histories.slice(0, historyIndex),
+        { directoryPath, scrollTop: 0, title },
+      ]
+      const tabs = window.tabs.map((tab, i) =>
+        i === window.tabIndex
+          ? {
+              ...tab,
+              history: {
+                ...tab.history,
+                histories,
+                index: historyIndex,
+              },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
+    go(state, action: PayloadAction<{ index: number; offset: number }>) {
+      const { index, offset } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs[window.tabIndex]
+      if (!tab) {
+        return state
+      }
+      const historyIndex = tab.history.index + offset
+      const history = tab.history.histories[historyIndex]
+      if (!history) {
+        return state
+      }
+      const tabs = window.tabs.map((tab, i) =>
+        i === window.tabIndex
+          ? {
+              ...tab,
+              history: { ...tab.history, index: historyIndex },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
+    setCurrentScrollTop(
+      state,
+      action: PayloadAction<{ index: number; scrollTop: number }>,
+    ) {
+      const { index, scrollTop } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs[window.tabIndex]
+      if (!tab) {
+        return state
+      }
+      const histories = tab.history.histories.map((history, i) =>
+        i === tab.history.index ? { ...history, scrollTop } : history,
+      )
+      const tabs = window.tabs.map((tab, i) =>
+        i === window.tabIndex
+          ? {
+              ...tab,
+              history: { ...tab.history, histories },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
+    sort(
+      state,
+      action: PayloadAction<{
+        index: number
+        directoryPath: string
+        orderBy: SortOption['orderBy']
+      }>,
+    ) {
+      const { index, directoryPath, orderBy } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const option = window.sorting[directoryPath]
+      const newOrder =
+        option && option.orderBy === orderBy
+          ? option.order === 'desc'
+            ? 'asc'
+            : 'desc'
+          : defaultOrders[orderBy as keyof typeof defaultOrders]
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          sorting: {
+            ...window.sorting,
+            [directoryPath]: {
+              order: newOrder,
+              orderBy,
+            },
+          },
+        },
+      }
+    },
     setSidebarHidden(
       state,
       action: PayloadAction<{
@@ -141,18 +387,18 @@ export const windowSlice = createSlice({
       }>,
     ) {
       const { index, variant, hidden } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
+      const window = state[index]
+      if (!window) {
         return state
       }
       return {
         ...state,
         [index]: {
-          ...windowState,
+          ...window,
           sidebar: {
-            ...windowState.sidebar,
+            ...window.sidebar,
             [variant]: {
-              ...windowState.sidebar[variant],
+              ...window.sidebar[variant],
               hidden,
             },
           },
@@ -168,130 +414,19 @@ export const windowSlice = createSlice({
       }>,
     ) {
       const { index, variant, width } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
+      const window = state[index]
+      if (!window) {
         return state
       }
       return {
         ...state,
         [index]: {
-          ...windowState,
+          ...window,
           sidebar: {
-            ...windowState.sidebar,
+            ...window.sidebar,
             [variant]: {
-              ...windowState.sidebar[variant],
+              ...window.sidebar[variant],
               width,
-            },
-          },
-        },
-      }
-    },
-    changeDirectory(
-      state,
-      action: PayloadAction<{
-        index: number
-        directoryPath: string
-        title: string
-      }>,
-    ) {
-      const { index, directoryPath, title } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
-        return state
-      }
-      const currentDirectoryPath =
-        windowState.history.histories[windowState.history.index]?.directoryPath
-      if (directoryPath === currentDirectoryPath) {
-        return
-      }
-      const historyIndex = windowState.history.index + 1
-      const histories = [
-        ...windowState.history.histories.slice(0, historyIndex),
-        { directoryPath, scrollTop: 0, title },
-      ]
-      return {
-        ...state,
-        [index]: {
-          ...windowState,
-          history: {
-            ...windowState.history,
-            histories,
-            index: historyIndex,
-          },
-        },
-      }
-    },
-    go(state, action: PayloadAction<{ index: number; offset: number }>) {
-      const { index, offset } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
-        return state
-      }
-      const historyIndex = windowState.history.index + offset
-      const history = windowState.history.histories[historyIndex]
-      if (!history) {
-        return state
-      }
-      return {
-        ...state,
-        [index]: {
-          ...windowState,
-          history: { ...windowState.history, index: historyIndex },
-        },
-      }
-    },
-    setCurrentScrollTop(
-      state,
-      action: PayloadAction<{ index: number; scrollTop: number }>,
-    ) {
-      const { index, scrollTop } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
-        return state
-      }
-      const histories = windowState.history.histories.map((history, i) =>
-        i === windowState.history.index ? { ...history, scrollTop } : history,
-      )
-      return {
-        ...state,
-        [index]: {
-          ...windowState,
-          history: {
-            ...windowState.history,
-            histories,
-          },
-        },
-      }
-    },
-    sort(
-      state,
-      action: PayloadAction<{
-        index: number
-        directoryPath: string
-        orderBy: SortOption['orderBy']
-      }>,
-    ) {
-      const { index, directoryPath, orderBy } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
-        return state
-      }
-      const option = windowState.sorting[directoryPath]
-      const newOrder =
-        option && option.orderBy === orderBy
-          ? option.order === 'desc'
-            ? 'asc'
-            : 'desc'
-          : defaultOrders[orderBy as keyof typeof defaultOrders]
-      return {
-        ...state,
-        [index]: {
-          ...windowState,
-          sorting: {
-            ...windowState.sorting,
-            [directoryPath]: {
-              order: newOrder,
-              orderBy,
             },
           },
         },
@@ -306,32 +441,20 @@ export const windowSlice = createSlice({
       }>,
     ) {
       const { index, directoryPath, viewMode } = action.payload
-      const windowState = state[index]
-      if (!windowState) {
+      const window = state[index]
+      if (!window) {
         return state
       }
       return {
         ...state,
         [index]: {
-          ...windowState,
+          ...window,
           viewMode: {
-            ...windowState.viewMode,
+            ...window.viewMode,
             [directoryPath]: viewMode,
           },
         },
       }
-    },
-    initialize(state, action: PayloadAction<{ index: number }>) {
-      const { index } = action.payload
-      return {
-        ...state,
-        [index]: {
-          ...defaultState,
-        },
-      }
-    },
-    replace(_state, action: PayloadAction<State>) {
-      return action.payload
     },
   },
 })
@@ -340,33 +463,50 @@ export const { replace } = windowSlice.actions
 
 export default windowSlice.reducer
 
-export const selectWindow = (state: AppState) => {
-  const windowState = state.window[state.windowIndex]
-  return windowState ?? defaultState
+export const selectCurrentWindow = (state: AppState) => {
+  const window = state.window[state.windowIndex]
+  return window ?? defaultWindowState
 }
 
-export const selectHistory = createSelector(
-  selectWindow,
-  (window) => window.history,
+export const selectTabIndex = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabIndex,
+)
+
+export const selectTabs = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabs,
 )
 
 export const selectSidebar = createSelector(
-  selectWindow,
-  (window) => window.sidebar,
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.sidebar,
 )
 
 export const selectSorting = createSelector(
-  selectWindow,
-  (window) => window.sorting,
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.sorting,
 )
 
 export const selectViewMode = createSelector(
-  selectWindow,
-  (window) => window.viewMode,
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.viewMode,
+)
+
+export const selectCurrentTab = createSelector(
+  selectTabs,
+  selectTabIndex,
+  (tabs, tabIndex) =>
+    tabs[tabIndex] ?? { history: { histories: [], index: -1 } },
+)
+
+export const selectCurrentTabHistory = createSelector(
+  selectCurrentTab,
+  (currentTab) => currentTab.history,
 )
 
 export const selectCurrentHistory = createSelector(
-  selectHistory,
+  selectCurrentTabHistory,
   (history) =>
     history.histories[history.index] ?? {
       directoryPath: '',
@@ -375,22 +515,44 @@ export const selectCurrentHistory = createSelector(
     },
 )
 
+export const selectGetCurrentHistory = createSelector(
+  selectTabs,
+  (tabs) => (tabIndex: number) => {
+    const tab = tabs[tabIndex] ?? { history: { histories: [], index: -1 } }
+    const history = tab.history
+    return (
+      history.histories[history.index] ?? {
+        directoryPath: '',
+        scrollTop: 0,
+        title: '',
+      }
+    )
+  },
+)
+
+export const selectCanCloseTab = createSelector(
+  selectTabs,
+  (tabs) => tabs.length > 1,
+)
+
 export const selectCanBack = createSelector(
-  selectHistory,
+  selectCurrentTabHistory,
   (history) => history.index > 0,
 )
 
 export const selectCanForward = createSelector(
-  selectHistory,
+  selectCurrentTabHistory,
   (history) => history.index < history.histories.length - 1,
 )
 
-export const selectBackHistories = createSelector(selectHistory, (history) =>
-  history.histories.slice(0, history.index).reverse(),
+export const selectBackHistories = createSelector(
+  selectCurrentTabHistory,
+  (history) => history.histories.slice(0, history.index).reverse(),
 )
 
-export const selectForwardHistories = createSelector(selectHistory, (history) =>
-  history.histories.slice(history.index + 1),
+export const selectForwardHistories = createSelector(
+  selectCurrentTabHistory,
+  (history) => history.histories.slice(history.index + 1),
 )
 
 export const selectCurrentDirectoryPath = createSelector(
@@ -442,61 +604,58 @@ export const selectGetViewMode = createSelector(
   (viewMode) => (directoryPath: string) => viewMode[directoryPath],
 )
 
-export const initialize = (): AppThunk => async (dispatch, getState) => {
-  const { initialize } = windowSlice.actions
+export const newWindow = (): AppThunk => async (dispatch, getState) => {
+  const { newWindow } = windowSlice.actions
   const index = selectWindowIndex(getState())
-  dispatch(initialize({ index }))
+  dispatch(newWindow({ index }))
 }
 
-export const setSidebarHidden =
-  (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
+export const newTab = (): AppThunk => async (dispatch, getState) => {
+  const { newTab } = windowSlice.actions
+  const index = selectWindowIndex(getState())
+  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+  dispatch(newTab({ index }))
+  dispatch(changeDirectory(currentDirectoryPath))
+}
+
+export const closeTab =
+  (tabIndex: number): AppThunk =>
   async (dispatch, getState) => {
-    const { setSidebarHidden } = windowSlice.actions
+    const { closeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(setSidebarHidden({ index, variant, hidden }))
+    dispatch(closeTab({ index, tabIndex }))
     dispatch(updateApplicationMenu())
   }
 
-export const setSidebarWidth =
-  (variant: 'primary' | 'secondary', width: number): AppThunk =>
+export const closeCurrentTab = (): AppThunk => async (dispatch, getState) => {
+  const { closeCurrentTab } = windowSlice.actions
+  const index = selectWindowIndex(getState())
+  dispatch(closeCurrentTab({ index }))
+}
+
+export const changeTab =
+  (tabIndex: number): AppThunk =>
   async (dispatch, getState) => {
-    const { setSidebarWidth } = windowSlice.actions
+    const { changeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(setSidebarWidth({ index, variant, width }))
+    dispatch(changeTab({ index, tabIndex }))
   }
-
-export const go =
-  (offset: number): AppThunk =>
-  async (dispatch, getState) => {
-    const loading = selectLoading(getState())
-    if (loading) {
-      return
-    }
-    const { go } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(go({ index, offset }))
-    dispatch(updateApplicationMenu())
-  }
-
-export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
-
-export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
+    const index = selectWindowIndex(getState())
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    const currentViewMode = selectCurrentViewMode(getState())
     const loading = selectLoading(getState())
+    const viewMode = selectGetViewMode(getState())(directoryPath)
     if (loading) {
       return
     }
     const { changeDirectory, setViewMode } = windowSlice.actions
-    const index = selectWindowIndex(getState())
     // inherit view mode if the path is a child of the current directory
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     if (directoryPath.startsWith(currentDirectoryPath)) {
-      const viewMode = selectGetViewMode(getState())(directoryPath)
       if (!viewMode) {
-        const currentViewMode = selectCurrentViewMode(getState())
         if (currentViewMode !== 'list') {
           dispatch(
             setViewMode({ index, directoryPath, viewMode: currentViewMode }),
@@ -508,6 +667,23 @@ export const changeDirectory =
     dispatch(changeDirectory({ index, directoryPath, title }))
     dispatch(updateApplicationMenu())
   }
+
+export const go =
+  (offset: number): AppThunk =>
+  async (dispatch, getState) => {
+    const index = selectWindowIndex(getState())
+    const loading = selectLoading(getState())
+    if (loading) {
+      return
+    }
+    const { go } = windowSlice.actions
+    dispatch(go({ index, offset }))
+    dispatch(updateApplicationMenu())
+  }
+
+export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
+
+export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
   const currentDirectoryPath = selectCurrentDirectoryPath(getState())
@@ -551,6 +727,23 @@ export const sort =
     dispatch(updateApplicationMenu())
   }
 
+export const setSidebarHidden =
+  (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
+  async (dispatch, getState) => {
+    const { setSidebarHidden } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    dispatch(setSidebarHidden({ index, variant, hidden }))
+    dispatch(updateApplicationMenu())
+  }
+
+export const setSidebarWidth =
+  (variant: 'primary' | 'secondary', width: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { setSidebarWidth } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    dispatch(setSidebarWidth({ index, variant, width }))
+  }
+
 export const setCurrentViewMode =
   (viewMode: ViewMode): AppThunk =>
   async (dispatch, getState) => {
@@ -565,12 +758,14 @@ export const setCurrentViewMode =
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const canBack = selectCanBack(getState())
+  const canCloseTab = selectCanCloseTab(getState())
   const canForward = selectCanForward(getState())
   const sidebar = selectSidebar(getState())
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())
   await window.electronAPI.updateApplicationMenu({
     canBack,
+    canCloseTab,
     canForward,
     inspectorHidden: sidebar.primary.hidden,
     navigatorHidden: sidebar.secondary.hidden,
