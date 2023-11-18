@@ -5,6 +5,7 @@ import {
   focus,
   select,
   selectContents,
+  selectEditing,
   selectError,
   selectFocused,
   selectLoading,
@@ -21,6 +22,7 @@ import {
 const useExplorerList = () => {
   const contents = useAppSelector(selectContents)
   const currentScrollTop = useAppSelector(selectCurrentScrollTop)
+  const editing = useAppSelector(selectEditing)
   const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
   const loading = useAppSelector(selectLoading)
@@ -74,6 +76,7 @@ const useExplorerList = () => {
 
   return {
     contents,
+    editing,
     focused,
     loading,
     noDataText,

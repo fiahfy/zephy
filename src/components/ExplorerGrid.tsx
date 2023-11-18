@@ -18,6 +18,7 @@ const maxItemSize = 256
 const ExplorerGrid = () => {
   const {
     contents,
+    editing,
     focused,
     loading,
     noDataText,
@@ -27,9 +28,11 @@ const ExplorerGrid = () => {
     scrollTop,
   } = useExplorerList()
 
+  const previousEditing = usePrevious(editing)
   const previousLoading = usePrevious(loading)
 
-  const parentRef = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const [restoring, setRestoring] = useState(false)
   const [wrapperWidth, setWrapperWidth] = useState(0)
@@ -51,13 +54,13 @@ const ExplorerGrid = () => {
 
   const virtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: () => size,
+    getScrollElement: () => scrollRef.current,
     overscan: 5,
   })
 
   useEffect(() => {
-    const el = parentRef.current
+    const el = scrollRef.current
     if (!el) {
       return
     }
@@ -73,7 +76,7 @@ const ExplorerGrid = () => {
   }, [])
 
   useEffect(() => {
-    const el = parentRef.current
+    const el = scrollRef.current
     if (!el) {
       return
     }
@@ -97,6 +100,16 @@ const ExplorerGrid = () => {
       })
     }
   }, [loading, previousLoading, scrollTop, virtualizer])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    if (previousEditing && !editing) {
+      el.focus()
+    }
+  }, [editing, previousEditing])
 
   useEffect(() => {
     if (focused) {
@@ -162,6 +175,7 @@ const ExplorerGrid = () => {
   return (
     <Box
       onKeyDown={handleKeyDown}
+      ref={ref}
       sx={{
         height: '100%',
         outline: 'none',
@@ -175,7 +189,7 @@ const ExplorerGrid = () => {
       tabIndex={0}
     >
       <Box
-        ref={parentRef}
+        ref={scrollRef}
         sx={{
           height: '100%',
           overflowX: 'hidden',

@@ -331,6 +331,7 @@ export const rename =
     dispatch(remove([path]))
     dispatch(add([entry]))
     dispatch(select(entry.path))
+    dispatch(focus(entry.path))
   }
 
 // TODO: update favorites and ratings

@@ -49,6 +49,7 @@ const columns: ColumnType[] = [
 const ExplorerTable = () => {
   const {
     contents,
+    editing,
     focused,
     loading,
     noDataText,
@@ -58,21 +59,23 @@ const ExplorerTable = () => {
     scrollTop,
   } = useExplorerList()
 
+  const previousEditing = usePrevious(editing)
   const previousLoading = usePrevious(loading)
 
-  const parentRef = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const [restoring, setRestoring] = useState(false)
 
   const virtualizer = useVirtualizer({
     count: contents.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: () => rowHeight,
+    getScrollElement: () => scrollRef.current,
     overscan: 20,
   })
 
   useEffect(() => {
-    const el = parentRef.current
+    const el = scrollRef.current
     if (!el) {
       return
     }
@@ -96,6 +99,16 @@ const ExplorerTable = () => {
       })
     }
   }, [contents, loading, previousLoading, scrollTop, virtualizer])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    if (previousEditing && !editing) {
+      el.focus()
+    }
+  }, [editing, previousEditing])
 
   useEffect(() => {
     if (focused) {
@@ -151,6 +164,7 @@ const ExplorerTable = () => {
   return (
     <Box
       onKeyDown={handleKeyDown}
+      ref={ref}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -179,7 +193,7 @@ const ExplorerTable = () => {
         ))}
       </Box>
       <Box
-        ref={parentRef}
+        ref={scrollRef}
         sx={{
           flexGrow: 1,
           overflowX: 'hidden',
