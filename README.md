@@ -2,7 +2,7 @@
 
 [![Create Release](https://github.com/fiahfy/zephy/actions/workflows/create-release.yml/badge.svg)](https://github.com/fiahfy/zephy/actions/workflows/create-release.yml)
 
-> Simple Media File Manager based on Electron.
+> Simple File Browser based on Electron.
 
 ## Features
 
