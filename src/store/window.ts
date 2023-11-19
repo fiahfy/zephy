@@ -107,8 +107,12 @@ const getTitle = async (path: string) => {
         return 'Settings'
     }
   } else {
-    const entry = await window.electronAPI.getDetailedEntry(path)
-    return entry.name
+    try {
+      const entry = await window.electronAPI.getDetailedEntry(path)
+      return entry.name
+    } catch (e) {
+      return '<Error>'
+    }
   }
 }
 

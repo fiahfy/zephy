@@ -425,7 +425,6 @@ export const load =
     }
     dispatch(unselectAll({ tabIndex }))
     dispatch(loading({ tabIndex, directoryPath: currentDirectoryPath }))
-    console.log('load', directoryPath)
     try {
       let entries: DetailedEntry[] = []
       if (url) {
@@ -439,7 +438,6 @@ export const load =
       }
       dispatch(loaded({ tabIndex, entries }))
     } catch (e) {
-      console.log('erro', currentDirectoryPath)
       dispatch(loaded({ tabIndex, error: true }))
     }
   }
