@@ -6,12 +6,12 @@
 
 ## Features
 
-- File and Folder Management
 - Favorites
 - Rating
-- Dark Mode Support
-- Tree View Display
 - Image and Video Preview
+- Tree View Display
+- Tabbed Browsing
+- Dark Mode Support
 - Cross-Platform Compatibility
 
 ## TODOs
