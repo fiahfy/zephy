@@ -5,7 +5,7 @@ import { selectIsFavorite } from '~/store/favorite'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const useEntryItem = (entry: Entry) => {
-  const isFavorite = useAppSelector(selectIsFavorite)
+  const favorite = useAppSelector(selectIsFavorite)(entry.path)
 
   const onContextMenu = useMemo(() => {
     const directory = entry.type === 'directory'
@@ -37,7 +37,7 @@ const useEntryItem = (entry: Entry) => {
         ? [
             {
               type: 'toggleFavorite',
-              data: { path, favorite: isFavorite(path) },
+              data: { path, favorite },
             },
           ]
         : []),
@@ -47,7 +47,7 @@ const useEntryItem = (entry: Entry) => {
         data: { paths: [path] },
       },
     ])
-  }, [entry.path, entry.type, isFavorite])
+  }, [entry.path, entry.type, favorite])
 
   return { onContextMenu }
 }

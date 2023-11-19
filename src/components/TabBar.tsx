@@ -1,5 +1,5 @@
 import { Close as CloseIcon } from '@mui/icons-material'
-import { IconButton, Tab, Tabs } from '@mui/material'
+import { IconButton, Tab, Tabs, Typography } from '@mui/material'
 import { MouseEvent, SyntheticEvent, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -12,8 +12,8 @@ import {
 
 const TabBar = () => {
   const getCurrentHistory = useAppSelector(selectGetCurrentHistory)
-  const tabs = useAppSelector(selectTabs)
   const tabIndex = useAppSelector(selectTabIndex)
+  const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
   const handleChange = useCallback(
@@ -70,14 +70,18 @@ const TabBar = () => {
               }
               iconPosition="end"
               key={i}
-              label={getCurrentHistory(i).title}
+              label={
+                <Typography variant="caption">
+                  {getCurrentHistory(i).title}
+                </Typography>
+              }
               sx={{
+                color: (theme) => theme.palette.text.primary,
                 borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-                fontSize: '0.75rem',
                 minHeight: 0,
                 pl: 1.5,
                 pr: 0.5,
-                py: 0.5,
+                py: 0.25,
                 textTransform: 'none',
                 '&.Mui-selected': {
                   backgroundColor: (theme) => theme.palette.background.default,

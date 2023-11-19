@@ -24,22 +24,13 @@ import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const useExplorerItem = (content: Content) => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const isEditing = useAppSelector(selectIsEditing)
-  const isFavorite = useAppSelector(selectIsFavorite)
-  const isFocused = useAppSelector(selectIsFocused)
-  const isSelected = useAppSelector(selectIsSelected)
+  const editing = useAppSelector(selectIsEditing)(content.path)
+  const favorite = useAppSelector(selectIsFavorite)(content.path)
+  const focused = useAppSelector(selectIsFocused)(content.path)
+  const selected = useAppSelector(selectIsSelected)(content.path)
   const selectedContents = useAppSelector(selectSelectedContents)
   const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
-
-  const focused = useMemo(
-    () => isFocused(content.path),
-    [content.path, isFocused],
-  )
-  const selected = useMemo(
-    () => isSelected(content.path),
-    [content.path, isSelected],
-  )
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
     (e: MouseEvent) => {
@@ -56,7 +47,7 @@ const useExplorerItem = (content: Content) => {
     },
     () => {
       if (
-        !isEditing(content.path) &&
+        !editing &&
         selectedContents.length === 1 &&
         selectedContents[0]?.path === content.path
       ) {
@@ -66,7 +57,7 @@ const useExplorerItem = (content: Content) => {
     async (e: MouseEvent) => {
       // prevent container event
       e.stopPropagation()
-      if (isEditing(content.path)) {
+      if (editing) {
         return
       }
       content.type === 'directory'
@@ -109,7 +100,7 @@ const useExplorerItem = (content: Content) => {
               ? [
                   {
                     type: 'toggleFavorite',
-                    data: { path, favorite: isFavorite(path) },
+                    data: { path, favorite },
                   },
                 ]
               : []),
@@ -136,12 +127,13 @@ const useExplorerItem = (content: Content) => {
     content.path,
     content.type,
     currentDirectoryPath,
-    isFavorite,
+    favorite,
     selectedContents,
     zephySchema,
   ])
 
   return {
+    editing,
     focused,
     onClick,
     onContextMenu,

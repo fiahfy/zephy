@@ -500,15 +500,10 @@ export const selectCurrentTab = createSelector(
     tabs[tabIndex] ?? { history: { histories: [], index: -1 } },
 )
 
-export const selectCurrentTabHistory = createSelector(
-  selectCurrentTab,
-  (currentTab) => currentTab.history,
-)
-
 export const selectCurrentHistory = createSelector(
-  selectCurrentTabHistory,
-  (history) =>
-    history.histories[history.index] ?? {
+  selectCurrentTab,
+  (tab) =>
+    tab.history.histories[tab.history.index] ?? {
       directoryPath: '',
       scrollTop: 0,
       title: '',
@@ -536,23 +531,21 @@ export const selectCanCloseTab = createSelector(
 )
 
 export const selectCanBack = createSelector(
-  selectCurrentTabHistory,
-  (history) => history.index > 0,
+  selectCurrentTab,
+  (tab) => tab.history.index > 0,
 )
 
 export const selectCanForward = createSelector(
-  selectCurrentTabHistory,
-  (history) => history.index < history.histories.length - 1,
+  selectCurrentTab,
+  (tab) => tab.history.index < tab.history.histories.length - 1,
 )
 
-export const selectBackHistories = createSelector(
-  selectCurrentTabHistory,
-  (history) => history.histories.slice(0, history.index).reverse(),
+export const selectBackHistories = createSelector(selectCurrentTab, (tab) =>
+  tab.history.histories.slice(0, tab.history.index).reverse(),
 )
 
-export const selectForwardHistories = createSelector(
-  selectCurrentTabHistory,
-  (history) => history.histories.slice(history.index + 1),
+export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>
+  tab.history.histories.slice(tab.history.index + 1),
 )
 
 export const selectCurrentDirectoryPath = createSelector(
@@ -563,6 +556,11 @@ export const selectCurrentDirectoryPath = createSelector(
 export const selectCurrentScrollTop = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.scrollTop,
+)
+
+export const selectCurrentTitle = createSelector(
+  selectCurrentHistory,
+  (currentHistory) => currentHistory.title,
 )
 
 export const selectZephyUrl = createSelector(

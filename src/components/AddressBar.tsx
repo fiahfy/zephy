@@ -33,7 +33,7 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { load, searchQuery, selectLoading } from '~/store/explorer'
+import { load, search, selectLoading } from '~/store/explorer'
 import { selectIsFavorite, toggle } from '~/store/favorite'
 import { remove, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
@@ -107,10 +107,10 @@ const AddressBar = () => {
   const [query, setQuery] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
-  const search = useCallback(
+  const searchBy = useCallback(
     (query: string) => {
       setQuery(query)
-      dispatch(searchQuery(query))
+      dispatch(search(query))
     },
     [dispatch],
   )
@@ -123,18 +123,18 @@ const AddressBar = () => {
           ref.current?.focus()
           return
         case 'search':
-          search(document.getSelection()?.toString() ?? '')
+          searchBy(document.getSelection()?.toString() ?? '')
           ref.current?.focus()
           return
       }
     })
     return () => removeListener()
-  }, [dispatch, search])
+  }, [dispatch, searchBy])
 
-  useEffect(() => {
-    setDirectory(currentDirectoryPath)
-    dispatch(load())
-  }, [currentDirectoryPath, dispatch])
+  useEffect(
+    () => setDirectory(currentDirectoryPath),
+    [currentDirectoryPath, dispatch],
+  )
 
   const directoryIconType = useMemo(() => {
     if (zephyUrl) {
@@ -172,7 +172,10 @@ const AddressBar = () => {
     [currentDirectoryPath, dispatch],
   )
 
-  const handleClickSearch = useCallback(() => search(query), [query, search])
+  const handleClickSearch = useCallback(
+    () => searchBy(query),
+    [query, searchBy],
+  )
 
   const handleClickRemove = useCallback(
     (e: MouseEvent, query: string) => {
@@ -225,14 +228,14 @@ const AddressBar = () => {
   )
 
   const handleChangeQuery = useCallback(
-    (_e: SyntheticEvent, value: string | null) => search(value ?? ''),
-    [search],
+    (_e: SyntheticEvent, value: string | null) => searchBy(value ?? ''),
+    [searchBy],
   )
 
   const handleInputChangeQuery = useCallback(
     (_e: SyntheticEvent, value: string) =>
-      value ? setQuery(value) : search(value),
-    [search],
+      value ? setQuery(value) : searchBy(value),
+    [searchBy],
   )
 
   const handleKeyDownDirectory = useCallback(
@@ -247,10 +250,10 @@ const AddressBar = () => {
   const handleKeyDownQuery = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-        search(query)
+        searchBy(query)
       }
     },
-    [query, search],
+    [query, searchBy],
   )
 
   return (

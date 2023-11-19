@@ -12,6 +12,7 @@ import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   copy,
+  // load,
   moveToTrash,
   newFolder,
   paste,
@@ -29,7 +30,8 @@ import {
   go,
   goToSettings,
   newTab,
-  selectCurrentHistory,
+  selectCurrentDirectoryPath,
+  selectCurrentTitle,
   setCurrentViewMode,
   setSidebarHidden,
   sort,
@@ -38,10 +40,15 @@ import {
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const App = () => {
-  const currentHistory = useAppSelector(selectCurrentHistory)
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const currentTitle = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
 
-  useTitle(currentHistory.title)
+  useTitle(currentTitle)
+
+  // useEffect(() => {
+  //   dispatch(load())
+  // }, [currentHistory.directoryPath, dispatch])
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {
@@ -141,13 +148,13 @@ const App = () => {
   }, [dispatch])
 
   const Component = useMemo(() => {
-    switch (currentHistory.directoryPath) {
+    switch (currentDirectoryPath) {
       case 'zephy://settings':
         return Settings
       default:
         return Explorer
     }
-  }, [currentHistory.directoryPath])
+  }, [currentDirectoryPath])
 
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 

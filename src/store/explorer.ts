@@ -390,7 +390,7 @@ export const selectSelectedContents = createSelector(
     contents.filter((content) => isSelected(content.path)),
 )
 
-export const searchQuery =
+export const search =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery } = explorerSlice.actions
