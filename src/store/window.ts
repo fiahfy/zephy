@@ -1,8 +1,8 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
+import { selectLoading } from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
-import { selectLoading } from './explorer'
 
 type History = {
   directoryPath: string
@@ -621,14 +621,17 @@ export const closeTab =
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
+    const canCloseTab = selectCanCloseTab(getState())
+    if (!canCloseTab) {
+      return
+    }
     dispatch(closeTab({ index, tabIndex }))
     dispatch(updateApplicationMenu())
   }
 
 export const closeCurrentTab = (): AppThunk => async (dispatch, getState) => {
-  const { closeCurrentTab } = windowSlice.actions
-  const index = selectWindowIndex(getState())
-  dispatch(closeCurrentTab({ index }))
+  const tabIndex = selectTabIndex(getState())
+  dispatch(closeTab(tabIndex))
 }
 
 export const changeTab =

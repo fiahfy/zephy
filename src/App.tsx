@@ -12,7 +12,7 @@ import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   copy,
-  // load,
+  load,
   moveToTrash,
   newFolder,
   paste,
@@ -46,9 +46,9 @@ const App = () => {
 
   useTitle(currentTitle)
 
-  // useEffect(() => {
-  //   dispatch(load())
-  // }, [currentHistory.directoryPath, dispatch])
+  useEffect(() => {
+    dispatch(load())
+  }, [currentDirectoryPath, dispatch])
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {

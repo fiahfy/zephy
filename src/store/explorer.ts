@@ -16,6 +16,7 @@ import {
 import { isHiddenFile } from '~/utils/file'
 
 type ExplorerState = {
+  directoryPath: string
   editing: string | undefined
   entries: DetailedEntry[]
   error: boolean
@@ -32,6 +33,7 @@ type State = {
 const initialState: State = {}
 
 const defaultExplorerState = {
+  directoryPath: '',
   editing: undefined,
   entries: [],
   error: false,
@@ -78,14 +80,16 @@ export const explorerSlice = createSlice({
       state,
       action: PayloadAction<{
         tabIndex: number
+        directoryPath: string
       }>,
     ) {
-      const { tabIndex } = action.payload
+      const { tabIndex, directoryPath } = action.payload
       const explorer = state[tabIndex] ?? defaultExplorerState
       return {
         ...state,
         [tabIndex]: {
           ...explorer,
+          directoryPath,
           entries: [],
           loading: true,
           error: false,
@@ -292,6 +296,11 @@ export const selectExplorer = (state: AppState) => {
   return explorer ?? defaultExplorerState
 }
 
+export const selectDirectoryPath = createSelector(
+  selectExplorer,
+  (explorer) => explorer.directoryPath,
+)
+
 export const selectEntries = createSelector(
   selectExplorer,
   (explorer) => explorer.entries,
@@ -399,30 +408,41 @@ export const search =
     dispatch(add(query))
   }
 
-export const load = (): AppThunk => async (dispatch, getState) => {
-  const { loaded, loading, unselectAll } = explorerSlice.actions
-  const tabIndex = selectTabIndex(getState())
-  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-  const pathsMap = selectPathsByScore(getState())
-  const url = selectZephyUrl(getState())
-  dispatch(unselectAll({ tabIndex }))
-  dispatch(loading({ tabIndex }))
-  try {
-    let entries: DetailedEntry[] = []
-    if (url) {
-      if (url.pathname === 'ratings') {
-        const paths = pathsMap[Number(url.params.score ?? 0)] ?? []
-        entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
-      }
-    } else {
-      entries =
-        await window.electronAPI.getDetailedEntries(currentDirectoryPath)
+export const load =
+  (force = false): AppThunk =>
+  async (dispatch, getState) => {
+    const { loaded, loading, unselectAll } = explorerSlice.actions
+    const tabIndex = selectTabIndex(getState())
+    const directoryPath = selectDirectoryPath(getState())
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    const pathsMap = selectPathsByScore(getState())
+    const url = selectZephyUrl(getState())
+    if (
+      !currentDirectoryPath ||
+      (currentDirectoryPath == directoryPath && !force)
+    ) {
+      return
     }
-    dispatch(loaded({ tabIndex, entries }))
-  } catch (e) {
-    dispatch(loaded({ tabIndex, error: true }))
+    dispatch(unselectAll({ tabIndex }))
+    dispatch(loading({ tabIndex, directoryPath: currentDirectoryPath }))
+    console.log('load', directoryPath)
+    try {
+      let entries: DetailedEntry[] = []
+      if (url) {
+        if (url.pathname === 'ratings') {
+          const paths = pathsMap[Number(url.params.score ?? 0)] ?? []
+          entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
+        }
+      } else {
+        entries =
+          await window.electronAPI.getDetailedEntries(currentDirectoryPath)
+      }
+      dispatch(loaded({ tabIndex, entries }))
+    } catch (e) {
+      console.log('erro', currentDirectoryPath)
+      dispatch(loaded({ tabIndex, error: true }))
+    }
   }
-}
 
 export const startEditing =
   (path: string): AppThunk =>
