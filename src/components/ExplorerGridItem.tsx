@@ -15,11 +15,7 @@ import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import useDnd from '~/hooks/useDnd'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import {
-  selectIsEditing,
-  selectIsSelected,
-  selectSelectedContents,
-} from '~/store/explorer'
+import { selectSelectedContents } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
@@ -62,13 +58,11 @@ type Props = {
 const ExplorerGridItem = (props: Props) => {
   const { content } = props
 
-  const isEditing = useAppSelector(selectIsEditing)
-  const isSelected = useAppSelector(selectIsSelected)
   const selectedContents = useAppSelector(selectSelectedContents)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { focused, onClick, onContextMenu, onDoubleClick, selected } =
+  const { editing, focused, onClick, onContextMenu, onDoubleClick, selected } =
     useExplorerItem(content)
 
   const { createDraggableBinder, createDroppableBinder, droppableStyle } =
@@ -141,19 +135,9 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [status])
 
-  const editing = useMemo(
-    () => isEditing(content.path),
-    [content.path, isEditing],
-  )
-
   const dragContents = useMemo(
-    () =>
-      editing
-        ? undefined
-        : isSelected(content.path)
-        ? selectedContents
-        : [content],
-    [content, editing, isSelected, selectedContents],
+    () => (editing ? undefined : selected ? selectedContents : [content]),
+    [content, editing, selected, selectedContents],
   )
 
   const handleChangeRating = useCallback(

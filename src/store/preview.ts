@@ -15,14 +15,14 @@ export const previewSlice = createSlice({
   name: 'preview',
   initialState,
   reducers: {
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
     setLoop(state, action: PayloadAction<boolean>) {
       return { ...state, loop: action.payload }
     },
     setVolume(state, action: PayloadAction<number>) {
       return { ...state, volume: action.payload }
-    },
-    replace(_state, action: PayloadAction<State>) {
-      return action.payload
     },
   },
 })

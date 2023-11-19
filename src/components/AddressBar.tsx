@@ -33,7 +33,7 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { load, searchQuery, selectLoading } from '~/store/explorer'
+import { load, search, selectLoading, selectQuery } from '~/store/explorer'
 import { selectIsFavorite, toggle } from '~/store/favorite'
 import { remove, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
@@ -66,6 +66,7 @@ const AddressBar = () => {
   const forwardHistories = useAppSelector(selectForwardHistories)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
   const loading = useAppSelector(selectLoading)
+  const query = useAppSelector(selectQuery)
   const queryHistories = useAppSelector(selectQueryHistories)
   const zephyUrl = useAppSelector(selectZephyUrl)
   const zephySchema = useAppSelector(selectZephySchema)
@@ -103,14 +104,14 @@ const AddressBar = () => {
   const bindBack = useLongPress(backHistoryMenuHandler)
   const bindForward = useLongPress(forwardHistoryMenuHandler)
 
-  const [directory, setDirectory] = useState('')
-  const [query, setQuery] = useState('')
+  const [directoryPath, setDirectoryPath] = useState('')
+  const [queryInput, setQueryInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
-  const search = useCallback(
+  const searchBy = useCallback(
     (query: string) => {
-      setQuery(query)
-      dispatch(searchQuery(query))
+      setQueryInput(query)
+      dispatch(search(query))
     },
     [dispatch],
   )
@@ -123,18 +124,20 @@ const AddressBar = () => {
           ref.current?.focus()
           return
         case 'search':
-          search(document.getSelection()?.toString() ?? '')
+          searchBy(document.getSelection()?.toString() ?? '')
           ref.current?.focus()
           return
       }
     })
     return () => removeListener()
-  }, [dispatch, search])
+  }, [dispatch, searchBy])
 
-  useEffect(() => {
-    setDirectory(currentDirectoryPath)
-    dispatch(load())
-  }, [currentDirectoryPath, dispatch])
+  useEffect(
+    () => setDirectoryPath(currentDirectoryPath),
+    [currentDirectoryPath, dispatch],
+  )
+
+  useEffect(() => setQueryInput(query), [dispatch, query])
 
   const directoryIconType = useMemo(() => {
     if (zephyUrl) {
@@ -158,8 +161,8 @@ const AddressBar = () => {
   )
 
   const handleClickRefresh = useCallback(async () => {
-    setDirectory(currentDirectoryPath)
-    dispatch(load())
+    setDirectoryPath(currentDirectoryPath)
+    dispatch(load(true))
   }, [currentDirectoryPath, dispatch])
 
   const handleClickFolder = useCallback(
@@ -172,7 +175,10 @@ const AddressBar = () => {
     [currentDirectoryPath, dispatch],
   )
 
-  const handleClickSearch = useCallback(() => search(query), [query, search])
+  const handleClickSearch = useCallback(
+    () => searchBy(queryInput),
+    [queryInput, searchBy],
+  )
 
   const handleClickRemove = useCallback(
     (e: MouseEvent, query: string) => {
@@ -219,38 +225,38 @@ const AddressBar = () => {
   const handleChangeDirectory = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      setDirectory(value)
+      setDirectoryPath(value)
     },
     [],
   )
 
   const handleChangeQuery = useCallback(
-    (_e: SyntheticEvent, value: string | null) => search(value ?? ''),
-    [search],
+    (_e: SyntheticEvent, value: string | null) => searchBy(value ?? ''),
+    [searchBy],
   )
 
   const handleInputChangeQuery = useCallback(
     (_e: SyntheticEvent, value: string) =>
-      value ? setQuery(value) : search(value),
-    [search],
+      value ? setQueryInput(value) : searchBy(value),
+    [searchBy],
   )
 
   const handleKeyDownDirectory = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.nativeEvent.isComposing && directory) {
-        dispatch(changeDirectory(directory))
+      if (e.key === 'Enter' && !e.nativeEvent.isComposing && directoryPath) {
+        dispatch(changeDirectory(directoryPath))
       }
     },
-    [directory, dispatch],
+    [directoryPath, dispatch],
   )
 
   const handleKeyDownQuery = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-        search(query)
+        searchBy(queryInput)
       }
     },
-    [query, search],
+    [queryInput, searchBy],
   )
 
   return (
@@ -346,7 +352,7 @@ const AddressBar = () => {
             onChange={handleChangeDirectory}
             onKeyDown={handleKeyDownDirectory}
             spellCheck={false}
-            value={directory}
+            value={directoryPath}
           />
         </Box>
         <Box sx={{ flex: '1 1 0' }} />
@@ -366,7 +372,7 @@ const AddressBar = () => {
             ListboxProps={{ sx: { typography: 'body2' } }}
             freeSolo
             fullWidth
-            inputValue={query}
+            inputValue={queryInput}
             onChange={handleChangeQuery}
             onInputChange={handleInputChangeQuery}
             onKeyDown={handleKeyDownQuery}

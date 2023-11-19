@@ -113,13 +113,13 @@ const ExplorerPanel = () => {
   const handleClickRefresh = useCallback(() => setRoot(undefined), [])
 
   const handleSelect = useCallback(
-    (_event: SyntheticEvent, nodeIds: string[] | string) =>
+    (_e: SyntheticEvent, nodeIds: string[] | string) =>
       setSelected(Array.isArray(nodeIds) ? nodeIds : [nodeIds]),
     [],
   )
 
   const handleToggle = useCallback(
-    async (_event: SyntheticEvent, nodeIds: string[]) => {
+    async (_e: SyntheticEvent, nodeIds: string[]) => {
       setExpanded(nodeIds)
 
       const expandedNodeId = nodeIds.find(

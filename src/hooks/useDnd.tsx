@@ -127,6 +127,7 @@ const useDnd = () => {
     [dispatch],
   )
 
+  // TODO: drag/drop で hooks 分ける、handler(on~) で提供する
   return {
     createDraggableBinder,
     createDroppableBinder,

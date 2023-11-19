@@ -2,11 +2,11 @@ import { Box } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import DirectoryPreviewItem from '~/components/DirectoryPreviewItem'
+import EmptyPreview from '~/components/EmptyPreview'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
-import EmptyPreview from './EmptyPreview'
 
 const maxItemSize = 256
 

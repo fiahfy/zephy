@@ -15,6 +15,9 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    replace(_state, action: PayloadAction<State>) {
+      return action.payload
+    },
     setShouldOpenWithVisty(state, action: PayloadAction<boolean>) {
       return { ...state, shouldOpenWithVisty: action.payload }
     },
@@ -23,9 +26,6 @@ export const settingsSlice = createSlice({
     },
     setTheme(state, action: PayloadAction<State['theme']>) {
       return { ...state, theme: action.payload }
-    },
-    replace(_state, action: PayloadAction<State>) {
-      return action.payload
     },
   },
 })

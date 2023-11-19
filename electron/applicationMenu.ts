@@ -11,6 +11,7 @@ import {
 
 type State = {
   canBack: boolean
+  canCloseTab: boolean
   canForward: boolean
   inspectorHidden: boolean
   isEditable: boolean
@@ -40,6 +41,7 @@ const registerApplicationMenu = (
 
   let state: State = {
     canBack: false,
+    canCloseTab: false,
     canForward: false,
     inspectorHidden: false,
     isEditable: false,
@@ -86,6 +88,11 @@ const registerApplicationMenu = (
             label: 'New Window',
           },
           {
+            accelerator: 'CmdOrCtrl+t',
+            click: () => send({ type: 'newTab' }),
+            label: 'New Tab',
+          },
+          {
             accelerator: 'CmdOrCtrl+O',
             click: async () => {
               const { filePaths } = await dialog.showOpenDialog({
@@ -98,7 +105,20 @@ const registerApplicationMenu = (
             },
             label: 'Open...',
           },
-          ...[isMac ? { role: 'close' } : { role: 'quit' }],
+          ...[
+            isMac
+              ? {
+                  accelerator: 'CmdOrCtrl+Shift+w',
+                  role: 'close',
+                }
+              : { role: 'quit' },
+          ],
+          {
+            accelerator: 'CmdOrCtrl+w',
+            click: () => send({ type: 'closeTab' }),
+            enabled: state.canCloseTab,
+            label: 'Close Tab',
+          },
           { type: 'separator' },
           {
             accelerator: 'CmdOrCtrl+Backspace',
