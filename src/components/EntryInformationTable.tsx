@@ -91,7 +91,7 @@ const EntryInformationTable = (props: Props) => {
   ]
 
   return (
-    <Table size="small" sx={{ userSelect: 'none' }}>
+    <Table size="small" sx={{ tableLayout: 'fixed', userSelect: 'none' }}>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.label}>
@@ -99,7 +99,7 @@ const EntryInformationTable = (props: Props) => {
               component="th"
               sx={{ borderBottom: 0, height: 20, px: 1, py: 0 }}
             >
-              <Typography noWrap variant="caption">
+              <Typography noWrap sx={{ display: 'block' }} variant="caption">
                 {row.label}
               </Typography>
             </TableCell>
@@ -107,7 +107,7 @@ const EntryInformationTable = (props: Props) => {
               align="right"
               sx={{ borderBottom: 0, height: 20, px: 1, py: 0 }}
             >
-              <Typography noWrap variant="caption">
+              <Typography noWrap sx={{ display: 'block' }} variant="caption">
                 {row.value}
               </Typography>
             </TableCell>
