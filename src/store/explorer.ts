@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content, DetailedEntry } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
-import { add } from '~/store/query'
+import { addQuery } from '~/store/query'
 import { selectGetScore, selectPathsByScore } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
@@ -47,13 +47,55 @@ export const explorerSlice = createSlice({
   name: 'explorer',
   initialState,
   reducers: {
-    setQuery(
+    addTab(state, action: PayloadAction<{ tabIndex: number }>) {
+      const { tabIndex } = action.payload
+      return {
+        ...Object.keys(state).reduce((acc, i) => {
+          const index = Number(i)
+          const newIndex = index >= tabIndex ? index + 1 : index
+          const explorer = state[Number(index)]
+          return {
+            ...acc,
+            [newIndex]: explorer,
+          }
+        }, {} as State),
+        [tabIndex]: defaultExplorerState,
+      }
+    },
+    removeTab(state, action: PayloadAction<{ tabIndex: number }>) {
+      const { tabIndex } = action.payload
+      return Object.keys(state).reduce((acc, i) => {
+        const index = Number(i)
+        if (index === tabIndex) {
+          return { ...acc }
+        }
+        const newIndex = index > tabIndex ? index - 1 : index
+        const explorer = state[Number(index)]
+        return {
+          ...acc,
+          [newIndex]: explorer,
+        }
+      }, {} as State)
+    },
+    loading(
       state,
-      action: PayloadAction<{ tabIndex: number; query: string }>,
+      action: PayloadAction<{
+        tabIndex: number
+        directoryPath: string
+      }>,
     ) {
-      const { tabIndex, query } = action.payload
+      const { tabIndex, directoryPath } = action.payload
       const explorer = state[tabIndex] ?? defaultExplorerState
-      return { ...state, [tabIndex]: { ...explorer, query } }
+      return {
+        ...state,
+        [tabIndex]: {
+          ...explorer,
+          directoryPath,
+          entries: [],
+          loading: true,
+          error: false,
+        },
+      }
     },
     loaded(
       state,
@@ -76,27 +118,15 @@ export const explorerSlice = createSlice({
         },
       }
     },
-    loading(
+    setQuery(
       state,
-      action: PayloadAction<{
-        tabIndex: number
-        directoryPath: string
-      }>,
+      action: PayloadAction<{ tabIndex: number; query: string }>,
     ) {
-      const { tabIndex, directoryPath } = action.payload
+      const { tabIndex, query } = action.payload
       const explorer = state[tabIndex] ?? defaultExplorerState
-      return {
-        ...state,
-        [tabIndex]: {
-          ...explorer,
-          directoryPath,
-          entries: [],
-          loading: true,
-          error: false,
-        },
-      }
+      return { ...state, [tabIndex]: { ...explorer, query } }
     },
-    add(
+    addEntries(
       state,
       action: PayloadAction<{
         tabIndex: number
@@ -118,7 +148,7 @@ export const explorerSlice = createSlice({
         },
       }
     },
-    remove(
+    removeEntries(
       state,
       action: PayloadAction<{
         tabIndex: number
@@ -288,6 +318,8 @@ export const explorerSlice = createSlice({
   },
 })
 
+export const { addTab, removeTab } = explorerSlice.actions
+
 export default explorerSlice.reducer
 
 export const selectExplorer = (state: AppState) => {
@@ -405,7 +437,7 @@ export const search =
     const { setQuery } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     dispatch(setQuery({ tabIndex, query }))
-    dispatch(add(query))
+    dispatch(addQuery(query))
   }
 
 export const load =
@@ -527,10 +559,10 @@ export const unselectAll = (): AppThunk => async (dispatch, getState) => {
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { add, focus, select, startEditing } = explorerSlice.actions
+    const { addEntries, focus, select, startEditing } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const entry = await window.electronAPI.createDirectory(directoryPath)
-    dispatch(add({ tabIndex, entries: [entry] }))
+    dispatch(addEntries({ tabIndex, entries: [entry] }))
     dispatch(select({ tabIndex, path: entry.path }))
     dispatch(focus({ tabIndex, path: entry.path }))
     dispatch(startEditing({ tabIndex, path: entry.path }))
@@ -539,12 +571,12 @@ export const newFolder =
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { remove, unselect } = explorerSlice.actions
+    const { removeEntries, unselect } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const selected = selectSelected(getState())
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
-    dispatch(remove({ tabIndex, paths: targetPaths }))
+    dispatch(removeEntries({ tabIndex, paths: targetPaths }))
     dispatch(unselect({ tabIndex, paths: targetPaths }))
   }
 
@@ -552,11 +584,11 @@ export const moveToTrash =
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
-    const { add, focus, remove, select } = explorerSlice.actions
+    const { addEntries, focus, removeEntries, select } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
-    dispatch(remove({ tabIndex, paths: [path] }))
-    dispatch(add({ tabIndex, entries: [entry] }))
+    dispatch(removeEntries({ tabIndex, paths: [path] }))
+    dispatch(addEntries({ tabIndex, entries: [entry] }))
     dispatch(select({ tabIndex, path: entry.path }))
     dispatch(focus({ tabIndex, path: entry.path }))
   }
@@ -599,15 +631,15 @@ export const handle =
       if (directoryPath !== currentDirectoryPath) {
         return
       }
-      const { add, remove } = explorerSlice.actions
+      const { addEntries, removeEntries } = explorerSlice.actions
       switch (eventType) {
         case 'create':
         case 'update': {
           const entry = await window.electronAPI.getDetailedEntry(filePath)
-          return dispatch(add({ tabIndex, entries: [entry] }))
+          return dispatch(addEntries({ tabIndex, entries: [entry] }))
         }
         case 'delete':
-          return dispatch(remove({ tabIndex, paths: [filePath] }))
+          return dispatch(removeEntries({ tabIndex, paths: [filePath] }))
       }
     })
   }

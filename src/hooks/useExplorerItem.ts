@@ -81,7 +81,11 @@ const useExplorerItem = (content: Content) => {
             ...(directory
               ? [
                   {
-                    type: 'openDirectoryInNewWindow',
+                    type: 'openInNewWindow',
+                    data: { path },
+                  },
+                  {
+                    type: 'openInNewTab',
                     data: { path },
                   },
                 ]

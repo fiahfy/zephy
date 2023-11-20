@@ -20,12 +20,12 @@ import {
   selectAll,
   startEditing,
 } from '~/store/explorer'
-import { add, remove } from '~/store/favorite'
+import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
 import {
   back,
   changeDirectory,
-  closeCurrentTab,
+  closeTab,
   forward,
   go,
   goToSettings,
@@ -55,7 +55,7 @@ const App = () => {
       const { type, data } = message
       switch (type) {
         case 'addToFavorites':
-          return dispatch(add(data.path))
+          return dispatch(addToFavorites(data.path))
         case 'back':
           return dispatch(back())
         case 'changeDirectory':
@@ -65,7 +65,7 @@ const App = () => {
         case 'changeViewMode':
           return dispatch(setCurrentViewMode(data.viewMode))
         case 'closeTab':
-          return dispatch(closeCurrentTab())
+          return dispatch(closeTab())
         case 'copy':
           return dispatch(copy())
         case 'forward':
@@ -79,11 +79,11 @@ const App = () => {
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'newTab':
-          return dispatch(newTab())
+          return dispatch(newTab(data.path))
         case 'openEntry':
           return dispatch(openEntry(data.path))
         case 'removeFromFavorites':
-          return dispatch(remove(data.path))
+          return dispatch(removeFromFavorites(data.path))
         case 'rename':
           dispatch(select(data.path))
           dispatch(startEditing(data.path))

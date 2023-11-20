@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
-import { selectLoading } from '~/store/explorer'
+import { addTab, removeTab, selectLoading } from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
 
 type History = {
@@ -158,28 +158,27 @@ export const windowSlice = createSlice({
         },
       }
     },
-    newTab(state, action: PayloadAction<{ index: number }>) {
-      const { index } = action.payload
+    newTab(state, action: PayloadAction<{ index: number; tabIndex: number }>) {
+      const { index, tabIndex } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
-      const newTabindex = window.tabIndex + 1
       const tabs = [
-        ...window.tabs.slice(0, window.tabIndex + 1),
+        ...window.tabs.slice(0, tabIndex),
         {
           history: {
             histories: [],
             index: -1,
           },
         },
-        ...window.tabs.slice(window.tabIndex + 1),
+        ...window.tabs.slice(tabIndex),
       ]
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex: newTabindex,
+          tabIndex,
           tabs,
         },
       }
@@ -504,16 +503,6 @@ export const selectCurrentTab = createSelector(
     tabs[tabIndex] ?? { history: { histories: [], index: -1 } },
 )
 
-export const selectCurrentHistory = createSelector(
-  selectCurrentTab,
-  (tab) =>
-    tab.history.histories[tab.history.index] ?? {
-      directoryPath: '',
-      scrollTop: 0,
-      title: '',
-    },
-)
-
 export const selectGetCurrentHistory = createSelector(
   selectTabs,
   (tabs) => (tabIndex: number) => {
@@ -532,6 +521,27 @@ export const selectGetCurrentHistory = createSelector(
 export const selectCanCloseTab = createSelector(
   selectTabs,
   (tabs) => tabs.length > 1,
+)
+
+export const selectCurrentDirectoryPaths = createSelector(selectTabs, (tabs) =>
+  tabs.reduce((acc, tab) => {
+    const directoryPath =
+      tab.history.histories[tab.history.index]?.directoryPath
+    if (!directoryPath) {
+      return acc
+    }
+    return [...acc, directoryPath]
+  }, [] as string[]),
+)
+
+export const selectCurrentHistory = createSelector(
+  selectCurrentTab,
+  (tab) =>
+    tab.history.histories[tab.history.index] ?? {
+      directoryPath: '',
+      scrollTop: 0,
+      title: '',
+    },
 )
 
 export const selectCanBack = createSelector(
@@ -612,31 +622,34 @@ export const newWindow = (): AppThunk => async (dispatch, getState) => {
   dispatch(newWindow({ index }))
 }
 
-export const newTab = (): AppThunk => async (dispatch, getState) => {
-  const { newTab } = windowSlice.actions
-  const index = selectWindowIndex(getState())
-  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-  dispatch(newTab({ index }))
-  dispatch(changeDirectory(currentDirectoryPath))
-}
+export const newTab =
+  (directoryPath?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { newTab } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    const tabIndex = selectTabIndex(getState())
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    const newTabIndex = tabIndex + 1
+    dispatch(newTab({ index, tabIndex: newTabIndex }))
+    dispatch(addTab({ tabIndex: newTabIndex }))
+    dispatch(changeDirectory(directoryPath ?? currentDirectoryPath))
+  }
 
 export const closeTab =
-  (tabIndex: number): AppThunk =>
+  (tabIndex?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
+    const currentTabIndex = selectTabIndex(getState())
     const canCloseTab = selectCanCloseTab(getState())
     if (!canCloseTab) {
       return
     }
-    dispatch(closeTab({ index, tabIndex }))
+    const closeTabIndex = tabIndex ?? currentTabIndex
+    dispatch(closeTab({ index, tabIndex: closeTabIndex }))
+    dispatch(removeTab({ tabIndex: closeTabIndex }))
     dispatch(updateApplicationMenu())
   }
-
-export const closeCurrentTab = (): AppThunk => async (dispatch, getState) => {
-  const tabIndex = selectTabIndex(getState())
-  dispatch(closeTab(tabIndex))
-}
 
 export const changeTab =
   (tabIndex: number): AppThunk =>

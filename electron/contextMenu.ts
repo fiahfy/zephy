@@ -49,9 +49,13 @@ const registerContextMenu = (
         send(event, { type: 'changeDirectory', data: { path: path } }),
       label: 'Open',
     }),
-    openDirectoryInNewWindow: (_event, _params, { path }) => ({
+    openInNewWindow: (_event, _params, { path }) => ({
       click: () => createWindow(path),
       label: 'Open in New Window',
+    }),
+    openInNewTab: (event, _params, { path }) => ({
+      click: () => send(event, { type: 'newTab', data: { path } }),
+      label: 'Open in New Tab',
     }),
     rename: (event, _params, { path }) => ({
       click: () => send(event, { type: 'rename', data: { path: path } }),

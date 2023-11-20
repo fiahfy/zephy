@@ -18,7 +18,7 @@ export const favoriteSlice = createSlice({
     replace(_state, action: PayloadAction<State>) {
       return action.payload
     },
-    add(state, action: PayloadAction<string>) {
+    addToFavorites(state, action: PayloadAction<string>) {
       const favorites = [
         ...state.favorites.filter(
           (favorite) => favorite.path !== action.payload,
@@ -27,7 +27,7 @@ export const favoriteSlice = createSlice({
       ]
       return { ...state, favorites }
     },
-    remove(state, action: PayloadAction<string>) {
+    removeFromFavorites(state, action: PayloadAction<string>) {
       const favorites = state.favorites.filter(
         (favorite) => favorite.path !== action.payload,
       )
@@ -36,7 +36,8 @@ export const favoriteSlice = createSlice({
   },
 })
 
-export const { add, remove, replace } = favoriteSlice.actions
+export const { addToFavorites, removeFromFavorites, replace } =
+  favoriteSlice.actions
 
 export default favoriteSlice.reducer
 
@@ -55,10 +56,10 @@ export const selectIsFavorite = createSelector(selectFavorites, (favorites) => {
   return (path: string) => hash[path] ?? false
 })
 
-export const toggle =
+export const toggleFavorite =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const favorite = selectIsFavorite(getState())(path)
-    const action = favorite ? remove(path) : add(path)
+    const action = favorite ? removeFromFavorites(path) : addToFavorites(path)
     dispatch(action)
   }

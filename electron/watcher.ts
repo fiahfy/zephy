@@ -4,17 +4,19 @@ import { dirname } from 'node:path'
 
 type EventType = 'create' | 'update' | 'delete'
 
+type Callback = (
+  eventType: EventType,
+  directoryPath: string,
+  filePath: string,
+) => void
+
 const createWatcher = () => {
   const watchers: { [key: string]: FSWatcher } = {}
 
   const createHandler = (
     eventType: EventType,
     directoryPaths: string[],
-    callback: (
-      eventType: EventType,
-      directoryPath: string,
-      filePath: string,
-    ) => void,
+    callback: Callback,
   ) => {
     return (path: string) => {
       const directoryPath = dirname(path)
@@ -35,11 +37,7 @@ const createWatcher = () => {
   const watch = async (
     id: number,
     directoryPaths: string[],
-    callback: (
-      eventType: EventType,
-      directoryPath: string,
-      filePath: string,
-    ) => void,
+    callback: Callback,
   ) => {
     await close(id)
     watchers[id] = chokidar

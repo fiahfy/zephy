@@ -3,24 +3,24 @@ import {
   createContext,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { handle } from '~/store/explorer'
-import { selectCurrentDirectoryPath } from '~/store/window'
+import { selectCurrentDirectoryPaths } from '~/store/window'
 
 type EventType = 'create' | 'update' | 'delete'
 
+type Callback = (
+  eventType: EventType,
+  directoryPath: string,
+  filePath: string,
+) => void
+
 export const WatcherContext = createContext<
   | {
-      watch: (
-        directoryPaths: string[],
-        callback: (
-          eventType: EventType,
-          directoryPath: string,
-          filePath: string,
-        ) => void,
-      ) => void
+      watch: (directoryPaths: string[], callback: Callback) => void
     }
   | undefined
 >(undefined)
@@ -30,30 +30,24 @@ type Props = { children: ReactNode }
 export const WatcherProvider = (props: Props) => {
   const { children } = props
 
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const currentDirectoryPaths = useAppSelector(selectCurrentDirectoryPaths)
   const dispatch = useAppDispatch()
 
   const [directoryPaths, setDirectoryPaths] = useState<string[]>([])
-  const [callback, setCallback] =
-    useState<
-      () => (
-        eventType: EventType,
-        directoryPath: string,
-        filePath: string,
-      ) => void
-    >()
+  const [callback, setCallback] = useState<() => Callback>()
+
+  const uniqueDirectoryPaths = useMemo(
+    () => [...new Set([...directoryPaths, ...currentDirectoryPaths])],
+    [currentDirectoryPaths, directoryPaths],
+  )
 
   useEffect(() => {
-    const uniqueDirectoryPaths = directoryPaths.includes(currentDirectoryPath)
-      ? directoryPaths
-      : [...directoryPaths, currentDirectoryPath]
     window.electronAPI.watchDirectories(
       uniqueDirectoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
-          currentDirectoryPath,
-          directoryPaths,
+          uniqueDirectoryPaths,
           eventType,
           directoryPath,
           filePath,
@@ -62,22 +56,12 @@ export const WatcherProvider = (props: Props) => {
         dispatch(handle(eventType, directoryPath, filePath))
       },
     )
-  }, [callback, currentDirectoryPath, directoryPaths, dispatch])
+  }, [callback, dispatch, uniqueDirectoryPaths])
 
-  const watch = useCallback(
-    (
-      directoryPaths: string[],
-      callback: (
-        eventType: EventType,
-        directoryPath: string,
-        filePath: string,
-      ) => void,
-    ) => {
-      setDirectoryPaths(directoryPaths)
-      setCallback(() => () => callback)
-    },
-    [],
-  )
+  const watch = useCallback((directoryPaths: string[], callback: Callback) => {
+    setDirectoryPaths(directoryPaths)
+    setCallback(() => () => callback)
+  }, [])
 
   const value = { watch }
 

@@ -125,12 +125,6 @@ const registerApplicationMenu = (
             click: () => send({ type: 'moveToTrash' }),
             label: 'Move to Trash',
           },
-          { type: 'separator' },
-          {
-            accelerator: 'CmdOrCtrl+F',
-            click: () => send({ type: 'find' }),
-            label: 'Find',
-          },
         ],
       } as MenuItemConstructorOptions,
       // { role: 'editMenu' }
@@ -172,6 +166,12 @@ const registerApplicationMenu = (
                   label: 'Select All',
                 },
               ]),
+          { type: 'separator' },
+          {
+            accelerator: 'CmdOrCtrl+F',
+            click: () => send({ type: 'find' }),
+            label: 'Find',
+          },
         ],
       } as MenuItemConstructorOptions,
       // { role: 'viewMenu' }

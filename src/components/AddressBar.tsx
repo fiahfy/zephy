@@ -34,8 +34,8 @@ import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load, search, selectLoading, selectQuery } from '~/store/explorer'
-import { selectIsFavorite, toggle } from '~/store/favorite'
-import { remove, selectQueryHistories } from '~/store/query'
+import { selectIsFavorite, toggleFavorite } from '~/store/favorite'
+import { removeQuery, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
 import {
   back,
@@ -171,7 +171,7 @@ const AddressBar = () => {
   )
 
   const handleClickFavorite = useCallback(
-    () => dispatch(toggle(currentDirectoryPath)),
+    () => dispatch(toggleFavorite(currentDirectoryPath)),
     [currentDirectoryPath, dispatch],
   )
 
@@ -183,7 +183,7 @@ const AddressBar = () => {
   const handleClickRemove = useCallback(
     (e: MouseEvent, query: string) => {
       e.stopPropagation()
-      dispatch(remove(query))
+      dispatch(removeQuery(query))
     },
     [dispatch],
   )

@@ -18,7 +18,11 @@ const useEntryItem = (entry: Entry) => {
       ...(directory
         ? [
             {
-              type: 'openDirectoryInNewWindow',
+              type: 'openInNewWindow',
+              data: { path },
+            },
+            {
+              type: 'openInNewTab',
               data: { path },
             },
           ]
