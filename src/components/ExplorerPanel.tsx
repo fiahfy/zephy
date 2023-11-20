@@ -15,7 +15,8 @@ import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectCurrentDirectoryPath, selectZephySchema } from '~/store/window'
+import { selectCurrentDirectoryPath } from '~/store/window'
+import { isZephySchema } from '~/utils/url'
 
 const getLoadedDirectories = (entry: Entry) => {
   const reducer = (acc: string[], entry: Entry): string[] => {
@@ -29,7 +30,6 @@ const getLoadedDirectories = (entry: Entry) => {
 
 const ExplorerPanel = () => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const zephySchema = useAppSelector(selectZephySchema)
 
   const { watch } = useWatcher()
 
@@ -38,6 +38,10 @@ const ExplorerPanel = () => {
   const [root, setRoot] = useState<Entry>()
 
   const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
+  const zephySchema = useMemo(
+    () => isZephySchema(currentDirectoryPath),
+    [currentDirectoryPath],
+  )
 
   useEffect(() => {
     ;(async () => {

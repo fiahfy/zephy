@@ -3,6 +3,7 @@ import { Content } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
 import { addTab, removeTab, selectLoading } from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
+import { buildZephyUrl, getTitle } from '~/utils/url'
 
 type History = {
   directoryPath: string
@@ -62,59 +63,6 @@ const defaultOrders = {
   size: 'desc',
   rating: 'desc',
 } as const
-
-const buildZephyUrl = (
-  inputs:
-    | { pathname: 'ratings'; params: { score: number } }
-    | { pathname: 'settings' },
-) => {
-  switch (inputs.pathname) {
-    case 'ratings':
-      return `zephy://ratings/${inputs.params.score}`
-    case 'settings':
-      return 'zephy://settings'
-  }
-}
-
-const parseZephyUrl = (url: string) => {
-  if (!url.startsWith('zephy://')) {
-    return undefined
-  }
-  const u = new URL(url)
-  const path = u.pathname.split('/')[2]
-  switch (path) {
-    case 'ratings': {
-      const score = Number(u.pathname.split('/')[3] ?? '')
-      return {
-        pathname: 'ratings' as const,
-        params: { score },
-      }
-    }
-    case 'settings':
-      return { pathname: 'settings' as const }
-    default:
-      return undefined
-  }
-}
-
-const getTitle = async (path: string) => {
-  const parsed = parseZephyUrl(path)
-  if (parsed) {
-    switch (parsed.pathname) {
-      case 'ratings':
-        return 'Ratings'
-      case 'settings':
-        return 'Settings'
-    }
-  } else {
-    try {
-      const entry = await window.electronAPI.getDetailedEntry(path)
-      return entry.name
-    } catch (e) {
-      return '<Error>'
-    }
-  }
-}
 
 const defaultWindowState: WindowState = {
   sidebar: {
@@ -575,16 +523,6 @@ export const selectCurrentScrollTop = createSelector(
 export const selectCurrentTitle = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.title,
-)
-
-export const selectZephyUrl = createSelector(
-  selectCurrentDirectoryPath,
-  (currentDirectoryPath) => parseZephyUrl(currentDirectoryPath),
-)
-
-export const selectZephySchema = createSelector(
-  selectZephyUrl,
-  (zephyUrl) => !!zephyUrl,
 )
 
 export const selectCurrentSortOption = createSelector(

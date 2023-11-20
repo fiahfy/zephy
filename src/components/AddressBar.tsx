@@ -49,11 +49,10 @@ import {
   selectCurrentViewMode,
   selectForwardHistories,
   selectIsSidebarHidden,
-  selectZephySchema,
-  selectZephyUrl,
   upward,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
+import { getIconType, isZephySchema } from '~/utils/url'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
@@ -68,8 +67,6 @@ const AddressBar = () => {
   const loading = useAppSelector(selectLoading)
   const query = useAppSelector(selectQuery)
   const queryHistories = useAppSelector(selectQueryHistories)
-  const zephyUrl = useAppSelector(selectZephyUrl)
-  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
   const { visible } = useTrafficLight()
@@ -108,6 +105,11 @@ const AddressBar = () => {
   const [queryInput, setQueryInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
+  const zephySchema = useMemo(
+    () => isZephySchema(currentDirectoryPath),
+    [currentDirectoryPath],
+  )
+
   const searchBy = useCallback(
     (query: string) => {
       setQueryInput(query)
@@ -138,18 +140,6 @@ const AddressBar = () => {
   )
 
   useEffect(() => setQueryInput(query), [dispatch, query])
-
-  const directoryIconType = useMemo(() => {
-    if (zephyUrl) {
-      switch (zephyUrl.pathname) {
-        case 'ratings':
-          return 'star'
-        case 'settings':
-          return 'settings'
-      }
-    }
-    return 'folder'
-  }, [zephyUrl])
 
   const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 
@@ -343,7 +333,7 @@ const AddressBar = () => {
                     onClick={zephySchema ? undefined : handleClickFolder}
                     size="small"
                   >
-                    <Icon iconType={directoryIconType} />
+                    <Icon iconType={getIconType(currentDirectoryPath)} />
                   </IconButton>
                 </InputAdornment>
               ),

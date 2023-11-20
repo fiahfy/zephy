@@ -9,18 +9,22 @@ import {
   selectCurrentDirectoryPath,
   selectCurrentSortOption,
   selectCurrentViewMode,
-  selectZephySchema,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
+import { isZephySchema } from '~/utils/url'
 
 const Explorer = () => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const currentSortOption = useAppSelector(selectCurrentSortOption)
   const currentViewMode = useAppSelector(selectCurrentViewMode)
-  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
   const { createDroppableBinder, droppableStyle } = useDnd()
+
+  const zephySchema = useMemo(
+    () => isZephySchema(currentDirectoryPath),
+    [currentDirectoryPath],
+  )
 
   const handleClick = useCallback(() => {
     dispatch(unselectAll())

@@ -10,10 +10,9 @@ import {
   selectGetCurrentHistory,
   selectTabIndex,
   selectTabs,
-  selectZephySchema,
-  selectZephyUrl,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
+import { parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
   directoryPath: string
@@ -448,7 +447,7 @@ export const load =
     const directoryPath = selectDirectoryPath(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     const pathsMap = selectPathsByScore(getState())
-    const url = selectZephyUrl(getState())
+    const url = parseZephyUrl(directoryPath)
     if (
       !currentDirectoryPath ||
       (currentDirectoryPath == directoryPath && !force)
@@ -610,8 +609,8 @@ export const copy = (): AppThunk => async (_, getState) => {
 
 export const paste = (): AppThunk => async (_, getState) => {
   const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-  const zephySchema = selectZephySchema(getState())
-  if (zephySchema) {
+  const zephyUrl = parseZephyUrl(currentDirectoryPath)
+  if (zephyUrl) {
     return
   }
   await window.electronAPI.pasteEntries(currentDirectoryPath)

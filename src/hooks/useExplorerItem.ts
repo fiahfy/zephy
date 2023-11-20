@@ -15,12 +15,9 @@ import {
 } from '~/store/explorer'
 import { selectIsFavorite } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import {
-  changeDirectory,
-  selectCurrentDirectoryPath,
-  selectZephySchema,
-} from '~/store/window'
+import { changeDirectory, selectCurrentDirectoryPath } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
+import { isZephySchema } from '~/utils/url'
 
 const useExplorerItem = (content: Content) => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
@@ -29,7 +26,6 @@ const useExplorerItem = (content: Content) => {
   const focused = useAppSelector(selectIsFocused)(content.path)
   const selected = useAppSelector(selectIsSelected)(content.path)
   const selectedContents = useAppSelector(selectSelectedContents)
-  const zephySchema = useAppSelector(selectZephySchema)
   const dispatch = useAppDispatch()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
@@ -64,6 +60,11 @@ const useExplorerItem = (content: Content) => {
         ? dispatch(changeDirectory(content.path))
         : dispatch(openEntry(content.path))
     },
+  )
+
+  const zephySchema = useMemo(
+    () => isZephySchema(currentDirectoryPath),
+    [currentDirectoryPath],
   )
 
   const onContextMenu = useMemo(() => {
