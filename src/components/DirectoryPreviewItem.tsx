@@ -9,7 +9,8 @@ import {
 } from 'react'
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import EntryIcon from '~/components/EntryIcon'
-import useDnd from '~/hooks/useDnd'
+import useDragEntry from '~/hooks/useDragEntry'
+import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -60,8 +61,8 @@ const DirectoryPreviewItem = (props: Props) => {
   const appDispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
-    useDnd()
+  const { draggable, ...dragHandlers } = useDragEntry(entry)
+  const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: undefined,
@@ -163,6 +164,7 @@ const DirectoryPreviewItem = (props: Props) => {
 
   return (
     <ImageListItem
+      draggable={draggable}
       onContextMenu={onContextMenu}
       onDoubleClick={handleDoubleClick}
       sx={{
@@ -181,8 +183,8 @@ const DirectoryPreviewItem = (props: Props) => {
         ...droppableStyle,
       }}
       tabIndex={0}
-      {...createDraggableBinder(entry)}
-      {...createDroppableBinder(entry)}
+      {...dragHandlers}
+      {...dropHandlers}
     >
       {status === 'loaded' && thumbnail ? (
         <img

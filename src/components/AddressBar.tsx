@@ -98,8 +98,8 @@ const AddressBar = () => {
     [forwardHistories],
   )
 
-  const bindBack = useLongPress(backHistoryMenuHandler)
-  const bindForward = useLongPress(forwardHistoryMenuHandler)
+  const backLongPressHandlers = useLongPress(backHistoryMenuHandler)
+  const forwardLongPressHandlers = useLongPress(forwardHistoryMenuHandler)
 
   const [directoryPath, setDirectoryPath] = useState('')
   const [queryInput, setQueryInput] = useState('')
@@ -287,7 +287,7 @@ const AddressBar = () => {
             onContextMenu={backHistoryMenuHandler}
             size="small"
             title="Go back"
-            {...bindBack}
+            {...backLongPressHandlers}
           >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
@@ -297,7 +297,7 @@ const AddressBar = () => {
             onContextMenu={forwardHistoryMenuHandler}
             size="small"
             title="Go forward"
-            {...bindForward}
+            {...forwardLongPressHandlers}
           >
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
@@ -387,6 +387,7 @@ const AddressBar = () => {
             )}
             renderOption={(props, option) => (
               <Box
+                {...props}
                 component="li"
                 sx={(theme) => ({
                   display: 'flex',
@@ -395,7 +396,6 @@ const AddressBar = () => {
                   px: `${theme.spacing(1.5)}!important`,
                   py: `${theme.spacing(0)}!important`,
                 })}
-                {...props}
               >
                 <Typography noWrap sx={{ flexGrow: 1 }} variant="caption">
                   {option}

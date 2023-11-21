@@ -1,6 +1,6 @@
 import { TableRow } from '@mui/material'
 import { FocusEvent, ReactNode, useCallback } from 'react'
-import useDnd from '~/hooks/useDnd'
+import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
@@ -20,7 +20,7 @@ const FavoriteTableRow = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { createDroppableBinder, droppableStyle } = useDnd()
+  const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
 
   const handleClick = useCallback(
     () => dispatch(changeDirectory(entry.path)),
@@ -44,7 +44,7 @@ const FavoriteTableRow = (props: Props) => {
         ...droppableStyle,
       }}
       tabIndex={0}
-      {...createDroppableBinder(entry)}
+      {...dropHandlers}
     >
       {children}
     </TableRow>

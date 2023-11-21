@@ -3,13 +3,14 @@ import { SyntheticEvent, useCallback, useMemo } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import useDnd from '~/hooks/useDnd'
+import useDragEntry from '~/hooks/useDragEntry'
+import useDropEntry from '~/hooks/useDropEntry'
+import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectSelectedContents } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
-import useExplorerItem from '~/hooks/useExplorerItem'
 
 type Key = keyof Content
 
@@ -29,13 +30,13 @@ const ExplorerTableCell = (props: Props) => {
 
   const { editing, selected } = useExplorerItem(content)
 
-  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
-    useDnd()
-
   const dragContents = useMemo(
-    () => (editing ? undefined : selected ? selectedContents : [content]),
+    () => (editing ? [] : selected ? selectedContents : [content]),
     [content, editing, selected, selectedContents],
   )
+
+  const { draggable, ...dragHandlers } = useDragEntry(dragContents)
+  const { droppableStyle, ...dropHandlers } = useDropEntry(content)
 
   const handleChangeRating = useCallback(
     (_e: SyntheticEvent, value: number | null) =>
@@ -76,8 +77,9 @@ const ExplorerTableCell = (props: Props) => {
       }}
       {...(dataKey === 'name'
         ? {
-            ...createDraggableBinder(dragContents),
-            ...createDroppableBinder(content),
+            draggable,
+            ...dragHandlers,
+            ...dropHandlers,
           }
         : {})}
     >

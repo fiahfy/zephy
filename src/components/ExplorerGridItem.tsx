@@ -12,14 +12,15 @@ import {
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import useDnd from '~/hooks/useDnd'
+import useDragEntry from '~/hooks/useDragEntry'
+import useDropEntry from '~/hooks/useDropEntry'
+import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectSelectedContents } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
-import useExplorerItem from '~/hooks/useExplorerItem'
 
 type State = {
   itemCount?: number
@@ -65,8 +66,13 @@ const ExplorerGridItem = (props: Props) => {
   const { editing, focused, onClick, onContextMenu, onDoubleClick, selected } =
     useExplorerItem(content)
 
-  const { createDraggableBinder, createDroppableBinder, droppableStyle } =
-    useDnd()
+  const dragContents = useMemo(
+    () => (editing ? [] : selected ? selectedContents : [content]),
+    [content, editing, selected, selectedContents],
+  )
+
+  const { draggable, ...dragHandlers } = useDragEntry(dragContents)
+  const { droppableStyle, ...dropHandlers } = useDropEntry(content)
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: undefined,
@@ -135,11 +141,6 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [status])
 
-  const dragContents = useMemo(
-    () => (editing ? undefined : selected ? selectedContents : [content]),
-    [content, editing, selected, selectedContents],
-  )
-
   const handleChangeRating = useCallback(
     (_e: SyntheticEvent, value: number | null) =>
       appDispatch(rate({ path: content.path, rating: value ?? 0 })),
@@ -167,6 +168,7 @@ const ExplorerGridItem = (props: Props) => {
     <ImageListItem
       className={clsx({ focused, selected })}
       component="div"
+      draggable={draggable}
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
@@ -206,8 +208,8 @@ const ExplorerGridItem = (props: Props) => {
         },
         ...droppableStyle,
       }}
-      {...createDraggableBinder(dragContents)}
-      {...createDroppableBinder(content)}
+      {...dragHandlers}
+      {...dropHandlers}
     >
       {status === 'loaded' && thumbnail ? (
         <img src={thumbnail} style={{ objectPosition: 'center top' }} />

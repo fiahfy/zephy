@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { FocusEvent, createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
-import useDnd from '~/hooks/useDnd'
+import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
 import {
@@ -19,7 +19,12 @@ const Explorer = () => {
   const currentViewMode = useAppSelector(selectCurrentViewMode)
   const dispatch = useAppDispatch()
 
-  const { createDroppableBinder, droppableStyle } = useDnd()
+  const { droppableStyle, ...dropHandlers } = useDropEntry({
+    path: currentDirectoryPath,
+    name: '',
+    type: 'directory',
+    url: '',
+  })
 
   const zephySchema = useMemo(
     () => isZephySchema(currentDirectoryPath),
@@ -80,12 +85,7 @@ const Explorer = () => {
       onContextMenu={handleContextMenu}
       onFocus={handleFocus}
       sx={{ height: '100%', ...droppableStyle }}
-      {...createDroppableBinder({
-        path: currentDirectoryPath,
-        name: '',
-        type: 'directory',
-        url: '',
-      })}
+      {...dropHandlers}
     >
       {createElement(
         currentViewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
