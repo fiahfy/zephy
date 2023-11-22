@@ -452,7 +452,7 @@ export const load =
     const directoryPath = selectDirectoryPath(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     const pathsMap = selectPathsByScore(getState())
-    const url = parseZephyUrl(directoryPath)
+    const url = parseZephyUrl(currentDirectoryPath)
     if (
       !currentDirectoryPath ||
       (currentDirectoryPath == directoryPath && !force)
