@@ -15,7 +15,7 @@ export const favoriteSlice = createSlice({
   name: 'favorite',
   initialState,
   reducers: {
-    replace(_state, action: PayloadAction<State>) {
+    replaceState(_state, action: PayloadAction<State>) {
       return action.payload
     },
     addToFavorites(state, action: PayloadAction<string>) {
@@ -33,11 +33,25 @@ export const favoriteSlice = createSlice({
       )
       return { ...state, favorites }
     },
+    changeFavoritePath(
+      state,
+      action: PayloadAction<{ oldPath: string; newPath: string }>,
+    ) {
+      const { oldPath, newPath } = action.payload
+      const favorites = state.favorites.map((favorite) =>
+        favorite.path === oldPath ? { ...favorite, path: newPath } : favorite,
+      )
+      return { ...state, favorites }
+    },
   },
 })
 
-export const { addToFavorites, removeFromFavorites, replace } =
-  favoriteSlice.actions
+export const {
+  replaceState,
+  addToFavorites,
+  removeFromFavorites,
+  changeFavoritePath,
+} = favoriteSlice.actions
 
 export default favoriteSlice.reducer
 

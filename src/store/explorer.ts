@@ -1,8 +1,13 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content, DetailedEntry } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
+import { changeFavoritePath } from '~/store/favorite'
 import { addQuery } from '~/store/query'
-import { selectGetScore, selectPathsByScore } from '~/store/rating'
+import {
+  changeRatingPath,
+  selectGetScore,
+  selectPathsByScore,
+} from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   selectCurrentDirectoryPath,
@@ -579,26 +584,31 @@ export const moveToTrash =
     dispatch(unselect({ tabIndex, paths: targetPaths }))
   }
 
-// TODO: update favorites and ratings
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntries, focus, removeEntries, select } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
+    dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+    dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
     dispatch(removeEntries({ tabIndex, paths: [path] }))
     dispatch(addEntries({ tabIndex, entries: [entry] }))
     dispatch(select({ tabIndex, path: entry.path }))
     dispatch(focus({ tabIndex, path: entry.path }))
   }
 
-// TODO: update favorites and ratings
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { unselect } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
-    await window.electronAPI.moveEntries(paths, directoryPath)
+    const entries = await window.electronAPI.moveEntries(paths, directoryPath)
+    paths.forEach((path, i) => {
+      const entry = entries[i]
+      dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+      dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+    })
     dispatch(unselect({ tabIndex, paths }))
   }
 

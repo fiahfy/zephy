@@ -2,15 +2,15 @@ import { ReactNode, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, storageKey, store } from '~/store'
-import { replace as replaceFavorite } from '~/store/favorite'
-import { replace as replacePreview } from '~/store/preview'
-import { replace as replaceQuery } from '~/store/query'
-import { replace as replaceRating } from '~/store/rating'
-import { replace as replaceSettings } from '~/store/settings'
+import { replaceState as replaceFavoriteState } from '~/store/favorite'
+import { replaceState as replacePreviewState } from '~/store/preview'
+import { replaceState as replaceQueryState } from '~/store/query'
+import { replaceState as replaceRatingState } from '~/store/rating'
+import { replaceState as replaceSettingsState } from '~/store/settings'
 import {
   changeDirectory,
   newWindow,
-  replace as replaceWindow,
+  replaceState as replaceWindowState,
 } from '~/store/window'
 import { set } from '~/store/windowIndex'
 
@@ -32,12 +32,12 @@ export const StoreProvider = (props: Props) => {
         return
       }
       const newState = JSON.parse(e.newValue)
-      dispatch(replaceFavorite(JSON.parse(newState.favorite)))
-      dispatch(replacePreview(JSON.parse(newState.preview)))
-      dispatch(replaceQuery(JSON.parse(newState.query)))
-      dispatch(replaceRating(JSON.parse(newState.rating)))
-      dispatch(replaceSettings(JSON.parse(newState.settings)))
-      dispatch(replaceWindow(JSON.parse(newState.window)))
+      dispatch(replaceFavoriteState(JSON.parse(newState.favorite)))
+      dispatch(replacePreviewState(JSON.parse(newState.preview)))
+      dispatch(replaceQueryState(JSON.parse(newState.query)))
+      dispatch(replaceRatingState(JSON.parse(newState.rating)))
+      dispatch(replaceSettingsState(JSON.parse(newState.settings)))
+      dispatch(replaceWindowState(JSON.parse(newState.window)))
     }
 
     window.addEventListener('storage', handler)

@@ -11,7 +11,7 @@ export const ratingSlice = createSlice({
   name: 'rating',
   initialState,
   reducers: {
-    replace(_state, action: PayloadAction<State>) {
+    replaceState(_state, action: PayloadAction<State>) {
       return action.payload
     },
     rate(state, action: PayloadAction<{ path: string; rating: number }>) {
@@ -22,10 +22,25 @@ export const ratingSlice = createSlice({
       }
       return { ...state, ratings }
     },
+    changeRatingPath(
+      state,
+      action: PayloadAction<{ oldPath: string; newPath: string }>,
+    ) {
+      const { oldPath, newPath } = action.payload
+      const { [oldPath]: score, ...others } = state.ratings
+      if (score === undefined) {
+        return state
+      }
+      const ratings = {
+        ...others,
+        [newPath]: score,
+      }
+      return { ...state, ratings }
+    },
   },
 })
 
-export const { rate, replace } = ratingSlice.actions
+export const { replaceState, rate, changeRatingPath } = ratingSlice.actions
 
 export default ratingSlice.reducer
 

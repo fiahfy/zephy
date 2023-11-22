@@ -11,7 +11,7 @@ export const querySlice = createSlice({
   name: 'query',
   initialState,
   reducers: {
-    replace(_state, action: PayloadAction<State>) {
+    replaceState(_state, action: PayloadAction<State>) {
       return action.payload
     },
     addQuery(state, action: PayloadAction<string>) {
@@ -36,7 +36,7 @@ export const querySlice = createSlice({
   },
 })
 
-export const { addQuery, removeQuery, replace } = querySlice.actions
+export const { replaceState, addQuery, removeQuery } = querySlice.actions
 
 export default querySlice.reducer
 

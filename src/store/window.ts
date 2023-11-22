@@ -94,7 +94,7 @@ export const windowSlice = createSlice({
   name: 'window',
   initialState,
   reducers: {
-    replace(_state, action: PayloadAction<State>) {
+    replaceState(_state, action: PayloadAction<State>) {
       return action.payload
     },
     newWindow(state, action: PayloadAction<{ index: number }>) {
@@ -410,7 +410,7 @@ export const windowSlice = createSlice({
   },
 })
 
-export const { replace } = windowSlice.actions
+export const { replaceState } = windowSlice.actions
 
 export default windowSlice.reducer
 
