@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import AudioPreview from '~/components/AudioPreview'
 import DirectoryPreview from '~/components/DirectoryPreview'
-import ImagePreview from '~/components/ImagePreview'
 import EmptyPreview from '~/components/EmptyPreview'
+import ImagePreview from '~/components/ImagePreview'
+import TextPreview from '~/components/TextPreview'
 import VideoPreview from '~/components/VideoPreview'
 import { useAppSelector } from '~/store'
 import { selectSelectedContents } from '~/store/explorer'
@@ -30,8 +31,9 @@ const Preview = () => {
           {type === 'audio' && <AudioPreview entry={content} />}
           {type === 'directory' && <DirectoryPreview entry={content} />}
           {type === 'image' && <ImagePreview entry={content} />}
+          {type === 'text' && <TextPreview entry={content} />}
           {type === 'video' && <VideoPreview entry={content} />}
-          {!['audio', 'directory', 'image', 'video'].includes(type) && (
+          {!['audio', 'directory', 'image', 'text', 'video'].includes(type) && (
             <EmptyPreview message="No preview" />
           )}
         </>

@@ -35,11 +35,7 @@ const FavoritePanel = () => {
 
   return (
     <Panel title="Favorites">
-      <Table
-        component="div"
-        size="small"
-        sx={{ display: 'flex', userSelect: 'none' }}
-      >
+      <Table component="div" size="small" sx={{ display: 'flex' }}>
         <TableBody component="div" sx={{ width: '100%' }}>
           {entries.map((entry) => (
             <FavoriteTableRow

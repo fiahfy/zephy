@@ -91,7 +91,7 @@ const EntryInformationTable = (props: Props) => {
   ]
 
   return (
-    <Table size="small" sx={{ tableLayout: 'fixed', userSelect: 'none' }}>
+    <Table size="small" sx={{ tableLayout: 'fixed' }}>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.label}>

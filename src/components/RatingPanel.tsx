@@ -25,7 +25,7 @@ const RatingPanel = () => {
 
   return (
     <Panel title="Ratings">
-      <Table size="small" sx={{ display: 'flex', userSelect: 'none' }}>
+      <Table size="small" sx={{ display: 'flex' }}>
         <TableBody sx={{ width: '100%' }}>
           {items.map((item) => (
             <RatingTableRow

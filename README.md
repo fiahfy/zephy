@@ -8,7 +8,7 @@
 
 - Favorites
 - Rating
-- Image and Video Preview
+- Image, Text and Video Preview
 - Tree View Display
 - Tabbed Browsing
 - Dark Mode Support
@@ -20,7 +20,6 @@
 - [ ] Show progress when copying & moving large files
 - [ ] Sort Favorites
 - [ ] Change Thumbnail Size
-- [ ] Text Preview
 - [ ] Use Electron Forge
 
 ## Screenshots
