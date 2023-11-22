@@ -99,16 +99,19 @@ export const getMetadata = async (
 
   const hasDuration = type.startsWith('video/') || type.startsWith('audio/')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const metadata: any = await new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(path, (err, metadata) => {
-      err ? reject(err) : resolve(metadata)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const metadata: any = await new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(path, (err, metadata) => {
+        err ? reject(err) : resolve(metadata)
+      })
     })
-  })
-
-  return {
-    duration: hasDuration ? metadata?.format?.duration : undefined,
-    height: metadata?.streams[0]?.height,
-    width: metadata?.streams[0]?.width,
+    return {
+      duration: hasDuration ? metadata?.format?.duration : undefined,
+      height: metadata?.streams[0]?.height,
+      width: metadata?.streams[0]?.width,
+    }
+  } catch (e) {
+    return undefined
   }
 }

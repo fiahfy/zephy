@@ -24,7 +24,7 @@ import { isHiddenFile } from '~/utils/file'
 
 type State = {
   itemCount?: number
-  status: 'error' | 'loaded' | 'loading' | 'waiting'
+  status: 'error' | 'loaded' | 'loading'
   thumbnail?: string
 }
 
