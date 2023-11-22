@@ -1,5 +1,5 @@
 import { Rating, Table, TableBody, TableCell, Typography } from '@mui/material'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Panel from '~/components/Panel'
 import RatingTableRow from '~/components/RatingTableRow'
 import { useAppSelector } from '~/store'
@@ -9,14 +9,24 @@ const RatingPanel = () => {
   const pathsByScore = useAppSelector(selectPathsByScore)
 
   const [selected, setSelected] = useState<number[]>([])
+  const [ratings, setRatings] = useState<{ count: number; score: number }[]>([])
 
-  const items = useMemo(() => {
-    return Object.keys(pathsByScore)
-      .map((score) => ({
-        score: Number(score),
-        count: pathsByScore[Number(score)]?.length ?? 0,
-      }))
-      .sort((a, b) => b.score - a.score)
+  useEffect(() => {
+    ;(async () => {
+      let ratings = await Promise.all(
+        Object.keys(pathsByScore).map(async (score) => {
+          const paths = pathsByScore[Number(score)] ?? []
+          const entries =
+            await window.electronAPI.getDetailedEntriesForPaths(paths)
+          return {
+            score: Number(score),
+            count: entries.length,
+          }
+        }),
+      )
+      ratings = ratings.sort((a, b) => b.score - a.score)
+      setRatings(ratings)
+    })()
   }, [pathsByScore])
 
   const handleBlur = useCallback(() => setSelected([]), [])
@@ -27,13 +37,13 @@ const RatingPanel = () => {
     <Panel title="Ratings">
       <Table size="small" sx={{ display: 'flex' }}>
         <TableBody sx={{ width: '100%' }}>
-          {items.map((item) => (
+          {ratings.map((rating) => (
             <RatingTableRow
-              key={item.score}
+              key={rating.score}
               onBlur={() => handleBlur()}
-              onFocus={() => handleFocus(item.score)}
-              score={item.score}
-              selected={selected.includes(item.score)}
+              onFocus={() => handleFocus(rating.score)}
+              score={rating.score}
+              selected={selected.includes(rating.score)}
             >
               <TableCell
                 sx={{
@@ -51,10 +61,10 @@ const RatingPanel = () => {
                   precision={0.5}
                   readOnly
                   size="small"
-                  value={item.score}
+                  value={rating.score}
                 />
                 <Typography noWrap variant="caption">
-                  ({item.count})
+                  ({rating.count})
                 </Typography>
               </TableCell>
             </RatingTableRow>
