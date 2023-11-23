@@ -79,7 +79,6 @@ const DirectoryPreviewItem = (props: Props) => {
         if (entry.type === 'file') {
           return [entry.path]
         }
-
         try {
           const entries = await window.electronAPI.getEntries(entry.path)
           return entries
@@ -92,9 +91,17 @@ const DirectoryPreviewItem = (props: Props) => {
           return []
         }
       })()
-      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
-      let success = true
-      if (thumbnail) {
+      const thumbnail = await (async () => {
+        try {
+          return await window.electronAPI.createEntryThumbnailUrl(paths)
+        } catch (e) {
+          return undefined
+        }
+      })()
+      const success = await (async () => {
+        if (!thumbnail) {
+          return true
+        }
         try {
           await new Promise((resolve, reject) => {
             const img = new Image()
@@ -102,10 +109,11 @@ const DirectoryPreviewItem = (props: Props) => {
             img.onerror = (e) => reject(e)
             img.src = thumbnail
           })
+          return true
         } catch (e) {
-          success = false
+          return false
         }
-      }
+      })()
       if (unmounted) {
         return
       }
