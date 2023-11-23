@@ -16,17 +16,20 @@ const ImagePreview = (props: Props) => {
   useEffect(() => {
     ;(async () => {
       setStatus('loading')
-      try {
-        await new Promise((resolve, reject) => {
-          const img = new Image()
-          img.onload = () => resolve(undefined)
-          img.onerror = (e) => reject(e)
-          img.src = entry.url
-        })
-        setStatus('loaded')
-      } catch (e) {
-        setStatus('error')
-      }
+      const success = await (async () => {
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(undefined)
+            img.onerror = (e) => reject(e)
+            img.src = entry.url
+          })
+          return true
+        } catch (e) {
+          return false
+        }
+      })()
+      setStatus(success ? 'loaded' : 'error')
     })()
   }, [entry.path, entry.type, entry.url])
 
