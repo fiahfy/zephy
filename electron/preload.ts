@@ -1,5 +1,4 @@
 import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
-import { exposeOperations as exposeTrafficLightOperations } from '@fiahfy/electron-traffic-light/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ApplicationMenuParams } from './applicationMenu'
@@ -64,6 +63,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return ipcRenderer.invoke('watchDirectories', directoryPaths)
   },
   ...exposeContextMenuOperations(),
-  ...exposeTrafficLightOperations(),
   ...exposeWindowOperations(),
 })

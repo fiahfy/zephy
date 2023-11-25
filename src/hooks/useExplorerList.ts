@@ -35,10 +35,10 @@ const useExplorerList = () => {
       loading
         ? 'Loading items...'
         : error
-        ? 'The specified directory does not exist'
-        : query
-        ? 'No results found'
-        : 'No items',
+          ? 'The specified directory does not exist'
+          : query
+            ? 'No results found'
+            : 'No items',
     [error, loading, query],
   )
 

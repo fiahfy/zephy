@@ -1,4 +1,3 @@
-import { createManager as createTrafficLightManager } from '@fiahfy/electron-traffic-light'
 import { createManager as createWindowManager } from '@fiahfy/electron-window'
 import { BrowserWindow, BrowserWindowConstructorOptions, app } from 'electron'
 import { join } from 'node:path'
@@ -24,7 +23,6 @@ process.env.VITE_PUBLIC = app.isPackaged
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
-const trafficLightManager = createTrafficLightManager()
 const watcher = createWatcher()
 
 const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
@@ -48,7 +46,6 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
     browserWindow.loadFile(join(process.env.DIST, 'index.html'))
   }
 
-  trafficLightManager.handle(browserWindow)
   watcher.handle(browserWindow)
 
   return browserWindow

@@ -4,7 +4,6 @@
 //
 // import User from 'path/to/interfaces';
 import { Operations as ContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
-import { Operations as TrafficLightOperations } from '@fiahfy/electron-traffic-light/preload'
 import { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type IElectronAPI = {
@@ -41,7 +40,6 @@ export type IElectronAPI = {
     ) => void,
   ) => Promise<void>
 } & ContextMenuOperations &
-  TrafficLightOperations &
   WindowOperations<{ directoryPath: string }>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
