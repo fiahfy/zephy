@@ -48,6 +48,7 @@ export type IElectronAPI = {
 export type ApplicationMenuParams = any
 
 export type Settings = {
+  shouldOpenWithPhoty: boolean
   shouldOpenWithVisty: boolean
   shouldShowHiddenFiles: boolean
   theme: 'light' | 'dark' | 'system'

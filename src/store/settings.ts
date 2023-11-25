@@ -6,6 +6,7 @@ import { detectFileType } from '~/utils/file'
 type State = Settings
 
 const initialState: State = {
+  shouldOpenWithPhoty: false,
   shouldOpenWithVisty: false,
   shouldShowHiddenFiles: false,
   theme: 'system',
@@ -17,6 +18,9 @@ export const settingsSlice = createSlice({
   reducers: {
     replaceState(_state, action: PayloadAction<State>) {
       return action.payload
+    },
+    setShouldOpenWithPhoty(state, action: PayloadAction<boolean>) {
+      return { ...state, shouldOpenWithPhoty: action.payload }
     },
     setShouldOpenWithVisty(state, action: PayloadAction<boolean>) {
       return { ...state, shouldOpenWithVisty: action.payload }
@@ -32,6 +36,7 @@ export const settingsSlice = createSlice({
 
 export const {
   replaceState,
+  setShouldOpenWithPhoty,
   setShouldOpenWithVisty,
   setShouldShowHiddenFiles,
   setTheme,
@@ -40,6 +45,11 @@ export const {
 export default settingsSlice.reducer
 
 export const selectSettings = (state: AppState) => state.settings
+
+export const selectShouldOpenWithPhoty = createSelector(
+  selectSettings,
+  (settings) => settings.shouldOpenWithPhoty,
+)
 
 export const selectShouldOpenWithVisty = createSelector(
   selectSettings,
@@ -59,9 +69,14 @@ export const selectTheme = createSelector(
 export const openEntry =
   (filePath: string): AppThunk =>
   async (_, getState) => {
+    const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
     const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
     const fileType = detectFileType(filePath)
     switch (fileType) {
+      case 'image':
+        return shouldOpenWithPhoty
+          ? await window.electronAPI.openUrl(`photy://open?path=${filePath}`)
+          : await window.electronAPI.openEntry(filePath)
       case 'video':
       case 'audio':
         return shouldOpenWithVisty

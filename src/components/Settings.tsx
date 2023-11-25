@@ -4,6 +4,7 @@ import {
   Container,
   FormControl,
   FormControlLabel,
+  FormGroup,
   InputLabel,
   MenuItem,
   Select,
@@ -14,9 +15,11 @@ import { ChangeEvent, useCallback } from 'react'
 import { Settings as SettingsType } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  selectShouldOpenWithPhoty,
   selectShouldOpenWithVisty,
   selectShouldShowHiddenFiles,
   selectTheme,
+  setShouldOpenWithPhoty,
   setShouldOpenWithVisty,
   setShouldShowHiddenFiles,
   setTheme,
@@ -30,6 +33,7 @@ const options = [
 
 const Settings = () => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const shouldOpenWithPhoty = useAppSelector(selectShouldOpenWithPhoty)
   const shouldOpenWithVisty = useAppSelector(selectShouldOpenWithVisty)
   const theme = useAppSelector(selectTheme)
   const dispatch = useAppDispatch()
@@ -50,6 +54,14 @@ const Settings = () => {
     [dispatch],
   )
 
+  const handleShouldOpenWithPhoty = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.checked
+      dispatch(setShouldOpenWithPhoty(value))
+    },
+    [dispatch],
+  )
+
   const handleShouldOpenWithVisty = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.checked
@@ -65,70 +77,103 @@ const Settings = () => {
           <Typography gutterBottom variant="subtitle2">
             Appearance
           </Typography>
-          <FormControl sx={{ mt: 1, width: 128 }}>
-            <InputLabel id="theme">Theme</InputLabel>
-            <Select
-              label="Theme"
-              labelId="theme"
-              onChange={handleChangeTheme}
-              size="small"
-              value={theme}
-            >
-              {options.map(({ label, value }) => (
-                <MenuItem dense key={value} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <FormGroup>
+            <FormControl sx={{ mt: 1, width: 128 }}>
+              <InputLabel id="theme">Theme</InputLabel>
+              <Select
+                label="Theme"
+                labelId="theme"
+                onChange={handleChangeTheme}
+                size="small"
+                value={theme}
+              >
+                {options.map(({ label, value }) => (
+                  <MenuItem dense key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </FormGroup>
         </Box>
         <Box>
           <Typography gutterBottom variant="subtitle2">
             Behavior
           </Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={shouldOpenWithVisty}
-                onChange={handleShouldOpenWithVisty}
-                size="small"
-              />
-            }
-            label={
-              <>
-                Open with{' '}
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    window.electronAPI.openUrl(
-                      'https://github.com/fiahfy/visty',
-                    )
-                  }}
-                >
-                  Visty
-                </a>{' '}
-                for Video and Audio Files
-              </>
-            }
-            slotProps={{ typography: { variant: 'body2' } }}
-          />
+          <FormGroup>
+            <FormControlLabel
+              componentsProps={{ typography: { variant: 'body2' } }}
+              control={
+                <Checkbox
+                  checked={shouldOpenWithPhoty}
+                  onChange={handleShouldOpenWithPhoty}
+                  size="small"
+                />
+              }
+              label={
+                <>
+                  Open with{' '}
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      window.electronAPI.openUrl(
+                        'https://github.com/fiahfy/photy',
+                      )
+                    }}
+                  >
+                    Photy
+                  </a>{' '}
+                  for Image Files
+                </>
+              }
+            />
+            <FormControlLabel
+              componentsProps={{ typography: { variant: 'body2' } }}
+              control={
+                <Checkbox
+                  checked={shouldOpenWithVisty}
+                  onChange={handleShouldOpenWithVisty}
+                  size="small"
+                />
+              }
+              label={
+                <>
+                  Open with{' '}
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      window.electronAPI.openUrl(
+                        'https://github.com/fiahfy/visty',
+                      )
+                    }}
+                  >
+                    Visty
+                  </a>{' '}
+                  for Video and Audio Files
+                </>
+              }
+            />
+          </FormGroup>
         </Box>
         <Box>
           <Typography gutterBottom variant="subtitle2">
             Advanced
           </Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={shouldShowHiddenFiles}
-                onChange={handleShouldShowHiddenFiles}
-                size="small"
-              />
-            }
-            label="Show Hidden Files"
-            slotProps={{ typography: { variant: 'body2' } }}
-          />
+          <FormGroup>
+            <FormControlLabel
+              componentsProps={{ typography: { variant: 'body2' } }}
+              control={
+                <Checkbox
+                  checked={shouldShowHiddenFiles}
+                  onChange={handleShouldShowHiddenFiles}
+                  size="small"
+                />
+              }
+              label="Show Hidden Files"
+            />
+          </FormGroup>
         </Box>
       </Box>
     </Container>
