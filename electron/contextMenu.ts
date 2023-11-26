@@ -73,18 +73,17 @@ const registerContextMenu = (
     sortBy: (event, _params, { orderBy }) => ({
       label: 'Sort By',
       submenu: [
-        { label: 'Name', orderBy: 'name' },
-        { label: 'Date Last Opened', orderBy: 'dateLastOpened' },
-        { label: 'Date Modified', orderBy: 'dateModified' },
-        { label: 'Date Created', orderBy: 'dateCreated' },
-        { label: 'Size', orderBy: 'size' },
-        { label: 'Rating', orderBy: 'rating' },
-      ].map((menu) => ({
-        ...menu,
-        checked: menu.orderBy === orderBy,
-        click: () =>
-          send(event, { type: 'sort', data: { orderBy: menu.orderBy } }),
-        type: 'checkbox',
+        { label: 'Name', value: 'name' },
+        { label: 'Date Last Opened', value: 'dateLastOpened' },
+        { label: 'Date Modified', value: 'dateModified' },
+        { label: 'Date Created', value: 'dateCreated' },
+        { label: 'Size', value: 'size' },
+        { label: 'Rating', value: 'rating' },
+      ].map(({ label, value }) => ({
+        checked: value === orderBy,
+        click: () => send(event, { type: 'sort', data: { orderBy: value } }),
+        label,
+        type: 'radio',
       })),
     }),
     toggleFavorite: (event, _params, { favorite, path }) => ({
@@ -120,17 +119,17 @@ const registerContextMenu = (
     view: (event, _params, { viewMode }) => ({
       label: 'View',
       submenu: [
-        { label: 'as List', viewMode: 'list' },
-        { label: 'as Thumbnail', viewMode: 'thumbnail' },
-      ].map((menu) => ({
-        ...menu,
-        checked: menu.viewMode === viewMode,
+        { label: 'as List', value: 'list' },
+        { label: 'as Thumbnail', value: 'thumbnail' },
+      ].map(({ label, value }) => ({
+        checked: value === viewMode,
         click: () =>
           send(event, {
             type: 'changeViewMode',
-            data: { viewMode: menu.viewMode },
+            data: { viewMode: value },
           }),
-        type: 'checkbox',
+        label,
+        type: 'radio',
       })),
     }),
     // TODO: implement
