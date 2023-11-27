@@ -15,12 +15,6 @@ jobs:
           node-version: 20
       - run: yarn
       - run: yarn build
-      - run: yarn release -ml -c.snap.publish=github
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # clear disk space because building nsis is failing
-      - run: rm -rf dist
-      - run: yarn build
-      - run: yarn release -w
+      - run: yarn release -lmw -c.snap.publish=github
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
