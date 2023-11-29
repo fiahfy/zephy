@@ -72,15 +72,16 @@ export const openEntry =
     const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
     const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
     const fileType = detectFileType(filePath)
+    const encoded = encodeURIComponent(filePath)
     switch (fileType) {
       case 'image':
         return shouldOpenWithPhoty
-          ? await window.electronAPI.openUrl(`photy://open?path=${filePath}`)
+          ? await window.electronAPI.openUrl(`photy://open?path=${encoded}`)
           : await window.electronAPI.openEntry(filePath)
       case 'video':
       case 'audio':
         return shouldOpenWithVisty
-          ? await window.electronAPI.openUrl(`visty://open?path=${filePath}`)
+          ? await window.electronAPI.openUrl(`visty://open?path=${encoded}`)
           : await window.electronAPI.openEntry(filePath)
       default:
         return await window.electronAPI.openEntry(filePath)
