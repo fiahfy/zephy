@@ -8,7 +8,7 @@ import {
 
 export const TrafficLightContext = createContext<
   | {
-      setVisible: (visible: boolean) => Promise<void>
+      setVisible: (visible: boolean) => void
       visible: boolean
     }
   | undefined
@@ -37,10 +37,9 @@ export const TrafficLightProvider = (props: Props) => {
     })()
   }, [])
 
-  const setVisible = useCallback(
-    (visible: boolean) => window.electronAPI.setTrafficLightVisibility(visible),
-    [],
-  )
+  const setVisible = useCallback((visible: boolean) => {
+    window.electronAPI.setTrafficLightVisibility(visible)
+  }, [])
 
   const value = { setVisible, visible: visibility }
 
