@@ -140,7 +140,7 @@ const ExplorerPanel = () => {
       const children = await window.electronAPI.getEntries(entry.path)
 
       const mapper = (e: Entry): Entry => {
-        if (e.type === 'file') {
+        if (e.type !== 'directory') {
           return e
         }
         if (e.path === entry.path) {

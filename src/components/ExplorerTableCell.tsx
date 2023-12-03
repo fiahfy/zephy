@@ -105,7 +105,7 @@ const ExplorerTableCell = (props: Props) => {
         </Box>
       )}
       {dataKey === 'rating' && rating}
-      {dataKey === 'size' && content.type === 'file' && (
+      {dataKey === 'size' && content.type !== 'directory' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}
         </Typography>

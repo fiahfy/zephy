@@ -14,7 +14,7 @@ import {
 
 const getTotalFileSize = (entries: DetailedEntry[]) =>
   entries
-    .filter((entry) => entry.type === 'file')
+    .filter((entry) => entry.type !== 'directory')
     .reduce((acc, entry) => acc + entry.size, 0)
 
 const formatDateRange = (

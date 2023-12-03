@@ -32,12 +32,12 @@ const ExplorerNameTextField = (props: Props) => {
     }
     el.focus()
     const index = content.name.lastIndexOf('.')
-    if (index > 0) {
+    if (content.type !== 'directory' && index > 0) {
       el.setSelectionRange(0, index)
     } else {
       el.select()
     }
-  }, [content.name])
+  }, [content.name, content.type])
 
   const finish = useCallback(() => {
     dispatch(finishEditing())

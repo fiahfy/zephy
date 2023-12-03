@@ -32,7 +32,7 @@ const ExplorerTreeItem = (props: Props) => {
   }, [dispatch, entry.path, entry.type])
 
   const handleDoubleClick = useCallback(async () => {
-    if (entry.type === 'file') {
+    if (entry.type !== 'directory') {
       dispatch(openEntry(entry.path))
     }
   }, [dispatch, entry.path, entry.type])

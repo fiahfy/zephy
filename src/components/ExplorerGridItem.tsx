@@ -86,7 +86,7 @@ const ExplorerGridItem = (props: Props) => {
     ;(async () => {
       dispatch({ type: 'loading' })
       const paths = await (async () => {
-        if (content.type === 'file') {
+        if (content.type !== 'directory') {
           return [content.path]
         }
         try {

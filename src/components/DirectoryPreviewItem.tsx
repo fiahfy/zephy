@@ -76,7 +76,7 @@ const DirectoryPreviewItem = (props: Props) => {
     ;(async () => {
       dispatch({ type: 'loading' })
       const paths = await (async () => {
-        if (entry.type === 'file') {
+        if (entry.type !== 'directory') {
           return [entry.path]
         }
         try {
