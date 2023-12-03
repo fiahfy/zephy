@@ -73,11 +73,23 @@ const TabBar = () => {
               iconPosition="end"
               key={i}
               label={
-                <Box sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}>
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexGrow: 1,
+                    gap: 0.5,
+                    minWidth: 0,
+                  }}
+                >
                   <Icon
                     iconType={getIconType(getCurrentHistory(i).directoryPath)}
                   />
-                  <Typography variant="caption">
+                  <Typography
+                    noWrap
+                    title={getCurrentHistory(i).title}
+                    variant="caption"
+                  >
                     {getCurrentHistory(i).title}
                   </Typography>
                 </Box>
