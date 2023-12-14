@@ -1,4 +1,9 @@
-import mime from 'mime'
+import { Mime } from 'mime'
+import standardTypes from 'mime/types/standard.js'
+import otherTypes from 'mime/types/other.js'
+
+const mime = new Mime(standardTypes, otherTypes)
+mime.define({ 'video/mp4': ['mp4'] }, true)
 
 export const isHiddenFile = (path: string) => path.startsWith('.')
 
