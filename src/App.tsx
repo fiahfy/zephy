@@ -143,8 +143,8 @@ const App = () => {
           return dispatch(forward())
       }
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('mouseup', handler)
+    return () => document.removeEventListener('mouseup', handler)
   }, [dispatch])
 
   const Component = useMemo(() => {
