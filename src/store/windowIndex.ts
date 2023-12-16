@@ -9,13 +9,13 @@ export const windowIndexSlice = createSlice({
   name: 'windowIndex',
   initialState,
   reducers: {
-    set(_state, action: PayloadAction<State>) {
-      return action.payload
+    setWindowIndex(_state, action: PayloadAction<{ windowIndex: State }>) {
+      return action.payload.windowIndex
     },
   },
 })
 
-export const { set } = windowIndexSlice.actions
+export const { setWindowIndex } = windowIndexSlice.actions
 
 export default windowIndexSlice.reducer
 

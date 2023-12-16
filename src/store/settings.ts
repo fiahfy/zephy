@@ -16,20 +16,33 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    replaceState(_state, action: PayloadAction<State>) {
-      return action.payload
+    replaceState(_state, action: PayloadAction<{ state: State }>) {
+      return action.payload.state
     },
-    setShouldOpenWithPhoty(state, action: PayloadAction<boolean>) {
-      return { ...state, shouldOpenWithPhoty: action.payload }
+    setShouldOpenWithPhoty(
+      state,
+      action: PayloadAction<{ shouldOpenWithPhoty: boolean }>,
+    ) {
+      const { shouldOpenWithPhoty } = action.payload
+      return { ...state, shouldOpenWithPhoty }
     },
-    setShouldOpenWithVisty(state, action: PayloadAction<boolean>) {
-      return { ...state, shouldOpenWithVisty: action.payload }
+    setShouldOpenWithVisty(
+      state,
+      action: PayloadAction<{ shouldOpenWithVisty: boolean }>,
+    ) {
+      const { shouldOpenWithVisty } = action.payload
+      return { ...state, shouldOpenWithVisty }
     },
-    setShouldShowHiddenFiles(state, action: PayloadAction<boolean>) {
-      return { ...state, shouldShowHiddenFiles: action.payload }
+    setShouldShowHiddenFiles(
+      state,
+      action: PayloadAction<{ shouldShowHiddenFiles: boolean }>,
+    ) {
+      const { shouldShowHiddenFiles } = action.payload
+      return { ...state, shouldShowHiddenFiles }
     },
-    setTheme(state, action: PayloadAction<State['theme']>) {
-      return { ...state, theme: action.payload }
+    setTheme(state, action: PayloadAction<{ theme: State['theme'] }>) {
+      const { theme } = action.payload
+      return { ...state, theme }
     },
   },
 })

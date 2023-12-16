@@ -1,10 +1,11 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content, DetailedEntry } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
-import { changeFavoritePath } from '~/store/favorite'
+import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
 import { addQuery } from '~/store/query'
 import {
   changeRatingPath,
+  removeRating,
   selectGetScore,
   selectPathsByScore,
 } from '~/store/rating'
@@ -441,7 +442,7 @@ export const search =
     const { setQuery } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     dispatch(setQuery({ tabIndex, query }))
-    dispatch(addQuery(query))
+    dispatch(addQuery({ query }))
   }
 
 export const load =
@@ -575,12 +576,15 @@ export const newFolder =
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { removeEntries, unselect } = explorerSlice.actions
+    const { unselect } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const selected = selectSelected(getState())
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
-    dispatch(removeEntries({ tabIndex, paths: targetPaths }))
+    targetPaths.forEach((path) => {
+      dispatch(removeFromFavorites(path))
+      dispatch(removeRating({ path }))
+    })
     dispatch(unselect({ tabIndex, paths: targetPaths }))
   }
 

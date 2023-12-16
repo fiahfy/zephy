@@ -94,8 +94,8 @@ export const windowSlice = createSlice({
   name: 'window',
   initialState,
   reducers: {
-    replaceState(_state, action: PayloadAction<State>) {
-      return action.payload
+    replaceState(_state, action: PayloadAction<{ state: State }>) {
+      return action.payload.state
     },
     newWindow(state, action: PayloadAction<{ index: number }>) {
       const { index } = action.payload

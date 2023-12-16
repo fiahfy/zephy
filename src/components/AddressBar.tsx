@@ -173,7 +173,7 @@ const AddressBar = () => {
   const handleClickRemove = useCallback(
     (e: MouseEvent, query: string) => {
       e.stopPropagation()
-      dispatch(removeQuery(query))
+      dispatch(removeQuery({ query }))
     },
     [dispatch],
   )

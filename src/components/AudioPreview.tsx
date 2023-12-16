@@ -96,7 +96,7 @@ const AudioPreview = (props: Props) => {
   const handleVolumeChange = useCallback(() => {
     const el = ref.current
     if (el) {
-      dispatch(setVolume(el.volume))
+      dispatch(setVolume({ volume: el.volume }))
     }
   }, [dispatch])
 

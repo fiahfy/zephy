@@ -124,7 +124,7 @@ const VideoPreview = (props: Props) => {
   const handleVolumeChange = useCallback(() => {
     const el = ref.current
     if (el) {
-      appDispatch(setVolume(el.volume))
+      appDispatch(setVolume({ volume: el.volume }))
     }
   }, [appDispatch])
 

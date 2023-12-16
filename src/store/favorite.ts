@@ -15,21 +15,21 @@ export const favoriteSlice = createSlice({
   name: 'favorite',
   initialState,
   reducers: {
-    replaceState(_state, action: PayloadAction<State>) {
-      return action.payload
+    replaceState(_state, action: PayloadAction<{ state: State }>) {
+      return action.payload.state
     },
-    addToFavorites(state, action: PayloadAction<string>) {
+    addToFavorites(state, action: PayloadAction<{ path: string }>) {
+      const { path } = action.payload
       const favorites = [
-        ...state.favorites.filter(
-          (favorite) => favorite.path !== action.payload,
-        ),
-        { path: action.payload },
+        ...state.favorites.filter((favorite) => favorite.path !== path),
+        { path },
       ]
       return { ...state, favorites }
     },
-    removeFromFavorites(state, action: PayloadAction<string>) {
+    removeFromFavorites(state, action: PayloadAction<{ path: string }>) {
+      const { path } = action.payload
       const favorites = state.favorites.filter(
-        (favorite) => favorite.path !== action.payload,
+        (favorite) => favorite.path !== path,
       )
       return { ...state, favorites }
     },
@@ -46,12 +46,7 @@ export const favoriteSlice = createSlice({
   },
 })
 
-export const {
-  replaceState,
-  addToFavorites,
-  removeFromFavorites,
-  changeFavoritePath,
-} = favoriteSlice.actions
+export const { replaceState, changeFavoritePath } = favoriteSlice.actions
 
 export default favoriteSlice.reducer
 
@@ -69,6 +64,20 @@ export const selectIsFavorite = createSelector(selectFavorites, (favorites) => {
   )
   return (path: string) => hash[path] ?? false
 })
+
+export const addToFavorites =
+  (path: string): AppThunk =>
+  async (dispatch) => {
+    const { addToFavorites } = favoriteSlice.actions
+    dispatch(addToFavorites({ path }))
+  }
+
+export const removeFromFavorites =
+  (path: string): AppThunk =>
+  async (dispatch) => {
+    const { removeFromFavorites } = favoriteSlice.actions
+    dispatch(removeFromFavorites({ path }))
+  }
 
 export const toggleFavorite =
   (path: string): AppThunk =>

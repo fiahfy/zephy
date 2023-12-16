@@ -40,32 +40,32 @@ const Settings = () => {
 
   const handleChangeTheme = useCallback(
     (e: SelectChangeEvent) => {
-      const value = e.target.value as SettingsType['theme']
-      dispatch(setTheme(value))
+      const theme = e.target.value as SettingsType['theme']
+      dispatch(setTheme({ theme }))
     },
     [dispatch],
   )
 
   const handleShouldShowHiddenFiles = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.checked
-      dispatch(setShouldShowHiddenFiles(value))
+      const shouldShowHiddenFiles = e.target.checked
+      dispatch(setShouldShowHiddenFiles({ shouldShowHiddenFiles }))
     },
     [dispatch],
   )
 
   const handleShouldOpenWithPhoty = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.checked
-      dispatch(setShouldOpenWithPhoty(value))
+      const shouldOpenWithPhoty = e.target.checked
+      dispatch(setShouldOpenWithPhoty({ shouldOpenWithPhoty }))
     },
     [dispatch],
   )
 
   const handleShouldOpenWithVisty = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.checked
-      dispatch(setShouldOpenWithVisty(value))
+      const shouldOpenWithVisty = e.target.checked
+      dispatch(setShouldOpenWithVisty({ shouldOpenWithVisty }))
     },
     [dispatch],
   )
