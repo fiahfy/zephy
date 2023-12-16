@@ -9,23 +9,25 @@ const RatingPanel = () => {
   const pathsByScore = useAppSelector(selectPathsByScore)
 
   const [selected, setSelected] = useState<number[]>([])
-  const [ratings, setRatings] = useState<{ count: number; score: number }[]>([])
+  const [items, setItems] = useState<{ count: number; score: number }[]>([])
 
   useEffect(() => {
     ;(async () => {
-      let ratings = await Promise.all(
+      let items = await Promise.all(
         Object.keys(pathsByScore).map(async (score) => {
           const paths = pathsByScore[Number(score)] ?? []
-          const entries =
+          const items =
             await window.electronAPI.getDetailedEntriesForPaths(paths)
           return {
             score: Number(score),
-            count: entries.length,
+            count: items.length,
           }
         }),
       )
-      ratings = ratings.sort((a, b) => b.score - a.score)
-      setRatings(ratings)
+      items = items
+        .filter((item) => item.count > 0)
+        .sort((a, b) => b.score - a.score)
+      setItems(items)
     })()
   }, [pathsByScore])
 
@@ -34,44 +36,48 @@ const RatingPanel = () => {
   const handleFocus = useCallback((score: number) => setSelected([score]), [])
 
   return (
-    <Panel title="Ratings">
-      <Table size="small" sx={{ display: 'flex' }}>
-        <TableBody sx={{ width: '100%' }}>
-          {ratings.map((rating) => (
-            <RatingTableRow
-              key={rating.score}
-              onBlur={() => handleBlur()}
-              onFocus={() => handleFocus(rating.score)}
-              score={rating.score}
-              selected={selected.includes(rating.score)}
-            >
-              <TableCell
-                sx={{
-                  alignItems: 'center',
-                  borderBottom: 'none',
-                  display: 'flex',
-                  height: 20,
-                  gap: 1,
-                  px: 1,
-                  py: 0,
-                  width: '100%',
-                }}
-              >
-                <Rating
-                  precision={0.5}
-                  readOnly
-                  size="small"
-                  value={rating.score}
-                />
-                <Typography noWrap variant="caption">
-                  ({rating.count})
-                </Typography>
-              </TableCell>
-            </RatingTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Panel>
+    <>
+      {items.length > 0 && (
+        <Panel title="Ratings">
+          <Table size="small" sx={{ display: 'flex' }}>
+            <TableBody sx={{ width: '100%' }}>
+              {items.map((item) => (
+                <RatingTableRow
+                  key={item.score}
+                  onBlur={() => handleBlur()}
+                  onFocus={() => handleFocus(item.score)}
+                  score={item.score}
+                  selected={selected.includes(item.score)}
+                >
+                  <TableCell
+                    sx={{
+                      alignItems: 'center',
+                      borderBottom: 'none',
+                      display: 'flex',
+                      height: 20,
+                      gap: 1,
+                      px: 1,
+                      py: 0,
+                      width: '100%',
+                    }}
+                  >
+                    <Rating
+                      precision={0.5}
+                      readOnly
+                      size="small"
+                      value={item.score}
+                    />
+                    <Typography noWrap variant="caption">
+                      ({item.count})
+                    </Typography>
+                  </TableCell>
+                </RatingTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Panel>
+      )}
+    </>
   )
 }
 

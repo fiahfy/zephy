@@ -34,41 +34,45 @@ const FavoritePanel = () => {
   const handleFocus = useCallback((path: string) => setSelected([path]), [])
 
   return (
-    <Panel title="Favorites">
-      <Table component="div" size="small" sx={{ display: 'flex' }}>
-        <TableBody component="div" sx={{ width: '100%' }}>
-          {entries.map((entry) => (
-            <FavoriteTableRow
-              entry={entry}
-              key={entry.path}
-              onBlur={() => handleBlur()}
-              onFocus={() => handleFocus(entry.path)}
-              selected={selected.includes(entry.path)}
-            >
-              <TableCell
-                component="div"
-                sx={{
-                  alignItems: 'center',
-                  borderBottom: 'none',
-                  display: 'flex',
-                  height: 20,
-                  gap: 0.5,
-                  px: 1,
-                  py: 0,
-                  width: '100%',
-                }}
-                title={entry.name}
-              >
-                <Icon iconType="folder" />
-                <Typography noWrap variant="caption">
-                  {entry.name}
-                </Typography>
-              </TableCell>
-            </FavoriteTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Panel>
+    <>
+      {entries.length > 0 && (
+        <Panel title="Favorites">
+          <Table component="div" size="small" sx={{ display: 'flex' }}>
+            <TableBody component="div" sx={{ width: '100%' }}>
+              {entries.map((entry) => (
+                <FavoriteTableRow
+                  entry={entry}
+                  key={entry.path}
+                  onBlur={() => handleBlur()}
+                  onFocus={() => handleFocus(entry.path)}
+                  selected={selected.includes(entry.path)}
+                >
+                  <TableCell
+                    component="div"
+                    sx={{
+                      alignItems: 'center',
+                      borderBottom: 'none',
+                      display: 'flex',
+                      height: 20,
+                      gap: 0.5,
+                      px: 1,
+                      py: 0,
+                      width: '100%',
+                    }}
+                    title={entry.name}
+                  >
+                    <Icon iconType="folder" />
+                    <Typography noWrap variant="caption">
+                      {entry.name}
+                    </Typography>
+                  </TableCell>
+                </FavoriteTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Panel>
+      )}
+    </>
   )
 }
 

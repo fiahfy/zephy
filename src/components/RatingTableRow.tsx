@@ -1,7 +1,9 @@
 import { TableRow } from '@mui/material'
-import { FocusEvent, ReactNode, useCallback } from 'react'
+import { FocusEvent, ReactNode, useCallback, useMemo } from 'react'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/contextMenu'
+import { buildZephyUrl } from '~/utils/url'
 
 type Props = {
   children: ReactNode
@@ -21,11 +23,30 @@ const RatingTableRow = (props: Props) => {
     [dispatch, score],
   )
 
+  const handleContextMenu = useMemo(() => {
+    const path = buildZephyUrl({ pathname: 'ratings', params: { score } })
+    return createContextMenuHandler([
+      {
+        type: 'openDirectory',
+        data: { path },
+      },
+      {
+        type: 'openInNewWindow',
+        data: { path },
+      },
+      {
+        type: 'openInNewTab',
+        data: { path },
+      },
+    ])
+  }, [score])
+
   return (
     <TableRow
       {...others}
       hover
       onClick={handleClick}
+      onContextMenu={handleContextMenu}
       sx={{
         cursor: 'pointer',
         display: 'flex',
