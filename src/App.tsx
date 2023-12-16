@@ -9,9 +9,11 @@ import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
 import TabBar from '~/components/TabBar'
 import useTitle from '~/hooks/useTitle'
+import useWatcher from '~/hooks/useWatcher'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   copy,
+  handle,
   load,
   moveToTrash,
   newFolder,
@@ -31,6 +33,7 @@ import {
   goToSettings,
   newTab,
   selectCurrentDirectoryPath,
+  selectCurrentDirectoryPaths,
   selectCurrentTitle,
   setCurrentViewMode,
   setSidebarHidden,
@@ -41,14 +44,27 @@ import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const App = () => {
   const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const currentDirectoryPaths = useAppSelector(selectCurrentDirectoryPaths)
   const currentTitle = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
 
   useTitle(currentTitle)
+  const { watch } = useWatcher()
 
   useEffect(() => {
     dispatch(load())
   }, [currentDirectoryPath, dispatch])
+
+  useEffect(
+    () =>
+      watch(
+        'tab',
+        currentDirectoryPaths,
+        async (eventType, directoryPath, filePath) =>
+          dispatch(handle(eventType, directoryPath, filePath)),
+      ),
+    [currentDirectoryPaths, dispatch, watch],
+  )
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {

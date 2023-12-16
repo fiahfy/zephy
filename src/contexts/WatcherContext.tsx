@@ -6,9 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { handle } from '~/store/explorer'
-import { selectCurrentDirectoryPaths } from '~/store/window'
+import { useAppDispatch } from '~/store'
 
 type EventType = 'create' | 'update' | 'delete'
 
@@ -20,7 +18,7 @@ type Callback = (
 
 export const WatcherContext = createContext<
   | {
-      watch: (directoryPaths: string[], callback: Callback) => void
+      watch: (key: string, directoryPaths: string[], callback: Callback) => void
     }
   | undefined
 >(undefined)
@@ -30,38 +28,53 @@ type Props = { children: ReactNode }
 export const WatcherProvider = (props: Props) => {
   const { children } = props
 
-  const currentDirectoryPaths = useAppSelector(selectCurrentDirectoryPaths)
   const dispatch = useAppDispatch()
 
-  const [directoryPaths, setDirectoryPaths] = useState<string[]>([])
-  const [callback, setCallback] = useState<() => Callback>()
+  const [registry, setRegistry] = useState<{
+    [key: string]: {
+      directoryPaths: string[]
+      callback: Callback
+    }
+  }>({})
 
-  const uniqueDirectoryPaths = useMemo(
-    () => [...new Set([...directoryPaths, ...currentDirectoryPaths])],
-    [currentDirectoryPaths, directoryPaths],
+  const directoryPaths = useMemo(
+    () => [
+      ...new Set(
+        Object.values(registry).flatMap(({ directoryPaths }) => directoryPaths),
+      ),
+    ],
+    [registry],
   )
 
   useEffect(() => {
     window.electronAPI.watchDirectories(
-      uniqueDirectoryPaths,
+      directoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
-          uniqueDirectoryPaths,
+          directoryPaths,
           eventType,
           directoryPath,
           filePath,
         })
-        callback?.()(eventType, directoryPath, filePath)
-        dispatch(handle(eventType, directoryPath, filePath))
+        Object.values(registry).forEach(({ callback }) =>
+          callback(eventType, directoryPath, filePath),
+        )
       },
     )
-  }, [callback, dispatch, uniqueDirectoryPaths])
+  }, [directoryPaths, dispatch, registry])
 
-  const watch = useCallback((directoryPaths: string[], callback: Callback) => {
-    setDirectoryPaths(directoryPaths)
-    setCallback(() => () => callback)
-  }, [])
+  const watch = useCallback(
+    (key: string, directoryPaths: string[], callback: Callback) =>
+      setRegistry((registry) => ({
+        ...registry,
+        [key]: {
+          directoryPaths,
+          callback,
+        },
+      })),
+    [],
+  )
 
   const value = { watch }
 

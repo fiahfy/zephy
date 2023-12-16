@@ -59,7 +59,7 @@ const ExplorerPanel = () => {
 
   useEffect(
     () =>
-      watch(loaded, async (eventType, directoryPath, filePath) => {
+      watch('explorer', loaded, async (eventType, directoryPath, filePath) => {
         const entry =
           eventType === 'delete'
             ? undefined

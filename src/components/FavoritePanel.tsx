@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import FavoriteTableRow from '~/components/FavoriteTableRow'
 import Icon from '~/components/Icon'
 import Panel from '~/components/Panel'
+import useWatcher from '~/hooks/useWatcher'
 import { DetailedEntry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorites } from '~/store/favorite'
@@ -10,24 +11,39 @@ import { selectFavorites } from '~/store/favorite'
 const FavoritePanel = () => {
   const favorites = useAppSelector(selectFavorites)
 
+  const { watch } = useWatcher()
+
   const [selected, setSelected] = useState<string[]>([])
   const [entries, setEntries] = useState<DetailedEntry[]>([])
 
-  useEffect(() => {
-    ;(async () => {
-      const entries = await (async () => {
-        try {
-          const entries = await window.electronAPI.getDetailedEntriesForPaths(
-            favorites.map((favorite) => favorite.path),
-          )
-          return entries.sort((a, b) => a.name.localeCompare(b.name))
-        } catch (e) {
-          return []
-        }
-      })()
-      setEntries(entries)
+  const load = useCallback(async () => {
+    const entries = await (async () => {
+      try {
+        const entries = await window.electronAPI.getDetailedEntriesForPaths(
+          favorites.map((favorite) => favorite.path),
+        )
+        return entries.sort((a, b) => a.name.localeCompare(b.name))
+      } catch (e) {
+        return []
+      }
     })()
+    setEntries(entries)
   }, [favorites])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  useEffect(
+    () =>
+      watch('favorite', [], async (_eventType, _directoryPath, filePath) => {
+        const paths = entries.map((entry) => entry.path)
+        if (paths.includes(filePath)) {
+          load()
+        }
+      }),
+    [entries, load, watch],
+  )
 
   const handleBlur = useCallback(() => setSelected([]), [])
 

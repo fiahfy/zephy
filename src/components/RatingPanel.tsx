@@ -2,34 +2,49 @@ import { Rating, Table, TableBody, TableCell, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import Panel from '~/components/Panel'
 import RatingTableRow from '~/components/RatingTableRow'
+import useWatcher from '~/hooks/useWatcher'
 import { useAppSelector } from '~/store'
 import { selectPathsByScore } from '~/store/rating'
 
 const RatingPanel = () => {
   const pathsByScore = useAppSelector(selectPathsByScore)
 
+  const { watch } = useWatcher()
+
   const [selected, setSelected] = useState<number[]>([])
   const [items, setItems] = useState<{ count: number; score: number }[]>([])
 
-  useEffect(() => {
-    ;(async () => {
-      let items = await Promise.all(
-        Object.keys(pathsByScore).map(async (score) => {
-          const paths = pathsByScore[Number(score)] ?? []
-          const items =
-            await window.electronAPI.getDetailedEntriesForPaths(paths)
-          return {
-            score: Number(score),
-            count: items.length,
-          }
-        }),
-      )
-      items = items
-        .filter((item) => item.count > 0)
-        .sort((a, b) => b.score - a.score)
-      setItems(items)
-    })()
+  const load = useCallback(async () => {
+    let items = await Promise.all(
+      Object.keys(pathsByScore).map(async (score) => {
+        const paths = pathsByScore[Number(score)] ?? []
+        const items = await window.electronAPI.getDetailedEntriesForPaths(paths)
+        return {
+          score: Number(score),
+          count: items.length,
+        }
+      }),
+    )
+    items = items
+      .filter((item) => item.count > 0)
+      .sort((a, b) => b.score - a.score)
+    setItems(items)
   }, [pathsByScore])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  useEffect(
+    () =>
+      watch('rating', [], async (_eventType, _directoryPath, filePath) => {
+        const paths = Object.values(pathsByScore).flatMap((paths) => paths)
+        if (paths.includes(filePath)) {
+          load()
+        }
+      }),
+    [load, pathsByScore, watch],
+  )
 
   const handleBlur = useCallback(() => setSelected([]), [])
 
