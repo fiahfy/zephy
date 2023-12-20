@@ -1,3 +1,4 @@
+import { alpha } from '@mui/system'
 import { DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import { Entry } from '~/interfaces'
@@ -36,9 +37,10 @@ const useDropEntry = (entry: Entry) => {
       ...(dropping
         ? {
             '::before': {
-              border: `${theme.spacing(0.25)} solid ${
-                theme.palette.primary.main
-              }`,
+              backgroundColor: alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity,
+              ),
               content: '""',
               inset: 0,
               pointerEvents: 'none',
