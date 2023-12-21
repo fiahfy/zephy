@@ -1,10 +1,18 @@
-import { Tabs } from '@mui/material'
+import { Add } from '@mui/icons-material'
+import { Box, IconButton, Tabs } from '@mui/material'
 import { SyntheticEvent, useCallback } from 'react'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { changeTab, selectTabIndex, selectTabs } from '~/store/window'
+import {
+  changeTab,
+  newTab,
+  selectCurrentDirectoryPath,
+  selectTabIndex,
+  selectTabs,
+} from '~/store/window'
 
 const TabBar = () => {
+  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
   const tabIndex = useAppSelector(selectTabIndex)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
@@ -12,6 +20,11 @@ const TabBar = () => {
   const handleChange = useCallback(
     (_e: SyntheticEvent, value: number) => dispatch(changeTab(value)),
     [dispatch],
+  )
+
+  const handleClick = useCallback(
+    () => dispatch(newTab(currentDirectoryPath)),
+    [currentDirectoryPath, dispatch],
   )
 
   return (
@@ -42,6 +55,16 @@ const TabBar = () => {
           {tabs.map((_, i) => (
             <TabBarItem index={i} key={i} />
           ))}
+          <Box sx={{ alignItems: 'center', display: 'flex', px: 0.5 }}>
+            <IconButton
+              component="span"
+              onClick={handleClick}
+              size="small"
+              title="Close"
+            >
+              <Add sx={{ fontSize: '1rem' }} />
+            </IconButton>
+          </Box>
         </Tabs>
       )}
     </>

@@ -561,16 +561,15 @@ export const newWindow = (): AppThunk => async (dispatch, getState) => {
 }
 
 export const newTab =
-  (directoryPath?: string): AppThunk =>
+  (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
     const tabIndex = selectTabIndex(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     const newTabIndex = tabIndex + 1
     dispatch(newTab({ index, tabIndex: newTabIndex }))
     dispatch(addTab({ tabIndex: newTabIndex }))
-    dispatch(changeDirectory(directoryPath ?? currentDirectoryPath))
+    dispatch(changeDirectory(directoryPath))
   }
 
 export const closeTab =

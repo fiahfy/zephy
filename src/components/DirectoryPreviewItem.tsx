@@ -239,6 +239,7 @@ const DirectoryPreviewItem = (props: Props) => {
         }
         sx={{
           '.MuiImageListItemBar-titleWrap': {
+            minWidth: 0,
             overflow: 'visible',
             p: 0,
             pb: 0.5,

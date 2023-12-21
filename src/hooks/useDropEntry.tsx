@@ -36,7 +36,7 @@ const useDropEntry = (entry: Entry) => {
       position: 'relative',
       ...(dropping
         ? {
-            '::before': {
+            '::after': {
               backgroundColor: alpha(
                 theme.palette.primary.main,
                 theme.palette.action.activatedOpacity,

@@ -89,7 +89,8 @@ const registerApplicationMenu = (
           },
           {
             accelerator: 'CmdOrCtrl+t',
-            click: () => send({ type: 'newTab' }),
+            click: () =>
+              send({ type: 'newTab', data: { path: app.getPath('home') } }),
             label: 'New Tab',
           },
           {
