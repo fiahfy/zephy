@@ -32,7 +32,7 @@ const TabBar = () => {
       {tabs.length > 1 && (
         <Tabs
           onChange={handleChange}
-          scrollButtons={false}
+          scrollButtons="auto"
           sx={{
             flexShrink: 0,
             minHeight: 0,
@@ -47,6 +47,9 @@ const TabBar = () => {
               bottom: 'auto',
               top: 0,
               transition: 'none',
+            },
+            '.MuiTabs-scrollButtons.Mui-disabled': {
+              opacity: 0.3,
             },
           }}
           value={tabIndex}
