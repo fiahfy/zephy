@@ -211,8 +211,7 @@ export const getEntryHierarchy = async (
     if (entry && entry.type === 'directory' && i < dirnames.length) {
       const path = dirnames.slice(0, i + 1).join(sep)
       const entries = await getEntries(path)
-      // limit entry size for performance issue
-      entry.children = entries.slice(0, 100)
+      entry.children = entries
     }
     return acc
   }, Promise.resolve(entry))

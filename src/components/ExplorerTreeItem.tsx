@@ -60,6 +60,8 @@ const ExplorerTreeItem = (props: Props) => {
                 (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
               )
               .sort((a, b) => a.name.localeCompare(b.name))
+              // limit entry size for performance issue
+              .slice(0, 100)
               .map((entry) => (
                 <ExplorerTreeItem entry={entry} key={entry.path} />
               ))
