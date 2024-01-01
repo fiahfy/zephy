@@ -594,12 +594,17 @@ export const rename =
     const { addEntries, focus, removeEntries, select } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
+    // get the selected paths after renaming
+    const selected = selectSelected(getState())
     dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
     dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
     dispatch(removeEntries({ tabIndex, paths: [path] }))
     dispatch(addEntries({ tabIndex, entries: [entry] }))
-    dispatch(select({ tabIndex, path: entry.path }))
-    dispatch(focus({ tabIndex, path: entry.path }))
+    // do not focus if the renamed entry is not selected
+    if (selected.length === 1 && selected[0] === path) {
+      dispatch(select({ tabIndex, path: entry.path }))
+      dispatch(focus({ tabIndex, path: entry.path }))
+    }
   }
 
 export const move =
