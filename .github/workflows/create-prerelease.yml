@@ -11,6 +11,21 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
+      - id: get_version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [[ $version != *-dev ]]; then
+            echo "Version suffix is not -dev"
+            exit 1
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+      - run: |
+          tag=v${{ steps.get_version.outputs.version }}
+          if gh release view $tag &> /dev/null; then
+            gh release delete $tag --cleanup-tag
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: yarn
       - run: yarn build
       - run: yarn release -m
