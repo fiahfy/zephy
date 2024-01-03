@@ -1,8 +1,6 @@
 import { Add as AddIcon } from '@mui/icons-material'
 import { IconButton, Tab } from '@mui/material'
 import { useCallback } from 'react'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { newTab, selectCurrentDirectoryPath } from '~/store/window'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {}
@@ -10,13 +8,7 @@ type Props = {}
 const TabBarAddItem = (props: Props) => {
   const { ...others } = props
 
-  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const dispatch = useAppDispatch()
-
-  const handleClick = useCallback(
-    () => dispatch(newTab(directoryPath)),
-    [directoryPath, dispatch],
-  )
+  const handleClick = useCallback(() => window.electronAPI.openTab(), [])
 
   return (
     <Tab

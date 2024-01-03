@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   moveEntriesToTrash: (paths: string[]) =>
     ipcRenderer.invoke('moveEntriesToTrash', paths),
   openEntry: (path: string) => ipcRenderer.invoke('openEntry', path),
+  openTab: () => ipcRenderer.invoke('openTab'),
   openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
   pasteEntries: (directoryPath: string) =>
     ipcRenderer.invoke('pasteEntries', directoryPath),

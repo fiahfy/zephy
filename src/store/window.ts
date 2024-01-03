@@ -580,10 +580,10 @@ export const newTab =
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    const tabIndex = selectTabIndex(getState())
-    const newTabIndex = tabIndex + 1
-    dispatch(newTab({ index, tabIndex: newTabIndex }))
-    dispatch(addTab({ tabIndex: newTabIndex }))
+    const tabs = selectTabs(getState())
+    const tabIndex = tabs.length
+    dispatch(newTab({ index, tabIndex }))
+    dispatch(addTab({ tabIndex }))
     dispatch(changeDirectory(directoryPath))
   }
 

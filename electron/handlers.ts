@@ -1,4 +1,4 @@
-import { IpcMainInvokeEvent, ipcMain, shell } from 'electron'
+import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 import { dirname } from 'node:path'
 import { copy, paste } from './utils/clipboard'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
@@ -79,6 +79,12 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   )
   ipcMain.handle('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
+  )
+  ipcMain.handle('openTab', (event: IpcMainInvokeEvent) =>
+    event.sender.send('sendMessage', {
+      type: 'newTab',
+      data: { path: app.getPath('home') },
+    }),
   )
   ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
     shell.openExternal(url),
