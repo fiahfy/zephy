@@ -6,29 +6,35 @@ import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
 import {
-  selectCurrentDirectoryPath,
-  selectCurrentSortOption,
-  selectCurrentViewMode,
+  selectGetDirectoryPath,
+  selectGetSortOption,
+  selectGetViewMode,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
-const Explorer = () => {
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const currentSortOption = useAppSelector(selectCurrentSortOption)
-  const currentViewMode = useAppSelector(selectCurrentViewMode)
+type Props = {
+  tabIndex: number
+}
+
+const Explorer = (props: Props) => {
+  const { tabIndex } = props
+
+  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
+  const sortOption = useAppSelector(selectGetSortOption)(directoryPath)
+  const viewMode = useAppSelector(selectGetViewMode)(directoryPath)
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({
-    path: currentDirectoryPath,
+    path: directoryPath,
     name: '',
     type: 'directory',
     url: '',
   })
 
   const zephySchema = useMemo(
-    () => isZephySchema(currentDirectoryPath),
-    [currentDirectoryPath],
+    () => isZephySchema(directoryPath),
+    [directoryPath],
   )
 
   const handleClick = useCallback(() => {
@@ -41,29 +47,24 @@ const Explorer = () => {
       createContextMenuHandler([
         {
           type: 'newFolder',
-          data: { path: zephySchema ? undefined : currentDirectoryPath },
+          data: { path: zephySchema ? undefined : directoryPath },
         },
         { type: 'separator' },
         { type: 'cutEntries', data: { paths: [] } },
         { type: 'copyEntries', data: { paths: [] } },
         {
           type: 'pasteEntries',
-          data: { path: zephySchema ? undefined : currentDirectoryPath },
+          data: { path: zephySchema ? undefined : directoryPath },
         },
         { type: 'separator' },
-        { type: 'view', data: { viewMode: currentViewMode } },
+        { type: 'view', data: { viewMode } },
         { type: 'separator' },
         {
           type: 'sortBy',
-          data: { orderBy: currentSortOption.orderBy },
+          data: { orderBy: sortOption.orderBy },
         },
       ]),
-    [
-      currentDirectoryPath,
-      currentSortOption.orderBy,
-      currentViewMode,
-      zephySchema,
-    ],
+    [directoryPath, sortOption.orderBy, viewMode, zephySchema],
   )
 
   const handleBlur = useCallback(
@@ -87,9 +88,9 @@ const Explorer = () => {
       sx={{ height: '100%', ...droppableStyle }}
       {...dropHandlers}
     >
-      {createElement(
-        currentViewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
-      )}
+      {createElement(viewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable, {
+        tabIndex,
+      })}
     </Box>
   )
 }

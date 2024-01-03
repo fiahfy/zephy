@@ -6,13 +6,14 @@ import { Content } from '~/interfaces'
 type Props = {
   children: React.ReactNode
   content: Content
+  tabIndex: number
 }
 
 const ExplorerTableRow = (props: Props) => {
-  const { children, content } = props
+  const { children, content, tabIndex } = props
 
   const { focused, onClick, onContextMenu, onDoubleClick, selected } =
-    useExplorerItem(content)
+    useExplorerItem(tabIndex, content)
 
   return (
     <Box

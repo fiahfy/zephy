@@ -4,30 +4,30 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import {
   focus,
   select,
-  selectContents,
-  selectEditing,
-  selectError,
-  selectFocused,
-  selectLoading,
-  selectQuery,
-  selectSelectedContents,
+  selectGetContents,
+  selectGetEditing,
+  selectGetError,
+  selectGetFocused,
+  selectGetLoading,
+  selectGetQuery,
+  selectGetSelectedContents,
 } from '~/store/explorer'
 import { openEntry } from '~/store/settings'
 import {
   changeDirectory,
-  selectCurrentScrollTop,
-  setCurrentScrollTop,
+  selectGetScrollTop,
+  setScrollTop,
 } from '~/store/window'
 
-const useExplorerList = () => {
-  const contents = useAppSelector(selectContents)
-  const currentScrollTop = useAppSelector(selectCurrentScrollTop)
-  const editing = useAppSelector(selectEditing)
-  const error = useAppSelector(selectError)
-  const focused = useAppSelector(selectFocused)
-  const loading = useAppSelector(selectLoading)
-  const query = useAppSelector(selectQuery)
-  const selectedContents = useAppSelector(selectSelectedContents)
+const useExplorerList = (tabIndex: number) => {
+  const contents = useAppSelector(selectGetContents)(tabIndex)
+  const editing = useAppSelector(selectGetEditing)(tabIndex)
+  const error = useAppSelector(selectGetError)(tabIndex)
+  const focused = useAppSelector(selectGetFocused)(tabIndex)
+  const loading = useAppSelector(selectGetLoading)(tabIndex)
+  const query = useAppSelector(selectGetQuery)(tabIndex)
+  const scrollTop = useAppSelector(selectGetScrollTop)(tabIndex)
+  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
   const dispatch = useAppDispatch()
 
   const noDataText = useMemo(
@@ -68,7 +68,7 @@ const useExplorerList = () => {
   const onScrollEnd = useCallback(
     (scrollTop: number) => {
       if (!loading) {
-        dispatch(setCurrentScrollTop(scrollTop))
+        dispatch(setScrollTop(scrollTop))
       }
     },
     [dispatch, loading],
@@ -83,7 +83,7 @@ const useExplorerList = () => {
     onKeyDownArrow,
     onKeyDownEnter,
     onScrollEnd,
-    scrollTop: currentScrollTop,
+    scrollTop,
   }
 }
 

@@ -33,7 +33,12 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { load, search, selectLoading, selectQuery } from '~/store/explorer'
+import {
+  refresh,
+  search,
+  selectCurrentLoading,
+  selectCurrentQuery,
+} from '~/store/explorer'
 import { selectIsFavorite, toggleFavorite } from '~/store/favorite'
 import { removeQuery, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
@@ -58,15 +63,15 @@ const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const currentSortOption = useAppSelector(selectCurrentSortOption)
-  const currentViewMode = useAppSelector(selectCurrentViewMode)
-  const favorite = useAppSelector(selectIsFavorite)(currentDirectoryPath)
+  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const favorite = useAppSelector(selectIsFavorite)(directoryPath)
   const forwardHistories = useAppSelector(selectForwardHistories)
   const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
-  const loading = useAppSelector(selectLoading)
-  const query = useAppSelector(selectQuery)
+  const loading = useAppSelector(selectCurrentLoading)
+  const query = useAppSelector(selectCurrentQuery)
   const queryHistories = useAppSelector(selectQueryHistories)
+  const sortOption = useAppSelector(selectCurrentSortOption)
+  const viewMode = useAppSelector(selectCurrentViewMode)
   const dispatch = useAppDispatch()
 
   const { visible } = useTrafficLight()
@@ -101,13 +106,13 @@ const AddressBar = () => {
   const backLongPressHandlers = useLongPress(backHistoryMenuHandler)
   const forwardLongPressHandlers = useLongPress(forwardHistoryMenuHandler)
 
-  const [directoryPath, setDirectoryPath] = useState('')
+  const [directoryPathInput, setDirectoryPathInput] = useState('')
   const [queryInput, setQueryInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
   const zephySchema = useMemo(
-    () => isZephySchema(currentDirectoryPath),
-    [currentDirectoryPath],
+    () => isZephySchema(directoryPath),
+    [directoryPath],
   )
 
   const searchBy = useCallback(
@@ -135,11 +140,11 @@ const AddressBar = () => {
   }, [dispatch, searchBy])
 
   useEffect(
-    () => setDirectoryPath(currentDirectoryPath),
-    [currentDirectoryPath, dispatch],
+    () => setDirectoryPathInput(directoryPath),
+    [directoryPath, dispatch],
   )
 
-  useEffect(() => setQueryInput(query), [dispatch, query])
+  useEffect(() => setQueryInput(query), [query, dispatch])
 
   const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 
@@ -151,18 +156,18 @@ const AddressBar = () => {
   )
 
   const handleClickRefresh = useCallback(async () => {
-    setDirectoryPath(currentDirectoryPath)
-    dispatch(load(true))
-  }, [currentDirectoryPath, dispatch])
+    setDirectoryPathInput(directoryPath)
+    dispatch(refresh())
+  }, [directoryPath, dispatch])
 
   const handleClickFolder = useCallback(
-    async () => dispatch(openEntry(currentDirectoryPath)),
-    [currentDirectoryPath, dispatch],
+    async () => dispatch(openEntry(directoryPath)),
+    [directoryPath, dispatch],
   )
 
   const handleClickFavorite = useCallback(
-    () => dispatch(toggleFavorite(currentDirectoryPath)),
-    [currentDirectoryPath, dispatch],
+    () => dispatch(toggleFavorite(directoryPath)),
+    [directoryPath, dispatch],
   )
 
   const handleClickSearch = useCallback(
@@ -183,14 +188,14 @@ const AddressBar = () => {
       createContextMenuHandler([
         {
           type: 'newFolder',
-          data: { path: zephySchema ? undefined : currentDirectoryPath },
+          data: { path: zephySchema ? undefined : directoryPath },
         },
         { type: 'separator' },
-        { type: 'view', data: { viewMode: currentViewMode } },
+        { type: 'view', data: { viewMode: viewMode } },
         { type: 'separator' },
         {
           type: 'sortBy',
-          data: { orderBy: currentSortOption.orderBy },
+          data: { orderBy: sortOption.orderBy },
         },
         { type: 'separator' },
         {
@@ -204,18 +209,12 @@ const AddressBar = () => {
         { type: 'separator' },
         { type: 'settings' },
       ]),
-    [
-      currentDirectoryPath,
-      currentSortOption.orderBy,
-      currentViewMode,
-      isSidebarHidden,
-      zephySchema,
-    ],
+    [directoryPath, sortOption.orderBy, viewMode, isSidebarHidden, zephySchema],
   )
   const handleChangeDirectory = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      setDirectoryPath(value)
+      setDirectoryPathInput(value)
     },
     [],
   )
@@ -233,11 +232,15 @@ const AddressBar = () => {
 
   const handleKeyDownDirectory = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.nativeEvent.isComposing && directoryPath) {
-        dispatch(changeDirectory(directoryPath))
+      if (
+        e.key === 'Enter' &&
+        !e.nativeEvent.isComposing &&
+        directoryPathInput
+      ) {
+        dispatch(changeDirectory(directoryPathInput))
       }
     },
-    [directoryPath, dispatch],
+    [directoryPathInput, dispatch],
   )
 
   const handleKeyDownQuery = useCallback(
@@ -333,7 +336,7 @@ const AddressBar = () => {
                     onClick={zephySchema ? undefined : handleClickFolder}
                     size="small"
                   >
-                    <Icon iconType={getIconType(currentDirectoryPath)} />
+                    <Icon iconType={getIconType(directoryPath)} />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -342,7 +345,7 @@ const AddressBar = () => {
             onChange={handleChangeDirectory}
             onKeyDown={handleKeyDownDirectory}
             spellCheck={false}
-            value={directoryPath}
+            value={directoryPathInput}
           />
         </Box>
         <Box sx={{ flex: '1 1 0' }} />

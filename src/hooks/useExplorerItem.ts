@@ -7,25 +7,25 @@ import {
   multiSelect,
   rangeSelect,
   select,
+  selectGetSelectedContents,
   selectIsEditing,
   selectIsFocused,
   selectIsSelected,
-  selectSelectedContents,
   startEditing,
 } from '~/store/explorer'
 import { selectIsFavorite } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import { changeDirectory, selectCurrentDirectoryPath } from '~/store/window'
+import { changeDirectory, selectGetDirectoryPath } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
-const useExplorerItem = (content: Content) => {
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const editing = useAppSelector(selectIsEditing)(content.path)
+const useExplorerItem = (tabIndex: number, content: Content) => {
+  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
+  const editing = useAppSelector(selectIsEditing)(tabIndex, content.path)
   const favorite = useAppSelector(selectIsFavorite)(content.path)
-  const focused = useAppSelector(selectIsFocused)(content.path)
-  const selected = useAppSelector(selectIsSelected)(content.path)
-  const selectedContents = useAppSelector(selectSelectedContents)
+  const focused = useAppSelector(selectIsFocused)(tabIndex, content.path)
+  const selected = useAppSelector(selectIsSelected)(tabIndex, content.path)
+  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
   const dispatch = useAppDispatch()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
@@ -63,8 +63,8 @@ const useExplorerItem = (content: Content) => {
   )
 
   const zephySchema = useMemo(
-    () => isZephySchema(currentDirectoryPath),
-    [currentDirectoryPath],
+    () => isZephySchema(directoryPath),
+    [directoryPath],
   )
 
   const onContextMenu = useMemo(() => {
@@ -125,13 +125,13 @@ const useExplorerItem = (content: Content) => {
       { type: 'copyEntries', data: { paths } },
       {
         type: 'pasteEntries',
-        data: { path: zephySchema ? undefined : currentDirectoryPath },
+        data: { path: zephySchema ? undefined : directoryPath },
       },
     ])
   }, [
     content.path,
     content.type,
-    currentDirectoryPath,
+    directoryPath,
     favorite,
     selectedContents,
     zephySchema,

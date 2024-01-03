@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
-import { addTab, removeTab, selectLoading } from '~/store/explorer'
+import { addTab, removeTab, selectGetLoading } from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
 import { buildZephyUrl, getTitle } from '~/utils/url'
 
@@ -263,7 +263,7 @@ export const windowSlice = createSlice({
         },
       }
     },
-    setCurrentScrollTop(
+    setScrollTop(
       state,
       action: PayloadAction<{ index: number; scrollTop: number }>,
     ) {
@@ -414,10 +414,13 @@ export const { replaceState } = windowSlice.actions
 
 export default windowSlice.reducer
 
-export const selectCurrentWindow = (state: AppState) => {
-  const window = state.window[state.windowIndex]
-  return window ?? defaultWindowState
-}
+export const selectWindow = (state: AppState) => state.window
+
+export const selectCurrentWindow = createSelector(
+  selectWindow,
+  selectWindowIndex,
+  (window, windowIndex) => window[windowIndex] ?? defaultWindowState,
+)
 
 export const selectTabIndex = createSelector(
   selectCurrentWindow,
@@ -444,17 +447,32 @@ export const selectViewMode = createSelector(
   (currentWindow) => currentWindow.viewMode,
 )
 
-export const selectCurrentTab = createSelector(
+export const selectGetTab = createSelector(
   selectTabs,
-  selectTabIndex,
-  (tabs, tabIndex) =>
+  (tabs) => (tabIndex: number) =>
     tabs[tabIndex] ?? { history: { histories: [], index: -1 } },
 )
 
-export const selectGetCurrentHistory = createSelector(
+export const selectCanCloseTab = createSelector(
   selectTabs,
-  (tabs) => (tabIndex: number) => {
-    const tab = tabs[tabIndex] ?? { history: { histories: [], index: -1 } }
+  (tabs) => tabs.length > 1,
+)
+
+export const selectDirectoryPaths = createSelector(selectTabs, (tabs) =>
+  tabs.reduce((acc, tab) => {
+    const directoryPath =
+      tab.history.histories[tab.history.index]?.directoryPath
+    if (!directoryPath) {
+      return acc
+    }
+    return [...acc, directoryPath]
+  }, [] as string[]),
+)
+
+export const selectGetHistory = createSelector(
+  selectGetTab,
+  (getTab) => (tabIndex: number) => {
+    const tab = getTab(tabIndex)
     const history = tab.history
     return (
       history.histories[history.index] ?? {
@@ -466,30 +484,43 @@ export const selectGetCurrentHistory = createSelector(
   },
 )
 
-export const selectCanCloseTab = createSelector(
-  selectTabs,
-  (tabs) => tabs.length > 1,
+export const selectGetDirectoryPath = createSelector(
+  selectGetHistory,
+  (getHistory) => (tabIndex: number) => getHistory(tabIndex).directoryPath,
 )
 
-export const selectCurrentDirectoryPaths = createSelector(selectTabs, (tabs) =>
-  tabs.reduce((acc, tab) => {
-    const directoryPath =
-      tab.history.histories[tab.history.index]?.directoryPath
-    if (!directoryPath) {
-      return acc
-    }
-    return [...acc, directoryPath]
-  }, [] as string[]),
+export const selectGetScrollTop = createSelector(
+  selectGetHistory,
+  (getHistory) => (tabIndex: number) => getHistory(tabIndex).scrollTop,
 )
 
-export const selectCurrentHistory = createSelector(
-  selectCurrentTab,
-  (tab) =>
-    tab.history.histories[tab.history.index] ?? {
-      directoryPath: '',
-      scrollTop: 0,
-      title: '',
-    },
+export const selectGetSortOption = createSelector(
+  selectSorting,
+  (sorting) => (directoryPath: string) =>
+    sorting[directoryPath] ?? ({ order: 'asc', orderBy: 'name' } as const),
+)
+
+export const selectGetViewMode = createSelector(
+  selectViewMode,
+  (viewMode) => (directoryPath: string) => viewMode[directoryPath] ?? 'list',
+)
+
+export const selectIsSidebarHidden = createSelector(
+  selectSidebar,
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden,
+)
+
+export const selectGetSidebarWidth = createSelector(
+  selectSidebar,
+  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width,
+)
+
+/* for current tab */
+
+export const selectCurrentTab = createSelector(
+  selectGetTab,
+  selectTabIndex,
+  (getTab, tabIndex) => getTab(tabIndex),
 )
 
 export const selectCanBack = createSelector(
@@ -510,14 +541,15 @@ export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>
   tab.history.histories.slice(tab.history.index + 1),
 )
 
+export const selectCurrentHistory = createSelector(
+  selectGetHistory,
+  selectTabIndex,
+  (getHistory, tabIndex) => getHistory(tabIndex),
+)
+
 export const selectCurrentDirectoryPath = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.directoryPath,
-)
-
-export const selectCurrentScrollTop = createSelector(
-  selectCurrentHistory,
-  (currentHistory) => currentHistory.scrollTop,
 )
 
 export const selectCurrentTitle = createSelector(
@@ -526,32 +558,15 @@ export const selectCurrentTitle = createSelector(
 )
 
 export const selectCurrentSortOption = createSelector(
-  selectSorting,
+  selectGetSortOption,
   selectCurrentDirectoryPath,
-  (sorting, currentDirectoryPath) =>
-    sorting[currentDirectoryPath] ??
-    ({ order: 'asc', orderBy: 'name' } as const),
+  (getSortOption, currentDirectoryPath) => getSortOption(currentDirectoryPath),
 )
 
 export const selectCurrentViewMode = createSelector(
-  selectViewMode,
+  selectGetViewMode,
   selectCurrentDirectoryPath,
-  (viewMode, currentDirectoryPath) => viewMode[currentDirectoryPath] ?? 'list',
-)
-
-export const selectIsSidebarHidden = createSelector(
-  selectSidebar,
-  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].hidden,
-)
-
-export const selectGetSidebarWidth = createSelector(
-  selectSidebar,
-  (sidebar) => (variant: 'primary' | 'secondary') => sidebar[variant].width,
-)
-
-export const selectGetViewMode = createSelector(
-  selectViewMode,
-  (viewMode) => (directoryPath: string) => viewMode[directoryPath],
+  (getViewMode, currentDirectoryPath) => getViewMode(currentDirectoryPath),
 )
 
 export const newWindow = (): AppThunk => async (dispatch, getState) => {
@@ -600,9 +615,10 @@ export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const index = selectWindowIndex(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-    const currentViewMode = selectCurrentViewMode(getState())
-    const loading = selectLoading(getState())
+    const tabIndex = selectTabIndex(getState())
+    const currentDirectoryPath = selectGetDirectoryPath(getState())(tabIndex)
+    const currentViewMode = selectGetViewMode(getState())(currentDirectoryPath)
+    const loading = selectGetLoading(getState())(tabIndex)
     const viewMode = selectGetViewMode(getState())(directoryPath)
     if (loading) {
       return
@@ -627,7 +643,8 @@ export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const index = selectWindowIndex(getState())
-    const loading = selectLoading(getState())
+    const tabIndex = selectTabIndex(getState())
+    const loading = selectGetLoading(getState())(tabIndex)
     if (loading) {
       return
     }
@@ -658,12 +675,12 @@ export const goToRatings =
 export const goToSettings = (): AppThunk => async (dispatch) =>
   dispatch(changeDirectory(buildZephyUrl({ pathname: 'settings' })))
 
-export const setCurrentScrollTop =
+export const setScrollTop =
   (scrollTop: number): AppThunk =>
   async (dispatch, getState) => {
-    const { setCurrentScrollTop } = windowSlice.actions
+    const { setScrollTop } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(setCurrentScrollTop({ index, scrollTop }))
+    dispatch(setScrollTop({ index, scrollTop }))
   }
 
 export const sort =

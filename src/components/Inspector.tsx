@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react'
 import EntryInformation from '~/components/EntryInformation'
 import Preview from '~/components/Preview'
 import { useAppSelector } from '~/store'
-import { selectSelected } from '~/store/explorer'
+import { selectCurrentSelected } from '~/store/explorer'
 
 const Inspector = () => {
-  const selected = useAppSelector(selectSelected)
+  const selected = useAppSelector(selectCurrentSelected)
 
   const ref = useRef<HTMLElement>(null)
 

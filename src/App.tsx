@@ -1,20 +1,16 @@
 import { Box, GlobalStyles, Toolbar } from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
-import Explorer from '~/components/Explorer'
 import Inspector from '~/components/Inspector'
 import Navigator from '~/components/Navigator'
-import Settings from '~/components/Settings'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
 import TabBar from '~/components/TabBar'
+import TabPanels from '~/components/TabPanels'
 import useTitle from '~/hooks/useTitle'
-import useWatcher from '~/hooks/useWatcher'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   copy,
-  handle,
-  load,
   moveToTrash,
   newFolder,
   paste,
@@ -32,8 +28,6 @@ import {
   go,
   goToSettings,
   newTab,
-  selectCurrentDirectoryPath,
-  selectCurrentDirectoryPaths,
   selectCurrentTitle,
   setCurrentViewMode,
   setSidebarHidden,
@@ -43,28 +37,10 @@ import {
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const App = () => {
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const currentDirectoryPaths = useAppSelector(selectCurrentDirectoryPaths)
-  const currentTitle = useAppSelector(selectCurrentTitle)
+  const title = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
 
-  useTitle(currentTitle)
-  const { watch } = useWatcher()
-
-  useEffect(() => {
-    dispatch(load())
-  }, [currentDirectoryPath, dispatch])
-
-  useEffect(
-    () =>
-      watch(
-        'tab',
-        currentDirectoryPaths,
-        async (eventType, directoryPath, filePath) =>
-          dispatch(handle(eventType, directoryPath, filePath)),
-      ),
-    [currentDirectoryPaths, dispatch, watch],
-  )
+  useTitle(title)
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {
@@ -163,15 +139,6 @@ const App = () => {
     return () => document.removeEventListener('mouseup', handler)
   }, [dispatch])
 
-  const Component = useMemo(() => {
-    switch (currentDirectoryPath) {
-      case 'zephy://settings':
-        return Settings
-      default:
-        return Explorer
-    }
-  }, [currentDirectoryPath])
-
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
@@ -244,9 +211,7 @@ const App = () => {
           }}
         />
         <TabBar />
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-          <Component />
-        </Box>
+        <TabPanels />
         <Toolbar
           sx={{
             flexShrink: 0,

@@ -17,7 +17,7 @@ import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectSelectedContents } from '~/store/explorer'
+import { selectGetSelectedContents } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
@@ -54,17 +54,18 @@ const reducer = (_state: State, action: Action) => {
 
 type Props = {
   content: Content
+  tabIndex: number
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const { content } = props
+  const { content, tabIndex } = props
 
-  const selectedContents = useAppSelector(selectSelectedContents)
+  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
   const { editing, focused, onClick, onContextMenu, onDoubleClick, selected } =
-    useExplorerItem(content)
+    useExplorerItem(tabIndex, content)
 
   const dragContents = useMemo(
     () => (editing ? [] : selected ? selectedContents : [content]),

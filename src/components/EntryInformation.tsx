@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import EntryInformationTable from '~/components/EntryInformationTable'
 import { Metadata } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectSelectedContents } from '~/store/explorer'
+import { selectCurrentSelectedContents } from '~/store/explorer'
 
 const EntryInformation = () => {
-  const entries = useAppSelector(selectSelectedContents)
+  const entries = useAppSelector(selectCurrentSelectedContents)
 
   const [metadata, setMetadata] = useState<Metadata>()
 

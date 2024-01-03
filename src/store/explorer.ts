@@ -11,9 +11,9 @@ import {
 } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
-  selectCurrentDirectoryPath,
-  selectCurrentSortOption,
-  selectGetCurrentHistory,
+  selectGetDirectoryPath,
+  selectGetHistory,
+  selectGetSortOption,
   selectTabIndex,
   selectTabs,
 } from '~/store/window'
@@ -21,7 +21,6 @@ import { isHiddenFile } from '~/utils/file'
 import { parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
-  directoryPath: string
   editing: string | undefined
   entries: DetailedEntry[]
   error: boolean
@@ -38,7 +37,6 @@ type State = {
 const initialState: State = {}
 
 const defaultExplorerState = {
-  directoryPath: '',
   editing: undefined,
   entries: [],
   error: false,
@@ -86,16 +84,14 @@ export const explorerSlice = createSlice({
       state,
       action: PayloadAction<{
         tabIndex: number
-        directoryPath: string
       }>,
     ) {
-      const { tabIndex, directoryPath } = action.payload
+      const { tabIndex } = action.payload
       const explorer = state[tabIndex] ?? defaultExplorerState
       return {
         ...state,
         [tabIndex]: {
           ...explorer,
-          directoryPath,
           entries: [],
           loading: true,
           error: false,
@@ -327,141 +323,175 @@ export const { addTab, removeTab } = explorerSlice.actions
 
 export default explorerSlice.reducer
 
-export const selectExplorer = (state: AppState) => {
-  const window = state.window[state.windowIndex]
-  const explorer = state.explorer[window.tabIndex]
-  return explorer ?? defaultExplorerState
-}
+export const selectExplorer = (state: AppState) => state.explorer
 
-export const selectDirectoryPath = createSelector(
+export const selectGetExplorer = createSelector(
   selectExplorer,
-  (explorer) => explorer.directoryPath,
+  (explorer) => (tabIndex: number) =>
+    explorer[tabIndex] ?? defaultExplorerState,
 )
 
-export const selectEntries = createSelector(
-  selectExplorer,
-  (explorer) => explorer.entries,
+export const selectGetEntries = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).entries,
 )
 
-export const selectError = createSelector(
-  selectExplorer,
-  (explorer) => explorer.error,
+export const selectGetError = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).error,
 )
 
-export const selectLoading = createSelector(
-  selectExplorer,
-  (explorer) => explorer.loading,
+export const selectGetLoading = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).loading,
 )
 
-export const selectQuery = createSelector(
-  selectExplorer,
-  (explorer) => explorer.query,
+export const selectGetQuery = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).query,
 )
 
-export const selectEditing = createSelector(
-  selectExplorer,
-  (explorer) => explorer.editing,
+export const selectGetEditing = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).editing,
 )
 
 export const selectIsEditing = createSelector(
-  selectEditing,
-  (editing) => (path: string) => editing === path,
+  selectGetEditing,
+  (getEditing) => (tabIndex: number, path: string) =>
+    getEditing(tabIndex) === path,
 )
 
-export const selectFocused = createSelector(
-  selectExplorer,
-  (explorer) => explorer.focused,
+export const selectGetFocused = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).focused,
 )
 
 export const selectIsFocused = createSelector(
-  selectFocused,
-  (focused) => (path: string) => focused === path,
+  selectGetFocused,
+  (getFocused) => (tabIndex: number, path: string) =>
+    getFocused(tabIndex) === path,
 )
 
-export const selectSelected = createSelector(
-  selectExplorer,
-  (explorer) => explorer.selected,
+export const selectGetSelected = createSelector(
+  selectGetExplorer,
+  (getExplorer) => (tabIndex: number) => getExplorer(tabIndex).selected,
 )
 
 export const selectIsSelected = createSelector(
-  selectSelected,
-  (selected) => (path: string) => selected.includes(path),
+  selectGetSelected,
+  (getSelected) => (tabIndex: number, path: string) =>
+    getSelected(tabIndex).includes(path),
 )
 
-export const selectContents = createSelector(
-  selectEntries,
-  selectQuery,
-  selectCurrentSortOption,
-  selectShouldShowHiddenFiles,
+export const selectGetContents = createSelector(
+  selectGetDirectoryPath,
+  selectGetEntries,
+  selectGetQuery,
+  selectGetSortOption,
   selectGetScore,
-  (entries, query, currentSortOption, shouldShowHiddenFiles, getScore) => {
-    const comparator = (a: Content, b: Content) => {
-      const aValue = a[currentSortOption.orderBy]
-      const bValue = b[currentSortOption.orderBy]
-      let result = 0
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        result = aValue.localeCompare(bValue)
-      } else {
-        if (aValue !== undefined && bValue !== undefined) {
-          if (aValue > bValue) {
-            result = 1
-          } else if (aValue < bValue) {
-            result = -1
-          }
+  selectShouldShowHiddenFiles,
+  (
+    getDirectoryPath,
+    getEntries,
+    getQuery,
+    getSortOption,
+    getScore,
+    shouldShowHiddenFiles,
+  ) =>
+    (tabIndex: number) => {
+      const directoryPath = getDirectoryPath(tabIndex)
+      const entries = getEntries(tabIndex)
+      const query = getQuery(tabIndex)
+      const sortOption = getSortOption(directoryPath)
+      const comparator = (a: Content, b: Content) => {
+        const aValue = a[sortOption.orderBy]
+        const bValue = b[sortOption.orderBy]
+        let result = 0
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          result = aValue.localeCompare(bValue)
         } else {
-          result = 0
+          if (aValue !== undefined && bValue !== undefined) {
+            if (aValue > bValue) {
+              result = 1
+            } else if (aValue < bValue) {
+              result = -1
+            }
+          } else {
+            result = 0
+          }
         }
+        const orderSign = sortOption.order === 'desc' ? -1 : 1
+        return orderSign * result
       }
-      const orderSign = currentSortOption.order === 'desc' ? -1 : 1
-      return orderSign * result
-    }
-    return entries
-      .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
-      .filter(
-        (entry) =>
-          !query || entry.name.toLowerCase().includes(query.toLowerCase()),
-      )
-      .map((entry) => ({
-        ...entry,
-        rating: getScore(entry.path),
-      }))
-      .sort((a, b) => comparator(a, b))
-  },
+      return entries
+        .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+        .filter(
+          (entry) =>
+            !query || entry.name.toLowerCase().includes(query.toLowerCase()),
+        )
+        .map((entry) => ({
+          ...entry,
+          rating: getScore(entry.path),
+        }))
+        .sort((a, b) => comparator(a, b))
+    },
 )
 
-export const selectSelectedContents = createSelector(
-  selectContents,
+export const selectGetSelectedContents = createSelector(
+  selectGetContents,
   selectIsSelected,
-  (contents, isSelected) =>
-    contents.filter((content) => isSelected(content.path)),
+  (getContents, isSelected) => (tabIndex: number) =>
+    getContents(tabIndex).filter((content) =>
+      isSelected(tabIndex, content.path),
+    ),
 )
 
-export const search =
-  (query: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { setQuery } = explorerSlice.actions
-    const tabIndex = selectTabIndex(getState())
-    dispatch(setQuery({ tabIndex, query }))
-    dispatch(addQuery({ query }))
-  }
+/* for current tab */
+
+export const selectCurrentExplorer = createSelector(
+  selectGetExplorer,
+  selectTabIndex,
+  (getExplorer, tabIndex) => getExplorer(tabIndex),
+)
+
+export const selectCurrentLoading = createSelector(
+  selectCurrentExplorer,
+  (currentExplorer) => currentExplorer.loading,
+)
+
+export const selectCurrentQuery = createSelector(
+  selectCurrentExplorer,
+  (currentExplorer) => currentExplorer.query,
+)
+
+export const selectCurrentSelected = createSelector(
+  selectGetSelected,
+  selectTabIndex,
+  (getSelected, tabIndex) => getSelected(tabIndex),
+)
+
+export const selectCurrentContents = createSelector(
+  selectGetContents,
+  selectTabIndex,
+  (getContents, tabIndex) => getContents(tabIndex),
+)
+
+export const selectCurrentSelectedContents = createSelector(
+  selectGetSelectedContents,
+  selectTabIndex,
+  (getSelectedContents, tabIndex) => getSelectedContents(tabIndex),
+)
 
 export const load =
-  (force = false): AppThunk =>
+  (tabIndex: number): AppThunk =>
   async (dispatch, getState) => {
     const { loaded, loading, unselectAll } = explorerSlice.actions
-    const tabIndex = selectTabIndex(getState())
-    const directoryPath = selectDirectoryPath(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    const directoryPath = selectGetDirectoryPath(getState())(tabIndex)
     const pathsMap = selectPathsByScore(getState())
-    const url = parseZephyUrl(currentDirectoryPath)
-    if (
-      !currentDirectoryPath ||
-      (currentDirectoryPath == directoryPath && !force)
-    ) {
-      return
-    }
+    const url = parseZephyUrl(directoryPath)
     dispatch(unselectAll({ tabIndex }))
-    dispatch(loading({ tabIndex, directoryPath: currentDirectoryPath }))
+    dispatch(loading({ tabIndex }))
     try {
       let entries: DetailedEntry[] = []
       if (url) {
@@ -470,13 +500,26 @@ export const load =
           entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
         }
       } else {
-        entries =
-          await window.electronAPI.getDetailedEntries(currentDirectoryPath)
+        entries = await window.electronAPI.getDetailedEntries(directoryPath)
       }
       dispatch(loaded({ tabIndex, entries }))
     } catch (e) {
       dispatch(loaded({ tabIndex, error: true }))
     }
+  }
+
+export const refresh = (): AppThunk => async (dispatch, getState) => {
+  const tabIndex = selectTabIndex(getState())
+  dispatch(load(tabIndex))
+}
+
+export const search =
+  (query: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { setQuery } = explorerSlice.actions
+    const tabIndex = selectTabIndex(getState())
+    dispatch(setQuery({ tabIndex, query }))
+    dispatch(addQuery({ query }))
   }
 
 export const startEditing =
@@ -512,8 +555,8 @@ export const rangeSelect =
   async (dispatch, getState) => {
     const { rangeSelect } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
-    const contents = selectContents(getState())
-    const selected = selectSelected(getState())
+    const contents = selectGetContents(getState())(tabIndex)
+    const selected = selectGetSelected(getState())(tabIndex)
     const paths = contents.map((content) => content.path)
     const prevSelected = selected[selected.length - 1]
     let newPaths
@@ -550,7 +593,7 @@ export const multiSelect =
 export const selectAll = (): AppThunk => async (dispatch, getState) => {
   const { selectAll } = explorerSlice.actions
   const tabIndex = selectTabIndex(getState())
-  const contents = selectContents(getState())
+  const contents = selectGetContents(getState())(tabIndex)
   const paths = contents.map((content) => content.path)
   dispatch(selectAll({ tabIndex, paths }))
 }
@@ -578,7 +621,7 @@ export const moveToTrash =
   async (dispatch, getState) => {
     const { unselect } = explorerSlice.actions
     const tabIndex = selectTabIndex(getState())
-    const selected = selectSelected(getState())
+    const selected = selectGetSelected(getState())(tabIndex)
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
     targetPaths.forEach((path) => {
@@ -595,7 +638,7 @@ export const rename =
     const tabIndex = selectTabIndex(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
     // get the selected paths after renaming
-    const selected = selectSelected(getState())
+    const selected = selectGetSelected(getState())(tabIndex)
     dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
     dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
     dispatch(removeEntries({ tabIndex, paths: [path] }))
@@ -622,17 +665,19 @@ export const move =
   }
 
 export const copy = (): AppThunk => async (_, getState) => {
-  const selected = selectSelected(getState())
+  const tabIndex = selectTabIndex(getState())
+  const selected = selectGetSelected(getState())(tabIndex)
   await window.electronAPI.copyEntries(selected)
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
-  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-  const zephyUrl = parseZephyUrl(currentDirectoryPath)
+  const tabIndex = selectTabIndex(getState())
+  const directoryPath = selectGetDirectoryPath(getState())(tabIndex)
+  const zephyUrl = parseZephyUrl(directoryPath)
   if (zephyUrl) {
     return
   }
-  await window.electronAPI.pasteEntries(currentDirectoryPath)
+  await window.electronAPI.pasteEntries(directoryPath)
 }
 
 export const handle =
@@ -643,9 +688,9 @@ export const handle =
   ): AppThunk =>
   async (dispatch, getState) => {
     const tabs = selectTabs(getState())
-    const getCurrentHistory = selectGetCurrentHistory(getState())
+    const getHistory = selectGetHistory(getState())
     tabs.forEach(async (_, tabIndex) => {
-      const currentDirectoryPath = getCurrentHistory(tabIndex).directoryPath
+      const currentDirectoryPath = getHistory(tabIndex).directoryPath
       if (directoryPath !== currentDirectoryPath) {
         return
       }

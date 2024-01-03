@@ -46,7 +46,13 @@ const columns: ColumnType[] = [
   },
 ]
 
-const ExplorerTable = () => {
+type Props = {
+  tabIndex: number
+}
+
+const ExplorerTable = (props: Props) => {
+  const { tabIndex } = props
+
   const {
     contents,
     editing,
@@ -57,7 +63,7 @@ const ExplorerTable = () => {
     onKeyDownEnter,
     onScrollEnd,
     scrollTop,
-  } = useExplorerList()
+  } = useExplorerList(tabIndex)
 
   const previousEditing = usePrevious(editing)
   const previousLoading = usePrevious(loading)
@@ -188,6 +194,7 @@ const ExplorerTable = () => {
             height={headerHeight}
             key={column.key}
             label={column.label}
+            tabIndex={tabIndex}
             width={column.width}
           />
         ))}
@@ -198,7 +205,7 @@ const ExplorerTable = () => {
           flexGrow: 1,
           overflowX: 'hidden',
           overflowY: 'scroll',
-          visibility: restoring ? 'hidden' : 'visible',
+          visibility: restoring ? 'hidden' : undefined,
         }}
       >
         <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
@@ -214,7 +221,7 @@ const ExplorerTable = () => {
                   }px)`,
                 }}
               >
-                <ExplorerTableRow content={content}>
+                <ExplorerTableRow content={content} tabIndex={tabIndex}>
                   {columns.map((column) => (
                     <ExplorerTableCell
                       align={column.align}
@@ -222,6 +229,7 @@ const ExplorerTable = () => {
                       dataKey={column.key}
                       height={rowHeight}
                       key={column.key}
+                      tabIndex={tabIndex}
                       width={column.width}
                     />
                   ))}

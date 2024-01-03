@@ -8,7 +8,7 @@ import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectSelectedContents } from '~/store/explorer'
+import { selectGetSelectedContents } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
@@ -19,16 +19,17 @@ type Props = {
   content: Content
   dataKey: Key
   height: number
+  tabIndex: number
   width?: number
 }
 
 const ExplorerTableCell = (props: Props) => {
-  const { align, content, dataKey, height, width } = props
+  const { align, content, dataKey, height, tabIndex, width } = props
 
-  const selectedContents = useAppSelector(selectSelectedContents)
+  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
   const dispatch = useAppDispatch()
 
-  const { editing, selected } = useExplorerItem(content)
+  const { editing, selected } = useExplorerItem(tabIndex, content)
 
   const dragContents = useMemo(
     () => (editing ? [] : selected ? selectedContents : [content]),

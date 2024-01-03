@@ -6,11 +6,11 @@ import ImagePreview from '~/components/ImagePreview'
 import TextPreview from '~/components/TextPreview'
 import VideoPreview from '~/components/VideoPreview'
 import { useAppSelector } from '~/store'
-import { selectSelectedContents } from '~/store/explorer'
+import { selectCurrentSelectedContents } from '~/store/explorer'
 import { detectFileType } from '~/utils/file'
 
 const Preview = () => {
-  const contents = useAppSelector(selectSelectedContents)
+  const contents = useAppSelector(selectCurrentSelectedContents)
 
   const content = useMemo(() => contents[0], [contents])
 

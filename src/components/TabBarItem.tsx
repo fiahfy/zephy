@@ -4,7 +4,7 @@ import { MouseEvent, useCallback } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { closeTab, selectGetCurrentHistory } from '~/store/window'
+import { closeTab, selectGetHistory } from '~/store/window'
 import { getIconType } from '~/utils/url'
 
 type Props = {
@@ -14,10 +14,8 @@ type Props = {
 const TabBarItem = (props: Props) => {
   const { index, ...others } = props
 
-  const getCurrentHistory = useAppSelector(selectGetCurrentHistory)
+  const history = useAppSelector(selectGetHistory)(index)
   const dispatch = useAppDispatch()
-
-  const history = getCurrentHistory(index)
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({
     name: '',

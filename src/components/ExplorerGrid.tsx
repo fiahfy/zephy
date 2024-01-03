@@ -15,7 +15,13 @@ import { Content } from '~/interfaces'
 
 const maxItemSize = 256
 
-const ExplorerGrid = () => {
+type Props = {
+  tabIndex: number
+}
+
+const ExplorerGrid = (props: Props) => {
+  const { tabIndex } = props
+
   const {
     contents,
     editing,
@@ -26,7 +32,7 @@ const ExplorerGrid = () => {
     onKeyDownEnter,
     onScrollEnd,
     scrollTop,
-  } = useExplorerList()
+  } = useExplorerList(tabIndex)
 
   const previousEditing = usePrevious(editing)
   const previousLoading = usePrevious(loading)
@@ -194,7 +200,7 @@ const ExplorerGrid = () => {
           height: '100%',
           overflowX: 'hidden',
           overflowY: 'scroll',
-          visibility: restoring ? 'hidden' : 'visible',
+          visibility: restoring ? 'hidden' : undefined,
         }}
       >
         {wrapperWidth > 0 && (
@@ -214,7 +220,7 @@ const ExplorerGrid = () => {
                 >
                   {columns.map((content) => (
                     <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                      <ExplorerGridItem content={content} />
+                      <ExplorerGridItem content={content} tabIndex={tabIndex} />
                     </Box>
                   ))}
                 </Box>

@@ -2,11 +2,11 @@ import { AppBar, Divider, Toolbar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
 import { useMemo } from 'react'
 import { useAppSelector } from '~/store'
-import { selectContents, selectSelected } from '~/store/explorer'
+import { selectCurrentContents, selectCurrentSelected } from '~/store/explorer'
 
 const StatusBar = () => {
-  const contents = useAppSelector(selectContents)
-  const selected = useAppSelector(selectSelected)
+  const contents = useAppSelector(selectCurrentContents)
+  const selected = useAppSelector(selectCurrentSelected)
 
   const message = useMemo(
     () =>

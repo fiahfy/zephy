@@ -29,7 +29,7 @@ const getLoadedDirectories = (entry: Entry) => {
 }
 
 const ExplorerPanel = () => {
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
 
   const { watch } = useWatcher()
 
@@ -39,8 +39,8 @@ const ExplorerPanel = () => {
 
   const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
   const zephySchema = useMemo(
-    () => isZephySchema(currentDirectoryPath),
-    [currentDirectoryPath],
+    () => isZephySchema(directoryPath),
+    [directoryPath],
   )
 
   useEffect(() => {
@@ -49,13 +49,13 @@ const ExplorerPanel = () => {
         return
       }
       const entry = await window.electronAPI.getEntryHierarchy(
-        zephySchema ? undefined : currentDirectoryPath,
+        zephySchema ? undefined : directoryPath,
       )
       const expanded = getLoadedDirectories(entry)
       setExpanded(expanded)
       setRoot(entry)
     })()
-  }, [currentDirectoryPath, root, zephySchema])
+  }, [directoryPath, root, zephySchema])
 
   useEffect(
     () =>

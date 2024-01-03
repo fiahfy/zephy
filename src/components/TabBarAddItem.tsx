@@ -10,12 +10,12 @@ type Props = {}
 const TabBarAddItem = (props: Props) => {
   const { ...others } = props
 
-  const currentDirectoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const dispatch = useAppDispatch()
 
   const handleClick = useCallback(
-    () => dispatch(newTab(currentDirectoryPath)),
-    [currentDirectoryPath, dispatch],
+    () => dispatch(newTab(directoryPath)),
+    [directoryPath, dispatch],
   )
 
   return (
