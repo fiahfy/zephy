@@ -44,7 +44,7 @@ const TabBar = () => {
           variant="scrollable"
         >
           {tabs.map((_, i) => (
-            <TabBarItem index={i} key={i} />
+            <TabBarItem key={i} tabIndex={i} />
           ))}
           <TabBarAddItem />
         </Tabs>

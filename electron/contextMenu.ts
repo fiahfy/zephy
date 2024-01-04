@@ -1,5 +1,5 @@
 import { ActionCreators, register } from '@fiahfy/electron-context-menu'
-import { IpcMainInvokeEvent, clipboard, shell } from 'electron'
+import { IpcMainInvokeEvent, app, clipboard, shell } from 'electron'
 import { canPaste, copy, paste } from './utils/clipboard'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,9 +10,21 @@ const registerContextMenu = (
   createWindow: (directoryPath?: string) => Promise<void>,
 ) => {
   const actionCreators: ActionCreators = {
+    closeOtherTabs: (event, _params, { tabIndex }) => ({
+      click: () => send(event, { type: 'closeOtherTabs', data: { tabIndex } }),
+      label: 'Close Other Tabs',
+    }),
+    closeTab: (event, _params, { tabIndex }) => ({
+      click: () => send(event, { type: 'closeTab', data: { tabIndex } }),
+      label: 'Close',
+    }),
     copyPath: (_event, _params, { path }) => ({
       click: () => clipboard.writeText(path),
       label: 'Copy Path',
+    }),
+    duplicateTab: (event, _params, { tabIndex }) => ({
+      click: () => send(event, { type: 'duplicateTab', data: { tabIndex } }),
+      label: 'Duplicate',
     }),
     go: (event, _params, { label, offset }) => ({
       click: () => send(event, { type: 'go', data: { offset } }),
@@ -40,6 +52,14 @@ const registerContextMenu = (
       enabled: !!path,
       label: 'New Folder',
     }),
+    newTab: (event, _params, { tabIndex }) => ({
+      click: () =>
+        send(event, {
+          type: 'newTab',
+          data: { path: app.getPath('home'), tabIndex },
+        }),
+      label: 'New Tab',
+    }),
     open: (event, _params, { path }) => ({
       click: () => send(event, { type: 'openEntry', data: { path } }),
       label: 'Open',
@@ -53,8 +73,8 @@ const registerContextMenu = (
       click: () => createWindow(path),
       label: 'Open in New Window',
     }),
-    openInNewTab: (event, _params, { path }) => ({
-      click: () => send(event, { type: 'newTab', data: { path } }),
+    openInNewTab: (event, _params, { path, tabIndex }) => ({
+      click: () => send(event, { type: 'newTab', data: { path, tabIndex } }),
       label: 'Open in New Tab',
     }),
     rename: (event, _params, { path }) => ({

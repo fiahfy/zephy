@@ -87,7 +87,7 @@ const useExplorerItem = (tabIndex: number, content: Content) => {
                   },
                   {
                     type: 'openInNewTab',
-                    data: { path },
+                    data: { path, tabIndex },
                   },
                 ]
               : []),
@@ -134,6 +134,7 @@ const useExplorerItem = (tabIndex: number, content: Content) => {
     directoryPath,
     favorite,
     selectedContents,
+    tabIndex,
     zephySchema,
   ])
 

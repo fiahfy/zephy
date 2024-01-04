@@ -1,20 +1,21 @@
 import { Close as CloseIcon } from '@mui/icons-material'
 import { Box, IconButton, Tab, Typography } from '@mui/material'
-import { MouseEvent, useCallback } from 'react'
+import { MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { closeTab, selectGetHistory } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 import { getIconType } from '~/utils/url'
 
 type Props = {
-  index: number
+  tabIndex: number
 }
 
 const TabBarItem = (props: Props) => {
-  const { index, ...others } = props
+  const { tabIndex, ...others } = props
 
-  const history = useAppSelector(selectGetHistory)(index)
+  const history = useAppSelector(selectGetHistory)(tabIndex)
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({
@@ -24,13 +25,38 @@ const TabBarItem = (props: Props) => {
     url: '',
   })
 
+  const handleContextMenu = useMemo(
+    () =>
+      createContextMenuHandler([
+        {
+          type: 'newTab',
+          data: { tabIndex },
+        },
+        { type: 'separator' },
+        {
+          type: 'duplicateTab',
+          data: { tabIndex },
+        },
+        { type: 'separator' },
+        {
+          type: 'closeTab',
+          data: { tabIndex },
+        },
+        {
+          type: 'closeOtherTabs',
+          data: { tabIndex },
+        },
+      ]),
+    [tabIndex],
+  )
+
   const handleClick = useCallback(
     (e: MouseEvent) => {
       // prevent tab change event
       e.stopPropagation()
-      dispatch(closeTab(index))
+      dispatch(closeTab(tabIndex))
     },
-    [dispatch, index],
+    [dispatch, tabIndex],
   )
 
   return (
@@ -66,6 +92,7 @@ const TabBarItem = (props: Props) => {
           </Typography>
         </Box>
       }
+      onContextMenu={handleContextMenu}
       sx={{
         color: (theme) => theme.palette.text.primary,
         borderRight: (theme) => `1px solid ${theme.palette.divider}`,

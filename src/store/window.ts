@@ -1,7 +1,13 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { Content } from '~/interfaces'
 import { AppState, AppThunk } from '~/store'
-import { addTab, removeTab, selectGetLoading } from '~/store/explorer'
+import {
+  addTab,
+  copyTab,
+  removeOtherTabs,
+  removeTab,
+  selectGetLoading,
+} from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
 import { buildZephyUrl, getTitle } from '~/utils/url'
 
@@ -131,6 +137,39 @@ export const windowSlice = createSlice({
         },
       }
     },
+    duplicateTab(
+      state,
+      action: PayloadAction<{ index: number; tabIndex: number }>,
+    ) {
+      const { index, tabIndex } = action.payload
+      const window = state[index]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs[tabIndex]
+      const tabs = [
+        ...window.tabs.slice(0, tabIndex),
+        {
+          ...tab,
+          history: {
+            ...tab.history,
+            histories: [
+              ...tab.history.histories.map((history) => ({ ...history })),
+            ],
+          },
+        },
+        ...window.tabs.slice(tabIndex),
+      ]
+      const newTabIndex = tabIndex + 1
+      return {
+        ...state,
+        [index]: {
+          ...window,
+          tabIndex: newTabIndex,
+          tabs,
+        },
+      }
+    },
     closeTab(
       state,
       action: PayloadAction<{ index: number; tabIndex: number }>,
@@ -151,19 +190,22 @@ export const windowSlice = createSlice({
         },
       }
     },
-    closeCurrentTab(state, action: PayloadAction<{ index: number }>) {
-      const { index } = action.payload
+    closeOtherTabs(
+      state,
+      action: PayloadAction<{ index: number; tabIndex: number }>,
+    ) {
+      const { index, tabIndex } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
-      const tabs = window.tabs.filter((_, i) => i !== window.tabIndex)
-      const tabIndex = Math.min(window.tabIndex, tabs.length - 1)
+      const tabs = window.tabs.filter((_, i) => i === tabIndex)
+      const newTabIndex = 0
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex,
+          tabIndex: newTabIndex,
           tabs,
         },
       }
@@ -576,30 +618,49 @@ export const newWindow = (): AppThunk => async (dispatch, getState) => {
 }
 
 export const newTab =
-  (directoryPath: string): AppThunk =>
+  (directoryPath: string, targetTabIndex?: number): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
     const tabs = selectTabs(getState())
-    const tabIndex = tabs.length
+    const tabIndex = (targetTabIndex ?? tabs.length - 1) + 1
     dispatch(newTab({ index, tabIndex }))
     dispatch(addTab({ tabIndex }))
     dispatch(changeDirectory(directoryPath))
   }
 
+export const duplicateTab =
+  (tabIndex: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { duplicateTab } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    dispatch(duplicateTab({ index, tabIndex }))
+    dispatch(copyTab({ tabIndex }))
+    dispatch(updateApplicationMenu())
+  }
+
 export const closeTab =
-  (tabIndex?: number): AppThunk =>
+  (targetTabIndex?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    const currentTabIndex = selectTabIndex(getState())
+    const tabIndex = targetTabIndex ?? selectTabIndex(getState())
     const canCloseTab = selectCanCloseTab(getState())
     if (!canCloseTab) {
       return
     }
-    const closeTabIndex = tabIndex ?? currentTabIndex
-    dispatch(closeTab({ index, tabIndex: closeTabIndex }))
-    dispatch(removeTab({ tabIndex: closeTabIndex }))
+    dispatch(closeTab({ index, tabIndex }))
+    dispatch(removeTab({ tabIndex }))
+    dispatch(updateApplicationMenu())
+  }
+
+export const closeOtherTabs =
+  (tabIndex: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { closeOtherTabs } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    dispatch(closeOtherTabs({ index, tabIndex }))
+    dispatch(removeOtherTabs({ tabIndex }))
     dispatch(updateApplicationMenu())
   }
 

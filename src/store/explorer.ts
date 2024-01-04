@@ -65,6 +65,26 @@ export const explorerSlice = createSlice({
         [tabIndex]: defaultExplorerState,
       }
     },
+    copyTab(state, action: PayloadAction<{ tabIndex: number }>) {
+      const { tabIndex } = action.payload
+      const explorer = state[tabIndex]
+      return {
+        ...Object.keys(state).reduce((acc, i) => {
+          const index = Number(i)
+          const newIndex = index >= tabIndex ? index + 1 : index
+          const explorer = state[Number(index)]
+          return {
+            ...acc,
+            [newIndex]: explorer,
+          }
+        }, {} as State),
+        [tabIndex]: {
+          ...explorer,
+          entries: [...explorer.entries],
+          selected: [...explorer.selected],
+        },
+      }
+    },
     removeTab(state, action: PayloadAction<{ tabIndex: number }>) {
       const { tabIndex } = action.payload
       return Object.keys(state).reduce((acc, i) => {
@@ -73,6 +93,21 @@ export const explorerSlice = createSlice({
           return { ...acc }
         }
         const newIndex = index > tabIndex ? index - 1 : index
+        const explorer = state[Number(index)]
+        return {
+          ...acc,
+          [newIndex]: explorer,
+        }
+      }, {} as State)
+    },
+    removeOtherTabs(state, action: PayloadAction<{ tabIndex: number }>) {
+      const { tabIndex } = action.payload
+      return Object.keys(state).reduce((acc, i) => {
+        const index = Number(i)
+        if (index !== tabIndex) {
+          return { ...acc }
+        }
+        const newIndex = 0
         const explorer = state[Number(index)]
         return {
           ...acc,
@@ -319,7 +354,8 @@ export const explorerSlice = createSlice({
   },
 })
 
-export const { addTab, removeTab } = explorerSlice.actions
+export const { addTab, copyTab, removeTab, removeOtherTabs } =
+  explorerSlice.actions
 
 export default explorerSlice.reducer
 
