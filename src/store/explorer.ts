@@ -434,8 +434,8 @@ export const selectGetContents = createSelector(
     getSortOption,
     getScore,
     shouldShowHiddenFiles,
-  ) =>
-    (tabIndex: number) => {
+  ) => {
+    const getContents = (tabIndex: number) => {
       const directoryPath = getDirectoryPath(tabIndex)
       const entries = getEntries(tabIndex)
       const query = getQuery(tabIndex)
@@ -471,7 +471,17 @@ export const selectGetContents = createSelector(
           rating: getScore(entry.path),
         }))
         .sort((a, b) => comparator(a, b))
-    },
+    }
+
+    const cache: { [tabIndex: number]: Content[] } = {}
+
+    return (tabIndex: number) => {
+      if (!cache[tabIndex]) {
+        cache[tabIndex] = getContents(tabIndex)
+      }
+      return cache[tabIndex]
+    }
+  },
 )
 
 export const selectGetSelectedContents = createSelector(
