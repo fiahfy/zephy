@@ -4,7 +4,10 @@ import Explorer from '~/components/Explorer'
 import Settings from '~/components/Settings'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load } from '~/store/explorer'
-import { selectGetDirectoryPath, selectTabIndex } from '~/store/window'
+import {
+  selectCurrentTabIndex,
+  selectDirectoryPathByTabIndex,
+} from '~/store/window'
 
 type Props = {
   tabIndex: number
@@ -13,13 +16,15 @@ type Props = {
 const TabPanel = (props: Props) => {
   const { tabIndex } = props
 
-  const activeTabIndex = useAppSelector(selectTabIndex)
-  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
+  const currentTabIndex = useAppSelector(selectCurrentTabIndex)
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabIndex(state, tabIndex),
+  )
   const dispatch = useAppDispatch()
 
-  const active = useMemo(
-    () => tabIndex === activeTabIndex,
-    [activeTabIndex, tabIndex],
+  const current = useMemo(
+    () => tabIndex === currentTabIndex,
+    [currentTabIndex, tabIndex],
   )
 
   useEffect(() => {
@@ -41,7 +46,7 @@ const TabPanel = (props: Props) => {
         height: '100%',
         inset: 0,
         position: 'absolute',
-        visibility: active ? undefined : 'hidden',
+        visibility: current ? undefined : 'hidden',
       }}
     >
       <Component tabIndex={tabIndex} />

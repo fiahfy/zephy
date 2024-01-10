@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
 import { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectIsFavorite } from '~/store/favorite'
+import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const useEntryItem = (entry: Entry) => {
-  const favorite = useAppSelector(selectIsFavorite)(entry.path)
+  const favorite = useAppSelector((state) =>
+    selectFavoriteByPath(selectFavorite(state), entry.path),
+  )
 
   const onContextMenu = useMemo(() => {
     const directory = entry.type === 'directory'

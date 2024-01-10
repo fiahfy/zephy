@@ -39,7 +39,11 @@ import {
   selectCurrentLoading,
   selectCurrentQuery,
 } from '~/store/explorer'
-import { selectIsFavorite, toggleFavorite } from '~/store/favorite'
+import {
+  selectFavorite,
+  selectFavoriteByPath,
+  toggleFavorite,
+} from '~/store/favorite'
 import { removeQuery, selectQueryHistories } from '~/store/query'
 import { openEntry } from '~/store/settings'
 import {
@@ -53,7 +57,7 @@ import {
   selectCurrentSortOption,
   selectCurrentViewMode,
   selectForwardHistories,
-  selectIsSidebarHidden,
+  selectSidebarHiddenByVariant,
   upward,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
@@ -64,9 +68,16 @@ const AddressBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const favorite = useAppSelector(selectIsFavorite)(directoryPath)
+  const favorite = useAppSelector((state) =>
+    selectFavoriteByPath(selectFavorite(state), directoryPath),
+  )
   const forwardHistories = useAppSelector(selectForwardHistories)
-  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
+  const primarySidebarHidden = useAppSelector((state) =>
+    selectSidebarHiddenByVariant(state, 'primary'),
+  )
+  const secondarySidebarHidden = useAppSelector((state) =>
+    selectSidebarHiddenByVariant(state, 'secondary'),
+  )
   const loading = useAppSelector(selectCurrentLoading)
   const query = useAppSelector(selectCurrentQuery)
   const queryHistories = useAppSelector(selectQueryHistories)
@@ -200,16 +211,23 @@ const AddressBar = () => {
         { type: 'separator' },
         {
           type: 'toggleNavigator',
-          data: { hidden: isSidebarHidden('primary') },
+          data: { hidden: primarySidebarHidden },
         },
         {
           type: 'toggleInspector',
-          data: { hidden: isSidebarHidden('secondary') },
+          data: { hidden: secondarySidebarHidden },
         },
         { type: 'separator' },
         { type: 'settings' },
       ]),
-    [directoryPath, sortOption.orderBy, viewMode, isSidebarHidden, zephySchema],
+    [
+      directoryPath,
+      primarySidebarHidden,
+      secondarySidebarHidden,
+      sortOption.orderBy,
+      viewMode,
+      zephySchema,
+    ],
   )
   const handleChangeDirectory = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {

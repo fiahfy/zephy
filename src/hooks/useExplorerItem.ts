@@ -7,25 +7,37 @@ import {
   multiSelect,
   rangeSelect,
   select,
-  selectGetSelectedContents,
-  selectIsEditing,
-  selectIsFocused,
-  selectIsSelected,
+  selectEditingByPath,
+  selectFocusedByPath,
+  selectSelectedByPath,
+  selectSelectedContentsByTabIndex,
   startEditing,
 } from '~/store/explorer'
-import { selectIsFavorite } from '~/store/favorite'
+import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import { changeDirectory, selectGetDirectoryPath } from '~/store/window'
+import { changeDirectory, selectDirectoryPathByTabIndex } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
 const useExplorerItem = (tabIndex: number, content: Content) => {
-  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
-  const editing = useAppSelector(selectIsEditing)(tabIndex, content.path)
-  const favorite = useAppSelector(selectIsFavorite)(content.path)
-  const focused = useAppSelector(selectIsFocused)(tabIndex, content.path)
-  const selected = useAppSelector(selectIsSelected)(tabIndex, content.path)
-  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabIndex(state, tabIndex),
+  )
+  const editing = useAppSelector((state) =>
+    selectEditingByPath(state, tabIndex, content.path),
+  )
+  const favorite = useAppSelector((state) =>
+    selectFavoriteByPath(selectFavorite(state), content.path),
+  )
+  const focused = useAppSelector((state) =>
+    selectFocusedByPath(state, tabIndex, content.path),
+  )
+  const selected = useAppSelector((state) =>
+    selectSelectedByPath(state, tabIndex, content.path),
+  )
+  const selectedContents = useAppSelector((state) =>
+    selectSelectedContentsByTabIndex(state, tabIndex),
+  )
   const dispatch = useAppDispatch()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(

@@ -4,30 +4,46 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import {
   focus,
   select,
-  selectGetContents,
-  selectGetEditing,
-  selectGetError,
-  selectGetFocused,
-  selectGetLoading,
-  selectGetQuery,
-  selectGetSelectedContents,
+  selectContentsByTabIndex,
+  selectEditingByTabIndex,
+  selectErrorByTabIndex,
+  selectFocusedByTabIndex,
+  selectLoadingByTabIndex,
+  selectQueryByTabIndex,
+  selectSelectedContentsByTabIndex,
 } from '~/store/explorer'
 import { openEntry } from '~/store/settings'
 import {
   changeDirectory,
-  selectGetScrollTop,
+  selectScrollTopByTabIndex,
   setScrollTop,
 } from '~/store/window'
 
 const useExplorerList = (tabIndex: number) => {
-  const contents = useAppSelector(selectGetContents)(tabIndex)
-  const editing = useAppSelector(selectGetEditing)(tabIndex)
-  const error = useAppSelector(selectGetError)(tabIndex)
-  const focused = useAppSelector(selectGetFocused)(tabIndex)
-  const loading = useAppSelector(selectGetLoading)(tabIndex)
-  const query = useAppSelector(selectGetQuery)(tabIndex)
-  const scrollTop = useAppSelector(selectGetScrollTop)(tabIndex)
-  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
+  const contents = useAppSelector((state) =>
+    selectContentsByTabIndex(state, tabIndex),
+  )
+  const editing = useAppSelector((state) =>
+    selectEditingByTabIndex(state, tabIndex),
+  )
+  const error = useAppSelector((state) =>
+    selectErrorByTabIndex(state, tabIndex),
+  )
+  const focused = useAppSelector((state) =>
+    selectFocusedByTabIndex(state, tabIndex),
+  )
+  const loading = useAppSelector((state) =>
+    selectLoadingByTabIndex(state, tabIndex),
+  )
+  const query = useAppSelector((state) =>
+    selectQueryByTabIndex(state, tabIndex),
+  )
+  const scrollTop = useAppSelector((state) =>
+    selectScrollTopByTabIndex(state, tabIndex),
+  )
+  const selectedContents = useAppSelector((state) =>
+    selectSelectedContentsByTabIndex(state, tabIndex),
+  )
   const dispatch = useAppDispatch()
 
   const noDataText = useMemo(

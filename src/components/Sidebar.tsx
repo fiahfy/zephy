@@ -3,8 +3,8 @@ import { styled } from '@mui/material/styles'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  selectGetSidebarWidth,
-  selectIsSidebarHidden,
+  selectSidebarHiddenByVariant,
+  selectSidebarWidthByVariant,
   setSidebarHidden,
   setSidebarWidth,
 } from '~/store/window'
@@ -30,8 +30,22 @@ type Props = {
 const Sidebar = (props: Props) => {
   const { children, variant } = props
 
-  const getSidebarWidth = useAppSelector(selectGetSidebarWidth)
-  const isSidebarHidden = useAppSelector(selectIsSidebarHidden)
+  const sidebarWidth = useAppSelector((state) =>
+    selectSidebarWidthByVariant(state, variant),
+  )
+  const sidebarHidden = useAppSelector((state) =>
+    selectSidebarHiddenByVariant(state, variant),
+  )
+  const opposite = useMemo(
+    () => (variant === 'primary' ? 'secondary' : 'primary'),
+    [variant],
+  )
+  const oppositeSidebarWidth = useAppSelector((state) =>
+    selectSidebarWidthByVariant(state, opposite),
+  )
+  const oppositeSidebarHidden = useAppSelector((state) =>
+    selectSidebarHiddenByVariant(state, opposite),
+  )
   const dispatch = useAppDispatch()
 
   const position = useMemo(
@@ -39,19 +53,13 @@ const Sidebar = (props: Props) => {
     [variant],
   )
 
-  const width = useMemo(
-    () => getSidebarWidth(variant),
-    [getSidebarWidth, variant],
-  )
-  const hidden = useMemo(
-    () => isSidebarHidden(variant),
-    [isSidebarHidden, variant],
-  )
+  const width = sidebarWidth
+  const hidden = sidebarHidden
 
-  const oppositeWidth = useMemo(() => {
-    const opposite = variant === 'primary' ? 'secondary' : 'primary'
-    return isSidebarHidden(opposite) ? 0 : getSidebarWidth(opposite)
-  }, [getSidebarWidth, isSidebarHidden, variant])
+  const oppositeWidth = useMemo(
+    () => (oppositeSidebarHidden ? 0 : oppositeSidebarWidth),
+    [oppositeSidebarHidden, oppositeSidebarWidth],
+  )
 
   useEffect(() => {
     const handler = () => {

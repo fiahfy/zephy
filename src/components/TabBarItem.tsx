@@ -4,7 +4,7 @@ import { MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { closeTab, selectGetHistory } from '~/store/window'
+import { closeTab, selectHistoryByTabIndex } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { getIconType } from '~/utils/url'
 
@@ -15,7 +15,9 @@ type Props = {
 const TabBarItem = (props: Props) => {
   const { tabIndex, ...others } = props
 
-  const history = useAppSelector(selectGetHistory)(tabIndex)
+  const history = useAppSelector((state) =>
+    selectHistoryByTabIndex(state, tabIndex),
+  )
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({

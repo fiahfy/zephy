@@ -6,9 +6,9 @@ import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
 import {
-  selectGetDirectoryPath,
-  selectGetSortOption,
-  selectGetViewMode,
+  selectDirectoryPathByTabIndex,
+  selectSortOptionByDirectoryPath,
+  selectViewModeByDirectoryPath,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
@@ -20,9 +20,15 @@ type Props = {
 const Explorer = (props: Props) => {
   const { tabIndex } = props
 
-  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
-  const sortOption = useAppSelector(selectGetSortOption)(directoryPath)
-  const viewMode = useAppSelector(selectGetViewMode)(directoryPath)
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabIndex(state, tabIndex),
+  )
+  const sortOption = useAppSelector((state) =>
+    selectSortOptionByDirectoryPath(state, directoryPath),
+  )
+  const viewMode = useAppSelector((state) =>
+    selectViewModeByDirectoryPath(state, directoryPath),
+  )
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({

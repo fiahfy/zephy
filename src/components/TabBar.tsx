@@ -3,10 +3,10 @@ import { SyntheticEvent, useCallback } from 'react'
 import TabBarAddItem from '~/components/TabBarAddItem'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { changeTab, selectTabIndex, selectTabs } from '~/store/window'
+import { changeTab, selectCurrentTabIndex, selectTabs } from '~/store/window'
 
 const TabBar = () => {
-  const tabIndex = useAppSelector(selectTabIndex)
+  const tabIndex = useAppSelector(selectCurrentTabIndex)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 

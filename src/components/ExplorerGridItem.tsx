@@ -17,7 +17,7 @@ import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectGetSelectedContents } from '~/store/explorer'
+import { selectSelectedContentsByTabIndex } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
@@ -60,7 +60,9 @@ type Props = {
 const ExplorerGridItem = (props: Props) => {
   const { content, tabIndex } = props
 
-  const selectedContents = useAppSelector(selectGetSelectedContents)(tabIndex)
+  const selectedContents = useAppSelector((state) =>
+    selectSelectedContentsByTabIndex(state, tabIndex),
+  )
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 

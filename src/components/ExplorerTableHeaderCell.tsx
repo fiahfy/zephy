@@ -3,8 +3,8 @@ import { MouseEvent, useCallback } from 'react'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  selectGetDirectoryPath,
-  selectGetSortOption,
+  selectDirectoryPathByTabIndex,
+  selectSortOptionByDirectoryPath,
   sort,
 } from '~/store/window'
 
@@ -21,8 +21,12 @@ type Props = {
 const ExplorerTableHeaderCell = (props: Props) => {
   const { height, dataKey, label, tabIndex, width } = props
 
-  const directoryPath = useAppSelector(selectGetDirectoryPath)(tabIndex)
-  const sortOption = useAppSelector(selectGetSortOption)(directoryPath)
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabIndex(state, tabIndex),
+  )
+  const sortOption = useAppSelector((state) =>
+    selectSortOptionByDirectoryPath(state, directoryPath),
+  )
   const dispatch = useAppDispatch()
 
   const handleClick = useCallback(

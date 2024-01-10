@@ -58,10 +58,8 @@ export const selectRatings = createSelector(
   (rating) => rating.ratings,
 )
 
-export const selectGetScore = createSelector(
-  selectRatings,
-  (ratings) => (path: string) => ratings[path] ?? 0,
-)
+export const selectScoreByPath = (rating: State, path: string) =>
+  rating.ratings[path] ?? 0
 
 export const selectPathsByScore = createSelector(selectRatings, (ratings) =>
   Object.keys(ratings).reduce(

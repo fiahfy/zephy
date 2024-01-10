@@ -57,13 +57,13 @@ export const selectFavorites = createSelector(
   (favorite) => favorite.favorites,
 )
 
-export const selectIsFavorite = createSelector(selectFavorites, (favorites) => {
-  const hash = favorites.reduce(
+export const selectFavoriteByPath = (favorite: State, path: string) => {
+  const hash = favorite.favorites.reduce(
     (acc, favorite) => ({ ...acc, [favorite.path]: true }),
     {} as { [path: string]: boolean },
   )
-  return (path: string) => hash[path] ?? false
-})
+  return hash[path] ?? false
+}
 
 export const addToFavorites =
   (path: string): AppThunk =>
@@ -82,7 +82,7 @@ export const removeFromFavorites =
 export const toggleFavorite =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
-    const favorite = selectIsFavorite(getState())(path)
+    const favorite = selectFavoriteByPath(selectFavorite(getState()), path)
     const action = favorite ? removeFromFavorites(path) : addToFavorites(path)
     dispatch(action)
   }

@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { rate, selectGetScore } from '~/store/rating'
+import { rate, selectRating, selectScoreByPath } from '~/store/rating'
 
 type State = {
   itemCount?: number
@@ -56,7 +56,9 @@ type Props = {
 const DirectoryPreviewItem = (props: Props) => {
   const { entry } = props
 
-  const getScore = useAppSelector(selectGetScore)
+  const score = useAppSelector((state) =>
+    selectScoreByPath(selectRating(state), entry.path),
+  )
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
@@ -164,10 +166,10 @@ const DirectoryPreviewItem = (props: Props) => {
         precision={0.5}
         size="small"
         sx={{ my: 0.25 }}
-        value={getScore(entry.path)}
+        value={score}
       />
     ),
-    [entry.path, getScore, handleChangeRating],
+    [handleChangeRating, score],
   )
 
   return (
