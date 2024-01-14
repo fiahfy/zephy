@@ -35,6 +35,7 @@ const ExplorerGrid = (props: Props) => {
   } = useExplorerList(tabIndex)
 
   const previousEditing = usePrevious(editing)
+  const previousFocused = usePrevious(focused)
   const previousLoading = usePrevious(loading)
 
   const ref = useRef<HTMLDivElement>(null)
@@ -118,14 +119,14 @@ const ExplorerGrid = (props: Props) => {
   }, [editing, previousEditing])
 
   useEffect(() => {
-    if (focused) {
+    if (focused && previousFocused !== focused) {
       const index = contents.findIndex((content) => content.path === focused)
       if (index >= 0) {
         const rowIndex = Math.floor(index / columns)
         virtualizer.scrollToIndex(rowIndex)
       }
     }
-  }, [columns, contents, focused, loading, virtualizer])
+  }, [columns, contents, focused, loading, previousFocused, virtualizer])
 
   const focusBy = useCallback(
     (e: KeyboardEvent, rowOffset: number, columnOffset: number) => {

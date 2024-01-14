@@ -66,6 +66,7 @@ const ExplorerTable = (props: Props) => {
   } = useExplorerList(tabIndex)
 
   const previousEditing = usePrevious(editing)
+  const previousFocused = usePrevious(focused)
   const previousLoading = usePrevious(loading)
 
   const ref = useRef<HTMLDivElement>(null)
@@ -117,13 +118,13 @@ const ExplorerTable = (props: Props) => {
   }, [editing, previousEditing])
 
   useEffect(() => {
-    if (focused) {
+    if (focused && previousFocused !== focused) {
       const index = contents.findIndex((content) => content.path === focused)
       if (index >= 0) {
         virtualizer.scrollToIndex(index)
       }
     }
-  }, [contents, focused, loading, virtualizer])
+  }, [contents, focused, loading, previousFocused, virtualizer])
 
   const focusBy = useCallback(
     (e: KeyboardEvent, offset: number) => {
