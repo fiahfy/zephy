@@ -672,6 +672,7 @@ export const changeTab =
     const { changeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
     dispatch(changeTab({ index, tabIndex }))
+    dispatch(updateApplicationMenu())
   }
 
 export const changeDirectory =
