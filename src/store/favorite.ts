@@ -52,18 +52,20 @@ export default favoriteSlice.reducer
 
 export const selectFavorite = (state: AppState) => state.favorite
 
-export const selectFavorites = createSelector(
-  selectFavorite,
-  (favorite) => favorite.favorites,
-)
+export const selectFavorites = (favorite: State) => favorite.favorites
 
-export const selectFavoriteByPath = (favorite: State, path: string) => {
-  const hash = favorite.favorites.reduce(
+export const selectFavoriteMap = createSelector(selectFavorites, (favorites) =>
+  favorites.reduce(
     (acc, favorite) => ({ ...acc, [favorite.path]: true }),
     {} as { [path: string]: boolean },
-  )
-  return hash[path] ?? false
-}
+  ),
+)
+
+export const selectFavoriteByPath = createSelector(
+  selectFavoriteMap,
+  (_favorite: State, path: string) => path,
+  (favoriteMap, path) => favoriteMap[path] ?? false,
+)
 
 export const addToFavorites =
   (path: string): AppThunk =>

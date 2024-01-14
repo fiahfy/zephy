@@ -41,9 +41,9 @@ const ExplorerTableCell = (props: Props) => {
   const { draggable, ...dragHandlers } = useDragEntry(dragContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)
 
-  const handleChangeRating = useCallback(
+  const handleChangeScore = useCallback(
     (_e: SyntheticEvent, value: number | null) =>
-      dispatch(rate({ path: content.path, rating: value ?? 0 })),
+      dispatch(rate({ path: content.path, score: value ?? 0 })),
     [content.path, dispatch],
   )
 
@@ -51,7 +51,7 @@ const ExplorerTableCell = (props: Props) => {
   const rating = useMemo(
     () => (
       <NoOutlineRating
-        onChange={handleChangeRating}
+        onChange={handleChangeScore}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
         precision={0.5}
@@ -59,7 +59,7 @@ const ExplorerTableCell = (props: Props) => {
         value={content.rating}
       />
     ),
-    [content.rating, handleChangeRating],
+    [content.rating, handleChangeScore],
   )
 
   return (

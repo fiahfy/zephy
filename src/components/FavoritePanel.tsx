@@ -6,10 +6,12 @@ import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import { DetailedEntry } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectFavorites } from '~/store/favorite'
+import { selectFavorite, selectFavorites } from '~/store/favorite'
 
 const FavoritePanel = () => {
-  const favorites = useAppSelector(selectFavorites)
+  const favorites = useAppSelector((state) =>
+    selectFavorites(selectFavorite(state)),
+  )
 
   const { watch } = useWatcher()
 

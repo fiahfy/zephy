@@ -152,9 +152,9 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [status])
 
-  const handleChangeRating = useCallback(
+  const handleChangeScore = useCallback(
     (_e: SyntheticEvent, value: number | null) =>
-      appDispatch(rate({ path: content.path, rating: value ?? 0 })),
+      appDispatch(rate({ path: content.path, score: value ?? 0 })),
     [appDispatch, content.path],
   )
 
@@ -163,7 +163,7 @@ const ExplorerGridItem = (props: Props) => {
     () => (
       <NoOutlineRating
         color="primary"
-        onChange={handleChangeRating}
+        onChange={handleChangeScore}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
         precision={0.5}
@@ -172,7 +172,7 @@ const ExplorerGridItem = (props: Props) => {
         value={content.rating}
       />
     ),
-    [content.rating, handleChangeRating],
+    [content.rating, handleChangeScore],
   )
 
   return (

@@ -1,11 +1,16 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { AppState } from '~/store'
 
-type State = {
-  ratings: { [path: string]: number }
+type Rating = {
+  path: string
+  score: number
 }
 
-const initialState: State = { ratings: {} }
+type State = {
+  ratings: Rating[]
+}
+
+const initialState: State = { ratings: [] }
 
 export const ratingSlice = createSlice({
   name: 'rating',
@@ -14,12 +19,17 @@ export const ratingSlice = createSlice({
     replaceState(_state, action: PayloadAction<{ state: State }>) {
       return action.payload.state
     },
-    rate(state, action: PayloadAction<{ path: string; rating: number }>) {
-      const { path, rating } = action.payload
-      const ratings = {
-        ...state.ratings,
-        [path]: rating,
-      }
+    rate(state, action: PayloadAction<{ path: string; score: number }>) {
+      const { path, score } = action.payload
+      const ratings = [
+        ...state.ratings.filter((rating) => rating.path !== path),
+        { path, score },
+      ]
+      return { ...state, ratings }
+    },
+    removeRating(state, action: PayloadAction<{ path: string }>) {
+      const { path } = action.payload
+      const ratings = state.ratings.filter((rating) => rating.path !== path)
       return { ...state, ratings }
     },
     changeRatingPath(
@@ -27,21 +37,10 @@ export const ratingSlice = createSlice({
       action: PayloadAction<{ oldPath: string; newPath: string }>,
     ) {
       const { oldPath, newPath } = action.payload
-      const { [oldPath]: score, ...others } = state.ratings
-      if (score === undefined) {
-        return state
-      }
-      const ratings = {
-        ...others,
-        [newPath]: score,
-      }
+      const ratings = state.ratings.map((rating) =>
+        rating.path === oldPath ? { ...rating, path: newPath } : rating,
+      )
       return { ...state, ratings }
-    },
-    removeRating(state, action: PayloadAction<{ path: string }>) {
-      const { path } = action.payload
-      const newRatings = { ...state.ratings }
-      delete newRatings[path]
-      return { ...state, ratings: newRatings }
     },
   },
 })
@@ -53,26 +52,29 @@ export default ratingSlice.reducer
 
 export const selectRating = (state: AppState) => state.rating
 
-export const selectRatings = createSelector(
-  selectRating,
-  (rating) => rating.ratings,
+export const selectRatings = (rating: State) => rating.ratings
+
+export const selectRatingMap = createSelector(selectRatings, (favorites) =>
+  favorites.reduce(
+    (acc, rating) => ({ ...acc, [rating.path]: rating.score }),
+    {} as { [path: string]: number },
+  ),
 )
 
-export const selectScoreByPath = (rating: State, path: string) =>
-  rating.ratings[path] ?? 0
+export const selectScoreByPath = createSelector(
+  selectRatingMap,
+  (_rating: State, path: string) => path,
+  (ratingMap, path) => ratingMap[path] ?? 0,
+)
 
-export const selectPathsByScore = createSelector(selectRatings, (ratings) =>
-  Object.keys(ratings).reduce(
-    (acc, path) => {
-      const score = ratings[path]
-      if (score) {
-        const paths = acc[score] ?? []
-        return {
-          ...acc,
-          [score]: [...paths, path],
-        }
+export const selectPathsByScore = createSelector(selectRating, (rating) =>
+  rating.ratings.reduce(
+    (acc, rating) => {
+      const paths = acc[rating.score] ?? []
+      return {
+        ...acc,
+        [rating.score]: [...paths, rating.path],
       }
-      return acc
     },
     {} as { [score: number]: string[] },
   ),

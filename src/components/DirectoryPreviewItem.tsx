@@ -149,9 +149,9 @@ const DirectoryPreviewItem = (props: Props) => {
     [appDispatch, entry.path, entry.type],
   )
 
-  const handleChangeRating = useCallback(
+  const handleChangeScore = useCallback(
     (_e: SyntheticEvent, value: number | null) =>
-      appDispatch(rate({ path: entry.path, rating: value ?? 0 })),
+      appDispatch(rate({ path: entry.path, score: value ?? 0 })),
     [appDispatch, entry.path],
   )
 
@@ -160,7 +160,7 @@ const DirectoryPreviewItem = (props: Props) => {
     () => (
       <NoOutlineRating
         color="primary"
-        onChange={handleChangeRating}
+        onChange={handleChangeScore}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
         precision={0.5}
@@ -169,7 +169,7 @@ const DirectoryPreviewItem = (props: Props) => {
         value={score}
       />
     ),
-    [handleChangeRating, score],
+    [handleChangeScore, score],
   )
 
   return (
