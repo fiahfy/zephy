@@ -62,8 +62,7 @@ const VideoPreview = (props: Props) => {
       if (!el) {
         return
       }
-      el.loop = data.enabled
-      appDispatch(setLoop(data.enabled))
+      appDispatch(setLoop({ loop: data.enabled }))
     })
     return () => removeListener()
   }, [appDispatch])

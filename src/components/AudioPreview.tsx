@@ -40,8 +40,7 @@ const AudioPreview = (props: Props) => {
       if (!el) {
         return
       }
-      el.loop = data.enabled
-      dispatch(setLoop(data.enabled))
+      dispatch(setLoop({ loop: data.enabled }))
     })
     return () => removeListener()
   }, [dispatch])
