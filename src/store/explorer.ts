@@ -518,6 +518,9 @@ export const load =
     const { loaded, loading, unselectAll } = explorerSlice.actions
     const directoryPath = selectDirectoryPathByTabIndex(getState(), tabIndex)
     const pathsMap = selectPathsByScore(getState())
+    if (!directoryPath) {
+      return
+    }
     const url = parseZephyUrl(directoryPath)
     dispatch(unselectAll({ tabIndex }))
     dispatch(loading({ tabIndex }))

@@ -83,14 +83,7 @@ const defaultWindowState: WindowState = {
   },
   sorting: {},
   tabIndex: 0,
-  tabs: [
-    {
-      history: {
-        histories: [],
-        index: -1,
-      },
-    },
-  ],
+  tabs: [],
   viewMode: {},
 }
 
@@ -613,11 +606,14 @@ export const selectCurrentSortOption = (state: AppState) =>
 export const selectCurrentViewMode = (state: AppState) =>
   selectViewModeByDirectoryPath(state, selectCurrentDirectoryPath(state))
 
-export const newWindow = (): AppThunk => async (dispatch, getState) => {
-  const { newWindow } = windowSlice.actions
-  const index = selectWindowIndex(getState())
-  dispatch(newWindow({ index }))
-}
+export const newWindow =
+  (directoryPath: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { newWindow } = windowSlice.actions
+    const index = selectWindowIndex(getState())
+    dispatch(newWindow({ index }))
+    dispatch(newTab(directoryPath))
+  }
 
 export const newTab =
   (directoryPath: string, targetTabIndex?: number): AppThunk =>
