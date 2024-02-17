@@ -173,7 +173,10 @@ export const windowSlice = createSlice({
         return state
       }
       const tabs = window.tabs.filter((_, i) => i !== tabIndex)
-      const newTabIndex = Math.min(window.tabIndex, tabs.length - 1)
+      const newTabIndex = Math.min(
+        tabIndex >= window.tabIndex ? window.tabIndex : window.tabIndex - 1,
+        tabs.length - 1,
+      )
       return {
         ...state,
         [index]: {
