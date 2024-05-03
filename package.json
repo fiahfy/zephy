@@ -29,7 +29,7 @@
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
-    "@fiahfy/eslint-config-react": "^0.0.22",
+    "@fiahfy/eslint-config-react": "^0.1.1",
     "@fiahfy/prettier-config": "^0.0.3",
     "@rollup/plugin-alias": "^5.1.0",
     "@types/fluent-ffmpeg": "^2.1.24",
@@ -57,7 +57,7 @@
     "build": "tsc && vite build",
     "dev": "vite",
     "format": "prettier -c --ignore-path .gitignore .",
-    "lint": "eslint --ext .js,.ts,.tsx --ignore-path .gitignore .",
+    "lint": "eslint .",
     "package": "electron-builder",
     "package-dir": "npm run package -- --dir",
     "prepare": "husky",
