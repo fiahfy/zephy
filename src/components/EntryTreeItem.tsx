@@ -1,4 +1,8 @@
-import { TreeItem, TreeItemContentProps, useTreeItem } from '@mui/x-tree-view'
+import {
+  TreeItem,
+  TreeItemContentProps,
+  useTreeItemState,
+} from '@mui/x-tree-view'
 import { Box, BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { ComponentProps, ReactNode, forwardRef } from 'react'
@@ -11,8 +15,8 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
     classes,
     className,
     label,
-    nodeId,
     icon: iconProp,
+    itemId,
     expansionIcon,
     displayIcon,
   } = props
@@ -25,7 +29,7 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
     handleExpansion,
     handleSelection,
     preventSelection,
-  } = useTreeItem(nodeId)
+  } = useTreeItemState(itemId)
 
   const icon = iconProp || expansionIcon || displayIcon
 

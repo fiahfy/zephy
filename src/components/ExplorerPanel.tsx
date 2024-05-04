@@ -2,7 +2,7 @@ import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material'
-import { TreeView } from '@mui/x-tree-view'
+import { SimpleTreeView } from '@mui/x-tree-view'
 import {
   SyntheticEvent,
   useCallback,
@@ -33,8 +33,8 @@ const ExplorerPanel = () => {
 
   const { watch } = useWatcher()
 
-  const [expanded, setExpanded] = useState<string[]>([])
-  const [selected, setSelected] = useState<string[]>([])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [root, setRoot] = useState<Entry>()
 
   const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
@@ -51,8 +51,8 @@ const ExplorerPanel = () => {
       const entry = await window.electronAPI.getEntryHierarchy(
         zephySchema ? undefined : directoryPath,
       )
-      const expanded = getLoadedDirectories(entry)
-      setExpanded(expanded)
+      const expandedItems = getLoadedDirectories(entry)
+      setExpandedItems(expandedItems)
       setRoot(entry)
     })()
   }, [directoryPath, root, zephySchema])
@@ -116,23 +116,23 @@ const ExplorerPanel = () => {
 
   const handleClickRefresh = useCallback(() => setRoot(undefined), [])
 
-  const handleSelect = useCallback(
-    (_e: SyntheticEvent, nodeIds: string[] | string) =>
-      setSelected(Array.isArray(nodeIds) ? nodeIds : [nodeIds]),
+  const handleSelectedItemsChange = useCallback(
+    (_e: SyntheticEvent, itemIds: string[] | string) =>
+      setSelectedItems(Array.isArray(itemIds) ? itemIds : [itemIds]),
     [],
   )
 
-  const handleToggle = useCallback(
-    async (_e: SyntheticEvent, nodeIds: string[]) => {
-      setExpanded(nodeIds)
+  const handleExpandedItemsChange = useCallback(
+    async (_e: SyntheticEvent, itemIds: string[]) => {
+      setExpandedItems(itemIds)
 
-      const expandedNodeId = nodeIds.find(
-        (nodeId) => !expanded.includes(nodeId),
+      const expandingItemId = itemIds.find(
+        (itemId) => !expandedItems.includes(itemId),
       )
-      if (!expandedNodeId) {
+      if (!expandingItemId) {
         return
       }
-      const entry = entryMap[expandedNodeId]
+      const entry = entryMap[expandingItemId]
       if (!entry || entry.type !== 'directory' || entry.children) {
         return
       }
@@ -163,19 +163,18 @@ const ExplorerPanel = () => {
         return newRoot
       })
     },
-    [entryMap, expanded],
+    [entryMap, expandedItems],
   )
 
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">
-      <TreeView
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-        expanded={expanded}
+      <SimpleTreeView
+        expandedItems={expandedItems}
         multiSelect
-        onNodeSelect={handleSelect}
-        onNodeToggle={handleToggle}
-        selected={selected}
+        onExpandedItemsChange={handleExpandedItemsChange}
+        onSelectedItemsChange={handleSelectedItemsChange}
+        selectedItems={selectedItems}
+        slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
         sx={{
           '&:focus-visible .Mui-focused': {
             outline: '-webkit-focus-ring-color auto 1px',
@@ -183,7 +182,7 @@ const ExplorerPanel = () => {
         }}
       >
         {root && <ExplorerTreeItem entry={root} />}
-      </TreeView>
+      </SimpleTreeView>
     </Panel>
   )
 }

@@ -46,8 +46,8 @@ const ExplorerTreeItem = (props: Props) => {
       }}
       draggable={draggable}
       icon={<EntryIcon entry={entry} />}
+      itemId={entry.path}
       label={entry.name}
-      nodeId={entry.path}
       sx={droppableStyle}
       {...dragHandlers}
       {...dropHandlers}
@@ -70,8 +70,8 @@ const ExplorerTreeItem = (props: Props) => {
               icon={
                 <CircularProgress size={16} sx={{ flexShrink: 0, p: 0.25 }} />
               }
+              itemId={`${entry.path}<loader>`}
               label="Loading items..."
-              nodeId={`${entry.path}<loader>`}
             />
           )}
         </>
