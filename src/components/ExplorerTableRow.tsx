@@ -25,6 +25,7 @@ const ExplorerTableRow = (props: Props) => {
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
       sx={{
+        borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         '&:hover': {

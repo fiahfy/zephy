@@ -184,22 +184,24 @@ const ExplorerGridItem = (props: Props) => {
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
       sx={{
+        borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         height: '100%!important',
+        overflow: 'hidden',
         width: '100%',
-        '::before': {
+        '&::before': {
           content: '""',
           inset: 0,
           pointerEvents: 'none',
           position: 'absolute',
         },
         '&:hover': {
-          '::before': {
+          '&::before': {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },
         '&.selected': {
-          '::before': {
+          '&::before': {
             backgroundColor: (theme) =>
               alpha(
                 theme.palette.primary.main,
@@ -207,7 +209,7 @@ const ExplorerGridItem = (props: Props) => {
               ),
           },
           '&:hover': {
-            '::before': {
+            '&::before': {
               backgroundColor: (theme) =>
                 alpha(
                   theme.palette.primary.main,

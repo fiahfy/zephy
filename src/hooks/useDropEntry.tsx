@@ -1,4 +1,4 @@
-import { alpha } from '@mui/system'
+import { SxProps, Theme, alpha } from '@mui/system'
 import { DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import { Entry } from '~/interfaces'
@@ -32,23 +32,25 @@ const useDropEntry = (entry: Entry) => {
   const dropping = useMemo(() => enterCount > 0, [enterCount])
 
   const droppableStyle = useMemo(
-    () => ({
-      position: 'relative',
-      ...(dropping
-        ? {
-            '::after': {
-              backgroundColor: alpha(
-                theme.palette.primary.main,
-                theme.palette.action.activatedOpacity,
-              ),
-              content: '""',
-              inset: 0,
-              pointerEvents: 'none',
-              position: 'absolute',
-            },
-          }
-        : {}),
-    }),
+    () =>
+      ({
+        position: 'relative',
+        ...(dropping
+          ? {
+              '::after': {
+                backgroundColor: alpha(
+                  theme.palette.primary.main,
+                  theme.palette.action.activatedOpacity,
+                ),
+                borderRadius: (theme) => theme.spacing(0.5),
+                content: '""',
+                inset: 0,
+                pointerEvents: 'none',
+                position: 'absolute',
+              },
+            }
+          : {}),
+      }) as SxProps<Theme>,
     [dropping, theme],
   )
 

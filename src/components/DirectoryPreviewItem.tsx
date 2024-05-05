@@ -178,15 +178,17 @@ const DirectoryPreviewItem = (props: Props) => {
       onContextMenu={onContextMenu}
       onDoubleClick={handleDoubleClick}
       sx={{
+        borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
-        '::before': {
+        overflow: 'hidden',
+        '&::before': {
           content: '""',
           inset: 0,
           pointerEvents: 'none',
           position: 'absolute',
         },
         '&:hover': {
-          '::before': {
+          '&::before': {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },

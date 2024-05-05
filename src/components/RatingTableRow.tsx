@@ -48,6 +48,7 @@ const RatingTableRow = (props: Props) => {
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       sx={{
+        borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',

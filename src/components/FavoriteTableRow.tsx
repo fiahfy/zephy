@@ -35,6 +35,7 @@ const FavoriteTableRow = (props: Props) => {
       onClick={handleClick}
       onContextMenu={onContextMenu}
       sx={{
+        borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',

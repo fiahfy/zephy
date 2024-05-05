@@ -175,11 +175,6 @@ const ExplorerPanel = () => {
         onSelectedItemsChange={handleSelectedItemsChange}
         selectedItems={selectedItems}
         slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-        sx={{
-          '&:focus-visible .Mui-focused': {
-            outline: '-webkit-focus-ring-color auto 1px',
-          },
-        }}
       >
         {root && <ExplorerTreeItem entry={root} />}
       </SimpleTreeView>
