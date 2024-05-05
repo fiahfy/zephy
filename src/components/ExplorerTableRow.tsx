@@ -1,4 +1,4 @@
-import { Box, alpha } from '@mui/system'
+import { TableRow } from '@mui/material'
 import clsx from 'clsx'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
@@ -16,40 +16,22 @@ const ExplorerTableRow = (props: Props) => {
     useExplorerItem(tabIndex, content)
 
   return (
-    <Box
-      className={clsx({
-        focused,
-        selected,
-      })}
+    <TableRow
+      className={clsx({ focused })}
+      component="div"
+      hover
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      selected={selected}
       sx={{
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
-        '&:hover': {
-          backgroundColor: (theme) => theme.palette.action.hover,
-        },
-        '&.selected': {
-          backgroundColor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.selectedOpacity,
-            ),
-          '&:hover': {
-            backgroundColor: (theme) =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.selectedOpacity +
-                  theme.palette.action.hoverOpacity,
-              ),
-          },
-        },
       }}
     >
       {children}
-    </Box>
+    </TableRow>
   )
 }
 

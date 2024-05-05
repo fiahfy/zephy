@@ -72,6 +72,10 @@ const TextPreview = (props: Props) => {
         <Typography
           component="pre"
           sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'light'
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
             p: 1,
             userSelect: 'text',
             whiteSpace: 'pre-wrap',

@@ -30,7 +30,6 @@ const FavoriteTableRow = (props: Props) => {
   return (
     <TableRow
       {...others}
-      component="div"
       hover
       onClick={handleClick}
       onContextMenu={onContextMenu}

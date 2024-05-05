@@ -174,6 +174,7 @@ const DirectoryPreviewItem = (props: Props) => {
 
   return (
     <ImageListItem
+      component="div"
       draggable={draggable}
       onContextMenu={onContextMenu}
       onDoubleClick={handleDoubleClick}

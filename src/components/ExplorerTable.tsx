@@ -1,4 +1,4 @@
-import { Box, LinearProgress, Typography } from '@mui/material'
+import { Box, LinearProgress, Table, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import ExplorerTableCell from '~/components/ExplorerTableCell'
@@ -209,7 +209,10 @@ const ExplorerTable = (props: Props) => {
           visibility: restoring ? 'hidden' : undefined,
         }}
       >
-        <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+        <Table
+          component="div"
+          sx={{ display: 'block', height: `${virtualizer.getTotalSize()}px` }}
+        >
           {virtualizer.getVirtualItems().map((virtualRow, index) => {
             const content = contents[virtualRow.index] as Content
             return (
@@ -238,7 +241,7 @@ const ExplorerTable = (props: Props) => {
               </Box>
             )
           })}
-        </Box>
+        </Table>
       </Box>
       {contents.length === 0 && (
         <Box

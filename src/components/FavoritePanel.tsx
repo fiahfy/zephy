@@ -55,8 +55,8 @@ const FavoritePanel = () => {
     <>
       {entries.length > 0 && (
         <Panel title="Favorites">
-          <Table component="div" size="small" sx={{ display: 'flex' }}>
-            <TableBody component="div" sx={{ width: '100%' }}>
+          <Table size="small" sx={{ display: 'flex' }}>
+            <TableBody sx={{ width: '100%' }}>
               {entries.map((entry) => (
                 <FavoriteTableRow
                   entry={entry}
@@ -66,7 +66,6 @@ const FavoritePanel = () => {
                   selected={selected.includes(entry.path)}
                 >
                   <TableCell
-                    component="div"
                     sx={{
                       alignItems: 'center',
                       borderBottom: 'none',
