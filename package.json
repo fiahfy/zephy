@@ -1,7 +1,7 @@
 {
   "name": "zephy",
   "description": "Simple File Browser based on Electron.",
-  "version": "0.0.5",
+  "version": "0.0.6-dev",
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
