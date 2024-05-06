@@ -2,6 +2,7 @@ import { Box } from '@mui/material'
 import { FocusEvent, createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
+import { ExplorerProvider } from '~/contexts/ExplorerContext'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
@@ -86,18 +87,23 @@ const Explorer = (props: Props) => {
   }, [])
 
   return (
-    <Box
-      onBlur={handleBlur}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-      onFocus={handleFocus}
-      sx={{ height: '100%', ...droppableStyle }}
-      {...dropHandlers}
-    >
-      {createElement(viewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable, {
-        tabIndex,
-      })}
-    </Box>
+    <ExplorerProvider>
+      <Box
+        onBlur={handleBlur}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        onFocus={handleFocus}
+        sx={{ height: '100%', ...droppableStyle }}
+        {...dropHandlers}
+      >
+        {createElement(
+          viewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
+          {
+            tabIndex,
+          },
+        )}
+      </Box>
+    </ExplorerProvider>
   )
 }
 

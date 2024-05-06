@@ -1,30 +1,27 @@
-import { KeyboardEvent, useCallback, useMemo } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { RefObject, useEffect, useMemo, useState } from 'react'
+import useExplorer from '~/hooks/useExplorer'
+import usePrevious from '~/hooks/usePrevious'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  focus,
-  select,
   selectContentsByTabIndex,
-  selectEditingByTabIndex,
   selectErrorByTabIndex,
   selectFocusedByTabIndex,
   selectLoadingByTabIndex,
   selectQueryByTabIndex,
-  selectSelectedContentsByTabIndex,
 } from '~/store/explorer'
-import { openEntry } from '~/store/settings'
-import {
-  changeDirectory,
-  selectScrollTopByTabIndex,
-  setScrollTop,
-} from '~/store/window'
+import { selectScrollTopByTabIndex, setScrollTop } from '~/store/window'
 
-const useExplorerList = (tabIndex: number) => {
+const useExplorerList = (
+  tabIndex: number,
+  columns: number,
+  estimateSize: number,
+  overscan: number,
+  ref: RefObject<HTMLElement>,
+) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabIndex(state, tabIndex),
-  )
-  const editing = useAppSelector((state) =>
-    selectEditingByTabIndex(state, tabIndex),
   )
   const error = useAppSelector((state) =>
     selectErrorByTabIndex(state, tabIndex),
@@ -41,10 +38,73 @@ const useExplorerList = (tabIndex: number) => {
   const scrollTop = useAppSelector((state) =>
     selectScrollTopByTabIndex(state, tabIndex),
   )
-  const selectedContents = useAppSelector((state) =>
-    selectSelectedContentsByTabIndex(state, tabIndex),
-  )
   const dispatch = useAppDispatch()
+
+  const { setColumns } = useExplorer()
+
+  const chunks = useMemo(
+    () =>
+      contents.reduce(
+        (acc, _, i) =>
+          i % columns ? acc : [...acc, contents.slice(i, i + columns)],
+        [] as Content[][],
+      ),
+    [columns, contents],
+  )
+
+  const virtualizer = useVirtualizer({
+    count: chunks.length,
+    estimateSize: () => estimateSize,
+    getScrollElement: () => ref.current,
+    overscan,
+  })
+
+  const previousFocused = usePrevious(focused)
+  const previousLoading = usePrevious(loading)
+
+  const [restoring, setRestoring] = useState(false)
+
+  useEffect(() => {
+    setColumns(columns)
+  }, [columns, setColumns])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    const handler = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        if (!loading) {
+          dispatch(setScrollTop(e.target.scrollTop))
+        }
+      }
+    }
+    el.addEventListener('scrollend', handler)
+    return () => el.removeEventListener('scrollend', handler)
+  }, [dispatch, loading, ref])
+
+  useEffect(() => {
+    if (!previousLoading && loading) {
+      setRestoring(true)
+    }
+    if (previousLoading && !loading) {
+      setTimeout(() => {
+        virtualizer.scrollToOffset(scrollTop)
+        setRestoring(false)
+      })
+    }
+  }, [contents, loading, previousLoading, scrollTop, virtualizer])
+
+  useEffect(() => {
+    if (focused && previousFocused !== focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        const rowIndex = Math.floor(index / columns)
+        virtualizer.scrollToIndex(rowIndex)
+      }
+    }
+  }, [columns, contents, focused, loading, previousFocused, virtualizer])
 
   const noDataText = useMemo(
     () =>
@@ -58,48 +118,12 @@ const useExplorerList = (tabIndex: number) => {
     [error, loading, query],
   )
 
-  const onKeyDownArrow = useCallback(
-    (e: KeyboardEvent, content: Content) => {
-      e.preventDefault()
-      dispatch(select(content.path))
-      dispatch(focus(content.path))
-    },
-    [dispatch],
-  )
-
-  const onKeyDownEnter = useCallback(
-    async (e: KeyboardEvent) => {
-      e.preventDefault()
-      const content = selectedContents[0]
-      if (!content) {
-        return
-      }
-      content.type === 'directory'
-        ? dispatch(changeDirectory(content.path))
-        : dispatch(openEntry(content.path))
-    },
-    [dispatch, selectedContents],
-  )
-
-  const onScrollEnd = useCallback(
-    (scrollTop: number) => {
-      if (!loading) {
-        dispatch(setScrollTop(scrollTop))
-      }
-    },
-    [dispatch, loading],
-  )
-
   return {
-    contents,
-    editing,
-    focused,
+    chunks,
     loading,
     noDataText,
-    onKeyDownArrow,
-    onKeyDownEnter,
-    onScrollEnd,
-    scrollTop,
+    restoring,
+    virtualizer,
   }
 }
 

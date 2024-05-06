@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import EmptyPreview from '~/components/EmptyPreview'
 import { Entry } from '~/interfaces'
-import EmptyPreview from './EmptyPreview'
 
 type Props = {
   entry: Entry
