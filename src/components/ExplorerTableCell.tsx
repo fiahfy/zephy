@@ -7,8 +7,7 @@ import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { selectSelectedContentsByTabIndex } from '~/store/explorer'
+import { useAppDispatch } from '~/store'
 import { rate } from '~/store/rating'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
@@ -26,19 +25,11 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabIndex, width } = props
 
-  const selectedContents = useAppSelector((state) =>
-    selectSelectedContentsByTabIndex(state, tabIndex),
-  )
   const dispatch = useAppDispatch()
 
-  const { editing, selected } = useExplorerItem(tabIndex, content)
+  const { draggingContents, editing } = useExplorerItem(tabIndex, content)
 
-  const dragContents = useMemo(
-    () => (editing ? [] : selected ? selectedContents : [content]),
-    [content, editing, selected, selectedContents],
-  )
-
-  const { draggable, ...dragHandlers } = useDragEntry(dragContents)
+  const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)
 
   const handleChangeScore = useCallback(

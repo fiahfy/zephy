@@ -8,6 +8,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from 'react'
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import EntryIcon from '~/components/EntryIcon'
@@ -17,7 +18,6 @@ import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectSelectedContentsByTabIndex } from '~/store/explorer'
 import { rate } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
@@ -60,21 +60,23 @@ type Props = {
 const ExplorerGridItem = (props: Props) => {
   const { content, tabIndex } = props
 
-  const selectedContents = useAppSelector((state) =>
-    selectSelectedContentsByTabIndex(state, tabIndex),
-  )
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
-  const { editing, focused, onClick, onContextMenu, onDoubleClick, selected } =
-    useExplorerItem(tabIndex, content)
+  const ref = useRef<HTMLDivElement>(null)
 
-  const dragContents = useMemo(
-    () => (editing ? [] : selected ? selectedContents : [content]),
-    [content, editing, selected, selectedContents],
-  )
+  const {
+    draggingContents,
+    editing,
+    focused,
+    onClick,
+    onContextMenu,
+    onDoubleClick,
+    onKeyDown,
+    selected,
+  } = useExplorerItem(tabIndex, content, ref)
 
-  const { draggable, ...dragHandlers } = useDragEntry(dragContents)
+  const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
@@ -183,6 +185,8 @@ const ExplorerGridItem = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onKeyDown={onKeyDown}
+      ref={ref}
       sx={{
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
@@ -219,8 +223,12 @@ const ExplorerGridItem = (props: Props) => {
             },
           },
         },
+        '&:focus-visible': {
+          outline: '-webkit-focus-ring-color auto 1px',
+        },
         ...droppableStyle,
       }}
+      tabIndex={0}
       {...dragHandlers}
       {...dropHandlers}
     >
