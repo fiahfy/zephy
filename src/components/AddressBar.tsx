@@ -18,7 +18,6 @@ import {
   Typography,
 } from '@mui/material'
 import {
-  ChangeEvent,
   KeyboardEvent,
   MouseEvent,
   SyntheticEvent,
@@ -28,7 +27,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import Icon from '~/components/Icon'
+import AddressTextField from '~/components/AddressTextField'
 import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
@@ -39,16 +38,9 @@ import {
   selectCurrentLoading,
   selectCurrentQuery,
 } from '~/store/explorer'
-import {
-  selectFavorite,
-  selectFavoriteByPath,
-  toggleFavorite,
-} from '~/store/favorite'
 import { removeQuery, selectQueryHistories } from '~/store/query'
-import { openEntry } from '~/store/settings'
 import {
   back,
-  changeDirectory,
   forward,
   selectBackHistories,
   selectCanBack,
@@ -61,16 +53,13 @@ import {
   upward,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
-import { getIconType, isZephySchema } from '~/utils/url'
+import { isZephySchema } from '~/utils/url'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
-  const favorite = useAppSelector((state) =>
-    selectFavoriteByPath(selectFavorite(state), directoryPath),
-  )
   const forwardHistories = useAppSelector(selectForwardHistories)
   const primarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'primary'),
@@ -171,16 +160,6 @@ const AddressBar = () => {
     dispatch(refresh())
   }, [directoryPath, dispatch])
 
-  const handleClickFolder = useCallback(
-    async () => dispatch(openEntry(directoryPath)),
-    [directoryPath, dispatch],
-  )
-
-  const handleClickFavorite = useCallback(
-    () => dispatch(toggleFavorite(directoryPath)),
-    [directoryPath, dispatch],
-  )
-
   const handleClickSearch = useCallback(
     () => searchBy(queryInput),
     [queryInput, searchBy],
@@ -229,13 +208,10 @@ const AddressBar = () => {
       zephySchema,
     ],
   )
-  const handleChangeDirectory = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      setDirectoryPathInput(value)
-    },
-    [],
-  )
+
+  const handleChangeDirectory = useCallback((value: string) => {
+    setDirectoryPathInput(value)
+  }, [])
 
   const handleChangeQuery = useCallback(
     (_e: SyntheticEvent, value: string | null) => searchBy(value ?? ''),
@@ -246,19 +222,6 @@ const AddressBar = () => {
     (_e: SyntheticEvent, value: string) =>
       value ? setQueryInput(value) : searchBy(value),
     [searchBy],
-  )
-
-  const handleKeyDownDirectory = useCallback(
-    (e: KeyboardEvent) => {
-      if (
-        e.key === 'Enter' &&
-        !e.nativeEvent.isComposing &&
-        directoryPathInput
-      ) {
-        dispatch(changeDirectory(directoryPathInput))
-      }
-    },
-    [directoryPathInput, dispatch],
   )
 
   const handleKeyDownQuery = useCallback(
@@ -338,31 +301,8 @@ const AddressBar = () => {
           >
             <RefreshIcon fontSize="small" />
           </IconButton>
-          <RoundedFilledTextField
-            InputProps={{
-              endAdornment: !zephySchema && (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClickFavorite} size="small">
-                    <Icon iconType={favorite ? 'star' : 'star-border'} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-              startAdornment: (
-                <InputAdornment position="start">
-                  <IconButton
-                    disabled={zephySchema}
-                    onClick={zephySchema ? undefined : handleClickFolder}
-                    size="small"
-                  >
-                    <Icon iconType={getIconType(directoryPath)} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            fullWidth
+          <AddressTextField
             onChange={handleChangeDirectory}
-            onKeyDown={handleKeyDownDirectory}
-            spellCheck={false}
             value={directoryPathInput}
           />
         </Box>
