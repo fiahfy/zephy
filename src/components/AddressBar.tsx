@@ -350,6 +350,7 @@ const AddressBar = () => {
               <Box
                 {...props}
                 component="li"
+                key={option}
                 sx={(theme) => ({
                   display: 'flex',
                   alignItems: 'center',
