@@ -23,7 +23,7 @@ export const ratingSlice = createSlice({
       const { path, score } = action.payload
       const ratings = [
         ...state.ratings.filter((rating) => rating.path !== path),
-        { path, score },
+        ...(score === 0 ? [] : [{ path, score }]),
       ]
       return { ...state, ratings }
     },
