@@ -1,6 +1,6 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useCallback, useEffect, useMemo } from 'react'
+import { MouseEvent, useCallback, useEffect, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectSidebarHiddenByVariant,
@@ -72,7 +72,7 @@ const Sidebar = (props: Props) => {
   }, [dispatch, variant, width])
 
   const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+    (e: globalThis.MouseEvent) => {
       const newWidth =
         position === 'left'
           ? e.clientX + 3
@@ -94,11 +94,16 @@ const Sidebar = (props: Props) => {
     document.removeEventListener('mousemove', handleMouseMove, true)
   }, [handleMouseMove])
 
-  const handleMouseDown = useCallback(() => {
-    document.body.classList.add('col-resizing')
-    document.addEventListener('mouseup', handleMouseUp, true)
-    document.addEventListener('mousemove', handleMouseMove, true)
-  }, [handleMouseMove, handleMouseUp])
+  const handleMouseDown = useCallback(
+    (e: MouseEvent) => {
+      // prevent dragging on tree view
+      e.preventDefault()
+      document.body.classList.add('col-resizing')
+      document.addEventListener('mouseup', handleMouseUp, true)
+      document.addEventListener('mousemove', handleMouseMove, true)
+    },
+    [handleMouseMove, handleMouseUp],
+  )
 
   return (
     <Drawer
