@@ -13,6 +13,7 @@ import {
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   changeDirectory,
+  selectCurrentDirectoryPath,
   selectCurrentTabIndex,
   selectDirectoryPathByTabIndex,
   selectHistoryByTabIndex,
@@ -549,10 +550,17 @@ export const refresh = (): AppThunk => async (dispatch, getState) => {
 export const search =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
-    const { setQuery } = explorerSlice.actions
+    const { setQuery, unselect } = explorerSlice.actions
     const tabIndex = selectCurrentTabIndex(getState())
     dispatch(setQuery({ tabIndex, query }))
     dispatch(addQuery({ query }))
+    const selected = selectSelectedByTabIndex(getState(), tabIndex)
+    const contents = selectContentsByTabIndex(getState(), tabIndex)
+    const paths = contents.reduce(
+      (acc, content) => acc.filter((path) => path !== content.path),
+      selected,
+    )
+    dispatch(unselect({ tabIndex, paths }))
   }
 
 export const startEditing =
@@ -682,10 +690,13 @@ export const moveToTrash =
   }
 
 export const startRenaming =
-  (path: string): AppThunk =>
+  (path?: string): AppThunk =>
   async (dispatch, getState) => {
     const selected = selectCurrentSelected(getState())
     const targetPath = path ?? selected[0]
+    if (!targetPath) {
+      return
+    }
     dispatch(select(targetPath))
     dispatch(startEditing(targetPath))
   }
@@ -724,14 +735,12 @@ export const move =
   }
 
 export const copy = (): AppThunk => async (_, getState) => {
-  const tabIndex = selectCurrentTabIndex(getState())
-  const selected = selectSelectedByTabIndex(getState(), tabIndex)
+  const selected = selectCurrentSelected(getState())
   await window.electronAPI.copyEntries(selected)
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
-  const tabIndex = selectCurrentTabIndex(getState())
-  const directoryPath = selectDirectoryPathByTabIndex(getState(), tabIndex)
+  const directoryPath = selectCurrentDirectoryPath(getState())
   const zephyUrl = parseZephyUrl(directoryPath)
   if (zephyUrl) {
     return
