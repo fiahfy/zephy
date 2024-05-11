@@ -43,7 +43,7 @@ const registerApplicationMenu = (
     canCloseTab: false,
     canForward: false,
     inspectorHidden: false,
-    isEditable: false,
+    isEditable: true,
     navigatorHidden: false,
     orderBy: 'name',
     viewMode: 'list',
@@ -111,6 +111,10 @@ const registerApplicationMenu = (
             accelerator: 'CmdOrCtrl+O',
             click: () => send({ type: 'open' }),
             label: 'Open',
+          },
+          {
+            click: () => send({ type: 'rename' }),
+            label: 'Rename',
           },
           {
             accelerator: 'CmdOrCtrl+Backspace',

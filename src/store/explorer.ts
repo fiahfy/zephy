@@ -681,6 +681,15 @@ export const moveToTrash =
     dispatch(unselect({ tabIndex, paths: targetPaths }))
   }
 
+export const startRenaming =
+  (path: string): AppThunk =>
+  async (dispatch, getState) => {
+    const selected = selectCurrentSelected(getState())
+    const targetPath = path ?? selected[0]
+    dispatch(select(targetPath))
+    dispatch(startEditing(targetPath))
+  }
+
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {

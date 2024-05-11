@@ -16,9 +16,8 @@ import {
   newFolder,
   open,
   paste,
-  select,
   selectAll,
-  startEditing,
+  startRenaming,
 } from '~/store/explorer'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
@@ -83,9 +82,7 @@ const App = () => {
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'rename':
-          dispatch(select(data.path))
-          dispatch(startEditing(data.path))
-          return
+          return dispatch(startRenaming(data?.path))
         case 'paste':
           return dispatch(paste())
         case 'selectAll':
