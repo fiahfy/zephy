@@ -14,7 +14,7 @@ const useEntryItem = (entry: Entry) => {
     const path = entry.path
     return createContextMenuHandler([
       {
-        type: directory ? 'openDirectory' : 'open',
+        type: 'open',
         data: { path },
       },
       ...(directory

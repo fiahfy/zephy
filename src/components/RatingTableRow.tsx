@@ -24,7 +24,7 @@ const RatingTableRow = (props: Props) => {
     const path = buildZephyUrl({ pathname: 'ratings', params: { score } })
     return createContextMenuHandler([
       {
-        type: 'openDirectory',
+        type: 'open',
         data: { path },
       },
       {

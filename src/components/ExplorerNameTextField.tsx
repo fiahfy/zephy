@@ -81,7 +81,11 @@ const ExplorerNameTextField = (props: Props) => {
       onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
       spellCheck={false}
-      sx={{ '.MuiInputBase-root': { color: 'inherit' } }}
+      sx={{
+        '.MuiInputBase-root': {
+          backgroundColor: (theme) => theme.palette.background.default,
+        },
+      }}
       value={name}
     />
   )

@@ -4,7 +4,6 @@ import {
   Menu,
   MenuItemConstructorOptions,
   app,
-  dialog,
   ipcMain,
   shell,
 } from 'electron'
@@ -93,19 +92,6 @@ const registerApplicationMenu = (
               send({ type: 'newTab', data: { path: app.getPath('home') } }),
             label: 'New Tab',
           },
-          {
-            accelerator: 'CmdOrCtrl+O',
-            click: async () => {
-              const { filePaths } = await dialog.showOpenDialog({
-                properties: ['openDirectory'],
-              })
-              const directoryPath = filePaths[0]
-              if (directoryPath) {
-                createWindow(directoryPath)
-              }
-            },
-            label: 'Open...',
-          },
           ...[
             isMac
               ? {
@@ -121,6 +107,11 @@ const registerApplicationMenu = (
             label: 'Close Tab',
           },
           { type: 'separator' },
+          {
+            accelerator: 'CmdOrCtrl+O',
+            click: () => send({ type: 'open' }),
+            label: 'Open',
+          },
           {
             accelerator: 'CmdOrCtrl+Backspace',
             click: () => send({ type: 'moveToTrash' }),

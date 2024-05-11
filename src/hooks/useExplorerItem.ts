@@ -130,7 +130,7 @@ const useExplorerItem = (
       ...(paths.length === 1
         ? [
             {
-              type: directory ? 'openDirectory' : 'open',
+              type: 'open',
               data: { path },
             },
             ...(directory
@@ -192,16 +192,6 @@ const useExplorerItem = (
     zephySchema,
   ])
 
-  const open = useCallback(async () => {
-    const content = selectedContents[0]
-    if (!content) {
-      return
-    }
-    content.type === 'directory'
-      ? dispatch(changeDirectory(content.path))
-      : dispatch(openEntry(content.path))
-  }, [dispatch, selectedContents])
-
   const focusBy = useCallback(
     (rowOffset: number, columnOffset: number) => {
       const index = contents.findIndex((c) => c.path === content.path)
@@ -237,7 +227,7 @@ const useExplorerItem = (
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
-            open()
+            dispatch(startEditing(content.path))
           }
           return
         case 'ArrowUp':
@@ -258,7 +248,7 @@ const useExplorerItem = (
           return focusBy(0, 1)
       }
     },
-    [focusBy, focusTo, open],
+    [content.path, dispatch, focusBy, focusTo],
   )
 
   return {

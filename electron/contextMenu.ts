@@ -61,12 +61,7 @@ const registerContextMenu = (
       label: 'New Tab',
     }),
     open: (event, _params, { path }) => ({
-      click: () => send(event, { type: 'openEntry', data: { path } }),
-      label: 'Open',
-    }),
-    openDirectory: (event, _params, { path }) => ({
-      click: () =>
-        send(event, { type: 'changeDirectory', data: { path: path } }),
+      click: () => send(event, { type: 'open', data: { path } }),
       label: 'Open',
     }),
     openInNewWindow: (_event, _params, { path }) => ({
@@ -78,7 +73,7 @@ const registerContextMenu = (
       label: 'Open in New Tab',
     }),
     rename: (event, _params, { path }) => ({
-      click: () => send(event, { type: 'rename', data: { path: path } }),
+      click: () => send(event, { type: 'rename', data: { path } }),
       label: 'Rename...',
     }),
     revealInFinder: (_event, _params, { path }) => ({

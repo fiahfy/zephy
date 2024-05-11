@@ -1,4 +1,4 @@
-import { Box, GlobalStyles, Toolbar } from '@mui/material'
+import { Box, GlobalStyles, Toolbar, lighten } from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
@@ -14,16 +14,15 @@ import {
   copy,
   moveToTrash,
   newFolder,
+  open,
   paste,
   select,
   selectAll,
   startEditing,
 } from '~/store/explorer'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
-import { openEntry } from '~/store/settings'
 import {
   back,
-  changeDirectory,
   closeOtherTabs,
   closeTab,
   duplicateTab,
@@ -55,8 +54,6 @@ const App = () => {
           return dispatch(addToFavorites(data.path))
         case 'back':
           return dispatch(back())
-        case 'changeDirectory':
-          return dispatch(changeDirectory(data.path))
         case 'changeSidebarHidden':
           return dispatch(setSidebarHidden(data.variant, data.hidden))
         case 'changeViewMode':
@@ -81,8 +78,8 @@ const App = () => {
           return dispatch(newFolder(data.path))
         case 'newTab':
           return dispatch(newTab(data.path, data?.tabIndex))
-        case 'openEntry':
-          return dispatch(openEntry(data.path))
+        case 'open':
+          return dispatch(open(data?.path))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'rename':
@@ -173,6 +170,9 @@ const App = () => {
             },
           },
           '.theme-light': {
+            '& ::selection': {
+              backgroundColor: lighten(theme.palette.primary.main, 0.5),
+            },
             '& ::-webkit-scrollbar-thumb': {
               backgroundColor: '#e0e0e0',
               '&:hover': {
@@ -184,6 +184,9 @@ const App = () => {
             },
           },
           '.theme-dark': {
+            '& ::selection': {
+              backgroundColor: lighten(theme.palette.primary.main, 0.2),
+            },
             '& ::-webkit-scrollbar-thumb': {
               backgroundColor: '#424242',
               '&:hover': {

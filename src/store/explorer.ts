@@ -10,8 +10,9 @@ import {
   selectRating,
   selectScoreByPath,
 } from '~/store/rating'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
+  changeDirectory,
   selectCurrentTabIndex,
   selectDirectoryPathByTabIndex,
   selectHistoryByTabIndex,
@@ -646,6 +647,23 @@ export const newFolder =
     dispatch(select({ tabIndex, path: entry.path }))
     dispatch(focus({ tabIndex, path: entry.path }))
     dispatch(startEditing({ tabIndex, path: entry.path }))
+  }
+
+export const open =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const contents = selectCurrentContents(getState())
+    const selected = selectCurrentSelected(getState())
+    const targetPath = path ?? selected[0]
+    const content = contents.find((content) => content.path === targetPath)
+    if (!content) {
+      return
+    }
+    const action =
+      content.type === 'directory'
+        ? changeDirectory(content.path)
+        : openEntry(content.path)
+    dispatch(action)
   }
 
 export const moveToTrash =
