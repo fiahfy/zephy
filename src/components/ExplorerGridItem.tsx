@@ -179,7 +179,7 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      className={clsx({ focused, selected })}
+      className={clsx({ focused, selected, outlined: true })}
       component="div"
       draggable={draggable}
       onClick={onClick}
@@ -222,9 +222,6 @@ const ExplorerGridItem = (props: Props) => {
                 ),
             },
           },
-        },
-        '&:focus-visible': {
-          outline: '-webkit-focus-ring-color auto 1px',
         },
         ...droppableStyle,
       }}

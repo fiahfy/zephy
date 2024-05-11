@@ -30,6 +30,9 @@ const Panel = (props: Props) => {
               opacity: 1,
             },
           },
+          '& .MuiIconButton-root:focus-visible': {
+            opacity: 1,
+          },
         }}
         variant="overline"
       >

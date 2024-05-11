@@ -1,5 +1,5 @@
 import { TableRow } from '@mui/material'
-import { FocusEvent, ReactNode, useCallback } from 'react'
+import { ReactNode, useCallback } from 'react'
 import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
@@ -9,9 +9,6 @@ import { changeDirectory } from '~/store/window'
 type Props = {
   children: ReactNode
   entry: Entry
-  onBlur: (e: FocusEvent) => void
-  onFocus: (e: FocusEvent) => void
-  selected: boolean
 }
 
 const FavoriteTableRow = (props: Props) => {
@@ -30,6 +27,7 @@ const FavoriteTableRow = (props: Props) => {
   return (
     <TableRow
       {...others}
+      className="outlined"
       hover
       onClick={handleClick}
       onContextMenu={onContextMenu}
@@ -38,9 +36,6 @@ const FavoriteTableRow = (props: Props) => {
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
-        '&:focus-visible': {
-          outline: '-webkit-focus-ring-color auto 1px',
-        },
         ...droppableStyle,
       }}
       tabIndex={0}

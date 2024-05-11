@@ -90,7 +90,8 @@ const EntryTreeItem = (props: Props) => {
       onFocusCapture={(e) => e.stopPropagation()}
       sx={{
         '&:focus-visible .Mui-focused': {
-          outline: '-webkit-focus-ring-color auto 1px',
+          outline: (theme) => `${theme.palette.primary.main} auto 1px`,
+          outlineOffset: '-1px',
         },
         '.MuiTreeItem-label': { position: 'static!important' },
         ...sx,

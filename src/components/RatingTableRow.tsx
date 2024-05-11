@@ -1,5 +1,5 @@
 import { TableRow } from '@mui/material'
-import { FocusEvent, ReactNode, useCallback, useMemo } from 'react'
+import { ReactNode, useCallback, useMemo } from 'react'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
@@ -7,10 +7,7 @@ import { buildZephyUrl } from '~/utils/url'
 
 type Props = {
   children: ReactNode
-  onBlur: (e: FocusEvent) => void
-  onFocus: (e: FocusEvent) => void
   score: number
-  selected: boolean
 }
 
 const RatingTableRow = (props: Props) => {
@@ -44,6 +41,7 @@ const RatingTableRow = (props: Props) => {
   return (
     <TableRow
       {...others}
+      className="outlined"
       hover
       onClick={handleClick}
       onContextMenu={handleContextMenu}
@@ -52,9 +50,6 @@ const RatingTableRow = (props: Props) => {
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
-        '&:focus-visible': {
-          outline: '-webkit-focus-ring-color auto 1px',
-        },
       }}
       tabIndex={0}
     >

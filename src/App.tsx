@@ -7,6 +7,7 @@ import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
 import TabBar from '~/components/TabBar'
 import TabPanels from '~/components/TabPanels'
+import useTheme from '~/hooks/useTheme'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -41,6 +42,8 @@ import { createContextMenuHandler } from '~/utils/contextMenu'
 const App = () => {
   const title = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
+
+  const { theme } = useTheme()
 
   useTitle(title)
 
@@ -194,6 +197,10 @@ const App = () => {
           '.col-resizing *': {
             cursor: 'col-resize',
             userSelect: 'none',
+          },
+          '.outlined:focus-visible': {
+            outline: `${theme.palette.primary.main} auto 1px!important`,
+            outlineOffset: '-1px',
           },
         }}
       />

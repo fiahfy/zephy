@@ -26,7 +26,7 @@ const ExplorerTableRow = (props: Props) => {
 
   return (
     <TableRow
-      className={clsx({ focused })}
+      className={clsx({ focused, outlined: true })}
       component="div"
       hover
       onClick={onClick}
@@ -39,9 +39,6 @@ const ExplorerTableRow = (props: Props) => {
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
-        '&:focus-visible': {
-          outline: '-webkit-focus-ring-color auto 1px',
-        },
       }}
       tabIndex={0}
     >

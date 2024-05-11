@@ -11,7 +11,6 @@ const RatingPanel = () => {
 
   const { watch } = useWatcher()
 
-  const [selected, setSelected] = useState<number[]>([])
   const [items, setItems] = useState<{ count: number; score: number }[]>([])
 
   const load = useCallback(async () => {
@@ -46,10 +45,6 @@ const RatingPanel = () => {
     [load, pathsByScore, watch],
   )
 
-  const handleBlur = useCallback(() => setSelected([]), [])
-
-  const handleFocus = useCallback((score: number) => setSelected([score]), [])
-
   return (
     <>
       {items.length > 0 && (
@@ -57,13 +52,7 @@ const RatingPanel = () => {
           <Table size="small" sx={{ display: 'flex' }}>
             <TableBody sx={{ width: '100%' }}>
               {items.map((item) => (
-                <RatingTableRow
-                  key={item.score}
-                  onBlur={() => handleBlur()}
-                  onFocus={() => handleFocus(item.score)}
-                  score={item.score}
-                  selected={selected.includes(item.score)}
-                >
+                <RatingTableRow key={item.score} score={item.score}>
                   <TableCell
                     sx={{
                       alignItems: 'center',

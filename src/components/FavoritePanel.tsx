@@ -15,7 +15,6 @@ const FavoritePanel = () => {
 
   const { watch } = useWatcher()
 
-  const [selected, setSelected] = useState<string[]>([])
   const [entries, setEntries] = useState<DetailedEntry[]>([])
 
   const load = useCallback(async () => {
@@ -47,10 +46,6 @@ const FavoritePanel = () => {
     [entries, load, watch],
   )
 
-  const handleBlur = useCallback(() => setSelected([]), [])
-
-  const handleFocus = useCallback((path: string) => setSelected([path]), [])
-
   return (
     <>
       {entries.length > 0 && (
@@ -58,13 +53,7 @@ const FavoritePanel = () => {
           <Table size="small" sx={{ display: 'flex' }}>
             <TableBody sx={{ width: '100%' }}>
               {entries.map((entry) => (
-                <FavoriteTableRow
-                  entry={entry}
-                  key={entry.path}
-                  onBlur={() => handleBlur()}
-                  onFocus={() => handleFocus(entry.path)}
-                  selected={selected.includes(entry.path)}
-                >
+                <FavoriteTableRow entry={entry} key={entry.path}>
                   <TableCell
                     sx={{
                       alignItems: 'center',
