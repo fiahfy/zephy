@@ -2,23 +2,15 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import {
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-} from 'react'
-import NoOutlineRating from '~/components/mui/NoOutlineRating'
+import { useEffect, useMemo, useReducer, useRef } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
+import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { rate } from '~/store/rating'
+import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
 
@@ -61,7 +53,6 @@ const ExplorerGridItem = (props: Props) => {
   const { content, tabIndex } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
-  const appDispatch = useAppDispatch()
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -154,29 +145,6 @@ const ExplorerGridItem = (props: Props) => {
     }
   }, [status])
 
-  const handleChangeScore = useCallback(
-    (_e: SyntheticEvent, value: number | null) =>
-      appDispatch(rate({ path: content.path, score: value ?? 0 })),
-    [appDispatch, content.path],
-  )
-
-  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
-  const rating = useMemo(
-    () => (
-      <NoOutlineRating
-        color="primary"
-        onChange={handleChangeScore}
-        onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => e.stopPropagation()}
-        precision={0.5}
-        size="small"
-        sx={{ my: 0.25 }}
-        value={content.rating}
-      />
-    ),
-    [content.rating, handleChangeScore],
-  )
-
   return (
     <ImageListItem
       className={clsx({ focused, selected, outlined: true })}
@@ -258,7 +226,9 @@ const ExplorerGridItem = (props: Props) => {
               justifyContent: 'space-between',
             }}
           >
-            {rating}
+            <Box sx={{ my: 0.25 }}>
+              <Rating path={content.path} score={content.score} />
+            </Box>
             {itemCount !== undefined && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
                 {pluralize('item', itemCount, true)}

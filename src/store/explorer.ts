@@ -475,7 +475,7 @@ export const selectContentsByTabIndex = createSelector(
       )
       .map((entry) => ({
         ...entry,
-        rating: selectScoreByPath(rating, entry.path),
+        score: selectScoreByPath(rating, entry.path),
       }))
       .sort((a, b) => comparator(a, b))
   },

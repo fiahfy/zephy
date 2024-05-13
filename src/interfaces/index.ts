@@ -73,7 +73,7 @@ export type DetailedEntry = Entry & {
   dateLastOpened: number
   size: number
 }
-export type Content = DetailedEntry & { rating: number }
+export type Content = DetailedEntry & { score: number }
 
 export type Metadata = {
   duration?: number

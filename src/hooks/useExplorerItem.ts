@@ -96,8 +96,12 @@ const useExplorerItem = (
   const previousEditing = usePrevious(editing)
 
   useEffect(() => {
+    const el = ref?.current
+    if (!el) {
+      return
+    }
     if (focused) {
-      ref?.current?.focus()
+      el.focus()
     }
   }, [focused, ref])
 

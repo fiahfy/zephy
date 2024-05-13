@@ -1,23 +1,17 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
-import {
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-} from 'react'
-import NoOutlineRating from '~/components/mui/NoOutlineRating'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import EntryIcon from '~/components/EntryIcon'
+import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
+import { selectRating, selectScoreByPath } from '~/store/rating'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { rate, selectRating, selectScoreByPath } from '~/store/rating'
 
 type State = {
   itemCount?: number
@@ -149,29 +143,6 @@ const DirectoryPreviewItem = (props: Props) => {
     [appDispatch, entry.path, entry.type],
   )
 
-  const handleChangeScore = useCallback(
-    (_e: SyntheticEvent, value: number | null) =>
-      appDispatch(rate({ path: entry.path, score: value ?? 0 })),
-    [appDispatch, entry.path],
-  )
-
-  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
-  const rating = useMemo(
-    () => (
-      <NoOutlineRating
-        color="primary"
-        onChange={handleChangeScore}
-        onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => e.stopPropagation()}
-        precision={0.5}
-        size="small"
-        sx={{ my: 0.25 }}
-        value={score}
-      />
-    ),
-    [handleChangeScore, score],
-  )
-
   return (
     <ImageListItem
       className="outlined"
@@ -235,7 +206,9 @@ const DirectoryPreviewItem = (props: Props) => {
               justifyContent: 'space-between',
             }}
           >
-            {rating}
+            <Box sx={{ my: 0.25 }}>
+              <Rating path={entry.path} score={score} />
+            </Box>
             {itemCount !== undefined && entry.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
                 {pluralize('item', itemCount, true)}

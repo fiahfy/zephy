@@ -1,14 +1,11 @@
 import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
-import { SyntheticEvent, useCallback, useMemo } from 'react'
 import EntryIcon from '~/components/EntryIcon'
-import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
+import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import { Content } from '~/interfaces'
-import { useAppDispatch } from '~/store'
-import { rate } from '~/store/rating'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
 type Key = keyof Content
@@ -25,33 +22,10 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabIndex, width } = props
 
-  const dispatch = useAppDispatch()
-
   const { draggingContents, editing } = useExplorerItem(tabIndex, content)
 
   const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)
-
-  const handleChangeScore = useCallback(
-    (_e: SyntheticEvent, value: number | null) =>
-      dispatch(rate({ path: content.path, score: value ?? 0 })),
-    [content.path, dispatch],
-  )
-
-  // Rating component rendering is slow, so use useMemo to avoid unnecessary rendering
-  const rating = useMemo(
-    () => (
-      <NoOutlineRating
-        onChange={handleChangeScore}
-        onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => e.stopPropagation()}
-        precision={0.5}
-        size="small"
-        value={content.rating}
-      />
-    ),
-    [content.rating, handleChangeScore],
-  )
 
   return (
     <TableCell
@@ -98,7 +72,9 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </Box>
       )}
-      {dataKey === 'rating' && rating}
+      {dataKey === 'score' && (
+        <Rating path={content.path} score={content.score} />
+      )}
       {dataKey === 'size' && content.type !== 'directory' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}

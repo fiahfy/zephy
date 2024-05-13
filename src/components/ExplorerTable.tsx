@@ -26,7 +26,7 @@ const columns: ColumnType[] = [
   },
   {
     align: 'left',
-    key: 'rating',
+    key: 'score',
     label: 'Rating',
     width: 110,
   },
