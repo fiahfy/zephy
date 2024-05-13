@@ -1,16 +1,18 @@
 import { SyntheticEvent, useCallback, useMemo } from 'react'
 import NoOutlineRating from '~/components/mui/NoOutlineRating'
-import { useAppDispatch } from '~/store'
-import { rate } from '~/store/rating'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { rate, selectRating, selectScoreByPath } from '~/store/rating'
 
 type Props = {
   path: string
-  score: number
 }
 
 const Rating = (props: Props) => {
-  const { path, score } = props
+  const { path } = props
 
+  const score = useAppSelector((state) =>
+    selectScoreByPath(selectRating(state), path),
+  )
   const dispatch = useAppDispatch()
 
   const handleChangeScore = useCallback(

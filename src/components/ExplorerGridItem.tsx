@@ -227,7 +227,7 @@ const ExplorerGridItem = (props: Props) => {
             }}
           >
             <Box sx={{ my: 0.25 }}>
-              <Rating path={content.path} score={content.score} />
+              <Rating path={content.path} />
             </Box>
             {itemCount !== undefined && content.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">

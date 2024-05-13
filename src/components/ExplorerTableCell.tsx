@@ -72,9 +72,7 @@ const ExplorerTableCell = (props: Props) => {
           )}
         </Box>
       )}
-      {dataKey === 'score' && (
-        <Rating path={content.path} score={content.score} />
-      )}
+      {dataKey === 'score' && <Rating path={content.path} />}
       {dataKey === 'size' && content.type !== 'directory' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}

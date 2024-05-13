@@ -8,7 +8,6 @@ import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectRating, selectScoreByPath } from '~/store/rating'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
@@ -50,9 +49,6 @@ type Props = {
 const DirectoryPreviewItem = (props: Props) => {
   const { entry } = props
 
-  const score = useAppSelector((state) =>
-    selectScoreByPath(selectRating(state), entry.path),
-  )
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const appDispatch = useAppDispatch()
 
@@ -207,7 +203,7 @@ const DirectoryPreviewItem = (props: Props) => {
             }}
           >
             <Box sx={{ my: 0.25 }}>
-              <Rating path={entry.path} score={score} />
+              <Rating path={entry.path} />
             </Box>
             {itemCount !== undefined && entry.type === 'directory' && (
               <Typography ml={1} noWrap variant="caption">
