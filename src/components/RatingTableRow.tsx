@@ -41,7 +41,6 @@ const RatingTableRow = (props: Props) => {
   return (
     <TableRow
       {...others}
-      className="outlined"
       hover
       onClick={handleClick}
       onContextMenu={handleContextMenu}

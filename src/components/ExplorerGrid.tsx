@@ -46,7 +46,6 @@ const ExplorerGrid = (props: Props) => {
     <Box
       sx={{
         height: '100%',
-        outline: 'none',
         position: 'relative',
       }}
     >

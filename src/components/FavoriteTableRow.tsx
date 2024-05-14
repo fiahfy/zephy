@@ -27,7 +27,6 @@ const FavoriteTableRow = (props: Props) => {
   return (
     <TableRow
       {...others}
-      className="outlined"
       hover
       onClick={handleClick}
       onContextMenu={onContextMenu}

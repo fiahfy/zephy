@@ -26,7 +26,7 @@ const ExplorerTableRow = (props: Props) => {
 
   return (
     <TableRow
-      className={clsx({ focused, outlined: true })}
+      className={clsx({ focused })}
       component="div"
       hover
       onClick={onClick}

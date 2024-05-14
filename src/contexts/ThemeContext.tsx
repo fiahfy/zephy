@@ -41,19 +41,55 @@ export const ThemeProvider = (props: Props) => {
   }, [mode])
 
   const theme = useMemo(() => {
-    const theme = createTheme({
-      palette: {
-        mode,
-        primary: {
-          main: '#ff4081',
-        },
-        // secondary: {
-        //   main: '#19857b',
-        // },
-        // error: {
-        //   main: colors.red.A400,
-        // },
+    const palette = {
+      mode,
+      primary: {
+        main: '#ff4081',
       },
+      // secondary: {
+      //   main: '#19857b',
+      // },
+      // error: {
+      //   main: colors.red.A400,
+      // },
+    }
+    const components = {
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            ':focus-visible': {
+              outline: `${palette.primary.main} solid 1px`,
+              outlineOffset: '-1px',
+            },
+          },
+        },
+      },
+      MuiImageListItem: {
+        styleOverrides: {
+          root: {
+            ':focus-visible': {
+              outline: `${palette.primary.main} solid 1px`,
+              outlineOffset: '-1px',
+            },
+          },
+        },
+      },
+      MuiTreeItem: {
+        styleOverrides: {
+          root: {
+            ':focus-visible': {
+              '& > .MuiTreeItem-content': {
+                outline: `${palette.primary.main} solid 1px`,
+                outlineOffset: '-1px',
+              },
+            },
+          },
+        },
+      },
+    }
+    const theme = createTheme({
+      palette,
+      components,
     })
     return createTheme(theme, {
       mixins: {

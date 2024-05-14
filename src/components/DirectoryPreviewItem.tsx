@@ -141,7 +141,6 @@ const DirectoryPreviewItem = (props: Props) => {
 
   return (
     <ImageListItem
-      className="outlined"
       component="div"
       draggable={draggable}
       onContextMenu={onContextMenu}

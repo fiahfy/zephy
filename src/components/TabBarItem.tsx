@@ -65,7 +65,6 @@ const TabBarItem = (props: Props) => {
     <Tab
       // @see https://github.com/mui/material-ui/issues/27947#issuecomment-905318861
       {...others}
-      className="outlined"
       disableRipple
       icon={
         <IconButton

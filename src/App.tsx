@@ -201,10 +201,6 @@ const App = () => {
             cursor: 'col-resize',
             userSelect: 'none',
           },
-          '.outlined:focus-visible': {
-            outline: `${theme.palette.primary.main} solid 1px!important`,
-            outlineOffset: '-1px',
-          },
         }}
       />
       <AddressBar />

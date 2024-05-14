@@ -147,7 +147,7 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      className={clsx({ focused, selected, outlined: true })}
+      className={clsx({ focused, selected })}
       component="div"
       draggable={draggable}
       onClick={onClick}

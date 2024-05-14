@@ -62,7 +62,6 @@ const ExplorerTable = (props: Props) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        outline: 'none',
         position: 'relative',
       }}
     >
