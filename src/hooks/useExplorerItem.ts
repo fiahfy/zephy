@@ -248,6 +248,7 @@ const useExplorerItem = (
           e.preventDefault()
           return focusBy(0, -1)
         case 'ArrowRight':
+        case 'Tab':
           e.preventDefault()
           return focusBy(0, 1)
       }
