@@ -1,4 +1,4 @@
-import { Box, GlobalStyles, Toolbar, lighten } from '@mui/material'
+import { Box, GlobalStyles, Toolbar, darken, lighten } from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
@@ -159,6 +159,9 @@ const App = () => {
           'html, body, #root': {
             height: '100%',
           },
+          a: {
+            color: theme.palette.primary.main,
+          },
           '::-webkit-scrollbar': {
             width: 10,
             height: 10,
@@ -182,7 +185,7 @@ const App = () => {
           },
           '.theme-dark': {
             '& ::selection': {
-              backgroundColor: lighten(theme.palette.primary.main, 0.2),
+              backgroundColor: darken(theme.palette.primary.main, 0.5),
             },
             '& ::-webkit-scrollbar-thumb': {
               backgroundColor: '#424242',
