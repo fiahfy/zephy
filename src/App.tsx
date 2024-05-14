@@ -202,7 +202,7 @@ const App = () => {
             userSelect: 'none',
           },
           '.outlined:focus-visible': {
-            outline: `${theme.palette.primary.main} auto 1px!important`,
+            outline: `${theme.palette.primary.main} solid 1px!important`,
             outlineOffset: '-1px',
           },
         }}
