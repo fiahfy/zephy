@@ -1,5 +1,5 @@
+import { Rating as MuiRating } from '@mui/material'
 import { SyntheticEvent, useCallback, useMemo } from 'react'
-import NoOutlineRating from '~/components/mui/NoOutlineRating'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { rate, selectRating, selectScoreByPath } from '~/store/rating'
 
@@ -24,12 +24,23 @@ const Rating = (props: Props) => {
   // Rating component rendering is slow, so avoid unnecessary rendering
   const rating = useMemo(
     () => (
-      <NoOutlineRating
+      <MuiRating
         onChange={handleChangeScore}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
         precision={0.5}
         size="small"
+        sx={{
+          '&.Mui-focusVisible': {
+            '.MuiRating-iconActive': {
+              outline: 'none',
+            },
+          },
+          '.MuiRating-labelEmptyValueActive': {
+            outline: 'none',
+          },
+        }}
         value={score}
       />
     ),

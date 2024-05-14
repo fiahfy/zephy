@@ -30,7 +30,7 @@ const Panel = (props: Props) => {
               opacity: 1,
             },
           },
-          '& .MuiIconButton-root:focus-visible': {
+          '.MuiIconButton-root:focus-visible': {
             opacity: 1,
           },
         }}
