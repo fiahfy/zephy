@@ -74,9 +74,8 @@ const DirectoryPreview = (props: Props) => {
 
   const virtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: () => size,
-    overscan: 5,
+    getScrollElement: () => parentRef.current,
   })
 
   useEffect(() => {

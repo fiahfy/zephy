@@ -24,7 +24,7 @@ const ExplorerGrid = (props: Props) => {
   const ref = useRef<HTMLDivElement>(null)
 
   const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabIndex, columns, size, 5, ref)
+    useExplorerList(tabIndex, columns, size, ref)
 
   useEffect(() => {
     const el = ref.current

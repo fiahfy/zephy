@@ -54,7 +54,7 @@ const ExplorerTable = (props: Props) => {
   const ref = useRef<HTMLDivElement>(null)
 
   const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabIndex, 1, rowHeight, 20, ref)
+    useExplorerList(tabIndex, 1, rowHeight, ref)
 
   return (
     <Box

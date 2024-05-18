@@ -17,7 +17,6 @@ const useExplorerList = (
   tabIndex: number,
   columns: number,
   estimateSize: number,
-  overscan: number,
   ref: RefObject<HTMLElement>,
 ) => {
   const contents = useAppSelector((state) =>
@@ -56,7 +55,6 @@ const useExplorerList = (
     count: chunks.length,
     estimateSize: () => estimateSize,
     getScrollElement: () => ref.current,
-    overscan,
   })
 
   const previousFocused = usePrevious(focused)
