@@ -24,7 +24,7 @@ import queryReducer from '~/store/query'
 import ratingReducer from '~/store/rating'
 import settingsReducer from '~/store/settings'
 import windowReducer from '~/store/window'
-import windowIndexReducer from '~/store/windowIndex'
+import windowIdReducer from '~/store/windowId'
 
 const reducers = combineReducers({
   explorer: explorerReducer,
@@ -34,7 +34,7 @@ const reducers = combineReducers({
   rating: ratingReducer,
   settings: settingsReducer,
   window: windowReducer,
-  windowIndex: windowIndexReducer,
+  windowId: windowIdReducer,
 })
 
 const persistConfig = {

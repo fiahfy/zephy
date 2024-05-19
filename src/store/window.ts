@@ -8,7 +8,7 @@ import {
   removeTab,
   selectLoadingByTabId,
 } from '~/store/explorer'
-import { selectWindowIndex } from '~/store/windowIndex'
+import { selectWindowId } from '~/store/windowId'
 import { buildZephyUrl, getTitle } from '~/utils/url'
 
 type History = {
@@ -61,8 +61,10 @@ type WindowState = {
 }
 
 type State = {
-  [index: number]: WindowState
+  [id: number]: WindowState
 }
+
+const initialState: State = {}
 
 const defaultOrders = {
   name: 'asc',
@@ -90,8 +92,6 @@ const defaultWindowState: WindowState = {
   viewMode: {},
 }
 
-const initialState: State = {}
-
 const findMissingTabId = (tabs: TabState[]) =>
   tabs
     .map((tab) => tab.id)
@@ -105,18 +105,18 @@ export const windowSlice = createSlice({
     replaceState(_state, action: PayloadAction<{ state: State }>) {
       return action.payload.state
     },
-    newWindow(state, action: PayloadAction<{ index: number }>) {
-      const { index } = action.payload
+    newWindow(state, action: PayloadAction<{ id: number }>) {
+      const { id } = action.payload
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...defaultWindowState,
         },
       }
     },
-    newTab(state, action: PayloadAction<{ index: number; srcTabId: number }>) {
-      const { index, srcTabId } = action.payload
-      const window = state[index]
+    newTab(state, action: PayloadAction<{ id: number; srcTabId: number }>) {
+      const { id, srcTabId } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -135,7 +135,7 @@ export const windowSlice = createSlice({
       ]
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabId,
           tabs,
@@ -144,10 +144,10 @@ export const windowSlice = createSlice({
     },
     duplicateTab(
       state,
-      action: PayloadAction<{ index: number; srcTabId: number }>,
+      action: PayloadAction<{ id: number; srcTabId: number }>,
     ) {
-      const { index, srcTabId } = action.payload
-      const window = state[index]
+      const { id, srcTabId } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -173,16 +173,16 @@ export const windowSlice = createSlice({
       ]
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabId,
           tabs,
         },
       }
     },
-    closeTab(state, action: PayloadAction<{ index: number; tabId: number }>) {
-      const { index, tabId } = action.payload
-      const window = state[index]
+    closeTab(state, action: PayloadAction<{ id: number; tabId: number }>) {
+      const { id, tabId } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -196,7 +196,7 @@ export const windowSlice = createSlice({
             : tabs[tabs.length - 1].id
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabId: newTabId,
           tabs,
@@ -205,32 +205,32 @@ export const windowSlice = createSlice({
     },
     closeOtherTabs(
       state,
-      action: PayloadAction<{ index: number; tabId: number }>,
+      action: PayloadAction<{ id: number; tabId: number }>,
     ) {
-      const { index, tabId } = action.payload
-      const window = state[index]
+      const { id, tabId } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
       const tabs = window.tabs.filter((tab) => tab.id === tabId)
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabId,
           tabs,
         },
       }
     },
-    changeTab(state, action: PayloadAction<{ index: number; tabId: number }>) {
-      const { index, tabId } = action.payload
-      const window = state[index]
+    changeTab(state, action: PayloadAction<{ id: number; tabId: number }>) {
+      const { id, tabId } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabId,
         },
@@ -239,13 +239,13 @@ export const windowSlice = createSlice({
     changeDirectory(
       state,
       action: PayloadAction<{
-        index: number
+        id: number
         directoryPath: string
         title: string
       }>,
     ) {
-      const { index, directoryPath, title } = action.payload
-      const window = state[index]
+      const { id, directoryPath, title } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -277,15 +277,15 @@ export const windowSlice = createSlice({
       )
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabs,
         },
       }
     },
-    go(state, action: PayloadAction<{ index: number; offset: number }>) {
-      const { index, offset } = action.payload
-      const window = state[index]
+    go(state, action: PayloadAction<{ id: number; offset: number }>) {
+      const { id, offset } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -308,7 +308,7 @@ export const windowSlice = createSlice({
       )
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabs,
         },
@@ -316,10 +316,10 @@ export const windowSlice = createSlice({
     },
     setScrollTop(
       state,
-      action: PayloadAction<{ index: number; scrollTop: number }>,
+      action: PayloadAction<{ id: number; scrollTop: number }>,
     ) {
-      const { index, scrollTop } = action.payload
-      const window = state[index]
+      const { id, scrollTop } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -340,7 +340,7 @@ export const windowSlice = createSlice({
       )
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           tabs,
         },
@@ -349,13 +349,13 @@ export const windowSlice = createSlice({
     sort(
       state,
       action: PayloadAction<{
-        index: number
+        id: number
         directoryPath: string
         orderBy: SortOption['orderBy']
       }>,
     ) {
-      const { index, directoryPath, orderBy } = action.payload
-      const window = state[index]
+      const { id, directoryPath, orderBy } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
@@ -368,7 +368,7 @@ export const windowSlice = createSlice({
           : defaultOrders[orderBy as keyof typeof defaultOrders]
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           sorting: {
             ...window.sorting,
@@ -383,19 +383,19 @@ export const windowSlice = createSlice({
     setSidebarHidden(
       state,
       action: PayloadAction<{
-        index: number
+        id: number
         variant: 'primary' | 'secondary'
         hidden: boolean
       }>,
     ) {
-      const { index, variant, hidden } = action.payload
-      const window = state[index]
+      const { id, variant, hidden } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           sidebar: {
             ...window.sidebar,
@@ -410,19 +410,19 @@ export const windowSlice = createSlice({
     setSidebarWidth(
       state,
       action: PayloadAction<{
-        index: number
+        id: number
         variant: 'primary' | 'secondary'
         width: number
       }>,
     ) {
-      const { index, variant, width } = action.payload
-      const window = state[index]
+      const { id, variant, width } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           sidebar: {
             ...window.sidebar,
@@ -437,19 +437,19 @@ export const windowSlice = createSlice({
     setViewMode(
       state,
       action: PayloadAction<{
-        index: number
+        id: number
         directoryPath: string
         viewMode: ViewMode
       }>,
     ) {
-      const { index, directoryPath, viewMode } = action.payload
-      const window = state[index]
+      const { id, directoryPath, viewMode } = action.payload
+      const window = state[id]
       if (!window) {
         return state
       }
       return {
         ...state,
-        [index]: {
+        [id]: {
           ...window,
           viewMode: {
             ...window.viewMode,
@@ -469,8 +469,8 @@ export const selectWindow = (state: AppState) => state.window
 
 export const selectCurrentWindow = createSelector(
   selectWindow,
-  selectWindowIndex,
-  (window, windowIndex) => window[windowIndex] ?? defaultWindowState,
+  selectWindowId,
+  (window, windowId) => window[windowId] ?? defaultWindowState,
 )
 
 export const selectCurrentTabId = createSelector(
@@ -625,8 +625,8 @@ export const newWindow =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { newWindow } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(newWindow({ index }))
+    const id = selectWindowId(getState())
+    dispatch(newWindow({ id }))
     dispatch(newTab(directoryPath))
   }
 
@@ -634,9 +634,9 @@ export const newTab =
   (directoryPath: string, srcTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const currentTabId = selectCurrentTabId(getState())
-    dispatch(newTab({ index, srcTabId: srcTabId ?? currentTabId }))
+    dispatch(newTab({ id, srcTabId: srcTabId ?? currentTabId }))
     const tabId = selectCurrentTabId(getState())
     dispatch(addTab({ tabId }))
     dispatch(changeDirectory(directoryPath))
@@ -646,8 +646,8 @@ export const duplicateTab =
   (srcTabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { duplicateTab } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(duplicateTab({ index, srcTabId }))
+    const id = selectWindowId(getState())
+    dispatch(duplicateTab({ id, srcTabId }))
     const destTabId = selectCurrentTabId(getState())
     dispatch(copyTab({ srcTabId, destTabId }))
     dispatch(updateApplicationMenu())
@@ -657,13 +657,13 @@ export const closeTab =
   (targetTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const tabId = targetTabId ?? selectCurrentTabId(getState())
     const canCloseTab = selectCanCloseTab(getState())
     if (!canCloseTab) {
       return
     }
-    dispatch(closeTab({ index, tabId }))
+    dispatch(closeTab({ id, tabId }))
     dispatch(removeTab({ tabId }))
     dispatch(updateApplicationMenu())
   }
@@ -672,8 +672,8 @@ export const closeOtherTabs =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeOtherTabs } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(closeOtherTabs({ index, tabId }))
+    const id = selectWindowId(getState())
+    dispatch(closeOtherTabs({ id, tabId }))
     dispatch(removeOtherTabs({ tabId }))
     dispatch(updateApplicationMenu())
   }
@@ -682,8 +682,8 @@ export const changeTab =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { changeTab } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(changeTab({ index, tabId }))
+    const id = selectWindowId(getState())
+    dispatch(changeTab({ id, tabId }))
     dispatch(updateApplicationMenu())
   }
 
@@ -691,7 +691,7 @@ export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { changeDirectory, setViewMode } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const tabId = selectCurrentTabId(getState())
     const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const currentViewMode = selectViewModeByDirectoryPath(
@@ -708,13 +708,13 @@ export const changeDirectory =
       if (!viewMode) {
         if (currentViewMode !== 'list') {
           dispatch(
-            setViewMode({ index, directoryPath, viewMode: currentViewMode }),
+            setViewMode({ id, directoryPath, viewMode: currentViewMode }),
           )
         }
       }
     }
     const title = await getTitle(directoryPath)
-    dispatch(changeDirectory({ index, directoryPath, title }))
+    dispatch(changeDirectory({ id, directoryPath, title }))
     dispatch(updateApplicationMenu())
   }
 
@@ -722,13 +722,13 @@ export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const { go } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const tabId = selectCurrentTabId(getState())
     const loading = selectLoadingByTabId(getState(), tabId)
     if (loading) {
       return
     }
-    dispatch(go({ index, offset }))
+    dispatch(go({ id, offset }))
     dispatch(updateApplicationMenu())
   }
 
@@ -758,19 +758,19 @@ export const setScrollTop =
   (scrollTop: number): AppThunk =>
   async (dispatch, getState) => {
     const { setScrollTop } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(setScrollTop({ index, scrollTop }))
+    const id = selectWindowId(getState())
+    dispatch(setScrollTop({ id, scrollTop }))
   }
 
 export const sort =
   (orderBy: SortOption['orderBy']): AppThunk =>
   async (dispatch, getState) => {
     const { sort } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     dispatch(
       sort({
-        index,
+        id,
         directoryPath: currentDirectoryPath,
         orderBy,
       }),
@@ -782,8 +782,8 @@ export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarHidden } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(setSidebarHidden({ index, variant, hidden }))
+    const id = selectWindowId(getState())
+    dispatch(setSidebarHidden({ id, variant, hidden }))
     dispatch(updateApplicationMenu())
   }
 
@@ -791,19 +791,17 @@ export const setSidebarWidth =
   (variant: 'primary' | 'secondary', width: number): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarWidth } = windowSlice.actions
-    const index = selectWindowIndex(getState())
-    dispatch(setSidebarWidth({ index, variant, width }))
+    const id = selectWindowId(getState())
+    dispatch(setSidebarWidth({ id, variant, width }))
   }
 
 export const setCurrentViewMode =
   (viewMode: ViewMode): AppThunk =>
   async (dispatch, getState) => {
     const { setViewMode } = windowSlice.actions
-    const index = selectWindowIndex(getState())
+    const id = selectWindowId(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-    dispatch(
-      setViewMode({ index, directoryPath: currentDirectoryPath, viewMode }),
-    )
+    dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
     dispatch(updateApplicationMenu())
   }
 

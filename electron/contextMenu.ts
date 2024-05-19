@@ -7,7 +7,7 @@ const send = (event: IpcMainInvokeEvent, message: any) =>
   event.sender.send('sendMessage', message)
 
 const registerContextMenu = (
-  createWindow: (directoryPath?: string) => Promise<void>,
+  createWindow: (directoryPath?: string) => void,
 ) => {
   const actionCreators: ActionCreators = {
     closeOtherTabs: (event, _params, { tabId }) => ({

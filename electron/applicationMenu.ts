@@ -34,7 +34,7 @@ const send = (message: any) => {
 }
 
 const registerApplicationMenu = (
-  createWindow: (directoryPath?: string) => Promise<void>,
+  createWindow: (directoryPath?: string) => void,
 ) => {
   const isMac = process.platform === 'darwin'
 
