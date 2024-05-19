@@ -50,20 +50,8 @@ const parsePath = (path: string) => {
   return dirnames
 }
 
-const findMissingNumber = (arr: number[]) => {
-  const sortedArr = arr.sort((a, b) => a - b)
-  let missingNumber = 1
-
-  for (const num of sortedArr) {
-    if (num === missingNumber) {
-      missingNumber++
-    } else if (num > missingNumber) {
-      break
-    }
-  }
-
-  return missingNumber
-}
+const findMissingNumber = (arr: number[]) =>
+  arr.sort((a, b) => a - b).reduce((acc, i) => (i === acc ? acc + 1 : acc), 1)
 
 const generateNewDirectoryName = async (directoryPath: string) => {
   const filename = 'untitled folder'

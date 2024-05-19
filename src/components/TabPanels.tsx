@@ -28,17 +28,17 @@ const TabPanels = () => {
 
   return (
     <Box sx={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
-      {tabs.map((_, i) => (
+      {tabs.map((tab) => (
         <Box
-          key={i}
+          key={tab.id}
           sx={{
             height: '100%',
             inset: 0,
             position: 'absolute',
-            zIndex: i === currentTabId ? 2 : 0,
+            zIndex: tab.id === currentTabId ? 2 : 0,
           }}
         >
-          <TabPanel tabId={i} />
+          <TabPanel tabId={tab.id} />
         </Box>
       ))}
       <Box

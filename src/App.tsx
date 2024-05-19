@@ -76,7 +76,7 @@ const App = () => {
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'newTab':
-          return dispatch(newTab(data.path, data?.tabId))
+          return dispatch(newTab(data.path, data.tabId))
         case 'open':
           return dispatch(open(data?.path))
         case 'removeFromFavorites':

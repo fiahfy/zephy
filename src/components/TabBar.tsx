@@ -1,5 +1,5 @@
 import { Tabs } from '@mui/material'
-import { SyntheticEvent, useCallback } from 'react'
+import { SyntheticEvent, useCallback, useMemo } from 'react'
 import TabBarAddItem from '~/components/TabBarAddItem'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -10,9 +10,19 @@ const TabBar = () => {
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
+  const tabIndex = useMemo(
+    () => tabs.findIndex((tab) => tab.id === tabId),
+    [tabId, tabs],
+  )
+
   const handleChange = useCallback(
-    (_e: SyntheticEvent, value: number) => dispatch(changeTab(value)),
-    [dispatch],
+    (_e: SyntheticEvent, value: number) => {
+      const tab = tabs[value]
+      if (tab) {
+        dispatch(changeTab(tab.id))
+      }
+    },
+    [dispatch, tabs],
   )
 
   return (
@@ -40,11 +50,11 @@ const TabBar = () => {
               opacity: 0.3,
             },
           }}
-          value={tabId}
+          value={tabIndex}
           variant="scrollable"
         >
-          {tabs.map((_, i) => (
-            <TabBarItem key={i} tabId={i} />
+          {tabs.map((tab) => (
+            <TabBarItem key={tab.id} tabId={tab.id} />
           ))}
           <TabBarAddItem />
         </Tabs>

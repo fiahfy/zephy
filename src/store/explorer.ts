@@ -49,6 +49,9 @@ const defaultExplorerState = {
   selected: [],
 }
 
+const findExplorer = (state: State, tabId: number) =>
+  state[tabId] ?? defaultExplorerState
+
 export const explorerSlice = createSlice({
   name: 'explorer',
   initialState,
@@ -56,32 +59,19 @@ export const explorerSlice = createSlice({
     addTab(state, action: PayloadAction<{ tabId: number }>) {
       const { tabId } = action.payload
       return {
-        ...Object.keys(state).reduce((acc, i) => {
-          const index = Number(i)
-          const newIndex = index >= tabId ? index + 1 : index
-          const explorer = state[Number(index)]
-          return {
-            ...acc,
-            [newIndex]: explorer,
-          }
-        }, {} as State),
+        ...state,
         [tabId]: defaultExplorerState,
       }
     },
-    copyTab(state, action: PayloadAction<{ tabId: number }>) {
-      const { tabId } = action.payload
-      const explorer = state[tabId]
+    copyTab(
+      state,
+      action: PayloadAction<{ srcTabId: number; destTabId: number }>,
+    ) {
+      const { srcTabId, destTabId } = action.payload
+      const explorer = findExplorer(state, srcTabId)
       return {
-        ...Object.keys(state).reduce((acc, i) => {
-          const index = Number(i)
-          const newIndex = index >= tabId ? index + 1 : index
-          const explorer = state[Number(index)]
-          return {
-            ...acc,
-            [newIndex]: explorer,
-          }
-        }, {} as State),
-        [tabId]: {
+        ...state,
+        [destTabId]: {
           ...explorer,
           entries: [...explorer.entries],
           selected: [...explorer.selected],
@@ -91,32 +81,19 @@ export const explorerSlice = createSlice({
     removeTab(state, action: PayloadAction<{ tabId: number }>) {
       const { tabId } = action.payload
       return Object.keys(state).reduce((acc, i) => {
-        const index = Number(i)
-        if (index === tabId) {
-          return { ...acc }
+        const id = Number(i)
+        if (id === tabId) {
+          return acc
         }
-        const newIndex = index > tabId ? index - 1 : index
-        const explorer = state[Number(index)]
         return {
           ...acc,
-          [newIndex]: explorer,
+          [id]: state[id],
         }
       }, {} as State)
     },
     removeOtherTabs(state, action: PayloadAction<{ tabId: number }>) {
       const { tabId } = action.payload
-      return Object.keys(state).reduce((acc, i) => {
-        const index = Number(i)
-        if (index !== tabId) {
-          return { ...acc }
-        }
-        const newIndex = 0
-        const explorer = state[Number(index)]
-        return {
-          ...acc,
-          [newIndex]: explorer,
-        }
-      }, {} as State)
+      return { [tabId]: findExplorer(state, tabId) }
     },
     loading(
       state,
@@ -125,7 +102,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -145,7 +122,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId, entries = [], error = false } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -159,7 +136,7 @@ export const explorerSlice = createSlice({
     },
     setQuery(state, action: PayloadAction<{ tabId: number; query: string }>) {
       const { tabId, query } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return { ...state, [tabId]: { ...explorer, query } }
     },
     addEntries(
@@ -170,7 +147,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId, entries } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const paths = entries.map((entry) => entry.path)
       const newEntries = [
         ...explorer.entries.filter((entry) => !paths.includes(entry.path)),
@@ -192,7 +169,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId, paths } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const entries = explorer.entries.filter(
         (entry) => !paths.includes(entry.path),
       )
@@ -212,7 +189,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId, path } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -228,7 +205,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -239,7 +216,7 @@ export const explorerSlice = createSlice({
     },
     focus(state, action: PayloadAction<{ tabId: number; path: string }>) {
       const { tabId, path } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -255,7 +232,7 @@ export const explorerSlice = createSlice({
       }>,
     ) {
       const { tabId } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -266,7 +243,7 @@ export const explorerSlice = createSlice({
     },
     select(state, action: PayloadAction<{ tabId: number; path: string }>) {
       const { tabId, path } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -277,7 +254,7 @@ export const explorerSlice = createSlice({
     },
     multiSelect(state, action: PayloadAction<{ tabId: number; path: string }>) {
       const { tabId, path } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const selected = explorer.selected.includes(path)
         ? explorer.selected.filter((p) => p !== path)
         : [...explorer.selected, path]
@@ -294,7 +271,7 @@ export const explorerSlice = createSlice({
       action: PayloadAction<{ tabId: number; paths: string[] }>,
     ) {
       const { tabId, paths } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const selected = [
         ...explorer.selected.filter((p) => !paths.includes(p)),
         ...paths,
@@ -312,7 +289,7 @@ export const explorerSlice = createSlice({
       action: PayloadAction<{ tabId: number; paths: string[] }>,
     ) {
       const { tabId, paths } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const selected = paths
       return {
         ...state,
@@ -324,7 +301,7 @@ export const explorerSlice = createSlice({
     },
     unselect(state, action: PayloadAction<{ tabId: number; paths: string[] }>) {
       const { tabId, paths } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       const selected = explorer.selected.filter((p) => !paths.includes(p))
       return {
         ...state,
@@ -336,7 +313,7 @@ export const explorerSlice = createSlice({
     },
     unselectAll(state, action: PayloadAction<{ tabId: number }>) {
       const { tabId } = action.payload
-      const explorer = state[tabId] ?? defaultExplorerState
+      const explorer = findExplorer(state, tabId)
       return {
         ...state,
         [tabId]: {
@@ -744,6 +721,7 @@ export const handle =
     filePath: string,
   ): AppThunk =>
   async (dispatch, getState) => {
+    const { addEntries, removeEntries } = explorerSlice.actions
     const tabs = selectTabs(getState())
     tabs.forEach(async (_, tabId) => {
       const history = selectHistoryByTabId(getState(), tabId)
@@ -751,7 +729,6 @@ export const handle =
       if (directoryPath !== currentDirectoryPath) {
         return
       }
-      const { addEntries, removeEntries } = explorerSlice.actions
       switch (eventType) {
         case 'create':
         case 'update': {
