@@ -51,9 +51,11 @@ type WindowState = {
     primary: SidebarState
     secondary: SidebarState
   }
+  // TODO: move to tab state
   sorting: SortingState
   tabIndex: number
   tabs: TabState[]
+  // TODO: move to tab state
   viewMode: ViewModeState
 }
 
