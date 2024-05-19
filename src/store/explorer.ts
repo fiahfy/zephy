@@ -460,8 +460,6 @@ export const selectContentsByTabIndex = createSelector(
           } else if (aValue < bValue) {
             result = -1
           }
-        } else {
-          result = 0
         }
       }
       const orderSign = sortOption.order === 'desc' ? -1 : 1
