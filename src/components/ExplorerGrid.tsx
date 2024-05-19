@@ -7,11 +7,11 @@ import { Content } from '~/interfaces'
 const maxItemSize = 256
 
 type Props = {
-  tabIndex: number
+  tabId: number
 }
 
 const ExplorerGrid = (props: Props) => {
-  const { tabIndex } = props
+  const { tabId } = props
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -24,7 +24,7 @@ const ExplorerGrid = (props: Props) => {
   const ref = useRef<HTMLDivElement>(null)
 
   const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabIndex, columns, size, ref)
+    useExplorerList(tabId, columns, size, ref)
 
   useEffect(() => {
     const el = ref.current
@@ -75,7 +75,7 @@ const ExplorerGrid = (props: Props) => {
                 >
                   {columns.map((content) => (
                     <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                      <ExplorerGridItem content={content} tabIndex={tabIndex} />
+                      <ExplorerGridItem content={content} tabId={tabId} />
                     </Box>
                   ))}
                 </Box>

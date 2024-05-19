@@ -10,20 +10,20 @@ const registerContextMenu = (
   createWindow: (directoryPath?: string) => Promise<void>,
 ) => {
   const actionCreators: ActionCreators = {
-    closeOtherTabs: (event, _params, { tabIndex }) => ({
-      click: () => send(event, { type: 'closeOtherTabs', data: { tabIndex } }),
+    closeOtherTabs: (event, _params, { tabId }) => ({
+      click: () => send(event, { type: 'closeOtherTabs', data: { tabId } }),
       label: 'Close Other Tabs',
     }),
-    closeTab: (event, _params, { tabIndex }) => ({
-      click: () => send(event, { type: 'closeTab', data: { tabIndex } }),
+    closeTab: (event, _params, { tabId }) => ({
+      click: () => send(event, { type: 'closeTab', data: { tabId } }),
       label: 'Close',
     }),
     copyPath: (_event, _params, { path }) => ({
       click: () => clipboard.writeText(path),
       label: 'Copy Path',
     }),
-    duplicateTab: (event, _params, { tabIndex }) => ({
-      click: () => send(event, { type: 'duplicateTab', data: { tabIndex } }),
+    duplicateTab: (event, _params, { tabId }) => ({
+      click: () => send(event, { type: 'duplicateTab', data: { tabId } }),
       label: 'Duplicate',
     }),
     go: (event, _params, { label, offset }) => ({
@@ -52,11 +52,11 @@ const registerContextMenu = (
       enabled: !!path,
       label: 'New Folder',
     }),
-    newTab: (event, _params, { tabIndex }) => ({
+    newTab: (event, _params, { tabId }) => ({
       click: () =>
         send(event, {
           type: 'newTab',
-          data: { path: app.getPath('home'), tabIndex },
+          data: { path: app.getPath('home'), tabId },
         }),
       label: 'New Tab',
     }),
@@ -68,8 +68,8 @@ const registerContextMenu = (
       click: () => createWindow(path),
       label: 'Open in New Window',
     }),
-    openInNewTab: (event, _params, { path, tabIndex }) => ({
-      click: () => send(event, { type: 'newTab', data: { path, tabIndex } }),
+    openInNewTab: (event, _params, { path, tabId }) => ({
+      click: () => send(event, { type: 'newTab', data: { path, tabId } }),
       label: 'Open in New Tab',
     }),
     rename: (event, _params, { path }) => ({

@@ -7,7 +7,7 @@ import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
 import {
-  selectDirectoryPathByTabIndex,
+  selectDirectoryPathByTabId,
   selectSortOptionByDirectoryPath,
   selectViewModeByDirectoryPath,
 } from '~/store/window'
@@ -15,14 +15,14 @@ import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
 type Props = {
-  tabIndex: number
+  tabId: number
 }
 
 const Explorer = (props: Props) => {
-  const { tabIndex } = props
+  const { tabId } = props
 
   const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabIndex(state, tabIndex),
+    selectDirectoryPathByTabId(state, tabId),
   )
   const sortOption = useAppSelector((state) =>
     selectSortOptionByDirectoryPath(state, directoryPath),
@@ -99,7 +99,7 @@ const Explorer = (props: Props) => {
         {createElement(
           viewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
           {
-            tabIndex,
+            tabId,
           },
         )}
       </Box>

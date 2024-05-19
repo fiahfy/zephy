@@ -5,13 +5,13 @@ import useWatcher from '~/hooks/useWatcher'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { handle } from '~/store/explorer'
 import {
-  selectCurrentTabIndex,
+  selectCurrentTabId,
   selectDirectoryPaths,
   selectTabs,
 } from '~/store/window'
 
 const TabPanels = () => {
-  const currentTabIndex = useAppSelector(selectCurrentTabIndex)
+  const currentTabId = useAppSelector(selectCurrentTabId)
   const directoryPaths = useAppSelector(selectDirectoryPaths)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
@@ -35,10 +35,10 @@ const TabPanels = () => {
             height: '100%',
             inset: 0,
             position: 'absolute',
-            zIndex: i === currentTabIndex ? 2 : 0,
+            zIndex: i === currentTabId ? 2 : 0,
           }}
         >
-          <TabPanel tabIndex={i} />
+          <TabPanel tabId={i} />
         </Box>
       ))}
       <Box

@@ -4,20 +4,18 @@ import { MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { closeTab, selectHistoryByTabIndex } from '~/store/window'
+import { closeTab, selectHistoryByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { getIconType } from '~/utils/url'
 
 type Props = {
-  tabIndex: number
+  tabId: number
 }
 
 const TabBarItem = (props: Props) => {
-  const { tabIndex, ...others } = props
+  const { tabId, ...others } = props
 
-  const history = useAppSelector((state) =>
-    selectHistoryByTabIndex(state, tabIndex),
-  )
+  const history = useAppSelector((state) => selectHistoryByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({
@@ -32,33 +30,33 @@ const TabBarItem = (props: Props) => {
       createContextMenuHandler([
         {
           type: 'newTab',
-          data: { tabIndex },
+          data: { tabId },
         },
         { type: 'separator' },
         {
           type: 'duplicateTab',
-          data: { tabIndex },
+          data: { tabId },
         },
         { type: 'separator' },
         {
           type: 'closeTab',
-          data: { tabIndex },
+          data: { tabId },
         },
         {
           type: 'closeOtherTabs',
-          data: { tabIndex },
+          data: { tabId },
         },
       ]),
-    [tabIndex],
+    [tabId],
   )
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       // prevent tab change event
       e.stopPropagation()
-      dispatch(closeTab(tabIndex))
+      dispatch(closeTab(tabId))
     },
-    [dispatch, tabIndex],
+    [dispatch, tabId],
   )
 
   return (

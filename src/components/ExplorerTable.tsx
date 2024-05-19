@@ -45,16 +45,16 @@ const columns: ColumnType[] = [
 ]
 
 type Props = {
-  tabIndex: number
+  tabId: number
 }
 
 const ExplorerTable = (props: Props) => {
-  const { tabIndex } = props
+  const { tabId } = props
 
   const ref = useRef<HTMLDivElement>(null)
 
   const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabIndex, 1, rowHeight, ref)
+    useExplorerList(tabId, 1, rowHeight, ref)
 
   return (
     <Box
@@ -79,7 +79,7 @@ const ExplorerTable = (props: Props) => {
             height={headerHeight}
             key={column.key}
             label={column.label}
-            tabIndex={tabIndex}
+            tabId={tabId}
             width={column.width}
           />
         ))}
@@ -109,7 +109,7 @@ const ExplorerTable = (props: Props) => {
                   }px)`,
                 }}
               >
-                <ExplorerTableRow content={content} tabIndex={tabIndex}>
+                <ExplorerTableRow content={content} tabId={tabId}>
                   {columns.map((column) => (
                     <ExplorerTableCell
                       align={column.align}
@@ -117,7 +117,7 @@ const ExplorerTable = (props: Props) => {
                       dataKey={column.key}
                       height={rowHeight}
                       key={column.key}
-                      tabIndex={tabIndex}
+                      tabId={tabId}
                       width={column.width}
                     />
                   ))}

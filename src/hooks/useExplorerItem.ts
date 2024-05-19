@@ -16,44 +16,44 @@ import {
   multiSelect,
   rangeSelect,
   select,
-  selectContentsByTabIndex,
+  selectContentsByTabId,
   selectEditingByPath,
   selectFocusedByPath,
   selectSelectedByPath,
-  selectSelectedContentsByTabIndex,
+  selectSelectedContentsByTabId,
   startEditing,
 } from '~/store/explorer'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import { changeDirectory, selectDirectoryPathByTabIndex } from '~/store/window'
+import { changeDirectory, selectDirectoryPathByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
 const useExplorerItem = (
-  tabIndex: number,
+  tabId: number,
   content: Content,
   ref?: RefObject<HTMLElement>,
 ) => {
   const contents = useAppSelector((state) =>
-    selectContentsByTabIndex(state, tabIndex),
+    selectContentsByTabId(state, tabId),
   )
   const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabIndex(state, tabIndex),
+    selectDirectoryPathByTabId(state, tabId),
   )
   const editing = useAppSelector((state) =>
-    selectEditingByPath(state, tabIndex, content.path),
+    selectEditingByPath(state, tabId, content.path),
   )
   const favorite = useAppSelector((state) =>
     selectFavoriteByPath(selectFavorite(state), content.path),
   )
   const focused = useAppSelector((state) =>
-    selectFocusedByPath(state, tabIndex, content.path),
+    selectFocusedByPath(state, tabId, content.path),
   )
   const selected = useAppSelector((state) =>
-    selectSelectedByPath(state, tabIndex, content.path),
+    selectSelectedByPath(state, tabId, content.path),
   )
   const selectedContents = useAppSelector((state) =>
-    selectSelectedContentsByTabIndex(state, tabIndex),
+    selectSelectedContentsByTabId(state, tabId),
   )
   const dispatch = useAppDispatch()
 
@@ -145,7 +145,7 @@ const useExplorerItem = (
                   },
                   {
                     type: 'openInNewTab',
-                    data: { path, tabIndex },
+                    data: { path, tabId },
                   },
                 ]
               : []),
@@ -192,7 +192,7 @@ const useExplorerItem = (
     directoryPath,
     favorite,
     selectedContents,
-    tabIndex,
+    tabId,
     zephySchema,
   ])
 

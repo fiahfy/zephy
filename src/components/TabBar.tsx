@@ -3,10 +3,10 @@ import { SyntheticEvent, useCallback } from 'react'
 import TabBarAddItem from '~/components/TabBarAddItem'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { changeTab, selectCurrentTabIndex, selectTabs } from '~/store/window'
+import { changeTab, selectCurrentTabId, selectTabs } from '~/store/window'
 
 const TabBar = () => {
-  const tabIndex = useAppSelector(selectCurrentTabIndex)
+  const tabId = useAppSelector(selectCurrentTabId)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
@@ -40,11 +40,11 @@ const TabBar = () => {
               opacity: 0.3,
             },
           }}
-          value={tabIndex}
+          value={tabId}
           variant="scrollable"
         >
           {tabs.map((_, i) => (
-            <TabBarItem key={i} tabIndex={i} />
+            <TabBarItem key={i} tabId={i} />
           ))}
           <TabBarAddItem />
         </Tabs>

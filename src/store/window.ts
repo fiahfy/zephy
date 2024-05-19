@@ -6,7 +6,7 @@ import {
   copyTab,
   removeOtherTabs,
   removeTab,
-  selectLoadingByTabIndex,
+  selectLoadingByTabId,
 } from '~/store/explorer'
 import { selectWindowIndex } from '~/store/windowIndex'
 import { buildZephyUrl, getTitle } from '~/utils/url'
@@ -53,7 +53,7 @@ type WindowState = {
   }
   // TODO: move to tab state
   sorting: SortingState
-  tabIndex: number
+  tabId: number
   tabs: TabState[]
   // TODO: move to tab state
   viewMode: ViewModeState
@@ -84,7 +84,7 @@ const defaultWindowState: WindowState = {
     },
   },
   sorting: {},
-  tabIndex: 0,
+  tabId: 0,
   tabs: [],
   viewMode: {},
 }
@@ -107,43 +107,43 @@ export const windowSlice = createSlice({
         },
       }
     },
-    newTab(state, action: PayloadAction<{ index: number; tabIndex: number }>) {
-      const { index, tabIndex } = action.payload
+    newTab(state, action: PayloadAction<{ index: number; tabId: number }>) {
+      const { index, tabId } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
       const tabs = [
-        ...window.tabs.slice(0, tabIndex),
+        ...window.tabs.slice(0, tabId),
         {
           history: {
             histories: [],
             index: -1,
           },
         },
-        ...window.tabs.slice(tabIndex),
+        ...window.tabs.slice(tabId),
       ]
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex,
+          tabId,
           tabs,
         },
       }
     },
     duplicateTab(
       state,
-      action: PayloadAction<{ index: number; tabIndex: number }>,
+      action: PayloadAction<{ index: number; tabId: number }>,
     ) {
-      const { index, tabIndex } = action.payload
+      const { index, tabId } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
-      const tab = window.tabs[tabIndex]
+      const tab = window.tabs[tabId]
       const tabs = [
-        ...window.tabs.slice(0, tabIndex),
+        ...window.tabs.slice(0, tabId),
         {
           ...tab,
           history: {
@@ -153,66 +153,60 @@ export const windowSlice = createSlice({
             ],
           },
         },
-        ...window.tabs.slice(tabIndex),
+        ...window.tabs.slice(tabId),
       ]
-      const newTabIndex = tabIndex + 1
+      const newTabId = tabId + 1
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex: newTabIndex,
+          tabId: newTabId,
           tabs,
         },
       }
     },
-    closeTab(
-      state,
-      action: PayloadAction<{ index: number; tabIndex: number }>,
-    ) {
-      const { index, tabIndex } = action.payload
+    closeTab(state, action: PayloadAction<{ index: number; tabId: number }>) {
+      const { index, tabId } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
-      const tabs = window.tabs.filter((_, i) => i !== tabIndex)
-      const newTabIndex = Math.min(
-        tabIndex >= window.tabIndex ? window.tabIndex : window.tabIndex - 1,
+      const tabs = window.tabs.filter((_, i) => i !== tabId)
+      const newTabId = Math.min(
+        tabId >= window.tabId ? window.tabId : window.tabId - 1,
         tabs.length - 1,
       )
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex: newTabIndex,
+          tabId: newTabId,
           tabs,
         },
       }
     },
     closeOtherTabs(
       state,
-      action: PayloadAction<{ index: number; tabIndex: number }>,
+      action: PayloadAction<{ index: number; tabId: number }>,
     ) {
-      const { index, tabIndex } = action.payload
+      const { index, tabId } = action.payload
       const window = state[index]
       if (!window) {
         return state
       }
-      const tabs = window.tabs.filter((_, i) => i === tabIndex)
-      const newTabIndex = 0
+      const tabs = window.tabs.filter((_, i) => i === tabId)
+      const newTabId = 0
       return {
         ...state,
         [index]: {
           ...window,
-          tabIndex: newTabIndex,
+          tabId: newTabId,
           tabs,
         },
       }
     },
-    changeTab(
-      state,
-      action: PayloadAction<{ index: number; tabIndex: number }>,
-    ) {
-      const { index, tabIndex } = action.payload
+    changeTab(state, action: PayloadAction<{ index: number; tabId: number }>) {
+      const { index, tabId } = action.payload
       const window = state[index]
       if (!window) {
         return state
@@ -221,7 +215,7 @@ export const windowSlice = createSlice({
         ...state,
         [index]: {
           ...window,
-          tabIndex,
+          tabId,
         },
       }
     },
@@ -238,7 +232,7 @@ export const windowSlice = createSlice({
       if (!window) {
         return state
       }
-      const tab = window.tabs[window.tabIndex]
+      const tab = window.tabs[window.tabId]
       if (!tab) {
         return state
       }
@@ -253,7 +247,7 @@ export const windowSlice = createSlice({
         { directoryPath, scrollTop: 0, title },
       ]
       const tabs = window.tabs.map((tab, i) =>
-        i === window.tabIndex
+        i === window.tabId
           ? {
               ...tab,
               history: {
@@ -278,7 +272,7 @@ export const windowSlice = createSlice({
       if (!window) {
         return state
       }
-      const tab = window.tabs[window.tabIndex]
+      const tab = window.tabs[window.tabId]
       if (!tab) {
         return state
       }
@@ -288,7 +282,7 @@ export const windowSlice = createSlice({
         return state
       }
       const tabs = window.tabs.map((tab, i) =>
-        i === window.tabIndex
+        i === window.tabId
           ? {
               ...tab,
               history: { ...tab.history, index: historyIndex },
@@ -312,7 +306,7 @@ export const windowSlice = createSlice({
       if (!window) {
         return state
       }
-      const tab = window.tabs[window.tabIndex]
+      const tab = window.tabs[window.tabId]
       if (!tab) {
         return state
       }
@@ -320,7 +314,7 @@ export const windowSlice = createSlice({
         i === tab.history.index ? { ...history, scrollTop } : history,
       )
       const tabs = window.tabs.map((tab, i) =>
-        i === window.tabIndex
+        i === window.tabId
           ? {
               ...tab,
               history: { ...tab.history, histories },
@@ -462,9 +456,9 @@ export const selectCurrentWindow = createSelector(
   (window, windowIndex) => window[windowIndex] ?? defaultWindowState,
 )
 
-export const selectCurrentTabIndex = createSelector(
+export const selectCurrentTabId = createSelector(
   selectCurrentWindow,
-  (currentWindow) => currentWindow.tabIndex,
+  (currentWindow) => currentWindow.tabId,
 )
 
 export const selectTabs = createSelector(
@@ -487,13 +481,12 @@ export const selectViewMode = createSelector(
   (currentWindow) => currentWindow.viewMode,
 )
 
-const selectTabIndex = (_state: AppState, tabIndex: number) => tabIndex
+const selectTabId = (_state: AppState, tabId: number) => tabId
 
-export const selectTabByTabIndex = createSelector(
+export const selectTabByTabId = createSelector(
   selectTabs,
-  selectTabIndex,
-  (tabs, tabIndex) =>
-    tabs[tabIndex] ?? { history: { histories: [], index: -1 } },
+  selectTabId,
+  (tabs, tabId) => tabs[tabId] ?? { history: { histories: [], index: -1 } },
 )
 
 export const selectCanCloseTab = createSelector(
@@ -512,27 +505,24 @@ export const selectDirectoryPaths = createSelector(selectTabs, (tabs) =>
   }, [] as string[]),
 )
 
-export const selectHistoryByTabIndex = createSelector(
-  selectTabByTabIndex,
-  (tab) => {
-    const history = tab.history
-    return (
-      history.histories[history.index] ?? {
-        directoryPath: '',
-        scrollTop: 0,
-        title: '',
-      }
-    )
-  },
-)
+export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
+  const history = tab.history
+  return (
+    history.histories[history.index] ?? {
+      directoryPath: '',
+      scrollTop: 0,
+      title: '',
+    }
+  )
+})
 
-export const selectDirectoryPathByTabIndex = createSelector(
-  selectHistoryByTabIndex,
+export const selectDirectoryPathByTabId = createSelector(
+  selectHistoryByTabId,
   (history) => history.directoryPath,
 )
 
-export const selectScrollTopByTabIndex = createSelector(
-  selectHistoryByTabIndex,
+export const selectScrollTopByTabId = createSelector(
+  selectHistoryByTabId,
   (history) => history.scrollTop,
 )
 
@@ -572,7 +562,7 @@ export const selectSidebarWidthByVariant = createSelector(
 /* for current tab */
 
 export const selectCurrentTab = (state: AppState) =>
-  selectTabByTabIndex(state, selectCurrentTabIndex(state))
+  selectTabByTabId(state, selectCurrentTabId(state))
 
 export const selectCanBack = createSelector(
   selectCurrentTab,
@@ -593,7 +583,7 @@ export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>
 )
 
 const selectCurrentHistory = (state: AppState) =>
-  selectHistoryByTabIndex(state, selectCurrentTabIndex(state))
+  selectHistoryByTabId(state, selectCurrentTabId(state))
 
 export const selectCurrentDirectoryPath = createSelector(
   selectCurrentHistory,
@@ -621,58 +611,58 @@ export const newWindow =
   }
 
 export const newTab =
-  (directoryPath: string, targetTabIndex?: number): AppThunk =>
+  (directoryPath: string, targetTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
     const tabs = selectTabs(getState())
-    const tabIndex = (targetTabIndex ?? tabs.length - 1) + 1
-    dispatch(newTab({ index, tabIndex }))
-    dispatch(addTab({ tabIndex }))
+    const tabId = (targetTabId ?? tabs.length - 1) + 1
+    dispatch(newTab({ index, tabId }))
+    dispatch(addTab({ tabId }))
     dispatch(changeDirectory(directoryPath))
   }
 
 export const duplicateTab =
-  (tabIndex: number): AppThunk =>
+  (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { duplicateTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(duplicateTab({ index, tabIndex }))
-    dispatch(copyTab({ tabIndex }))
+    dispatch(duplicateTab({ index, tabId }))
+    dispatch(copyTab({ tabId }))
     dispatch(updateApplicationMenu())
   }
 
 export const closeTab =
-  (targetTabIndex?: number): AppThunk =>
+  (targetTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    const tabIndex = targetTabIndex ?? selectCurrentTabIndex(getState())
+    const tabId = targetTabId ?? selectCurrentTabId(getState())
     const canCloseTab = selectCanCloseTab(getState())
     if (!canCloseTab) {
       return
     }
-    dispatch(closeTab({ index, tabIndex }))
-    dispatch(removeTab({ tabIndex }))
+    dispatch(closeTab({ index, tabId }))
+    dispatch(removeTab({ tabId }))
     dispatch(updateApplicationMenu())
   }
 
 export const closeOtherTabs =
-  (tabIndex: number): AppThunk =>
+  (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeOtherTabs } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(closeOtherTabs({ index, tabIndex }))
-    dispatch(removeOtherTabs({ tabIndex }))
+    dispatch(closeOtherTabs({ index, tabId }))
+    dispatch(removeOtherTabs({ tabId }))
     dispatch(updateApplicationMenu())
   }
 
 export const changeTab =
-  (tabIndex: number): AppThunk =>
+  (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { changeTab } = windowSlice.actions
     const index = selectWindowIndex(getState())
-    dispatch(changeTab({ index, tabIndex }))
+    dispatch(changeTab({ index, tabId }))
     dispatch(updateApplicationMenu())
   }
 
@@ -680,16 +670,13 @@ export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const index = selectWindowIndex(getState())
-    const tabIndex = selectCurrentTabIndex(getState())
-    const currentDirectoryPath = selectDirectoryPathByTabIndex(
-      getState(),
-      tabIndex,
-    )
+    const tabId = selectCurrentTabId(getState())
+    const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const currentViewMode = selectViewModeByDirectoryPath(
       getState(),
       currentDirectoryPath,
     )
-    const loading = selectLoadingByTabIndex(getState(), tabIndex)
+    const loading = selectLoadingByTabId(getState(), tabId)
     const viewMode = selectViewModeByDirectoryPath(getState(), directoryPath)
     if (loading) {
       return
@@ -714,8 +701,8 @@ export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const index = selectWindowIndex(getState())
-    const tabIndex = selectCurrentTabIndex(getState())
-    const loading = selectLoadingByTabIndex(getState(), tabIndex)
+    const tabId = selectCurrentTabId(getState())
+    const loading = selectLoadingByTabId(getState(), tabId)
     if (loading) {
       return
     }

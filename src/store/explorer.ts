@@ -14,9 +14,9 @@ import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   changeDirectory,
   selectCurrentDirectoryPath,
-  selectCurrentTabIndex,
-  selectDirectoryPathByTabIndex,
-  selectHistoryByTabIndex,
+  selectCurrentTabId,
+  selectDirectoryPathByTabId,
+  selectHistoryByTabId,
   selectSortOptionByDirectoryPath,
   selectTabs,
 } from '~/store/window'
@@ -34,7 +34,7 @@ type ExplorerState = {
 }
 
 type State = {
-  [tabIndex: number]: ExplorerState
+  [tabId: number]: ExplorerState
 }
 
 const initialState: State = {}
@@ -53,49 +53,49 @@ export const explorerSlice = createSlice({
   name: 'explorer',
   initialState,
   reducers: {
-    addTab(state, action: PayloadAction<{ tabIndex: number }>) {
-      const { tabIndex } = action.payload
+    addTab(state, action: PayloadAction<{ tabId: number }>) {
+      const { tabId } = action.payload
       return {
         ...Object.keys(state).reduce((acc, i) => {
           const index = Number(i)
-          const newIndex = index >= tabIndex ? index + 1 : index
+          const newIndex = index >= tabId ? index + 1 : index
           const explorer = state[Number(index)]
           return {
             ...acc,
             [newIndex]: explorer,
           }
         }, {} as State),
-        [tabIndex]: defaultExplorerState,
+        [tabId]: defaultExplorerState,
       }
     },
-    copyTab(state, action: PayloadAction<{ tabIndex: number }>) {
-      const { tabIndex } = action.payload
-      const explorer = state[tabIndex]
+    copyTab(state, action: PayloadAction<{ tabId: number }>) {
+      const { tabId } = action.payload
+      const explorer = state[tabId]
       return {
         ...Object.keys(state).reduce((acc, i) => {
           const index = Number(i)
-          const newIndex = index >= tabIndex ? index + 1 : index
+          const newIndex = index >= tabId ? index + 1 : index
           const explorer = state[Number(index)]
           return {
             ...acc,
             [newIndex]: explorer,
           }
         }, {} as State),
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           entries: [...explorer.entries],
           selected: [...explorer.selected],
         },
       }
     },
-    removeTab(state, action: PayloadAction<{ tabIndex: number }>) {
-      const { tabIndex } = action.payload
+    removeTab(state, action: PayloadAction<{ tabId: number }>) {
+      const { tabId } = action.payload
       return Object.keys(state).reduce((acc, i) => {
         const index = Number(i)
-        if (index === tabIndex) {
+        if (index === tabId) {
           return { ...acc }
         }
-        const newIndex = index > tabIndex ? index - 1 : index
+        const newIndex = index > tabId ? index - 1 : index
         const explorer = state[Number(index)]
         return {
           ...acc,
@@ -103,11 +103,11 @@ export const explorerSlice = createSlice({
         }
       }, {} as State)
     },
-    removeOtherTabs(state, action: PayloadAction<{ tabIndex: number }>) {
-      const { tabIndex } = action.payload
+    removeOtherTabs(state, action: PayloadAction<{ tabId: number }>) {
+      const { tabId } = action.payload
       return Object.keys(state).reduce((acc, i) => {
         const index = Number(i)
-        if (index !== tabIndex) {
+        if (index !== tabId) {
           return { ...acc }
         }
         const newIndex = 0
@@ -121,14 +121,14 @@ export const explorerSlice = createSlice({
     loading(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
       }>,
     ) {
-      const { tabIndex } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           entries: [],
           loading: true,
@@ -139,16 +139,16 @@ export const explorerSlice = createSlice({
     loaded(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
         entries?: DetailedEntry[]
         error?: boolean
       }>,
     ) {
-      const { tabIndex, entries = [], error = false } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, entries = [], error = false } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           entries,
           error,
@@ -157,23 +157,20 @@ export const explorerSlice = createSlice({
         },
       }
     },
-    setQuery(
-      state,
-      action: PayloadAction<{ tabIndex: number; query: string }>,
-    ) {
-      const { tabIndex, query } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
-      return { ...state, [tabIndex]: { ...explorer, query } }
+    setQuery(state, action: PayloadAction<{ tabId: number; query: string }>) {
+      const { tabId, query } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
+      return { ...state, [tabId]: { ...explorer, query } }
     },
     addEntries(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
         entries: DetailedEntry[]
       }>,
     ) {
-      const { tabIndex, entries } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, entries } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const paths = entries.map((entry) => entry.path)
       const newEntries = [
         ...explorer.entries.filter((entry) => !paths.includes(entry.path)),
@@ -181,7 +178,7 @@ export const explorerSlice = createSlice({
       ]
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           entries: newEntries,
         },
@@ -190,18 +187,18 @@ export const explorerSlice = createSlice({
     removeEntries(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
         paths: string[]
       }>,
     ) {
-      const { tabIndex, paths } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, paths } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const entries = explorer.entries.filter(
         (entry) => !paths.includes(entry.path),
       )
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           entries,
         },
@@ -210,15 +207,15 @@ export const explorerSlice = createSlice({
     startEditing(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
         path: string
       }>,
     ) {
-      const { tabIndex, path } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, path } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           editing: path,
         },
@@ -227,25 +224,25 @@ export const explorerSlice = createSlice({
     finishEditing(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
       }>,
     ) {
-      const { tabIndex } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           editing: undefined,
         },
       }
     },
-    focus(state, action: PayloadAction<{ tabIndex: number; path: string }>) {
-      const { tabIndex, path } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+    focus(state, action: PayloadAction<{ tabId: number; path: string }>) {
+      const { tabId, path } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           focused: path,
         },
@@ -254,42 +251,39 @@ export const explorerSlice = createSlice({
     blur(
       state,
       action: PayloadAction<{
-        tabIndex: number
+        tabId: number
       }>,
     ) {
-      const { tabIndex } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           focused: undefined,
         },
       }
     },
-    select(state, action: PayloadAction<{ tabIndex: number; path: string }>) {
-      const { tabIndex, path } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+    select(state, action: PayloadAction<{ tabId: number; path: string }>) {
+      const { tabId, path } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected: [path],
         },
       }
     },
-    multiSelect(
-      state,
-      action: PayloadAction<{ tabIndex: number; path: string }>,
-    ) {
-      const { tabIndex, path } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+    multiSelect(state, action: PayloadAction<{ tabId: number; path: string }>) {
+      const { tabId, path } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const selected = explorer.selected.includes(path)
         ? explorer.selected.filter((p) => p !== path)
         : [...explorer.selected, path]
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected,
         },
@@ -297,17 +291,17 @@ export const explorerSlice = createSlice({
     },
     rangeSelect(
       state,
-      action: PayloadAction<{ tabIndex: number; paths: string[] }>,
+      action: PayloadAction<{ tabId: number; paths: string[] }>,
     ) {
-      const { tabIndex, paths } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, paths } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const selected = [
         ...explorer.selected.filter((p) => !paths.includes(p)),
         ...paths,
       ]
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected,
         },
@@ -315,40 +309,37 @@ export const explorerSlice = createSlice({
     },
     selectAll(
       state,
-      action: PayloadAction<{ tabIndex: number; paths: string[] }>,
+      action: PayloadAction<{ tabId: number; paths: string[] }>,
     ) {
-      const { tabIndex, paths } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+      const { tabId, paths } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const selected = paths
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected,
         },
       }
     },
-    unselect(
-      state,
-      action: PayloadAction<{ tabIndex: number; paths: string[] }>,
-    ) {
-      const { tabIndex, paths } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+    unselect(state, action: PayloadAction<{ tabId: number; paths: string[] }>) {
+      const { tabId, paths } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       const selected = explorer.selected.filter((p) => !paths.includes(p))
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected,
         },
       }
     },
-    unselectAll(state, action: PayloadAction<{ tabIndex: number }>) {
-      const { tabIndex } = action.payload
-      const explorer = state[tabIndex] ?? defaultExplorerState
+    unselectAll(state, action: PayloadAction<{ tabId: number }>) {
+      const { tabId } = action.payload
+      const explorer = state[tabId] ?? defaultExplorerState
       return {
         ...state,
-        [tabIndex]: {
+        [tabId]: {
           ...explorer,
           selected: [],
         },
@@ -364,46 +355,46 @@ export default explorerSlice.reducer
 
 export const selectExplorer = (state: AppState) => state.explorer
 
-const selectTabIndex = (_state: AppState, tabIndex: number) => tabIndex
+const selectTabId = (_state: AppState, tabId: number) => tabId
 
-export const selectExplorerByTabIndex = createSelector(
+export const selectExplorerByTabId = createSelector(
   selectExplorer,
-  selectTabIndex,
-  (explorer, tabIndex) => explorer[tabIndex] ?? defaultExplorerState,
+  selectTabId,
+  (explorer, tabId) => explorer[tabId] ?? defaultExplorerState,
 )
 
-export const selectEntriesByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectEntriesByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.entries,
 )
 
-export const selectErrorByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectErrorByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.error,
 )
 
-export const selectLoadingByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectLoadingByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.loading,
 )
 
-export const selectQueryByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectQueryByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.query,
 )
 
-const selectPath = (_state: AppState, _tabIndex: number, path: string) => path
+const selectPath = (_state: AppState, _tabId: number, path: string) => path
 
 const selectEditing = (editing: string | undefined, path: string) =>
   editing === path
 
-export const selectEditingByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectEditingByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.editing,
 )
 
 export const selectEditingByPath = createSelector(
-  selectEditingByTabIndex,
+  selectEditingByTabId,
   selectPath,
   (editing, path) => selectEditing(editing, path),
 )
@@ -411,13 +402,13 @@ export const selectEditingByPath = createSelector(
 const selectFocused = (focused: string | undefined, path: string) =>
   focused === path
 
-export const selectFocusedByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectFocusedByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.focused,
 )
 
 export const selectFocusedByPath = createSelector(
-  selectFocusedByTabIndex,
+  selectFocusedByTabId,
   selectPath,
   (focused, path) => selectFocused(focused, path),
 )
@@ -425,24 +416,24 @@ export const selectFocusedByPath = createSelector(
 const selectSelected = (selected: string[], path: string) =>
   selected.includes(path)
 
-export const selectSelectedByTabIndex = createSelector(
-  selectExplorerByTabIndex,
+export const selectSelectedByTabId = createSelector(
+  selectExplorerByTabId,
   (explorer) => explorer.selected,
 )
 
 export const selectSelectedByPath = createSelector(
-  selectSelectedByTabIndex,
+  selectSelectedByTabId,
   selectPath,
   (selected, path) => selectSelected(selected, path),
 )
 
-export const selectContentsByTabIndex = createSelector(
-  selectEntriesByTabIndex,
-  selectQueryByTabIndex,
-  (state: AppState, tabIndex: number) =>
+export const selectContentsByTabId = createSelector(
+  selectEntriesByTabId,
+  selectQueryByTabId,
+  (state: AppState, tabId: number) =>
     selectSortOptionByDirectoryPath(
       state,
-      selectDirectoryPathByTabIndex(state, tabIndex),
+      selectDirectoryPathByTabId(state, tabId),
     ),
   selectRating,
   selectShouldShowHiddenFiles,
@@ -479,9 +470,9 @@ export const selectContentsByTabIndex = createSelector(
   },
 )
 
-export const selectSelectedContentsByTabIndex = createSelector(
-  selectContentsByTabIndex,
-  selectSelectedByTabIndex,
+export const selectSelectedContentsByTabId = createSelector(
+  selectContentsByTabId,
+  selectSelectedByTabId,
   (contents, selected) =>
     contents.filter((content: Content) =>
       selectSelected(selected, content.path),
@@ -491,7 +482,7 @@ export const selectSelectedContentsByTabIndex = createSelector(
 /* for current tab */
 
 export const selectCurrentExplorer = (state: AppState) =>
-  selectExplorerByTabIndex(state, selectCurrentTabIndex(state))
+  selectExplorerByTabId(state, selectCurrentTabId(state))
 
 export const selectCurrentLoading = createSelector(
   selectCurrentExplorer,
@@ -504,26 +495,26 @@ export const selectCurrentQuery = createSelector(
 )
 
 export const selectCurrentSelected = (state: AppState) =>
-  selectSelectedByTabIndex(state, selectCurrentTabIndex(state))
+  selectSelectedByTabId(state, selectCurrentTabId(state))
 
 export const selectCurrentContents = (state: AppState) =>
-  selectContentsByTabIndex(state, selectCurrentTabIndex(state))
+  selectContentsByTabId(state, selectCurrentTabId(state))
 
 export const selectCurrentSelectedContents = (state: AppState) =>
-  selectSelectedContentsByTabIndex(state, selectCurrentTabIndex(state))
+  selectSelectedContentsByTabId(state, selectCurrentTabId(state))
 
 export const load =
-  (tabIndex: number): AppThunk =>
+  (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { loaded, loading, unselectAll } = explorerSlice.actions
-    const directoryPath = selectDirectoryPathByTabIndex(getState(), tabIndex)
+    const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const pathsMap = selectPathsByScore(getState())
     if (!directoryPath) {
       return
     }
     const url = parseZephyUrl(directoryPath)
-    dispatch(unselectAll({ tabIndex }))
-    dispatch(loading({ tabIndex }))
+    dispatch(unselectAll({ tabId }))
+    dispatch(loading({ tabId }))
     try {
       let entries: DetailedEntry[] = []
       if (url) {
@@ -534,68 +525,68 @@ export const load =
       } else {
         entries = await window.electronAPI.getDetailedEntries(directoryPath)
       }
-      dispatch(loaded({ tabIndex, entries }))
+      dispatch(loaded({ tabId, entries }))
     } catch (e) {
-      dispatch(loaded({ tabIndex, error: true }))
+      dispatch(loaded({ tabId, error: true }))
     }
   }
 
 export const refresh = (): AppThunk => async (dispatch, getState) => {
-  const tabIndex = selectCurrentTabIndex(getState())
-  dispatch(load(tabIndex))
+  const tabId = selectCurrentTabId(getState())
+  dispatch(load(tabId))
 }
 
 export const search =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery, unselect } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    dispatch(setQuery({ tabIndex, query }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(setQuery({ tabId, query }))
     dispatch(addQuery({ query }))
-    const selected = selectSelectedByTabIndex(getState(), tabIndex)
-    const contents = selectContentsByTabIndex(getState(), tabIndex)
+    const selected = selectSelectedByTabId(getState(), tabId)
+    const contents = selectContentsByTabId(getState(), tabId)
     const paths = contents.reduce(
       (acc, content) => acc.filter((path) => path !== content.path),
       selected,
     )
-    dispatch(unselect({ tabIndex, paths }))
+    dispatch(unselect({ tabId, paths }))
   }
 
 export const startEditing =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { startEditing } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    dispatch(startEditing({ tabIndex, path }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(startEditing({ tabId, path }))
   }
 
 export const finishEditing = (): AppThunk => async (dispatch, getState) => {
   const { finishEditing } = explorerSlice.actions
-  const tabIndex = selectCurrentTabIndex(getState())
-  dispatch(finishEditing({ tabIndex }))
+  const tabId = selectCurrentTabId(getState())
+  dispatch(finishEditing({ tabId }))
 }
 
 export const focus =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { focus } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    dispatch(focus({ tabIndex, path }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(focus({ tabId, path }))
   }
 
 export const blur = (): AppThunk => async (dispatch, getState) => {
   const { blur } = explorerSlice.actions
-  const tabIndex = selectCurrentTabIndex(getState())
-  dispatch(blur({ tabIndex }))
+  const tabId = selectCurrentTabId(getState())
+  dispatch(blur({ tabId }))
 }
 
 export const rangeSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { rangeSelect } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    const contents = selectContentsByTabIndex(getState(), tabIndex)
-    const selected = selectSelectedByTabIndex(getState(), tabIndex)
+    const tabId = selectCurrentTabId(getState())
+    const contents = selectContentsByTabId(getState(), tabId)
+    const selected = selectSelectedByTabId(getState(), tabId)
     const paths = contents.map((content) => content.path)
     const prevSelected = selected[selected.length - 1]
     let newPaths
@@ -610,49 +601,49 @@ export const rangeSelect =
       const index = paths.indexOf(path)
       newPaths = paths.slice(0, index + 1)
     }
-    dispatch(rangeSelect({ tabIndex, paths: newPaths }))
+    dispatch(rangeSelect({ tabId, paths: newPaths }))
   }
 
 export const select =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { select } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    dispatch(select({ tabIndex, path }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(select({ tabId, path }))
   }
 
 export const multiSelect =
   (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { multiSelect } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    dispatch(multiSelect({ tabIndex, path }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(multiSelect({ tabId, path }))
   }
 
 export const selectAll = (): AppThunk => async (dispatch, getState) => {
   const { selectAll } = explorerSlice.actions
-  const tabIndex = selectCurrentTabIndex(getState())
-  const contents = selectContentsByTabIndex(getState(), tabIndex)
+  const tabId = selectCurrentTabId(getState())
+  const contents = selectContentsByTabId(getState(), tabId)
   const paths = contents.map((content) => content.path)
-  dispatch(selectAll({ tabIndex, paths }))
+  dispatch(selectAll({ tabId, paths }))
 }
 
 export const unselectAll = (): AppThunk => async (dispatch, getState) => {
   const { unselectAll } = explorerSlice.actions
-  const tabIndex = selectCurrentTabIndex(getState())
-  dispatch(unselectAll({ tabIndex }))
+  const tabId = selectCurrentTabId(getState())
+  dispatch(unselectAll({ tabId }))
 }
 
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntries, focus, select, startEditing } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
+    const tabId = selectCurrentTabId(getState())
     const entry = await window.electronAPI.createDirectory(directoryPath)
-    dispatch(addEntries({ tabIndex, entries: [entry] }))
-    dispatch(select({ tabIndex, path: entry.path }))
-    dispatch(focus({ tabIndex, path: entry.path }))
-    dispatch(startEditing({ tabIndex, path: entry.path }))
+    dispatch(addEntries({ tabId, entries: [entry] }))
+    dispatch(select({ tabId, path: entry.path }))
+    dispatch(focus({ tabId, path: entry.path }))
+    dispatch(startEditing({ tabId, path: entry.path }))
   }
 
 export const open =
@@ -676,15 +667,15 @@ export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
     const { unselect } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
-    const selected = selectSelectedByTabIndex(getState(), tabIndex)
+    const tabId = selectCurrentTabId(getState())
+    const selected = selectSelectedByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
     targetPaths.forEach((path) => {
       dispatch(removeFromFavorites(path))
       dispatch(removeRating({ path }))
     })
-    dispatch(unselect({ tabIndex, paths: targetPaths }))
+    dispatch(unselect({ tabId, paths: targetPaths }))
   }
 
 export const startRenaming =
@@ -703,18 +694,18 @@ export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntries, focus, removeEntries, select } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
+    const tabId = selectCurrentTabId(getState())
     const entry = await window.electronAPI.renameEntry(path, newName)
     // get the selected paths after renaming
-    const selected = selectSelectedByTabIndex(getState(), tabIndex)
+    const selected = selectSelectedByTabId(getState(), tabId)
     dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
     dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-    dispatch(removeEntries({ tabIndex, paths: [path] }))
-    dispatch(addEntries({ tabIndex, entries: [entry] }))
+    dispatch(removeEntries({ tabId, paths: [path] }))
+    dispatch(addEntries({ tabId, entries: [entry] }))
     // do not focus if the renamed entry is not selected
     if (selected.length === 1 && selected[0] === path) {
-      dispatch(select({ tabIndex, path: entry.path }))
-      dispatch(focus({ tabIndex, path: entry.path }))
+      dispatch(select({ tabId, path: entry.path }))
+      dispatch(focus({ tabId, path: entry.path }))
     }
   }
 
@@ -722,14 +713,14 @@ export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { unselect } = explorerSlice.actions
-    const tabIndex = selectCurrentTabIndex(getState())
+    const tabId = selectCurrentTabId(getState())
     const entries = await window.electronAPI.moveEntries(paths, directoryPath)
     paths.forEach((path, i) => {
       const entry = entries[i]
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
     })
-    dispatch(unselect({ tabIndex, paths }))
+    dispatch(unselect({ tabId, paths }))
   }
 
 export const copy = (): AppThunk => async (_, getState) => {
@@ -754,8 +745,8 @@ export const handle =
   ): AppThunk =>
   async (dispatch, getState) => {
     const tabs = selectTabs(getState())
-    tabs.forEach(async (_, tabIndex) => {
-      const history = selectHistoryByTabIndex(getState(), tabIndex)
+    tabs.forEach(async (_, tabId) => {
+      const history = selectHistoryByTabId(getState(), tabId)
       const currentDirectoryPath = history.directoryPath
       if (directoryPath !== currentDirectoryPath) {
         return
@@ -765,10 +756,10 @@ export const handle =
         case 'create':
         case 'update': {
           const entry = await window.electronAPI.getDetailedEntry(filePath)
-          return dispatch(addEntries({ tabIndex, entries: [entry] }))
+          return dispatch(addEntries({ tabId, entries: [entry] }))
         }
         case 'delete':
-          return dispatch(removeEntries({ tabIndex, paths: [filePath] }))
+          return dispatch(removeEntries({ tabId, paths: [filePath] }))
       }
     })
   }

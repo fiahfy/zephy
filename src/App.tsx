@@ -58,13 +58,13 @@ const App = () => {
         case 'changeViewMode':
           return dispatch(setCurrentViewMode(data.viewMode))
         case 'closeOtherTabs':
-          return dispatch(closeOtherTabs(data.tabIndex))
+          return dispatch(closeOtherTabs(data.tabId))
         case 'closeTab':
-          return dispatch(closeTab(data?.tabIndex))
+          return dispatch(closeTab(data?.tabId))
         case 'copy':
           return dispatch(copy())
         case 'duplicateTab':
-          return dispatch(duplicateTab(data.tabIndex))
+          return dispatch(duplicateTab(data.tabId))
         case 'forward':
           return dispatch(forward())
         case 'go':
@@ -76,7 +76,7 @@ const App = () => {
         case 'newFolder':
           return dispatch(newFolder(data.path))
         case 'newTab':
-          return dispatch(newTab(data.path, data?.tabIndex))
+          return dispatch(newTab(data.path, data?.tabId))
         case 'open':
           return dispatch(open(data?.path))
         case 'removeFromFavorites':

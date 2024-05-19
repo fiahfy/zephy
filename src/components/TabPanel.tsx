@@ -3,23 +3,23 @@ import Explorer from '~/components/Explorer'
 import Settings from '~/components/Settings'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load } from '~/store/explorer'
-import { selectDirectoryPathByTabIndex } from '~/store/window'
+import { selectDirectoryPathByTabId } from '~/store/window'
 
 type Props = {
-  tabIndex: number
+  tabId: number
 }
 
 const TabPanel = (props: Props) => {
-  const { tabIndex } = props
+  const { tabId } = props
 
   const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabIndex(state, tabIndex),
+    selectDirectoryPathByTabId(state, tabId),
   )
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(load(tabIndex))
-  }, [directoryPath, dispatch, tabIndex])
+    dispatch(load(tabId))
+  }, [directoryPath, dispatch, tabId])
 
   const Component = useMemo(() => {
     switch (directoryPath) {
@@ -30,7 +30,7 @@ const TabPanel = (props: Props) => {
     }
   }, [directoryPath])
 
-  return <Component tabIndex={tabIndex} />
+  return <Component tabId={tabId} />
 }
 
 export default TabPanel

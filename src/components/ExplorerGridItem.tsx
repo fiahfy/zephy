@@ -46,11 +46,11 @@ const reducer = (_state: State, action: Action) => {
 
 type Props = {
   content: Content
-  tabIndex: number
+  tabId: number
 }
 
 const ExplorerGridItem = (props: Props) => {
-  const { content, tabIndex } = props
+  const { content, tabId } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
@@ -65,7 +65,7 @@ const ExplorerGridItem = (props: Props) => {
     onDoubleClick,
     onKeyDown,
     selected,
-  } = useExplorerItem(tabIndex, content, ref)
+  } = useExplorerItem(tabId, content, ref)
 
   const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)

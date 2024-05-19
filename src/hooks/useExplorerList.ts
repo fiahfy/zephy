@@ -5,37 +5,29 @@ import usePrevious from '~/hooks/usePrevious'
 import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  selectContentsByTabIndex,
-  selectErrorByTabIndex,
-  selectFocusedByTabIndex,
-  selectLoadingByTabIndex,
-  selectQueryByTabIndex,
+  selectContentsByTabId,
+  selectErrorByTabId,
+  selectFocusedByTabId,
+  selectLoadingByTabId,
+  selectQueryByTabId,
 } from '~/store/explorer'
-import { selectScrollTopByTabIndex, setScrollTop } from '~/store/window'
+import { selectScrollTopByTabId, setScrollTop } from '~/store/window'
 
 const useExplorerList = (
-  tabIndex: number,
+  tabId: number,
   columns: number,
   estimateSize: number,
   ref: RefObject<HTMLElement>,
 ) => {
   const contents = useAppSelector((state) =>
-    selectContentsByTabIndex(state, tabIndex),
+    selectContentsByTabId(state, tabId),
   )
-  const error = useAppSelector((state) =>
-    selectErrorByTabIndex(state, tabIndex),
-  )
-  const focused = useAppSelector((state) =>
-    selectFocusedByTabIndex(state, tabIndex),
-  )
-  const loading = useAppSelector((state) =>
-    selectLoadingByTabIndex(state, tabIndex),
-  )
-  const query = useAppSelector((state) =>
-    selectQueryByTabIndex(state, tabIndex),
-  )
+  const error = useAppSelector((state) => selectErrorByTabId(state, tabId))
+  const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
+  const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
+  const query = useAppSelector((state) => selectQueryByTabId(state, tabId))
   const scrollTop = useAppSelector((state) =>
-    selectScrollTopByTabIndex(state, tabIndex),
+    selectScrollTopByTabId(state, tabId),
   )
   const dispatch = useAppDispatch()
 

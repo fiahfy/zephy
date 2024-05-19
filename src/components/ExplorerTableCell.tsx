@@ -15,14 +15,14 @@ type Props = {
   content: Content
   dataKey: Key
   height: number
-  tabIndex: number
+  tabId: number
   width?: number
 }
 
 const ExplorerTableCell = (props: Props) => {
-  const { align, content, dataKey, height, tabIndex, width } = props
+  const { align, content, dataKey, height, tabId, width } = props
 
-  const { draggingContents, editing } = useExplorerItem(tabIndex, content)
+  const { draggingContents, editing } = useExplorerItem(tabId, content)
 
   const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)

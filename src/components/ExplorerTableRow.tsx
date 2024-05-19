@@ -7,11 +7,11 @@ import { Content } from '~/interfaces'
 type Props = {
   children: React.ReactNode
   content: Content
-  tabIndex: number
+  tabId: number
 }
 
 const ExplorerTableRow = (props: Props) => {
-  const { children, content, tabIndex } = props
+  const { children, content, tabId } = props
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -22,7 +22,7 @@ const ExplorerTableRow = (props: Props) => {
     onDoubleClick,
     onKeyDown,
     selected,
-  } = useExplorerItem(tabIndex, content, ref)
+  } = useExplorerItem(tabId, content, ref)
 
   return (
     <TableRow
