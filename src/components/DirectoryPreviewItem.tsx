@@ -1,46 +1,16 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
+import useThumbnailEntry from '~/hooks/useThumbnailEntry'
 import { Entry } from '~/interfaces'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
+import { useAppDispatch } from '~/store'
+import { openEntry } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
-import { isHiddenFile } from '~/utils/file'
-
-type State = {
-  itemCount?: number
-  status: 'error' | 'loaded' | 'loading'
-  thumbnail?: string
-}
-
-type Action =
-  | {
-      type: 'error'
-      payload: { itemCount: number; thumbnail?: string }
-    }
-  | {
-      type: 'loaded'
-      payload: { itemCount: number; thumbnail?: string }
-    }
-  | { type: 'loading' }
-
-const reducer = (_state: State, action: Action) => {
-  switch (action.type) {
-    case 'error':
-    case 'loaded':
-      return {
-        ...action.payload,
-        status: action.type,
-      }
-    case 'loading':
-      return { itemCount: undefined, status: action.type, thumbnail: undefined }
-  }
-}
 
 type Props = {
   entry: Entry
@@ -49,94 +19,19 @@ type Props = {
 const DirectoryPreviewItem = (props: Props) => {
   const { entry } = props
 
-  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
-  const appDispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
+  const { itemCount, message, status, thumbnail } = useThumbnailEntry(entry)
   const { draggable, ...dragHandlers } = useDragEntry(entry)
   const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
-
-  const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
-    itemCount: undefined,
-    status: 'loading',
-    thumbnail: undefined,
-  })
-
-  useEffect(() => {
-    let unmounted = false
-
-    ;(async () => {
-      dispatch({ type: 'loading' })
-      const paths = await (async () => {
-        if (entry.type !== 'directory') {
-          return [entry.path]
-        }
-        try {
-          const entries = await window.electronAPI.getEntries(entry.path)
-          return entries
-            .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.path)
-        } catch (e) {
-          return []
-        }
-      })()
-      const thumbnail = await (async () => {
-        try {
-          return await window.electronAPI.createEntryThumbnailUrl(paths)
-        } catch (e) {
-          return undefined
-        }
-      })()
-      const success = await (async () => {
-        if (!thumbnail) {
-          return true
-        }
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(undefined)
-            img.onerror = (e) => reject(e)
-            img.src = thumbnail
-          })
-          return true
-        } catch (e) {
-          return false
-        }
-      })()
-      if (unmounted) {
-        return
-      }
-      dispatch({
-        type: success ? 'loaded' : 'error',
-        payload: { itemCount: paths.length, thumbnail },
-      })
-    })()
-
-    return () => {
-      unmounted = true
-    }
-  }, [entry.path, entry.type, entry.url, shouldShowHiddenFiles])
-
-  const message = useMemo(() => {
-    switch (status) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load'
-      case 'loaded':
-        return 'No preview'
-    }
-  }, [status])
 
   const handleDoubleClick = useCallback(
     async () =>
       entry.type === 'directory'
-        ? appDispatch(changeDirectory(entry.path))
-        : appDispatch(openEntry(entry.path)),
-    [appDispatch, entry.path, entry.type],
+        ? dispatch(changeDirectory(entry.path))
+        : dispatch(openEntry(entry.path)),
+    [dispatch, entry.path, entry.type],
   )
 
   return (

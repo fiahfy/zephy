@@ -2,47 +2,15 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { useRef } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
+import useThumbnailEntry from '~/hooks/useThumbnailEntry'
 import { Content } from '~/interfaces'
-import { useAppSelector } from '~/store'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
-import { isHiddenFile } from '~/utils/file'
-
-type State = {
-  itemCount?: number
-  status: 'error' | 'loaded' | 'loading'
-  thumbnail?: string
-}
-
-type Action =
-  | {
-      type: 'error'
-      payload: { itemCount: number; thumbnail?: string }
-    }
-  | {
-      type: 'loaded'
-      payload: { itemCount: number; thumbnail?: string }
-    }
-  | { type: 'loading' }
-
-const reducer = (_state: State, action: Action) => {
-  switch (action.type) {
-    case 'error':
-    case 'loaded':
-      return {
-        ...action.payload,
-        status: action.type,
-      }
-    case 'loading':
-      return { itemCount: undefined, status: action.type, thumbnail: undefined }
-  }
-}
 
 type Props = {
   content: Content
@@ -51,8 +19,6 @@ type Props = {
 
 const ExplorerGridItem = (props: Props) => {
   const { content, tabId } = props
-
-  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -67,83 +33,10 @@ const ExplorerGridItem = (props: Props) => {
     selected,
   } = useExplorerItem(tabId, content, ref)
 
+  const { itemCount, message, status, thumbnail } = useThumbnailEntry(content)
+
   const { draggable, ...dragHandlers } = useDragEntry(draggingContents)
   const { droppableStyle, ...dropHandlers } = useDropEntry(content)
-
-  const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
-    itemCount: undefined,
-    status: 'loading',
-    thumbnail: undefined,
-  })
-
-  useEffect(() => {
-    let unmounted = false
-
-    ;(async () => {
-      dispatch({ type: 'loading' })
-      const paths = await (async () => {
-        if (content.type !== 'directory') {
-          return [content.path]
-        }
-        try {
-          const entries = await window.electronAPI.getEntries(content.path)
-          return entries
-            .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.path)
-        } catch (e) {
-          return []
-        }
-      })()
-      const thumbnail = await (async () => {
-        try {
-          return await window.electronAPI.createEntryThumbnailUrl(paths)
-        } catch (e) {
-          return undefined
-        }
-      })()
-      const success = await (async () => {
-        if (!thumbnail) {
-          return true
-        }
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(undefined)
-            img.onerror = (e) => reject(e)
-            img.src = thumbnail
-          })
-          return true
-        } catch (e) {
-          return false
-        }
-      })()
-      if (unmounted) {
-        return
-      }
-      dispatch({
-        type: success ? 'loaded' : 'error',
-        payload: { itemCount: paths.length, thumbnail },
-      })
-    })()
-
-    return () => {
-      unmounted = true
-    }
-  }, [content.path, content.type, content.url, shouldShowHiddenFiles])
-
-  const message = useMemo(() => {
-    switch (status) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load'
-      case 'loaded':
-        return 'No preview'
-    }
-  }, [status])
 
   return (
     <ImageListItem
