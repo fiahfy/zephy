@@ -114,13 +114,15 @@ export const windowSlice = createSlice({
         },
       }
     },
-    newTab(state, action: PayloadAction<{ id: number; srcTabId: number }>) {
+    newTab(state, action: PayloadAction<{ id: number; srcTabId?: number }>) {
       const { id, srcTabId } = action.payload
       const window = state[id]
       if (!window) {
         return state
       }
-      const tabIndex = window.tabs.findIndex((tab) => tab.id === srcTabId)
+      const tabIndex = srcTabId
+        ? window.tabs.findIndex((tab) => tab.id === srcTabId)
+        : window.tabs.length - 1
       const tabId = findMissingTabId(window.tabs)
       const tabs = [
         ...window.tabs.slice(0, tabIndex + 1),
@@ -635,8 +637,7 @@ export const newTab =
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
     const id = selectWindowId(getState())
-    const currentTabId = selectCurrentTabId(getState())
-    dispatch(newTab({ id, srcTabId: srcTabId ?? currentTabId }))
+    dispatch(newTab({ id, srcTabId }))
     const tabId = selectCurrentTabId(getState())
     dispatch(addTab({ tabId }))
     dispatch(changeDirectory(directoryPath))
