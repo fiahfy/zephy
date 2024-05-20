@@ -248,22 +248,25 @@ const AddressBar = () => {
         disableGutters
         sx={{
           minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
+          gap: 1,
           pl: visible ? 10 : 1,
           pr: 1,
         }}
       >
-        <Box sx={{ flex: '1 1 0' }} />
         <Box
           sx={(theme) => ({
+            flex: '1 1 0',
+            [theme.breakpoints.down('md')]: { display: 'none' },
+          })}
+        />
+        <Box
+          sx={{
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
             display: 'flex',
             flex: '6 1 0',
-            [theme.breakpoints.down('sm')]: {
-              flex: '12 1 0',
-            },
             gap: 0.5,
-          })}
+          }}
         >
           <IconButton
             disabled={loading || !canBack}
@@ -306,18 +309,20 @@ const AddressBar = () => {
             value={directoryPathInput}
           />
         </Box>
-        <Box sx={{ flex: '1 1 0' }} />
         <Box
           sx={(theme) => ({
+            flex: '1 1 0',
+            [theme.breakpoints.down('md')]: { display: 'none' },
+          })}
+        />
+        <Box
+          sx={{
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
             display: 'flex',
             flex: '3 1 0',
-            [theme.breakpoints.down('sm')]: {
-              flex: '6 1 0',
-            },
             gap: 1,
-          })}
+          }}
         >
           <Autocomplete
             ListboxProps={{ sx: { typography: 'body2' } }}
