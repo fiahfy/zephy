@@ -20,8 +20,8 @@ type State = {
     | 'dateLastOpened'
     | 'dateModified'
     | 'dateCreated'
+    | 'score'
     | 'size'
-    | 'rating'
   viewMode: 'list' | 'thumbnail'
 }
 
@@ -204,7 +204,7 @@ const registerApplicationMenu = (
               { label: 'Date Modified', orderBy: 'dateModified' },
               { label: 'Date Created', orderBy: 'dateCreated' },
               { label: 'Size', orderBy: 'size' },
-              { label: 'Rating', orderBy: 'rating' },
+              { label: 'Rating', orderBy: 'score' },
             ].map((menu) => ({
               ...menu,
               checked: menu.orderBy === state.orderBy,

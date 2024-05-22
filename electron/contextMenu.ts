@@ -93,7 +93,7 @@ const registerContextMenu = (
         { label: 'Date Modified', value: 'dateModified' },
         { label: 'Date Created', value: 'dateCreated' },
         { label: 'Size', value: 'size' },
-        { label: 'Rating', value: 'rating' },
+        { label: 'Rating', value: 'score' },
       ].map(({ label, value }) => ({
         checked: value === orderBy,
         click: () => send(event, { type: 'sort', data: { orderBy: value } }),

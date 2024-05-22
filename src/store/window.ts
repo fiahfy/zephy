@@ -71,8 +71,8 @@ const defaultOrders = {
   dateLastOpened: 'desc',
   dateModified: 'desc',
   dateCreated: 'desc',
+  score: 'desc',
   size: 'desc',
-  rating: 'desc',
 } as const
 
 const defaultWindowState: WindowState = {
