@@ -1,12 +1,12 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useRef } from 'react'
-import EntryInformation from '~/components/EntryInformation'
+import EntryInformationTable from '~/components/EntryInformationTable'
 import Preview from '~/components/Preview'
 import { useAppSelector } from '~/store'
-import { selectCurrentSelected } from '~/store/explorer'
+import { selectCurrentSelectedContents } from '~/store/explorer'
 
 const Inspector = () => {
-  const selected = useAppSelector(selectCurrentSelected)
+  const contents = useAppSelector(selectCurrentSelectedContents)
 
   const ref = useRef<HTMLElement>(null)
 
@@ -15,11 +15,11 @@ const Inspector = () => {
     if (el) {
       el.scrollTop = 0
     }
-  }, [selected])
+  }, [contents])
 
   return (
     <Box ref={ref} sx={{ height: '100%' }}>
-      {selected.length > 0 ? (
+      {contents.length > 0 ? (
         <Box
           sx={{
             display: 'flex',
@@ -41,16 +41,17 @@ const Inspector = () => {
           >
             Preview
           </Typography>
-          <Preview />
+          <Preview entries={contents} />
           <Box
             sx={{
               background: (theme) => theme.palette.background.default,
               bottom: 0,
               position: 'sticky',
+              py: 1,
               zIndex: 1,
             }}
           >
-            <EntryInformation />
+            <EntryInformationTable entries={contents} />
           </Box>
         </Box>
       ) : (

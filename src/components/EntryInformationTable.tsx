@@ -5,6 +5,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import pluralize from 'pluralize'
+import { useEffect, useMemo, useState } from 'react'
 import { DetailedEntry, Metadata } from '~/interfaces'
 import {
   formatDateTime,
@@ -39,65 +41,129 @@ const formatDateRange = (
 
 type Props = {
   entries: DetailedEntry[]
-  metadata?: Metadata
 }
 
 const EntryInformationTable = (props: Props) => {
-  const { entries, metadata } = props
+  const { entries } = props
 
-  const fileSize = getTotalFileSize(entries)
+  const [metadata, setMetadata] = useState<Metadata>()
 
-  const rows = [
-    ...(fileSize
-      ? [
-          {
-            label: 'Size',
-            value: formatFileSize(fileSize),
-          },
-        ]
-      : []),
-    {
-      label: 'Date Created',
-      value: formatDateRange(entries, 'dateCreated'),
-    },
-    {
-      label: 'Date Modified',
-      value: formatDateRange(entries, 'dateModified'),
-    },
-    {
-      label: 'Date Last Opened',
-      value: formatDateRange(entries, 'dateLastOpened'),
-    },
-    ...(metadata
-      ? [
-          ...(metadata.height && metadata.width
-            ? [
-                {
-                  label: 'Dimensions',
-                  value: `${metadata.width}x${metadata.height}`,
-                },
-              ]
-            : []),
-          ...(metadata.duration
-            ? [
-                {
-                  label: 'Duration',
-                  value: formatDuration(metadata.duration),
-                },
-              ]
-            : []),
-        ]
-      : []),
-  ]
+  const entry = useMemo(() => entries[0], [entries])
+
+  useEffect(() => {
+    let unmounted = false
+
+    ;(async () => {
+      if (entries.length > 1) {
+        return
+      }
+      if (!entry.path) {
+        return
+      }
+      const metadata = await (async () => {
+        try {
+          return await window.electronAPI.getEntryMetadata(entry.path)
+        } catch (e) {
+          return undefined
+        }
+      })()
+      if (unmounted) {
+        return
+      }
+      setMetadata(metadata)
+    })()
+
+    return () => {
+      unmounted = true
+    }
+  }, [entries.length, entry.path])
+
+  const caption = useMemo(
+    () =>
+      entries.length > 1 ? pluralize('item', entries.length, true) : entry.name,
+    [entries, entry],
+  )
+
+  const fileSize = useMemo(() => getTotalFileSize(entries), [entries])
+
+  const rows = useMemo(
+    () => [
+      ...(fileSize
+        ? [
+            {
+              label: 'Size',
+              value: formatFileSize(fileSize),
+            },
+          ]
+        : []),
+      {
+        label: 'Date Created',
+        value: formatDateRange(entries, 'dateCreated'),
+      },
+      {
+        label: 'Date Modified',
+        value: formatDateRange(entries, 'dateModified'),
+      },
+      {
+        label: 'Date Last Opened',
+        value: formatDateRange(entries, 'dateLastOpened'),
+      },
+      ...(metadata
+        ? [
+            ...(metadata.height && metadata.width
+              ? [
+                  {
+                    label: 'Dimensions',
+                    value: `${metadata.width}x${metadata.height}`,
+                  },
+                ]
+              : []),
+            ...(metadata.duration
+              ? [
+                  {
+                    label: 'Duration',
+                    value: formatDuration(metadata.duration),
+                  },
+                ]
+              : []),
+          ]
+        : []),
+    ],
+    [entries, fileSize, metadata],
+  )
 
   return (
     <Table size="small" sx={{ tableLayout: 'fixed' }}>
+      <caption style={{ captionSide: 'top', padding: 0 }}>
+        <Typography
+          align="center"
+          fontWeight="bold"
+          paragraph
+          sx={{
+            color: (theme) => theme.palette.text.primary,
+            mb: 0,
+            overflowWrap: 'break-word',
+            pb: 0.5,
+            px: 1,
+            userSelect: 'text',
+          }}
+          variant="caption"
+        >
+          {caption}
+        </Typography>
+      </caption>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.label}>
             <TableCell
               component="th"
-              sx={{ borderBottom: 0, height: 20, px: 1, py: 0 }}
+              sx={{
+                borderBottom: 0,
+                height: 20,
+                px: 1,
+                py: 0,
+                width: 128,
+              }}
             >
               <Typography noWrap sx={{ display: 'block' }} variant="caption">
                 {row.label}

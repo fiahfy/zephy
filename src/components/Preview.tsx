@@ -5,34 +5,37 @@ import EmptyPreview from '~/components/EmptyPreview'
 import ImagePreview from '~/components/ImagePreview'
 import TextPreview from '~/components/TextPreview'
 import VideoPreview from '~/components/VideoPreview'
-import { useAppSelector } from '~/store'
-import { selectCurrentSelectedContents } from '~/store/explorer'
+import { Entry } from '~/interfaces'
 import { detectFileType } from '~/utils/file'
 
-const Preview = () => {
-  const contents = useAppSelector(selectCurrentSelectedContents)
+type Props = {
+  entries: Entry[]
+}
 
-  const content = useMemo(() => contents[0], [contents])
+const Preview = (props: Props) => {
+  const { entries } = props
+
+  const entry = useMemo(() => entries[0], [entries])
 
   const type = useMemo(
     () =>
-      content
-        ? content.type === 'directory'
+      entry
+        ? entry.type === 'directory'
           ? 'directory'
-          : detectFileType(content.path)
+          : detectFileType(entry.path)
         : 'none',
-    [content],
+    [entry],
   )
 
   return (
     <>
-      {contents.length === 1 && content ? (
+      {entries.length === 1 && entry ? (
         <>
-          {type === 'audio' && <AudioPreview entry={content} />}
-          {type === 'directory' && <DirectoryPreview entry={content} />}
-          {type === 'image' && <ImagePreview entry={content} />}
-          {type === 'text' && <TextPreview entry={content} />}
-          {type === 'video' && <VideoPreview entry={content} />}
+          {type === 'audio' && <AudioPreview entry={entry} />}
+          {type === 'directory' && <DirectoryPreview entry={entry} />}
+          {type === 'image' && <ImagePreview entry={entry} />}
+          {type === 'text' && <TextPreview entry={entry} />}
+          {type === 'video' && <VideoPreview entry={entry} />}
           {!['audio', 'directory', 'image', 'text', 'video'].includes(type) && (
             <EmptyPreview message="No preview" />
           )}
