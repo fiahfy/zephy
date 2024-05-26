@@ -48,7 +48,7 @@ const ExplorerPanel = () => {
       if (root) {
         return
       }
-      const entry = await window.electronAPI.getEntryHierarchy(
+      const entry = await window.electronAPI.getRootEntry(
         zephySchema ? undefined : directoryPath,
       )
       const expandedItems = getLoadedDirectories(entry)

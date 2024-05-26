@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
@@ -21,8 +20,6 @@ type Metadata = {
   width?: number
 }
 
-const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
-
 const generateThumbnailFilename = async (path: string) => {
   const stats = await stat(path)
   return (
@@ -32,7 +29,7 @@ const generateThumbnailFilename = async (path: string) => {
   )
 }
 
-const createThumbnail = async (path: string) => {
+const createThumbnail = async (path: string, thumbnailDir: string) => {
   const thumbnailFilename = await generateThumbnailFilename(path)
   const thumbnailPath = join(thumbnailDir, thumbnailFilename)
   const exists = await pathExists(thumbnailPath)
@@ -51,7 +48,10 @@ const createThumbnail = async (path: string) => {
   return pathToFileURL(thumbnailPath).href
 }
 
-export const createThumbnailUrl = async (paths: string | string[]) => {
+export const createThumbnailUrl = async (
+  paths: string | string[],
+  thumbnailDir: string,
+) => {
   return (Array.isArray(paths) ? paths : [paths]).reduce(
     async (promise, path) => {
       const acc = await promise
@@ -68,7 +68,7 @@ export const createThumbnailUrl = async (paths: string | string[]) => {
         case type.startsWith('image/'):
           return pathToFileURL(path).href
         case type.startsWith('video/'):
-          return await createThumbnail(path)
+          return await createThumbnail(path, thumbnailDir)
         default:
           return undefined
       }

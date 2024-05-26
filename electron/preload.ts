@@ -25,11 +25,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('getDetailedEntry', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('getEntries', directoryPath),
-  getEntryHierarchy: (path?: string) =>
-    ipcRenderer.invoke('getEntryHierarchy', path),
   getEntryMetadata: (path: string) =>
     ipcRenderer.invoke('getEntryMetadata', path),
   getParentEntry: (path: string) => ipcRenderer.invoke('getParentEntry', path),
+  getRootEntry: (path?: string) => ipcRenderer.invoke('getRootEntry', path),
   moveEntries: (paths: string[], directoryPath: string) =>
     ipcRenderer.invoke('moveEntries', paths, directoryPath),
   moveEntriesToTrash: (paths: string[]) =>

@@ -158,7 +158,7 @@ export const getDetailedEntries = async (
   return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
 }
 
-export const getEntryHierarchy = async (
+export const getRootEntry = async (
   path?: string,
 ): Promise<Entry | undefined> => {
   const targetPath = path ?? app.getPath('home')

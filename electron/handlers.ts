@@ -1,18 +1,10 @@
 import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
-import { dirname } from 'node:path'
+import { dirname, join } from 'node:path'
 import { copy, paste } from './utils/clipboard'
-import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
-import {
-  createDirectory,
-  getDetailedEntries,
-  getDetailedEntriesForPaths,
-  getDetailedEntry,
-  getEntries,
-  getEntryHierarchy,
-  moveEntries,
-  renameEntry,
-} from './utils/file'
+import { postMessage } from './utils/worker'
 import createWatcher from './watcher'
+
+const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
@@ -21,50 +13,52 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle(
     'createDirectory',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
-      createDirectory(directoryPath),
+      postMessage('createDirectory', directoryPath),
   )
   ipcMain.handle(
     'createEntryThumbnailUrl',
-    (_event: IpcMainInvokeEvent, path: string) => createThumbnailUrl(path),
+    (_event: IpcMainInvokeEvent, path: string) =>
+      postMessage('createThumbnailUrl', path, thumbnailDir),
   )
   ipcMain.handle(
     'getDetailedEntries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
-      getDetailedEntries(directoryPath),
+      postMessage('getDetailedEntries', directoryPath),
   )
   ipcMain.handle(
     'getDetailedEntriesForPaths',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
-      getDetailedEntriesForPaths(paths),
+      postMessage('getDetailedEntriesForPaths', paths),
   )
   ipcMain.handle(
     'getDetailedEntry',
-    (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path),
+    (_event: IpcMainInvokeEvent, path: string) =>
+      postMessage('getDetailedEntry', path),
   )
   ipcMain.handle(
     'getEntries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
-      getEntries(directoryPath),
-  )
-  ipcMain.handle(
-    'getEntryHierarchy',
-    (_event: IpcMainInvokeEvent, path?: string) => getEntryHierarchy(path),
+      postMessage('getEntries', directoryPath),
   )
   ipcMain.handle(
     'getEntryMetadata',
-    (_event: IpcMainInvokeEvent, path: string) => getMetadata(path),
+    (_event: IpcMainInvokeEvent, path: string) =>
+      postMessage('getMetadata', path),
   )
   ipcMain.handle(
     'getParentEntry',
     (_event: IpcMainInvokeEvent, path: string) => {
       const parentPath = dirname(path)
-      return getDetailedEntry(parentPath)
+      return postMessage('getDetailedEntry', parentPath)
     },
+  )
+  ipcMain.handle('getRootEntry', (_event: IpcMainInvokeEvent, path?: string) =>
+    postMessage('getRootEntry', path),
   )
   ipcMain.handle(
     'moveEntries',
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
-      moveEntries(paths, directoryPath),
+      postMessage('moveEntries', paths, directoryPath),
   )
   ipcMain.handle(
     'moveEntriesToTrash',
@@ -89,13 +83,17 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
     shell.openExternal(url),
   )
-  ipcMain.handle('pasteEntries', (_event: IpcMainInvokeEvent, directoryPath) =>
-    paste(directoryPath),
+  ipcMain.handle(
+    'pasteEntries',
+    (_event: IpcMainInvokeEvent, directoryPath) => {
+      const paths = paste()
+      return postMessage('copyEntries', paths, directoryPath)
+    },
   )
   ipcMain.handle(
     'renameEntry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
-      renameEntry(path, newName),
+      postMessage('renameEntry', path, newName),
   )
 }
 

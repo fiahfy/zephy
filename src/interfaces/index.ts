@@ -18,9 +18,9 @@ export type IElectronAPI = {
   getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
   getDetailedEntry: (path: string) => Promise<DetailedEntry>
   getEntries: (directoryPath: string) => Promise<Entry[]>
-  getEntryHierarchy: (path?: string) => Promise<Entry>
   getEntryMetadata: (path: string) => Promise<Metadata | undefined>
   getParentEntry: (path: string) => Promise<DetailedEntry>
+  getRootEntry: (path?: string) => Promise<Entry>
   moveEntries: (
     paths: string[],
     directoryPath: string,
