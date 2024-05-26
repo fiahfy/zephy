@@ -53,7 +53,7 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     },
   )
   ipcMain.handle('getRootEntry', (_event: IpcMainInvokeEvent, path?: string) =>
-    postMessage('getRootEntry', path),
+    postMessage('getRootEntry', path ?? app.getPath('home')),
   )
   ipcMain.handle(
     'moveEntries',

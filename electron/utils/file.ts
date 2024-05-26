@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import { copy, move, pathExists } from 'fs-extra'
 import { Dirent, Stats } from 'node:fs'
 import { mkdir, readdir, rename, stat } from 'node:fs/promises'
@@ -159,11 +158,9 @@ export const getDetailedEntries = async (
 }
 
 export const getRootEntry = async (
-  path?: string,
+  path: string,
 ): Promise<Entry | undefined> => {
-  const targetPath = path ?? app.getPath('home')
-
-  const dirnames = parsePath(targetPath)
+  const dirnames = parsePath(path)
 
   const rootPath = dirnames[0] ?? ''
 
