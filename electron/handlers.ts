@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 import { dirname, join } from 'node:path'
-import { copy, paste } from './utils/clipboard'
+import { readPaths, writePaths } from './utils/clipboard'
 import { postMessage } from './utils/worker'
 import createWatcher from './watcher'
 
@@ -8,7 +8,7 @@ const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
-    copy(paths),
+    writePaths(paths),
   )
   ipcMain.handle(
     'createDirectory',
@@ -86,7 +86,7 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle(
     'pasteEntries',
     (_event: IpcMainInvokeEvent, directoryPath) => {
-      const paths = paste()
+      const paths = readPaths()
       return postMessage('copyEntries', paths, directoryPath)
     },
   )
