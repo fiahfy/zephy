@@ -8,6 +8,7 @@ import App from '~/App'
 import { DragGhostProvider } from '~/contexts/DragGhostContext'
 import { StoreProvider } from '~/contexts/StoreContext'
 import { ThemeProvider } from '~/contexts/ThemeContext'
+import { ThumbnailProvider } from '~/contexts/ThumbnailContext'
 import { TrafficLightProvider } from '~/contexts/TrafficLightContext'
 import { WatcherProvider } from '~/contexts/WatcherContext'
 
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <TrafficLightProvider>
           <DragGhostProvider>
             <WatcherProvider>
-              <App />
+              <ThumbnailProvider>
+                <App />
+              </ThumbnailProvider>
             </WatcherProvider>
           </DragGhostProvider>
         </TrafficLightProvider>

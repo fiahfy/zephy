@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useReducer } from 'react'
+import useThumbnail from '~/hooks/useThumbnail'
 import { Entry } from '~/interfaces'
-import { useAppSelector } from '~/store'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
-import { isHiddenFile } from '~/utils/file'
 
 type State = {
   itemCount?: number
@@ -35,7 +33,7 @@ const reducer = (_state: State, action: Action) => {
 }
 
 const useThumbnailEntry = (entry: Entry) => {
-  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const { load } = useThumbnail()
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: undefined,
@@ -46,65 +44,45 @@ const useThumbnailEntry = (entry: Entry) => {
   useEffect(() => {
     let unmounted = false
 
-    ;(async () => {
-      dispatch({ type: 'loading' })
+    const timer = window.setTimeout(() => {
+      ;(async () => {
+        dispatch({ type: 'loading' })
 
-      const paths = await (async () => {
-        if (entry.type !== 'directory') {
-          return [entry.path]
+        const { itemCount, thumbnail } = await load(entry)
+
+        const success = await (async () => {
+          if (!thumbnail) {
+            return true
+          }
+          try {
+            await new Promise((resolve, reject) => {
+              const img = new Image()
+              img.onload = () => resolve(undefined)
+              img.onerror = (e) => reject(e)
+              img.src = thumbnail
+            })
+            return true
+          } catch (e) {
+            return false
+          }
+        })()
+
+        if (unmounted) {
+          return
         }
-        try {
-          const entries = await window.electronAPI.getEntries(entry.path)
-          return entries
-            .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((entry) => entry.path)
-        } catch (e) {
-          return []
-        }
+
+        dispatch({
+          type: success ? 'loaded' : 'error',
+          payload: { itemCount, thumbnail },
+        })
       })()
-
-      const thumbnail = await (async () => {
-        try {
-          return await window.electronAPI.createEntryThumbnailUrl(paths)
-        } catch (e) {
-          return undefined
-        }
-      })()
-
-      const success = await (async () => {
-        if (!thumbnail) {
-          return true
-        }
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(undefined)
-            img.onerror = (e) => reject(e)
-            img.src = thumbnail
-          })
-          return true
-        } catch (e) {
-          return false
-        }
-      })()
-
-      if (unmounted) {
-        return
-      }
-
-      dispatch({
-        type: success ? 'loaded' : 'error',
-        payload: { itemCount: paths.length, thumbnail },
-      })
-    })()
+    }, 100)
 
     return () => {
       unmounted = true
+      window.clearTimeout(timer)
     }
-  }, [entry.path, entry.type, entry.url, shouldShowHiddenFiles])
+  }, [entry, load])
 
   const message = useMemo(() => {
     switch (status) {

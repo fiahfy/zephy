@@ -593,6 +593,11 @@
   resolved "https://registry.yarnpkg.com/@fiahfy/prettier-config/-/prettier-config-0.0.3.tgz#89558a0dc91f890df855ba892c6a07403e02f869"
   integrity sha512-eV6vDznC+VSO41zKLmmrJvX/6S78QMcDnMbyIMyfekPkZvezdexp92LvpUO+gTBdJM7EHkizTaNaDZZKfXHZ0w==
 
+"@fiahfy/semaphore@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@fiahfy/semaphore/-/semaphore-0.0.2.tgz#f3121454fd03ac1ba35ee6cf6b2ae2d1a0d7d117"
+  integrity sha512-dkxuLmntMXqE6VaLE7PnJiCMqGKm3P7B7PQcwNqIj7rrAYXT00MSYnBQ66TDrrq6vY2gmbkOqc7KB8gCsLQUdw==
+
 "@floating-ui/core@^1.0.0":
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.6.2.tgz#d37f3e0ac1f1c756c7de45db13303a266226851a"
