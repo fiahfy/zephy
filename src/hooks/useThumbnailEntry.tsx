@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import useThumbnail from '~/hooks/useThumbnail'
 import { Entry } from '~/interfaces'
 
@@ -41,6 +41,23 @@ const useThumbnailEntry = (entry: Entry) => {
     thumbnail: undefined,
   })
 
+  const loadImage = useCallback(async (url?: string) => {
+    if (!url) {
+      return true
+    }
+    try {
+      await new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(undefined)
+        img.onerror = (e) => reject(e)
+        img.src = url
+      })
+      return true
+    } catch (e) {
+      return false
+    }
+  }, [])
+
   useEffect(() => {
     let unmounted = false
 
@@ -49,23 +66,7 @@ const useThumbnailEntry = (entry: Entry) => {
         dispatch({ type: 'loading' })
 
         const { itemCount, thumbnail } = await load(entry)
-
-        const success = await (async () => {
-          if (!thumbnail) {
-            return true
-          }
-          try {
-            await new Promise((resolve, reject) => {
-              const img = new Image()
-              img.onload = () => resolve(undefined)
-              img.onerror = (e) => reject(e)
-              img.src = thumbnail
-            })
-            return true
-          } catch (e) {
-            return false
-          }
-        })()
+        const success = await loadImage(thumbnail)
 
         if (unmounted) {
           return
@@ -82,7 +83,7 @@ const useThumbnailEntry = (entry: Entry) => {
       unmounted = true
       window.clearTimeout(timer)
     }
-  }, [entry, load])
+  }, [entry, load, loadImage])
 
   const message = useMemo(() => {
     switch (status) {
