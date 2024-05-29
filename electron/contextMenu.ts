@@ -1,7 +1,7 @@
 import { ActionCreators, register } from '@fiahfy/electron-context-menu'
 import { IpcMainInvokeEvent, app, clipboard, shell } from 'electron'
 import { canReadPaths, readPaths, writePaths } from './utils/clipboard'
-import { postMessage } from './utils/worker'
+import { copyEntries } from './utils/file'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send = (event: IpcMainInvokeEvent, message: any) =>
@@ -165,7 +165,7 @@ const registerContextMenu = (
       accelerator: 'CmdOrCtrl+V',
       click: () => {
         const paths = readPaths()
-        return postMessage('copyEntries', paths, path)
+        return copyEntries(paths, path)
       },
       enabled: !!path && canReadPaths(),
       label: 'Paste',

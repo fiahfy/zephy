@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
-import useThumbnail from '~/hooks/useThumbnail'
 import { Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { isHiddenFile } from '~/utils/file'
 
 type State = {
   itemCount?: number
@@ -33,13 +35,39 @@ const reducer = (_state: State, action: Action) => {
 }
 
 const useThumbnailEntry = (entry: Entry) => {
-  const { load } = useThumbnail()
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: undefined,
     status: 'loading',
     thumbnail: undefined,
   })
+
+  const getPaths = useCallback(
+    async (entry: Entry) => {
+      if (entry.type !== 'directory') {
+        return [entry.path]
+      }
+      try {
+        const entries = await window.electronAPI.getEntries(entry.path)
+        return entries
+          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((entry) => entry.path)
+      } catch (e) {
+        return []
+      }
+    },
+    [shouldShowHiddenFiles],
+  )
+
+  const getThumbnail = useCallback(async (paths: string[]) => {
+    try {
+      return await window.electronAPI.createEntryThumbnailUrl(paths)
+    } catch (e) {
+      return undefined
+    }
+  }, [])
 
   const loadImage = useCallback(async (url?: string) => {
     if (!url) {
@@ -65,7 +93,8 @@ const useThumbnailEntry = (entry: Entry) => {
       ;(async () => {
         dispatch({ type: 'loading' })
 
-        const { itemCount, thumbnail } = await load(entry)
+        const paths = await getPaths(entry)
+        const thumbnail = await getThumbnail(paths)
         const success = await loadImage(thumbnail)
 
         if (unmounted) {
@@ -74,7 +103,7 @@ const useThumbnailEntry = (entry: Entry) => {
 
         dispatch({
           type: success ? 'loaded' : 'error',
-          payload: { itemCount, thumbnail },
+          payload: { itemCount: paths.length, thumbnail },
         })
       })()
     }, 100)
@@ -83,7 +112,7 @@ const useThumbnailEntry = (entry: Entry) => {
       unmounted = true
       window.clearTimeout(timer)
     }
-  }, [entry, load, loadImage])
+  }, [entry, getPaths, getThumbnail, loadImage])
 
   const message = useMemo(() => {
     switch (status) {

@@ -8,10 +8,10 @@ export const canReadPaths = () => clipboard.has(format)
 
 export const readPaths = () => {
   if (!canReadPaths()) {
-    return
+    return []
   }
   const buffer = clipboard.readBuffer(format)
-  const paths = parse(buffer.toString())
+  const paths = parse(buffer.toString()) as string[]
   if (!Array.isArray(paths)) {
     return []
   }

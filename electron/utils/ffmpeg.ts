@@ -30,22 +30,26 @@ const generateThumbnailFilename = async (path: string) => {
 }
 
 const createThumbnail = async (path: string, thumbnailDir: string) => {
-  const thumbnailFilename = await generateThumbnailFilename(path)
-  const thumbnailPath = join(thumbnailDir, thumbnailFilename)
-  const exists = await pathExists(thumbnailPath)
-  if (!exists) {
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg(path)
-        .screenshots({
-          count: 1,
-          folder: thumbnailDir,
-          filename: thumbnailFilename,
-        })
-        .on('error', (e) => reject(e))
-        .on('end', () => resolve())
-    })
+  try {
+    const thumbnailFilename = await generateThumbnailFilename(path)
+    const thumbnailPath = join(thumbnailDir, thumbnailFilename)
+    const exists = await pathExists(thumbnailPath)
+    if (!exists) {
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(path)
+          .screenshots({
+            count: 1,
+            folder: thumbnailDir,
+            filename: thumbnailFilename,
+          })
+          .on('error', (e) => reject(e))
+          .on('end', () => resolve())
+      })
+    }
+    return pathToFileURL(thumbnailPath).href
+  } catch (e) {
+    return undefined
   }
-  return pathToFileURL(thumbnailPath).href
 }
 
 export const createThumbnailUrl = async (
