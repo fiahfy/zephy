@@ -37,6 +37,11 @@ import {
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
+const isEditable = () => {
+  const el = document.activeElement
+  return el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+}
+
 const App = () => {
   const title = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
@@ -46,51 +51,72 @@ const App = () => {
   useTitle(title)
 
   useEffect(() => {
-    const removeListener = window.electronAPI.addMessageListener((message) => {
-      const { type, data } = message
-      switch (type) {
-        case 'addToFavorites':
-          return dispatch(addToFavorites(data.path))
-        case 'back':
-          return dispatch(back())
-        case 'changeSidebarHidden':
-          return dispatch(setSidebarHidden(data.variant, data.hidden))
-        case 'changeViewMode':
-          return dispatch(setCurrentViewMode(data.viewMode))
-        case 'closeOtherTabs':
-          return dispatch(closeOtherTabs(data.tabId))
-        case 'closeTab':
-          return dispatch(closeTab(data?.tabId))
-        case 'copy':
-          return dispatch(copy())
-        case 'duplicateTab':
-          return dispatch(duplicateTab(data.tabId))
-        case 'forward':
-          return dispatch(forward())
-        case 'go':
-          return dispatch(go(data.offset))
-        case 'goToSettings':
-          return dispatch(goToSettings())
-        case 'moveToTrash':
-          return dispatch(moveToTrash(data?.paths))
-        case 'newFolder':
-          return dispatch(newFolder(data.path))
-        case 'newTab':
-          return dispatch(newTab(data.path, data.tabId))
-        case 'open':
-          return dispatch(open(data?.path))
-        case 'removeFromFavorites':
-          return dispatch(removeFromFavorites(data.path))
-        case 'rename':
-          return dispatch(startRenaming(data?.path))
-        case 'paste':
-          return dispatch(paste())
-        case 'selectAll':
-          return dispatch(selectAll())
-        case 'sort':
-          return dispatch(sort(data.orderBy))
-      }
-    })
+    const removeListener = window.electronAPI.addMessageListener(
+      async (message) => {
+        const { type, data } = message
+        switch (type) {
+          case 'addToFavorites':
+            return dispatch(addToFavorites(data.path))
+          case 'back':
+            return dispatch(back())
+          case 'changeSidebarHidden':
+            return dispatch(setSidebarHidden(data.variant, data.hidden))
+          case 'changeViewMode':
+            return dispatch(setCurrentViewMode(data.viewMode))
+          case 'closeOtherTabs':
+            return dispatch(closeOtherTabs(data.tabId))
+          case 'closeTab':
+            return dispatch(closeTab(data?.tabId))
+          case 'copy':
+            if (isEditable() || window.getSelection()?.toString()) {
+              return document.execCommand('copy')
+            } else {
+              return dispatch(copy())
+            }
+          case 'cut':
+            if (isEditable()) {
+              return document.execCommand('cut')
+            } else {
+              // TODO: implement
+              return
+            }
+          case 'duplicateTab':
+            return dispatch(duplicateTab(data.tabId))
+          case 'forward':
+            return dispatch(forward())
+          case 'go':
+            return dispatch(go(data.offset))
+          case 'goToSettings':
+            return dispatch(goToSettings())
+          case 'moveToTrash':
+            return dispatch(moveToTrash(data?.paths))
+          case 'newFolder':
+            return dispatch(newFolder(data.path))
+          case 'newTab':
+            return dispatch(newTab(data.path, data.tabId))
+          case 'open':
+            return dispatch(open(data?.path))
+          case 'removeFromFavorites':
+            return dispatch(removeFromFavorites(data.path))
+          case 'rename':
+            return dispatch(startRenaming(data?.path))
+          case 'paste':
+            if (isEditable()) {
+              return document.execCommand('paste')
+            } else {
+              return dispatch(paste())
+            }
+          case 'selectAll':
+            if (isEditable()) {
+              return document.execCommand('selectall')
+            } else {
+              return dispatch(selectAll())
+            }
+          case 'sort':
+            return dispatch(sort(data.orderBy))
+        }
+      },
+    )
     return () => removeListener()
   }, [dispatch])
 

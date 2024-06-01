@@ -13,7 +13,6 @@ type State = {
   canCloseTab: boolean
   canForward: boolean
   inspectorHidden: boolean
-  isEditable: boolean
   navigatorHidden: boolean
   orderBy:
     | 'name'
@@ -43,7 +42,6 @@ const registerApplicationMenu = (
     canCloseTab: false,
     canForward: false,
     inspectorHidden: false,
-    isEditable: true,
     navigatorHidden: false,
     orderBy: 'name',
     viewMode: 'list',
@@ -130,38 +128,26 @@ const registerApplicationMenu = (
           { role: 'undo' },
           { role: 'redo' },
           { type: 'separator' },
-
-          ...(state.isEditable
-            ? [
-                { role: 'cut' },
-                { role: 'copy' },
-                { role: 'paste' },
-                { role: 'selectAll' },
-              ]
-            : [
-                // TODO: implement
-                {
-                  accelerator: 'CmdOrCtrl+X',
-                  click: () => undefined,
-                  enabled: false,
-                  label: 'Cut',
-                },
-                {
-                  accelerator: 'CmdOrCtrl+C',
-                  click: () => send({ type: 'copy' }),
-                  label: 'Copy',
-                },
-                {
-                  accelerator: 'CmdOrCtrl+V',
-                  click: () => send({ type: 'paste' }),
-                  label: 'Paste',
-                },
-                {
-                  accelerator: 'CmdOrCtrl+A',
-                  click: () => send({ type: 'selectAll' }),
-                  label: 'Select All',
-                },
-              ]),
+          {
+            accelerator: 'CmdOrCtrl+X',
+            click: () => send({ type: 'cut' }),
+            label: 'Cut',
+          },
+          {
+            accelerator: 'CmdOrCtrl+C',
+            click: () => send({ type: 'copy' }),
+            label: 'Copy',
+          },
+          {
+            accelerator: 'CmdOrCtrl+V',
+            click: () => send({ type: 'paste' }),
+            label: 'Paste',
+          },
+          {
+            accelerator: 'CmdOrCtrl+A',
+            click: () => send({ type: 'selectAll' }),
+            label: 'Select All',
+          },
           { type: 'separator' },
           {
             accelerator: 'CmdOrCtrl+F',

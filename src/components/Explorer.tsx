@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { FocusEvent, createElement, useCallback, useMemo } from 'react'
+import { createElement, useCallback, useMemo } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
 import { ExplorerProvider } from '~/contexts/ExplorerContext'
@@ -74,25 +74,11 @@ const Explorer = (props: Props) => {
     [directoryPath, sortOption.orderBy, viewMode, zephySchema],
   )
 
-  const handleBlur = useCallback(
-    () => window.electronAPI.updateApplicationMenu({ isEditable: true }),
-    [],
-  )
-
-  const handleFocus = useCallback((e: FocusEvent) => {
-    const isEditable =
-      e.target instanceof HTMLInputElement ||
-      e.target instanceof HTMLTextAreaElement
-    window.electronAPI.updateApplicationMenu({ isEditable })
-  }, [])
-
   return (
     <ExplorerProvider>
       <Box
-        onBlur={handleBlur}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        onFocus={handleFocus}
         sx={{ height: '100%', ...droppableStyle }}
         {...dropHandlers}
       >

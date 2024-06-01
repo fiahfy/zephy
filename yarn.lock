@@ -555,10 +555,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@fiahfy/electron-context-menu@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@fiahfy/electron-context-menu/-/electron-context-menu-0.1.0.tgz#fdc60427bd7915c4d28da0f623b9cf1066609456"
-  integrity sha512-t65RwN1kApl+UhS9myIAe3uWP/RhCGaZk4U2gD/du0kETPhAhsBxykkRLAsx3ME+upDjGwLXWPMPkLx+HtDV6w==
+"@fiahfy/electron-context-menu@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@fiahfy/electron-context-menu/-/electron-context-menu-0.1.1.tgz#a6704ac3d93d56c15227be38042bc40af4a12db6"
+  integrity sha512-YLbJywv5xUn3ihV10QbVoaXv+3mXb3RJIzVqtO5rG8g/eygGNJ0De97WYsO/S2QIuiONj/8/mHYuRGlmSVBrpg==
 
 "@fiahfy/electron-window@^0.1.0":
   version "0.1.0"
@@ -1054,9 +1054,9 @@
   integrity sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==
 
 "@types/node@*", "@types/node@^20.9.0":
-  version "20.12.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.12.13.tgz#90ed3b8a4e52dd3c5dc5a42dde5b85b74ad8ed88"
-  integrity sha512-gBGeanV41c1L171rR7wjbMiEpEI/l5XFQdLLfhr/REwpgDy/4U8y89+i8kRiLzDyZdOkXh+cRaTetUnCYutoXA==
+  version "20.13.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.13.0.tgz#011a76bc1e71ae9a026dddcfd7039084f752c4b6"
+  integrity sha512-FM6AOb3khNkNIXPnHFDYaHerSv8uN22C91z098AnGccVu+Pcdhi+pNUFDi0iLmPIsVE0JBD0KVS7mzUYt4nRzQ==
   dependencies:
     undici-types "~5.26.4"
 
@@ -2021,9 +2021,9 @@ electron-publish@24.13.1:
     mime "^2.5.2"
 
 electron-to-chromium@^1.4.668:
-  version "1.4.787"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.787.tgz#3eedd0a3b8be2b9e96e21675d399786ad90b99ed"
-  integrity sha512-d0EFmtLPjctczO3LogReyM2pbBiiZbnsKnGF+cdZhsYzHm/A0GV7W94kqzLD8SN4O3f3iHlgLUChqghgyznvCQ==
+  version "1.4.788"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.788.tgz#a3545959d5cfa0a266d3e551386c040be34e7e06"
+  integrity sha512-ubp5+Ev/VV8KuRoWnfP2QF2Bg+O2ZFdb49DiiNbz2VmgkIqrnyYaqIOqj8A6K/3p1xV0QcU5hBQ1+BmB6ot1OA==
 
 electron-window-state@^5.0.3:
   version "5.0.3"
