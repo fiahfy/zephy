@@ -110,10 +110,10 @@ const useExplorerItem = (
     if (!el) {
       return
     }
-    if (previousEditing && !editing) {
+    if (focused && previousEditing && !editing) {
       el.focus()
     }
-  }, [editing, previousEditing, ref])
+  }, [editing, focused, previousEditing, ref])
 
   const draggingContents = useMemo(
     () => (editing ? [] : selected ? selectedContents : [content]),

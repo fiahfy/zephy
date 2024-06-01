@@ -46,7 +46,10 @@ const ExplorerNameTextField = (props: Props) => {
     }
   }, [content.name, content.path, dispatch, name])
 
-  const handleBlur = useCallback(() => finish(), [finish])
+  const handleBlur = useCallback(
+    () => window.setTimeout(() => finish(), 300),
+    [finish],
+  )
 
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
