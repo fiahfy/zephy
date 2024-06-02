@@ -44,14 +44,11 @@ const useThumbnailEntry = (entry: Entry) => {
   })
 
   const getPaths = useCallback(
-    async (entry: Entry) => {
-      if (entry.type !== 'directory') {
-        return [entry.path]
-      }
+    async (path: string) => {
       try {
-        const entries = await window.electronAPI.getEntries(entry.path)
+        const entries = await window.electronAPI.getEntries(path)
         return entries
-          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
+          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((entry) => entry.path)
       } catch (e) {
@@ -89,30 +86,28 @@ const useThumbnailEntry = (entry: Entry) => {
   useEffect(() => {
     let unmounted = false
 
-    const timer = window.setTimeout(() => {
-      ;(async () => {
-        dispatch({ type: 'loading' })
+    ;(async () => {
+      dispatch({ type: 'loading' })
 
-        const paths = await getPaths(entry)
-        const thumbnail = await getThumbnail(paths)
-        const success = await loadImage(thumbnail)
+      const paths =
+        entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
+      const thumbnail = await getThumbnail(paths)
+      const success = await loadImage(thumbnail)
 
-        if (unmounted) {
-          return
-        }
+      if (unmounted) {
+        return
+      }
 
-        dispatch({
-          type: success ? 'loaded' : 'error',
-          payload: { itemCount: paths.length, thumbnail },
-        })
-      })()
-    }, 100)
+      dispatch({
+        type: success ? 'loaded' : 'error',
+        payload: { itemCount: paths.length, thumbnail },
+      })
+    })()
 
     return () => {
       unmounted = true
-      window.clearTimeout(timer)
     }
-  }, [entry, getPaths, getThumbnail, loadImage])
+  }, [entry.path, entry.type, getPaths, getThumbnail, loadImage])
 
   const message = useMemo(() => {
     switch (status) {

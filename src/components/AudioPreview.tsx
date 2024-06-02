@@ -55,7 +55,7 @@ const AudioPreview = (props: Props) => {
     el.volume = volume
   }, [dispatch, loop, volume])
 
-  useEffect(() => setPaused(true), [entry])
+  useEffect(() => setPaused(true), [entry.path])
 
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
 
