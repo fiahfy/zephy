@@ -25,6 +25,8 @@ type HistoryState = {
 type TabState = {
   history: HistoryState
   id: number
+  sorting: SortingState
+  viewMode: ViewModeState
 }
 
 type SidebarState = {
@@ -52,12 +54,8 @@ type WindowState = {
     primary: SidebarState
     secondary: SidebarState
   }
-  // TODO: move to tab state
-  sorting: SortingState
   tabId: number
   tabs: TabState[]
-  // TODO: move to tab state
-  viewMode: ViewModeState
 }
 
 type State = {
@@ -86,10 +84,8 @@ const defaultWindowState: WindowState = {
       width: 256,
     },
   },
-  sorting: {},
   tabId: 0,
   tabs: [],
-  viewMode: {},
 }
 
 const findMissingTabId = (tabs: TabState[]) =>
@@ -132,6 +128,8 @@ export const windowSlice = createSlice({
             index: -1,
           },
           id: tabId,
+          sorting: {},
+          viewMode: {},
         },
         ...window.tabs.slice(tabIndex + 1),
       ]
@@ -238,6 +236,7 @@ export const windowSlice = createSlice({
         },
       }
     },
+    // TODO: specify tabId
     changeDirectory(
       state,
       action: PayloadAction<{
@@ -285,6 +284,7 @@ export const windowSlice = createSlice({
         },
       }
     },
+    // TODO: specify tabId
     go(state, action: PayloadAction<{ id: number; offset: number }>) {
       const { id, offset } = action.payload
       const window = state[id]
@@ -316,6 +316,7 @@ export const windowSlice = createSlice({
         },
       }
     },
+    // TODO: specify tabId
     setScrollTop(
       state,
       action: PayloadAction<{ id: number; scrollTop: number }>,
@@ -348,6 +349,7 @@ export const windowSlice = createSlice({
         },
       }
     },
+    // TODO: specify tabId
     sort(
       state,
       action: PayloadAction<{
@@ -361,24 +363,73 @@ export const windowSlice = createSlice({
       if (!window) {
         return state
       }
-      const option = window.sorting[directoryPath]
+      const tab = window.tabs.find((tab) => tab.id === window.tabId)
+      if (!tab) {
+        return state
+      }
+      const option = tab.sorting[directoryPath]
       const newOrder =
         option && option.orderBy === orderBy
           ? option.order === 'desc'
             ? 'asc'
             : 'desc'
           : defaultOrders[orderBy as keyof typeof defaultOrders]
+      const tabs = window.tabs.map((tab) =>
+        tab.id === window.tabId
+          ? {
+              ...tab,
+              sorting: {
+                ...tab.sorting,
+                [directoryPath]: {
+                  order: newOrder,
+                  orderBy,
+                },
+              },
+            }
+          : tab,
+      )
       return {
         ...state,
         [id]: {
           ...window,
-          sorting: {
-            ...window.sorting,
-            [directoryPath]: {
-              order: newOrder,
-              orderBy,
-            },
-          },
+          tabs,
+        },
+      }
+    },
+    // TODO: specify tabId
+    setViewMode(
+      state,
+      action: PayloadAction<{
+        id: number
+        directoryPath: string
+        viewMode: ViewMode
+      }>,
+    ) {
+      const { id, directoryPath, viewMode } = action.payload
+      const window = state[id]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs.find((tab) => tab.id === window.tabId)
+      if (!tab) {
+        return state
+      }
+      const tabs = window.tabs.map((tab) =>
+        tab.id === window.tabId
+          ? {
+              ...tab,
+              viewMode: {
+                ...tab.viewMode,
+                [directoryPath]: viewMode,
+              },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [id]: {
+          ...window,
+          tabs,
         },
       }
     },
@@ -436,30 +487,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    setViewMode(
-      state,
-      action: PayloadAction<{
-        id: number
-        directoryPath: string
-        viewMode: ViewMode
-      }>,
-    ) {
-      const { id, directoryPath, viewMode } = action.payload
-      const window = state[id]
-      if (!window) {
-        return state
-      }
-      return {
-        ...state,
-        [id]: {
-          ...window,
-          viewMode: {
-            ...window.viewMode,
-            [directoryPath]: viewMode,
-          },
-        },
-      }
-    },
   },
 })
 
@@ -490,16 +517,6 @@ export const selectSidebar = createSelector(
   (currentWindow) => currentWindow.sidebar,
 )
 
-export const selectSorting = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.sorting,
-)
-
-export const selectViewMode = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.viewMode,
-)
-
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
 export const selectTabByTabId = createSelector(
@@ -508,6 +525,9 @@ export const selectTabByTabId = createSelector(
   (tabs, tabId) =>
     tabs.find((tab) => tab.id == tabId) ?? {
       history: { histories: [], index: -1 },
+      id: 0,
+      sorting: {},
+      viewMode: {},
     },
 )
 
@@ -548,20 +568,23 @@ export const selectScrollTopByTabId = createSelector(
   (history) => history.scrollTop,
 )
 
-const selectDirectoryPath = (_state: AppState, directoryPath: string) =>
-  directoryPath
+const selectDirectoryPath = (
+  _state: AppState,
+  _tabId: number,
+  directoryPath: string,
+) => directoryPath
 
-export const selectSortOptionByDirectoryPath = createSelector(
-  selectSorting,
+export const selectSortOptionByTabIdAndDirectoryPath = createSelector(
+  selectTabByTabId,
   selectDirectoryPath,
-  (sorting, directoryPath) =>
-    sorting[directoryPath] ?? ({ order: 'asc', orderBy: 'name' } as const),
+  (tab, directoryPath) =>
+    tab.sorting[directoryPath] ?? ({ order: 'asc', orderBy: 'name' } as const),
 )
 
-export const selectViewModeByDirectoryPath = createSelector(
-  selectViewMode,
+export const selectViewModeByTabIdAndDirectoryPath = createSelector(
+  selectTabByTabId,
   selectDirectoryPath,
-  (viewMode, directoryPath) => viewMode[directoryPath] ?? 'list',
+  (tab, directoryPath) => tab.viewMode[directoryPath] ?? 'list',
 )
 
 const selectSidebarVariant = (
@@ -618,10 +641,18 @@ export const selectCurrentTitle = createSelector(
 )
 
 export const selectCurrentSortOption = (state: AppState) =>
-  selectSortOptionByDirectoryPath(state, selectCurrentDirectoryPath(state))
+  selectSortOptionByTabIdAndDirectoryPath(
+    state,
+    selectCurrentTabId(state),
+    selectCurrentDirectoryPath(state),
+  )
 
 export const selectCurrentViewMode = (state: AppState) =>
-  selectViewModeByDirectoryPath(state, selectCurrentDirectoryPath(state))
+  selectViewModeByTabIdAndDirectoryPath(
+    state,
+    selectCurrentTabId(state),
+    selectCurrentDirectoryPath(state),
+  )
 
 export const newWindow =
   (directoryPath: string): AppThunk =>
@@ -695,12 +726,17 @@ export const changeDirectory =
     const id = selectWindowId(getState())
     const tabId = selectCurrentTabId(getState())
     const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
-    const currentViewMode = selectViewModeByDirectoryPath(
+    const currentViewMode = selectViewModeByTabIdAndDirectoryPath(
       getState(),
+      tabId,
       currentDirectoryPath,
     )
     const loading = selectLoadingByTabId(getState(), tabId)
-    const viewMode = selectViewModeByDirectoryPath(getState(), directoryPath)
+    const viewMode = selectViewModeByTabIdAndDirectoryPath(
+      getState(),
+      tabId,
+      directoryPath,
+    )
     if (loading) {
       return
     }

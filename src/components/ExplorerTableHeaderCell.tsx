@@ -4,7 +4,7 @@ import { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDirectoryPathByTabId,
-  selectSortOptionByDirectoryPath,
+  selectSortOptionByTabIdAndDirectoryPath,
   sort,
 } from '~/store/window'
 
@@ -25,7 +25,7 @@ const ExplorerTableHeaderCell = (props: Props) => {
     selectDirectoryPathByTabId(state, tabId),
   )
   const sortOption = useAppSelector((state) =>
-    selectSortOptionByDirectoryPath(state, directoryPath),
+    selectSortOptionByTabIdAndDirectoryPath(state, tabId, directoryPath),
   )
   const dispatch = useAppDispatch()
 

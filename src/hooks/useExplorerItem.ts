@@ -17,9 +17,9 @@ import {
   rangeSelect,
   select,
   selectContentsByTabId,
-  selectEditingByPath,
-  selectFocusedByPath,
-  selectSelectedByPath,
+  selectEditingByTabIdAndPath,
+  selectFocusedByTabIdAndPath,
+  selectSelectedByTabIdAndPath,
   selectSelectedContentsByTabId,
   startEditing,
 } from '~/store/explorer'
@@ -41,16 +41,16 @@ const useExplorerItem = (
     selectDirectoryPathByTabId(state, tabId),
   )
   const editing = useAppSelector((state) =>
-    selectEditingByPath(state, tabId, content.path),
+    selectEditingByTabIdAndPath(state, tabId, content.path),
   )
   const favorite = useAppSelector((state) =>
     selectFavoriteByPath(selectFavorite(state), content.path),
   )
   const focused = useAppSelector((state) =>
-    selectFocusedByPath(state, tabId, content.path),
+    selectFocusedByTabIdAndPath(state, tabId, content.path),
   )
   const selected = useAppSelector((state) =>
-    selectSelectedByPath(state, tabId, content.path),
+    selectSelectedByTabIdAndPath(state, tabId, content.path),
   )
   const selectedContents = useAppSelector((state) =>
     selectSelectedContentsByTabId(state, tabId),

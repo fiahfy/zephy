@@ -17,7 +17,7 @@ import {
   selectCurrentTabId,
   selectDirectoryPathByTabId,
   selectHistoryByTabId,
-  selectSortOptionByDirectoryPath,
+  selectSortOptionByTabIdAndDirectoryPath,
   selectTabs,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
@@ -370,7 +370,7 @@ export const selectEditingByTabId = createSelector(
   (explorer) => explorer.editing,
 )
 
-export const selectEditingByPath = createSelector(
+export const selectEditingByTabIdAndPath = createSelector(
   selectEditingByTabId,
   selectPath,
   (editing, path) => selectEditing(editing, path),
@@ -384,7 +384,7 @@ export const selectFocusedByTabId = createSelector(
   (explorer) => explorer.focused,
 )
 
-export const selectFocusedByPath = createSelector(
+export const selectFocusedByTabIdAndPath = createSelector(
   selectFocusedByTabId,
   selectPath,
   (focused, path) => selectFocused(focused, path),
@@ -398,7 +398,7 @@ export const selectSelectedByTabId = createSelector(
   (explorer) => explorer.selected,
 )
 
-export const selectSelectedByPath = createSelector(
+export const selectSelectedByTabIdAndPath = createSelector(
   selectSelectedByTabId,
   selectPath,
   (selected, path) => selectSelected(selected, path),
@@ -408,8 +408,9 @@ export const selectContentsByTabId = createSelector(
   selectEntriesByTabId,
   selectQueryByTabId,
   (state: AppState, tabId: number) =>
-    selectSortOptionByDirectoryPath(
+    selectSortOptionByTabIdAndDirectoryPath(
       state,
+      tabId,
       selectDirectoryPathByTabId(state, tabId),
     ),
   selectRating,

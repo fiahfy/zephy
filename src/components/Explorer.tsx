@@ -8,8 +8,8 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { blur, unselectAll } from '~/store/explorer'
 import {
   selectDirectoryPathByTabId,
-  selectSortOptionByDirectoryPath,
-  selectViewModeByDirectoryPath,
+  selectSortOptionByTabIdAndDirectoryPath,
+  selectViewModeByTabIdAndDirectoryPath,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
@@ -25,10 +25,10 @@ const Explorer = (props: Props) => {
     selectDirectoryPathByTabId(state, tabId),
   )
   const sortOption = useAppSelector((state) =>
-    selectSortOptionByDirectoryPath(state, directoryPath),
+    selectSortOptionByTabIdAndDirectoryPath(state, tabId, directoryPath),
   )
   const viewMode = useAppSelector((state) =>
-    selectViewModeByDirectoryPath(state, directoryPath),
+    selectViewModeByTabIdAndDirectoryPath(state, tabId, directoryPath),
   )
   const dispatch = useAppDispatch()
 
