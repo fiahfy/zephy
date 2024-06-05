@@ -457,7 +457,7 @@ export const selectSelectedContentsByTabId = createSelector(
     ),
 )
 
-/* for current tab */
+// selectCurrentTabId
 
 export const selectCurrentExplorer = (state: AppState) =>
   selectExplorerByTabId(state, selectCurrentTabId(state))

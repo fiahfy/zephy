@@ -236,7 +236,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    // TODO: specify tabId
     changeDirectory(
       state,
       action: PayloadAction<{
@@ -284,7 +283,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    // TODO: specify tabId
     go(state, action: PayloadAction<{ id: number; offset: number }>) {
       const { id, offset } = action.payload
       const window = state[id]
@@ -316,7 +314,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    // TODO: specify tabId
     setScrollTop(
       state,
       action: PayloadAction<{ id: number; scrollTop: number }>,
@@ -349,7 +346,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    // TODO: specify tabId
     sort(
       state,
       action: PayloadAction<{
@@ -396,7 +392,6 @@ export const windowSlice = createSlice({
         },
       }
     },
-    // TODO: specify tabId
     setViewMode(
       state,
       action: PayloadAction<{
@@ -502,19 +497,11 @@ export const selectCurrentWindow = createSelector(
   (window, windowId) => window[windowId] ?? defaultWindowState,
 )
 
-export const selectCurrentTabId = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.tabId,
-)
+// selectTabs
 
 export const selectTabs = createSelector(
   selectCurrentWindow,
   (currentWindow) => currentWindow.tabs,
-)
-
-export const selectSidebar = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.sidebar,
 )
 
 const selectTabId = (_state: AppState, tabId: number) => tabId
@@ -587,6 +574,13 @@ export const selectViewModeByTabIdAndDirectoryPath = createSelector(
   (tab, directoryPath) => tab.viewMode[directoryPath] ?? 'list',
 )
 
+// selectSidebar
+
+export const selectSidebar = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.sidebar,
+)
+
 const selectSidebarVariant = (
   _state: AppState,
   variant: 'primary' | 'secondary',
@@ -604,7 +598,12 @@ export const selectSidebarWidthByVariant = createSelector(
   (sidebar, variant) => sidebar[variant].width,
 )
 
-/* for current tab */
+// selectCurrentTabId
+
+export const selectCurrentTabId = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabId,
+)
 
 export const selectCurrentTab = (state: AppState) =>
   selectTabByTabId(state, selectCurrentTabId(state))
@@ -815,6 +814,16 @@ export const sort =
     dispatch(updateApplicationMenu())
   }
 
+export const setCurrentViewMode =
+  (viewMode: ViewMode): AppThunk =>
+  async (dispatch, getState) => {
+    const { setViewMode } = windowSlice.actions
+    const id = selectWindowId(getState())
+    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
+    dispatch(updateApplicationMenu())
+  }
+
 export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
@@ -830,16 +839,6 @@ export const setSidebarWidth =
     const { setSidebarWidth } = windowSlice.actions
     const id = selectWindowId(getState())
     dispatch(setSidebarWidth({ id, variant, width }))
-  }
-
-export const setCurrentViewMode =
-  (viewMode: ViewMode): AppThunk =>
-  async (dispatch, getState) => {
-    const { setViewMode } = windowSlice.actions
-    const id = selectWindowId(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-    dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
-    dispatch(updateApplicationMenu())
   }
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
