@@ -10,7 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
     ipcRenderer.on('sendMessage', listener)
-    return () => ipcRenderer.removeListener('sendMessage', listener)
+    return () => ipcRenderer.off('sendMessage', listener)
   },
   copyEntries: (paths: string[]) => ipcRenderer.invoke('copyEntries', paths),
   createDirectory: (directoryPath: string) =>

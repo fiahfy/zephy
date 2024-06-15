@@ -1,10 +1,13 @@
 import { createManager as createWindowManager } from '@fiahfy/electron-window'
 import { BrowserWindow, BrowserWindowConstructorOptions, app } from 'electron'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
 import registerHandlers from './handlers'
 import createWatcher from './watcher'
+
+const dirPath = dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
 //
@@ -13,15 +16,18 @@ import createWatcher from './watcher'
 // │ │
 // │ ├─┬ dist-electron
 // │ │ ├── main.js
-// │ │ └── preload.js
+// │ │ └── preload.mjs
 // │
-process.env.DIST = join(__dirname, '../dist')
-process.env.VITE_PUBLIC = app.isPackaged
-  ? process.env.DIST
-  : join(process.env.DIST, '../public')
+process.env.APP_ROOT = join(dirPath, '..')
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
+export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
+export const MAIN_DIST = join(process.env.APP_ROOT, 'dist-electron')
+export const RENDERER_DIST = join(process.env.APP_ROOT, 'dist')
+
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+  ? join(process.env.APP_ROOT, 'public')
+  : RENDERER_DIST
 
 const watcher = createWatcher()
 
@@ -32,7 +38,7 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
     minWidth: 400,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
+      preload: join(dirPath, 'preload.mjs'),
       webSecurity: !VITE_DEV_SERVER_URL,
     },
   })
@@ -43,7 +49,7 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
       browserWindow.webContents.openDevTools()
     })
   } else {
-    browserWindow.loadFile(join(process.env.DIST, 'index.html'))
+    browserWindow.loadFile(join(RENDERER_DIST, 'index.html'))
   }
 
   watcher.handle(browserWindow)

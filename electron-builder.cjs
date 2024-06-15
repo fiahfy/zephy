@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   appId: 'net.fiahfy.zephy',
   asar: true,
   directories: {

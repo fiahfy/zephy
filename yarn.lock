@@ -675,7 +675,7 @@
   resolved "https://registry.yarnpkg.com/@jridgewell/set-array/-/set-array-1.2.1.tgz#558fb6472ed16a4c850b889530e6b36438c49280"
   integrity sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==
 
-"@jridgewell/sourcemap-codec@^1.4.10", "@jridgewell/sourcemap-codec@^1.4.14":
+"@jridgewell/sourcemap-codec@^1.4.10", "@jridgewell/sourcemap-codec@^1.4.14", "@jridgewell/sourcemap-codec@^1.4.15":
   version "1.4.15"
   resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz#d7c6e6755c78567a951e04ab52ef0fd26de59f32"
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
@@ -857,6 +857,13 @@
   integrity sha512-lpA3RZ9PdIG7qqhEfv79tBffNaoDuukFDrmhLqg9ifv99u/ehn+lOg30x2zmhf8AQqQUZaMk/B9fZraQ6/acDQ==
   dependencies:
     slash "^4.0.0"
+
+"@rollup/plugin-esm-shim@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-esm-shim/-/plugin-esm-shim-0.1.7.tgz#8633045b3837e265dde250e405c62e21d03cd4a4"
+  integrity sha512-Du+ZohybNzcg9H6iuMZwrjQo7dYetvm6E5rxFf13cUHa7XVZ8Lqz+HTKgwNekLla2wXZsNbv9dhDMW6FotwbSg==
+  dependencies:
+    magic-string "^0.30.3"
 
 "@rollup/rollup-android-arm-eabi@4.18.0":
   version "4.18.0"
@@ -3321,6 +3328,13 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+magic-string@^0.30.3:
+  version "0.30.10"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.10.tgz#123d9c41a0cb5640c892b041d4cfb3bd0aa4b39e"
+  integrity sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==
+  dependencies:
+    "@jridgewell/sourcemap-codec" "^1.4.15"
+
 matcher@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/matcher/-/matcher-3.0.0.tgz#bd9060f4c5b70aa8041ccc6f80368760994f30ca"
@@ -4448,10 +4462,10 @@ vite-plugin-electron-renderer@^0.14.5:
   resolved "https://registry.yarnpkg.com/vite-plugin-electron-renderer/-/vite-plugin-electron-renderer-0.14.5.tgz#2ac36f31773cb23a09353fabb6fb788bdad94f50"
   integrity sha512-EQ7ORuPp8vFPCqfuGnVo7d36fXS0IFH4/RUlKb1drseix3TQEPcgwEuFADdXBxRgqMp70njz/1m0kdf5lEsm8w==
 
-vite-plugin-electron@^0.15.6:
-  version "0.15.6"
-  resolved "https://registry.yarnpkg.com/vite-plugin-electron/-/vite-plugin-electron-0.15.6.tgz#5483393ac50be3bba4b741c77206a9313393135f"
-  integrity sha512-sbjzNiH8N6Was67oIUgglW6tefahkiCTItM3MsdOAQ0xhUMxizeQMF9DhSvEBwvLvUGKYboIdIYskSchV7Akrg==
+vite-plugin-electron@^0.28.7:
+  version "0.28.7"
+  resolved "https://registry.yarnpkg.com/vite-plugin-electron/-/vite-plugin-electron-0.28.7.tgz#fb2c673838c5546981c8e1238e781680d50a24fb"
+  integrity sha512-wsiFUY9AN/HBwn6Jc+i7ehNQISAzUzy6p7NvgJJB1jKCNvZ7PyYlZloH0m3LWFkC+/dFDRGwW89kyAafRRPsLA==
 
 vite-tsconfig-paths@^4.3.2:
   version "4.3.2"

@@ -1,1 +1,1 @@
-module.exports = require('@fiahfy/prettier-config')
+export { default } from '@fiahfy/prettier-config'

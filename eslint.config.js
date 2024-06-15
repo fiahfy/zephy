@@ -1,5 +1,7 @@
-module.exports = [
-  ...require('@fiahfy/eslint-config-react'),
+import config from '@fiahfy/eslint-config-react'
+
+export default [
+  ...config,
   {
     ignores: ['dist', 'dist-electron'],
   },
