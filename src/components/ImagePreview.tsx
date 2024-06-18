@@ -49,7 +49,12 @@ const ImagePreview = (props: Props) => {
       {status === 'loaded' ? (
         <img
           src={entry.url}
-          style={{ minHeight: 128, objectFit: 'contain', width: '100%' }}
+          style={{
+            backgroundColor: 'black',
+            minHeight: 128,
+            objectFit: 'contain',
+            width: '100%',
+          }}
         />
       ) : (
         <EmptyPreview message={message} />

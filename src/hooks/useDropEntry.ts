@@ -42,7 +42,7 @@ const useDropEntry = (entry: Entry) => {
                   theme.palette.primary.main,
                   theme.palette.action.activatedOpacity,
                 ),
-                borderRadius: (theme) => theme.spacing(0.5),
+                borderRadius: theme.spacing(0.5),
                 content: '""',
                 inset: 0,
                 pointerEvents: 'none',

@@ -114,8 +114,10 @@ const AudioPreview = (props: Props) => {
         onContextMenu={handleContextMenu}
         sx={{
           aspectRatio: '16 / 9',
+          backgroundColor: 'black',
           display: 'flex',
           flexDirection: 'column',
+          minHeight: 128,
         }}
       >
         <Box
@@ -128,7 +130,7 @@ const AudioPreview = (props: Props) => {
             justifyContent: 'center',
           }}
         >
-          <Icon fontSize="large" />
+          <Icon fontSize="large" sx={{ color: 'white' }} />
         </Box>
         <audio
           controls

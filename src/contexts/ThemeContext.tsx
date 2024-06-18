@@ -1,8 +1,10 @@
-import { CssBaseline, Theme, useMediaQuery } from '@mui/material'
 import {
+  CssBaseline,
   ThemeProvider as MuiThemeProvider,
+  Theme,
   createTheme,
-} from '@mui/material/styles'
+  useMediaQuery,
+} from '@mui/material'
 import { ReactNode, createContext, useEffect, useMemo } from 'react'
 import { useAppSelector } from '~/store'
 import { selectTheme } from '~/store/settings'
