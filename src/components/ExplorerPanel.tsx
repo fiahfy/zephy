@@ -105,7 +105,7 @@ const ExplorerPanel = () => {
     ): { [path: string]: Entry } => {
       return {
         [entry.path]: entry,
-        ...(entry.type === 'directory' ? entry.children ?? [] : []).reduce(
+        ...(entry.type === 'directory' ? (entry.children ?? []) : []).reduce(
           reducer,
           acc,
         ),
