@@ -31,7 +31,7 @@ export default defineConfig({
     electron({
       main: {
         // Shortcut of `build.lib.entry`.
-        entry: ['electron/main.ts', 'electron/worker.ts'],
+        entry: 'electron/main.ts',
         vite: {
           build: {
             rollupOptions: {
