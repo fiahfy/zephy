@@ -15,6 +15,6 @@ jobs:
           node-version: 20
       - run: yarn
       - run: yarn build
-      - run: yarn release -lmw -c.snap.publish=github
+      - run: yarn release -mw
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
