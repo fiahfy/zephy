@@ -57,9 +57,9 @@ export const WatcherProvider = (props: Props) => {
           directoryPath,
           filePath,
         })
-        Object.values(registry).forEach(({ callback }) =>
-          callback(eventType, directoryPath, filePath),
-        )
+        for (const { callback } of Object.values(registry)) {
+          callback(eventType, directoryPath, filePath)
+        }
       },
     )
   }, [directoryPaths, dispatch, registry])

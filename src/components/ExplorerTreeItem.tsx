@@ -52,30 +52,25 @@ const ExplorerTreeItem = (props: Props) => {
       {...dragHandlers}
       {...dropHandlers}
     >
-      {entry.type === 'directory' && (
-        <>
-          {entry.children ? (
-            entry.children
-              .filter(
-                (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-              )
-              .sort((a, b) => a.name.localeCompare(b.name))
-              // limit entry size for performance issue
-              .slice(0, 100)
-              .map((entry) => (
-                <ExplorerTreeItem entry={entry} key={entry.path} />
-              ))
-          ) : (
-            <EntryTreeItem
-              icon={
-                <CircularProgress size={16} sx={{ flexShrink: 0, p: 0.25 }} />
-              }
-              itemId={`${entry.path}<loader>`}
-              label="Loading items..."
-            />
-          )}
-        </>
-      )}
+      {entry.type === 'directory' &&
+        (entry.children ? (
+          entry.children
+            .filter(
+              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
+            )
+            .sort((a, b) => a.name.localeCompare(b.name))
+            // limit entry size for performance issue
+            .slice(0, 100)
+            .map((entry) => <ExplorerTreeItem entry={entry} key={entry.path} />)
+        ) : (
+          <EntryTreeItem
+            icon={
+              <CircularProgress size={16} sx={{ flexShrink: 0, p: 0.25 }} />
+            }
+            itemId={`${entry.path}<loader>`}
+            label="Loading items..."
+          />
+        ))}
     </EntryTreeItem>
   )
 }

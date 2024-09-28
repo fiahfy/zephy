@@ -649,10 +649,10 @@ export const moveToTrash =
     const selected = selectSelectedByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
     await window.electronAPI.moveEntriesToTrash(targetPaths)
-    targetPaths.forEach((path) => {
+    for (const path of targetPaths) {
       dispatch(removeFromFavorites(path))
       dispatch(removeRating({ path }))
-    })
+    }
     dispatch(unselect({ tabId, paths: targetPaths }))
   }
 
@@ -724,7 +724,7 @@ export const handle =
   async (dispatch, getState) => {
     const { addEntries, removeEntries } = explorerSlice.actions
     const tabs = selectTabs(getState())
-    tabs.forEach(async (_, tabId) => {
+    for (const { id: tabId } of tabs) {
       const history = selectHistoryByTabId(getState(), tabId)
       const currentDirectoryPath = history.directoryPath
       if (directoryPath !== currentDirectoryPath) {
@@ -739,5 +739,5 @@ export const handle =
         case 'delete':
           return dispatch(removeEntries({ tabId, paths: [filePath] }))
       }
-    })
+    }
   }

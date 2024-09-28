@@ -61,14 +61,14 @@ const createWatcher = () => {
     filePath: string,
   ) => {
     const windows = BrowserWindow.getAllWindows()
-    windows.forEach((window) => {
+    for (const window of windows) {
       window.webContents.send(
         'notifyToWatcher',
         eventType,
         directoryPath,
         filePath,
       )
-    })
+    }
   }
 
   ipcMain.handle(

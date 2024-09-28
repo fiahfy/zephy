@@ -186,7 +186,7 @@ export const getRootEntry = async (
       .slice(0, i + 1)
       .reduce(
         (acc, dirname) =>
-          acc && acc.children
+          acc?.children
             ? (acc.children.find(
                 (entry) => entry.type === 'directory' && entry.name === dirname,
               ) as Directory)

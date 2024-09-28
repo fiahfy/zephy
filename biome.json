@@ -13,13 +13,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "complexity": {
-        "noBannedTypes": "off",
-        "noForEach": "off",
-        "noUselessFragments": "off",
-        "useLiteralKeys": "off",
-        "useOptionalChain": "off"
-      },
       "correctness": {
         "noFlatMapIdentity": "off",
         "useExhaustiveDependencies": "off"
