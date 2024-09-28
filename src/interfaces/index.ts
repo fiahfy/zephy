@@ -7,7 +7,6 @@ import { Operations as ContextMenuOperations } from '@fiahfy/electron-context-me
 import { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type IElectronAPI = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMessageListener: (callback: (message: any) => void) => () => void
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
@@ -43,7 +42,6 @@ export type IElectronAPI = {
 } & ContextMenuOperations &
   WindowOperations<{ directoryPath: string }>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApplicationMenuParams = any
 
 export type Settings = {

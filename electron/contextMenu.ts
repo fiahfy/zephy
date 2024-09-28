@@ -3,7 +3,6 @@ import { IpcMainInvokeEvent, app, clipboard, shell } from 'electron'
 import { canReadPaths, readPaths, writePaths } from './utils/clipboard'
 import { copyEntries } from './utils/file'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send = (event: IpcMainInvokeEvent, message: any) =>
   event.sender.send('sendMessage', message)
 

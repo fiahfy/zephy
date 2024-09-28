@@ -2,7 +2,6 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { IconButton, Tab } from '@mui/material'
 import { useCallback } from 'react'
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {}
 
 const TabBarAddItem = (props: Props) => {

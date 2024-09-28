@@ -15,7 +15,6 @@ const getPaths = (e: DragEvent) => {
     // noop
   }
   return Array.from(e.dataTransfer.files).map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (file) => (file as any).path,
   ) as string[]
 }

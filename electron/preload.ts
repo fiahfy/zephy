@@ -4,9 +4,7 @@ import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ApplicationMenuParams } from './applicationMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMessageListener: (callback: (message: any) => void) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
     ipcRenderer.on('sendMessage', listener)

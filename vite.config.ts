@@ -9,7 +9,6 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 // @see https://twitter.com/fiahfy/status/1801860274736996514
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface Process {
       electronApp: import('node:child_process').ChildProcess
