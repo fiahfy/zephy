@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { WatcherContext } from '~/contexts/WatcherContext'
+import WatcherContext from '~/contexts/WatcherContext'
 
 const useWatcher = () => {
   const context = useContext(WatcherContext)

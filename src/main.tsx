@@ -5,11 +5,11 @@ import '@fontsource/roboto/700.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '~/App'
-import { DragGhostProvider } from '~/contexts/DragGhostContext'
-import { StoreProvider } from '~/contexts/StoreContext'
-import { ThemeProvider } from '~/contexts/ThemeContext'
-import { TrafficLightProvider } from '~/contexts/TrafficLightContext'
-import { WatcherProvider } from '~/contexts/WatcherContext'
+import DragGhostProvider from '~/providers/DragGhostProvider'
+import StoreProvider from '~/providers/StoreProvider'
+import ThemeProvider from '~/providers/ThemeProvider'
+import TrafficLightProvider from '~/providers/TrafficLightProvider'
+import WatcherProvider from '~/providers/WatcherProvider'
 
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -12,7 +12,7 @@ import { setWindowId } from '~/store/windowId'
 
 type Props = { children: ReactNode }
 
-export const StoreProvider = (props: Props) => {
+const StoreProvider = (props: Props) => {
   const { children } = props
 
   const { dispatch } = store
@@ -63,3 +63,5 @@ export const StoreProvider = (props: Props) => {
     </Provider>
   )
 }
+
+export default StoreProvider

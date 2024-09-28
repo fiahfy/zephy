@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { ExplorerContext } from '~/contexts/ExplorerContext'
+import ExplorerContext from '~/contexts/ExplorerContext'
 
 const useExplorer = () => {
   const context = useContext(ExplorerContext)

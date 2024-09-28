@@ -1,22 +1,9 @@
-import {
-  type ReactNode,
-  type RefObject,
-  createContext,
-  useCallback,
-  useRef,
-  useState,
-} from 'react'
-
-export const DragGhostContext = createContext<
-  | {
-      render: (node: ReactNode) => RefObject<HTMLDivElement>
-    }
-  | undefined
->(undefined)
+import { type ReactNode, useCallback, useRef, useState } from 'react'
+import DragGhostContext from '~/contexts/DragGhostContext'
 
 type Props = { children: ReactNode }
 
-export const DragGhostProvider = (props: Props) => {
+const DragGhostProvider = (props: Props) => {
   const { children } = props
 
   const [node, setNode] = useState<ReactNode>()
@@ -38,3 +25,5 @@ export const DragGhostProvider = (props: Props) => {
     </DragGhostContext.Provider>
   )
 }
+
+export default DragGhostProvider

@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { TrafficLightContext } from '~/contexts/TrafficLightContext'
+import TrafficLightContext from '~/contexts/TrafficLightContext'
 
 const useTrafficLight = () => {
   const context = useContext(TrafficLightContext)

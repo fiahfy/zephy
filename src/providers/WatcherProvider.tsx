@@ -1,30 +1,15 @@
 import {
   type ReactNode,
-  createContext,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from 'react'
-
-type EventType = 'create' | 'update' | 'delete'
-
-type Callback = (
-  eventType: EventType,
-  directoryPath: string,
-  filePath: string,
-) => void
-
-export const WatcherContext = createContext<
-  | {
-      watch: (key: string, directoryPaths: string[], callback: Callback) => void
-    }
-  | undefined
->(undefined)
+import { type Callback, WatcherContext } from '~/contexts/WatcherContext'
 
 type Props = { children: ReactNode }
 
-export const WatcherProvider = (props: Props) => {
+const WatcherProvider = (props: Props) => {
   const { children } = props
 
   const [registry, setRegistry] = useState<{
@@ -79,3 +64,5 @@ export const WatcherProvider = (props: Props) => {
     <WatcherContext.Provider value={value}>{children}</WatcherContext.Provider>
   )
 }
+
+export default WatcherProvider

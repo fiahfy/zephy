@@ -1,24 +1,17 @@
 import {
   CssBaseline,
   ThemeProvider as MuiThemeProvider,
-  type Theme,
   createTheme,
   useMediaQuery,
 } from '@mui/material'
-import { type ReactNode, createContext, useEffect, useMemo } from 'react'
+import { type ReactNode, useEffect, useMemo } from 'react'
+import ThemeContext from '~/contexts/ThemeContext'
 import { useAppSelector } from '~/store'
 import { selectTheme } from '~/store/settings'
 
-export const ThemeContext = createContext<
-  | {
-      theme: Theme
-    }
-  | undefined
->(undefined)
-
 type Props = { children: ReactNode }
 
-export const ThemeProvider = (props: Props) => {
+const ThemeProvider = (props: Props) => {
   const { children } = props
 
   const themeSetting = useAppSelector(selectTheme)
@@ -117,3 +110,5 @@ export const ThemeProvider = (props: Props) => {
     </ThemeContext.Provider>
   )
 }
+
+export default ThemeProvider

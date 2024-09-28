@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { DragGhostContext } from '~/contexts/DragGhostContext'
+import DragGhostContext from '~/contexts/DragGhostContext'
 
 const useDragGhost = () => {
   const context = useContext(DragGhostContext)
