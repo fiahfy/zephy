@@ -1,12 +1,12 @@
+import { createHash } from 'node:crypto'
+import { stat } from 'node:fs/promises'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg from 'fluent-ffmpeg'
 import { pathExists } from 'fs-extra'
 import mime from 'mime'
-import { createHash } from 'node:crypto'
-import { stat } from 'node:fs/promises'
-import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
 
 // @see https://stackoverflow.com/q/63106834
 ffmpeg.setFfmpegPath(ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked'))

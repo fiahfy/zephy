@@ -1,7 +1,7 @@
+import path from 'node:path'
 import alias from '@rollup/plugin-alias'
 import esmShim from '@rollup/plugin-esm-shim'
 import react from '@vitejs/plugin-react'
-import path from 'node:path'
 import { defineConfig } from 'vite'
 import { startup } from 'vite-plugin-electron'
 import electron from 'vite-plugin-electron/simple'

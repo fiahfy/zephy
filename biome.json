@@ -20,7 +20,7 @@
     "indentStyle": "space"
   },
   "organizeImports": {
-    "enabled": false
+    "enabled": true
   },
   "javascript": {
     "formatter": {

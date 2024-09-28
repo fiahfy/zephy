@@ -1,8 +1,8 @@
-import { copy, move, pathExists } from 'fs-extra'
 import type { Dirent, Stats } from 'node:fs'
 import { mkdir, readdir, rename, stat } from 'node:fs/promises'
 import { basename, dirname, join, parse, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { copy, move, pathExists } from 'fs-extra'
 
 type File = {
   name: string

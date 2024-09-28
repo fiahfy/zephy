@@ -1,6 +1,6 @@
+import { dirname } from 'node:path'
 import chokidar, { type FSWatcher } from 'chokidar'
 import { BrowserWindow, type IpcMainInvokeEvent, ipcMain } from 'electron'
-import { dirname } from 'node:path'
 
 type EventType = 'create' | 'update' | 'delete'
 

@@ -1,9 +1,9 @@
+import { Box, type BoxProps, Typography } from '@mui/material'
 import {
   TreeItem,
   type TreeItemContentProps,
   useTreeItemState,
 } from '@mui/x-tree-view'
-import { Box, type BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
 import { type ComponentProps, type ReactNode, forwardRef } from 'react'
 

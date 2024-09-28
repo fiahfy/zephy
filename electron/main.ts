@@ -1,11 +1,11 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createManager as createWindowManager } from '@fiahfy/electron-window'
 import {
   BrowserWindow,
   type BrowserWindowConstructorOptions,
   app,
 } from 'electron'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import registerApplicationMenu from './applicationMenu'
 import registerContextMenu from './contextMenu'
 import registerHandlers from './handlers'

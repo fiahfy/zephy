@@ -1,5 +1,5 @@
-import { type IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 import { dirname, join } from 'node:path'
+import { type IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 import { readPaths, writePaths } from './utils/clipboard'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
