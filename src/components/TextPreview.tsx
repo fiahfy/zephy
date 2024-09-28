@@ -53,7 +53,7 @@ const TextPreview = (props: Props) => {
         dispatch({ type: 'error' })
       }
     })()
-  }, [entry.path, entry.type, entry.url])
+  }, [entry.url])
 
   const message = useMemo(() => {
     switch (status) {

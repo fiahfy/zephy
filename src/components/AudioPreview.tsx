@@ -53,8 +53,9 @@ const AudioPreview = (props: Props) => {
 
     el.loop = loop
     el.volume = volume
-  }, [dispatch, loop, volume])
+  }, [loop, volume])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => setPaused(true), [entry.path])
 
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])

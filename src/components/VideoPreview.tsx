@@ -75,7 +75,7 @@ const VideoPreview = (props: Props) => {
 
     el.loop = loop
     el.volume = volume
-  }, [appDispatch, loop, volume])
+  }, [loop, volume])
 
   useEffect(() => {
     let unmounted = false

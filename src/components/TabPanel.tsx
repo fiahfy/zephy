@@ -17,6 +17,7 @@ const TabPanel = (props: Props) => {
   )
   const dispatch = useAppDispatch()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     dispatch(load(tabId))
   }, [directoryPath, dispatch, tabId])

@@ -84,7 +84,7 @@ const useExplorerList = (
         setRestoring(false)
       })
     }
-  }, [contents, loading, previousLoading, scrollTop, virtualizer])
+  }, [loading, previousLoading, scrollTop, virtualizer])
 
   useEffect(() => {
     if (focused && previousFocused !== focused) {
@@ -94,7 +94,7 @@ const useExplorerList = (
         virtualizer.scrollToIndex(rowIndex)
       }
     }
-  }, [columns, contents, focused, loading, previousFocused, virtualizer])
+  }, [columns, contents, focused, previousFocused, virtualizer])
 
   const noDataText = useMemo(
     () =>

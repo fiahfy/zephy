@@ -10,6 +10,7 @@ const Inspector = () => {
 
   const ref = useRef<HTMLElement>(null)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const el = ref.current
     if (el) {

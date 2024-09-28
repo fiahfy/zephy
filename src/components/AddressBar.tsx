@@ -137,14 +137,11 @@ const AddressBar = () => {
       }
     })
     return () => removeListener()
-  }, [dispatch, searchBy])
+  }, [searchBy])
 
-  useEffect(
-    () => setDirectoryPathInput(directoryPath),
-    [directoryPath, dispatch],
-  )
+  useEffect(() => setDirectoryPathInput(directoryPath), [directoryPath])
 
-  useEffect(() => setQueryInput(query), [query, dispatch])
+  useEffect(() => setQueryInput(query), [query])
 
   const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 

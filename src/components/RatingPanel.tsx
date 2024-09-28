@@ -37,7 +37,7 @@ const RatingPanel = () => {
   useEffect(
     () =>
       watch('rating', [], async (_eventType, _directoryPath, filePath) => {
-        const paths = Object.values(pathsByScore).flatMap((paths) => paths)
+        const paths = Object.values(pathsByScore).flat()
         if (paths.includes(filePath)) {
           load()
         }

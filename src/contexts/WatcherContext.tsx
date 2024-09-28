@@ -6,7 +6,6 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { useAppDispatch } from '~/store'
 
 type EventType = 'create' | 'update' | 'delete'
 
@@ -27,8 +26,6 @@ type Props = { children: ReactNode }
 
 export const WatcherProvider = (props: Props) => {
   const { children } = props
-
-  const dispatch = useAppDispatch()
 
   const [registry, setRegistry] = useState<{
     [key: string]: {
@@ -62,7 +59,7 @@ export const WatcherProvider = (props: Props) => {
         }
       },
     )
-  }, [directoryPaths, dispatch, registry])
+  }, [directoryPaths, registry])
 
   const watch = useCallback(
     (key: string, directoryPaths: string[], callback: Callback) =>

@@ -13,10 +13,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": {
-        "noFlatMapIdentity": "off",
-        "useExhaustiveDependencies": "off"
-      },
       "suspicious": {
         "noDoubleEquals": "off",
         "noExplicitAny": "off",

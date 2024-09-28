@@ -31,7 +31,7 @@ const ImagePreview = (props: Props) => {
       })()
       setStatus(success ? 'loaded' : 'error')
     })()
-  }, [entry.path, entry.type, entry.url])
+  }, [entry.url])
 
   const message = useMemo(() => {
     switch (status) {
