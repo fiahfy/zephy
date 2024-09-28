@@ -60,12 +60,14 @@ const generateNewDirectoryName = async (directoryPath: string) => {
       return acc
     }
     if (entry.name === filename) {
-      return [...acc, 1]
+      acc.push(1)
+      return acc
     }
     const reg = new RegExp(`^${escapeRegex(filename)} (\\d+)$`)
     const match = entry.name.match(reg)
     if (match) {
-      return [...acc, Number(match[1])]
+      acc.push(Number(match[1]))
+      return acc
     }
     return acc
   }, [] as number[])
@@ -89,7 +91,8 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
     )
     const match = entry.name.match(reg)
     if (match) {
-      return [...acc, Number(match[2] ?? 1)]
+      acc.push(Number(match[2] ?? 1))
+      return acc
     }
     return acc
   }, [] as number[])
@@ -107,15 +110,13 @@ export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
       return acc
     }
     const path = join(directoryPath, dirent.name)
-    return [
-      ...acc,
-      {
-        name: dirent.name.normalize('NFC'),
-        path,
-        type,
-        url: pathToFileURL(path).href,
-      },
-    ]
+    acc.push({
+      name: dirent.name.normalize('NFC'),
+      path,
+      type,
+      url: pathToFileURL(path).href,
+    })
+    return acc
   }, [] as Entry[])
 }
 
@@ -145,11 +146,12 @@ export const getDetailedEntriesForPaths = async (
   const results = await Promise.allSettled(
     paths.map((path) => getDetailedEntry(path)),
   )
-  return results.reduce(
-    (acc, result) =>
-      result.status === 'fulfilled' ? [...acc, result.value] : acc,
-    [] as DetailedEntry[],
-  )
+  return results.reduce((acc, result) => {
+    if (result.status === 'fulfilled') {
+      acc.push(result.value)
+    }
+    return acc
+  }, [] as DetailedEntry[])
 }
 
 export const getDetailedEntries = async (

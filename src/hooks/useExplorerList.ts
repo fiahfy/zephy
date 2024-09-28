@@ -35,11 +35,12 @@ const useExplorerList = (
 
   const chunks = useMemo(
     () =>
-      contents.reduce(
-        (acc, _, i) =>
-          i % columns ? acc : [...acc, contents.slice(i, i + columns)],
-        [] as Content[][],
-      ),
+      contents.reduce((acc, _, i) => {
+        if (i % columns === 0) {
+          acc.push(contents.slice(i, i + columns))
+        }
+        return acc
+      }, [] as Content[][]),
     [columns, contents],
   )
 

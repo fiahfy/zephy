@@ -86,13 +86,10 @@ export const explorerSlice = createSlice({
       const { tabId } = action.payload
       return Object.keys(state).reduce((acc, i) => {
         const id = Number(i)
-        if (id === tabId) {
-          return acc
+        if (id !== tabId) {
+          acc[id] = state[id]
         }
-        return {
-          ...acc,
-          [id]: state[id],
-        }
+        return acc
       }, {} as State)
     },
     removeOtherTabs(state, action: PayloadAction<{ tabId: number }>) {

@@ -60,7 +60,10 @@ export const selectFavorites = (favorite: State) => favorite.favorites
 
 export const selectFavoriteMap = createSelector(selectFavorites, (favorites) =>
   favorites.reduce(
-    (acc, favorite) => ({ ...acc, [favorite.path]: true }),
+    (acc, favorite) => {
+      acc[favorite.path] = true
+      return acc
+    },
     {} as { [path: string]: boolean },
   ),
 )

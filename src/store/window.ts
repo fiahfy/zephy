@@ -531,10 +531,10 @@ export const selectDirectoryPaths = createSelector(selectTabs, (tabs) =>
   tabs.reduce((acc, tab) => {
     const directoryPath =
       tab.history.histories[tab.history.index]?.directoryPath
-    if (!directoryPath) {
-      return acc
+    if (directoryPath) {
+      acc.push(directoryPath)
     }
-    return [...acc, directoryPath]
+    return acc
   }, [] as string[]),
 )
 

@@ -58,11 +58,12 @@ const DirectoryPreview = (props: Props) => {
   )
   const rows = useMemo(
     () =>
-      entries.reduce(
-        (acc, _, i) =>
-          i % columns ? acc : [...acc, entries.slice(i, i + columns)],
-        [] as Entry[][],
-      ),
+      entries.reduce((acc, _, i) => {
+        if (i % columns === 0) {
+          acc.push(entries.slice(i, i + columns))
+        }
+        return acc
+      }, [] as Entry[][]),
     [columns, entries],
   )
   const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
