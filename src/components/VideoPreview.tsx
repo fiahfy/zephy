@@ -79,7 +79,6 @@ const VideoPreview = (props: Props) => {
 
   useEffect(() => {
     let unmounted = false
-
     ;(async () => {
       dispatch({ type: 'loading' })
       const thumbnail = await (async () => {

@@ -85,7 +85,6 @@ const useThumbnailEntry = (entry: Entry) => {
 
   useEffect(() => {
     let unmounted = false
-
     ;(async () => {
       dispatch({ type: 'loading' })
 

@@ -102,7 +102,6 @@ const DirectoryPreview = (props: Props) => {
 
   useEffect(() => {
     let unmounted = false
-
     ;(async () => {
       dispatch({ type: 'loading' })
       const entries = await (async () => {

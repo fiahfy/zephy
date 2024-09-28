@@ -52,7 +52,6 @@ const EntryInformationTable = (props: Props) => {
 
   useEffect(() => {
     let unmounted = false
-
     ;(async () => {
       if (entries.length > 1) {
         return
