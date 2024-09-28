@@ -99,6 +99,7 @@ export const getMetadata = async (
 
   const hasDuration = type.startsWith('video/') || type.startsWith('audio/')
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const metadata: any = await new Promise((resolve, reject) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
       err ? reject(err) : resolve(metadata)

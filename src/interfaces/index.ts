@@ -7,6 +7,7 @@ import { Operations as ContextMenuOperations } from '@fiahfy/electron-context-me
 import { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type IElectronAPI = {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   addMessageListener: (callback: (message: any) => void) => () => void
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
@@ -42,6 +43,7 @@ export type IElectronAPI = {
 } & ContextMenuOperations &
   WindowOperations<{ directoryPath: string }>
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type ApplicationMenuParams = any
 
 export type Settings = {

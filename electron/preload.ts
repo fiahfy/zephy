@@ -4,7 +4,9 @@ import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import { ApplicationMenuParams } from './applicationMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   addMessageListener: (callback: (message: any) => void) => {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
     ipcRenderer.on('sendMessage', listener)

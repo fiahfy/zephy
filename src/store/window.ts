@@ -510,7 +510,7 @@ export const selectTabByTabId = createSelector(
   selectTabs,
   selectTabId,
   (tabs, tabId) =>
-    tabs.find((tab) => tab.id == tabId) ?? {
+    tabs.find((tab) => tab.id === tabId) ?? {
       history: { histories: [], index: -1 },
       id: 0,
       sorting: {},

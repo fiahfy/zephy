@@ -567,7 +567,7 @@ export const rangeSelect =
     const selected = selectSelectedByTabId(getState(), tabId)
     const paths = contents.map((content) => content.path)
     const prevSelected = selected[selected.length - 1]
-    let newPaths
+    let newPaths: string[]
     if (prevSelected) {
       const index = paths.indexOf(path)
       const prevIndex = paths.indexOf(prevSelected)

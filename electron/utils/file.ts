@@ -26,7 +26,7 @@ type DetailedEntry = Entry & {
 }
 
 // @see https://stackoverflow.com/a/3561711
-const escape = (s: string) => s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
+const escapeRegex = (s: string) => s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
 
 const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
@@ -62,7 +62,7 @@ const generateNewDirectoryName = async (directoryPath: string) => {
     if (entry.name === filename) {
       return [...acc, 1]
     }
-    const reg = new RegExp(`^${escape(filename)} (\\d+)$`)
+    const reg = new RegExp(`^${escapeRegex(filename)} (\\d+)$`)
     const match = entry.name.match(reg)
     if (match) {
       return [...acc, Number(match[1])]
@@ -84,7 +84,9 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
   const ext = parsed.ext
   const entries = await getEntries(directoryPath)
   const numbers = entries.reduce((acc, entry) => {
-    const reg = new RegExp(`^${escape(name)} copy( (\\d+))?${escape(ext)}$`)
+    const reg = new RegExp(
+      `^${escapeRegex(name)} copy( (\\d+))?${escapeRegex(ext)}$`,
+    )
     const match = entry.name.match(reg)
     if (match) {
       return [...acc, Number(match[2] ?? 1)]

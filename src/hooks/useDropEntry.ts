@@ -15,6 +15,7 @@ const getPaths = (e: DragEvent) => {
     // noop
   }
   return Array.from(e.dataTransfer.files).map(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (file) => (file as any).path,
   ) as string[]
 }

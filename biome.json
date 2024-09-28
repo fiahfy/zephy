@@ -13,12 +13,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noDoubleEquals": "off",
-        "noExplicitAny": "off",
-        "noImplicitAnyLet": "off",
-        "noShadowRestrictedNames": "off"
-      },
       "style": {
         "useExponentiationOperator": "off",
         "noNonNullAssertion": "off",
