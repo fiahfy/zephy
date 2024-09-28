@@ -48,6 +48,7 @@ const ImagePreview = (props: Props) => {
     <>
       {status === 'loaded' ? (
         <img
+          alt=""
           src={entry.url}
           style={{
             backgroundColor: 'black',

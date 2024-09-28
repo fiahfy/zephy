@@ -113,6 +113,7 @@ const Settings = () => {
               label={
                 <>
                   Open with{' '}
+                  {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
                   <a
                     href="#"
                     onClick={(e) => {
@@ -140,6 +141,7 @@ const Settings = () => {
               label={
                 <>
                   Open with{' '}
+                  {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
                   <a
                     href="#"
                     onClick={(e) => {

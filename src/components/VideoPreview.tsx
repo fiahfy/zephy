@@ -127,6 +127,7 @@ const VideoPreview = (props: Props) => {
   }, [appDispatch])
 
   return (
+    // biome-ignore lint/a11y/useMediaCaption: <explanation>
     <video
       controls
       onContextMenu={handleContextMenu}

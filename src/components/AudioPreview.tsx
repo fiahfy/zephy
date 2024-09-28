@@ -132,6 +132,7 @@ const AudioPreview = (props: Props) => {
         >
           <Icon fontSize="large" sx={{ color: 'white' }} />
         </Box>
+        {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
         <audio
           controls
           id="custom-audio"

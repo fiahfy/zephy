@@ -63,6 +63,7 @@ const DirectoryPreviewItem = (props: Props) => {
     >
       {status === 'loaded' && thumbnail ? (
         <img
+          alt=""
           src={thumbnail}
           style={{
             aspectRatio: '1 / 1',

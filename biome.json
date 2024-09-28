@@ -13,11 +13,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": {
-        "useAltText": "off",
-        "useMediaCaption": "off",
-        "useValidAnchor": "off"
-      },
       "complexity": {
         "noBannedTypes": "off",
         "noForEach": "off",

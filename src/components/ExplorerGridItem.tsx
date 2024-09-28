@@ -91,7 +91,7 @@ const ExplorerGridItem = (props: Props) => {
       {...dropHandlers}
     >
       {status === 'loaded' && thumbnail ? (
-        <img src={thumbnail} style={{ objectPosition: 'center top' }} />
+        <img alt="" src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
         <Box
           sx={{
