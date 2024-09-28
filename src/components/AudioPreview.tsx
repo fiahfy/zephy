@@ -4,14 +4,14 @@ import {
 } from '@mui/icons-material'
 import { Box, GlobalStyles } from '@mui/material'
 import {
-  KeyboardEvent,
+  type KeyboardEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/contextMenu'

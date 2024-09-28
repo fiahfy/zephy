@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AppState } from '~/store'
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit'
+import type { AppState } from '~/store'
 
 type State = number
 

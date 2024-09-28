@@ -1,4 +1,4 @@
-import { IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
+import { type IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
 import { dirname, join } from 'node:path'
 import { readPaths, writePaths } from './utils/clipboard'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
@@ -13,7 +13,7 @@ import {
   moveEntries,
   renameEntry,
 } from './utils/file'
-import createWatcher from './watcher'
+import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 

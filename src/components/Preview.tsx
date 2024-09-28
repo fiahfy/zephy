@@ -5,7 +5,7 @@ import EmptyPreview from '~/components/EmptyPreview'
 import ImagePreview from '~/components/ImagePreview'
 import TextPreview from '~/components/TextPreview'
 import VideoPreview from '~/components/VideoPreview'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { detectFileType } from '~/utils/file'
 
 type Props = {

@@ -1,11 +1,11 @@
 import {
   TreeItem,
-  TreeItemContentProps,
+  type TreeItemContentProps,
   useTreeItemState,
 } from '@mui/x-tree-view'
-import { Box, BoxProps, Typography } from '@mui/material'
+import { Box, type BoxProps, Typography } from '@mui/material'
 import clsx from 'clsx'
-import { ComponentProps, ReactNode, forwardRef } from 'react'
+import { type ComponentProps, type ReactNode, forwardRef } from 'react'
 
 const EntryTreeItemContent = forwardRef(function EntryContent(
   props: TreeItemContentProps,

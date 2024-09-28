@@ -10,7 +10,7 @@ import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import useThumbnailEntry from '~/hooks/useThumbnailEntry'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 
 type Props = {
   content: Content

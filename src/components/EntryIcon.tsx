@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import Icon from '~/components/Icon'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { detectFileType } from '~/utils/file'
 
 const iconTypes = {

@@ -1,7 +1,7 @@
 import {
-  KeyboardEvent,
-  MouseEvent,
-  RefObject,
+  type KeyboardEvent,
+  type MouseEvent,
+  type RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -9,7 +9,7 @@ import {
 import useExplorer from '~/hooks/useExplorer'
 import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import usePrevious from '~/hooks/usePrevious'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   focus,

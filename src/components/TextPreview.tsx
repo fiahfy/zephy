@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useReducer } from 'react'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 
 type State = {
   status: 'error' | 'loaded' | 'loading'

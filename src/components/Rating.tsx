@@ -1,5 +1,5 @@
 import { Rating as MuiRating } from '@mui/material'
-import { SyntheticEvent, useCallback, useMemo } from 'react'
+import { type SyntheticEvent, useCallback, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { rate, selectRating, selectScoreByPath } from '~/store/rating'
 

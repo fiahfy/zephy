@@ -3,8 +3,8 @@
 // example, to import the interface below do:
 //
 // import User from 'path/to/interfaces';
-import { Operations as ContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
-import { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
+import type { Operations as ContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
+import type { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type IElectronAPI = {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>

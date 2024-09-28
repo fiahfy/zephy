@@ -1,4 +1,10 @@
-import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 const useLongPress = (callback: (e: MouseEvent) => void, timeout = 400) => {
   const timer = useRef<number>()

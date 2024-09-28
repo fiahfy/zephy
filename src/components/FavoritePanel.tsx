@@ -4,7 +4,7 @@ import FavoriteTableRow from '~/components/FavoriteTableRow'
 import Icon from '~/components/Icon'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
-import { DetailedEntry } from '~/interfaces'
+import type { DetailedEntry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavorites } from '~/store/favorite'
 

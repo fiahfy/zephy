@@ -1,8 +1,8 @@
 import { IconButton, InputAdornment } from '@mui/material'
 import {
-  ChangeEvent,
-  FocusEvent,
-  KeyboardEvent,
+  type ChangeEvent,
+  type FocusEvent,
+  type KeyboardEvent,
   useCallback,
   useMemo,
 } from 'react'

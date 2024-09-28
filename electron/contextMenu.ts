@@ -1,5 +1,5 @@
-import { ActionCreators, register } from '@fiahfy/electron-context-menu'
-import { IpcMainInvokeEvent, app, clipboard, shell } from 'electron'
+import { type ActionCreators, register } from '@fiahfy/electron-context-menu'
+import { type IpcMainInvokeEvent, app, clipboard, shell } from 'electron'
 import { canReadPaths, readPaths, writePaths } from './utils/clipboard'
 import { copyEntries } from './utils/file'
 

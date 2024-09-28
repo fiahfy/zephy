@@ -1,6 +1,6 @@
 import {
-  ChangeEvent,
-  KeyboardEvent,
+  type ChangeEvent,
+  type KeyboardEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react'
 import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { finishEditing, rename } from '~/store/explorer'
 import { createContextMenuHandler } from '~/utils/contextMenu'

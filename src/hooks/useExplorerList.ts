@@ -1,8 +1,8 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { RefObject, useEffect, useMemo, useState } from 'react'
+import { type RefObject, useEffect, useMemo, useState } from 'react'
 import useExplorer from '~/hooks/useExplorer'
 import usePrevious from '~/hooks/usePrevious'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectContentsByTabId,

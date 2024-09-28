@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useEffect, useRef } from 'react'
+import { type MouseEvent, useCallback, useEffect, useRef } from 'react'
 
 const usePreventClickOnDoubleClick = <T>(
   beforeClickCallback: (e: MouseEvent, ...args: T[]) => void,

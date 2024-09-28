@@ -1,5 +1,5 @@
 import { copy, move, pathExists } from 'fs-extra'
-import { Dirent, Stats } from 'node:fs'
+import type { Dirent, Stats } from 'node:fs'
 import { mkdir, readdir, rename, stat } from 'node:fs/promises'
 import { basename, dirname, join, parse, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -31,11 +31,11 @@ const escapeRegex = (s: string) => s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
 const getEntryType = (obj: Dirent | Stats) => {
   if (obj.isFile()) {
     return 'file' as const
-  } else if (obj.isDirectory()) {
-    return 'directory' as const
-  } else {
-    return 'other' as const
   }
+  if (obj.isDirectory()) {
+    return 'directory' as const
+  }
+  return 'other' as const
 }
 
 const parsePath = (path: string) => {

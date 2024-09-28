@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
-import { DragEvent, useCallback, useMemo } from 'react'
+import { type DragEvent, useCallback, useMemo } from 'react'
 import useDragGhost from '~/hooks/useDragGhost'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 
 const mime = 'application/zephy.path-list'
 

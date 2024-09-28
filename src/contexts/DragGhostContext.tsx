@@ -1,6 +1,6 @@
 import {
-  ReactNode,
-  RefObject,
+  type ReactNode,
+  type RefObject,
   createContext,
   useCallback,
   useRef,

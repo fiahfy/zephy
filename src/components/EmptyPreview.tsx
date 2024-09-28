@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 
 type Props = {
   message: string

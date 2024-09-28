@@ -2,7 +2,7 @@ import { Box, LinearProgress, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerGridItem from '~/components/ExplorerGridItem'
 import useExplorerList from '~/hooks/useExplorerList'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 
 const maxItemSize = 256
 

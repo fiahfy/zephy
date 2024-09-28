@@ -70,16 +70,14 @@ const App = () => {
           case 'copy':
             if (isEditable() || window.getSelection()?.toString()) {
               return document.execCommand('copy')
-            } else {
-              return dispatch(copy())
             }
+            return dispatch(copy())
           case 'cut':
             if (isEditable()) {
               return document.execCommand('cut')
-            } else {
-              // TODO: implement
-              return
             }
+            // TODO: implement
+            return
           case 'duplicateTab':
             return dispatch(duplicateTab(data.tabId))
           case 'forward':
@@ -103,15 +101,13 @@ const App = () => {
           case 'paste':
             if (isEditable()) {
               return document.execCommand('paste')
-            } else {
-              return dispatch(paste())
             }
+            return dispatch(paste())
           case 'selectAll':
             if (isEditable()) {
               return document.execCommand('selectall')
-            } else {
-              return dispatch(selectAll())
             }
+            return dispatch(selectAll())
           case 'sort':
             return dispatch(sort(data.orderBy))
         }

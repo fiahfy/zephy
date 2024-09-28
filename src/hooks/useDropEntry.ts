@@ -1,7 +1,7 @@
-import { SxProps, Theme, alpha } from '@mui/system'
-import { DragEvent, useCallback, useMemo, useState } from 'react'
+import { type SxProps, type Theme, alpha } from '@mui/system'
+import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { move } from '~/store/explorer'
 

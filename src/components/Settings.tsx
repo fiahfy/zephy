@@ -8,11 +8,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
+  type SelectChangeEvent,
   Typography,
 } from '@mui/material'
-import { ChangeEvent, useCallback } from 'react'
-import { Settings as SettingsType } from '~/interfaces'
+import { type ChangeEvent, useCallback } from 'react'
+import type { Settings as SettingsType } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldOpenWithPhoty,

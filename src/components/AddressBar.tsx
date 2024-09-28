@@ -18,9 +18,9 @@ import {
   Typography,
 } from '@mui/material'
 import {
-  KeyboardEvent,
-  MouseEvent,
-  SyntheticEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+  type SyntheticEvent,
   useCallback,
   useEffect,
   useMemo,

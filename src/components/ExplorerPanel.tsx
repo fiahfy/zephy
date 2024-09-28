@@ -4,7 +4,7 @@ import {
 } from '@mui/icons-material'
 import { SimpleTreeView } from '@mui/x-tree-view'
 import {
-  SyntheticEvent,
+  type SyntheticEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -13,7 +13,7 @@ import {
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectCurrentDirectoryPath } from '~/store/window'
 import { isZephySchema } from '~/utils/url'

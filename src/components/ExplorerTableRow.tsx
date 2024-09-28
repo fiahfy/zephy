@@ -2,7 +2,7 @@ import { TableRow } from '@mui/material'
 import clsx from 'clsx'
 import { useRef } from 'react'
 import useExplorerItem from '~/hooks/useExplorerItem'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 
 type Props = {
   children: React.ReactNode

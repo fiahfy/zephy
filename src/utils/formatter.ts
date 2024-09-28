@@ -8,19 +8,19 @@ export const formatFileSize = (bytes: number) => {
   }
 
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  const formattedSize = parseFloat((bytes / Math.pow(1024, i)).toFixed(2))
+  const formattedSize = Number.parseFloat((bytes / 1024 ** i).toFixed(2))
 
   return `${formattedSize} ${sizes[i]}`
 }
 
 export const formatDateTime = (timestamp: number) => {
   if (isToday(timestamp)) {
-    return 'Today ' + format(timestamp, 'HH:mm')
-  } else if (isYesterday(timestamp)) {
-    return 'Yesterday ' + format(timestamp, 'HH:mm')
-  } else {
-    return format(timestamp, 'PP HH:mm')
+    return `Today ${format(timestamp, 'HH:mm')}`
   }
+  if (isYesterday(timestamp)) {
+    return `Yesterday ${format(timestamp, 'HH:mm')}`
+  }
+  return format(timestamp, 'PP HH:mm')
 }
 
 export const formatDuration = (sec: number) => {

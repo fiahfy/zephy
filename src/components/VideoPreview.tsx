@@ -1,12 +1,12 @@
 import {
-  KeyboardEvent,
+  type KeyboardEvent,
   useCallback,
   useEffect,
   useMemo,
   useReducer,
   useRef,
 } from 'react'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/contextMenu'

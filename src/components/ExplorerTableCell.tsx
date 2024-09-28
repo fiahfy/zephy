@@ -1,11 +1,11 @@
-import { Box, TableCell, TableCellProps, Typography } from '@mui/material'
+import { Box, TableCell, type TableCellProps, Typography } from '@mui/material'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useExplorerItem from '~/hooks/useExplorerItem'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
 type Key = keyof Content

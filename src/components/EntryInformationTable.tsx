@@ -7,7 +7,7 @@ import {
 } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
-import { DetailedEntry, Metadata } from '~/interfaces'
+import type { DetailedEntry, Metadata } from '~/interfaces'
 import {
   formatDateTime,
   formatDuration,
@@ -34,9 +34,8 @@ const formatDateRange = (
     return minDate === maxDate
       ? formatDateTime(minDate)
       : `${formatDateTime(minDate)} - ${formatDateTime(maxDate)}`
-  } else {
-    return formatDateTime(entry[dateProperty])
   }
+  return formatDateTime(entry[dateProperty])
 }
 
 type Props = {

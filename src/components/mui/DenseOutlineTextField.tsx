@@ -1,4 +1,4 @@
-import { TextField, TextFieldProps } from '@mui/material'
+import { TextField, type TextFieldProps } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 const DenseOutlineTextField = styled((props: TextFieldProps) => (

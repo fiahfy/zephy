@@ -1,6 +1,6 @@
 import { Refresh as RefreshIcon } from '@mui/icons-material'
 import { Box, IconButton, Typography } from '@mui/material'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 type Props = {
   children?: ReactNode

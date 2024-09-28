@@ -1,8 +1,8 @@
 import {
   BrowserWindow,
-  IpcMainInvokeEvent,
+  type IpcMainInvokeEvent,
   Menu,
-  MenuItemConstructorOptions,
+  type MenuItemConstructorOptions,
   app,
   ipcMain,
   shell,

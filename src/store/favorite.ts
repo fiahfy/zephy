@@ -1,5 +1,9 @@
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { AppState, AppThunk } from '~/store'
+import {
+  type PayloadAction,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit'
+import type { AppState, AppThunk } from '~/store'
 
 type Favorite = {
   path: string

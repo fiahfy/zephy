@@ -22,11 +22,10 @@ type Metadata = {
 
 const generateThumbnailFilename = async (path: string) => {
   const stats = await stat(path)
-  return (
-    createHash('md5')
-      .update(path + stats.mtimeMs)
-      .digest('hex') + '.png'
-  )
+  const basename = createHash('md5')
+    .update(path + stats.mtimeMs)
+    .digest('hex')
+  return `${basename}.png`
 }
 
 const createThumbnail = async (path: string, thumbnailDir: string) => {

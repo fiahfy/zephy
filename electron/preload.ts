@@ -1,7 +1,7 @@
 import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
-import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
-import { ApplicationMenuParams } from './applicationMenu'
+import { type IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import type { ApplicationMenuParams } from './applicationMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>

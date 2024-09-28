@@ -1,5 +1,5 @@
 import { Tabs } from '@mui/material'
-import { SyntheticEvent, useCallback, useMemo } from 'react'
+import { type SyntheticEvent, useCallback, useMemo } from 'react'
 import TabBarAddItem from '~/components/TabBarAddItem'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'

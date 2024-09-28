@@ -1,5 +1,9 @@
 import { createManager as createWindowManager } from '@fiahfy/electron-window'
-import { BrowserWindow, BrowserWindowConstructorOptions, app } from 'electron'
+import {
+  BrowserWindow,
+  type BrowserWindowConstructorOptions,
+  app,
+} from 'electron'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import registerApplicationMenu from './applicationMenu'

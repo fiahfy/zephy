@@ -1,6 +1,10 @@
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { Content, DetailedEntry } from '~/interfaces'
-import { AppState, AppThunk } from '~/store'
+import {
+  type PayloadAction,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit'
+import type { Content, DetailedEntry } from '~/interfaces'
+import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
 import { addQuery } from '~/store/query'
 import {

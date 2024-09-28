@@ -1,8 +1,8 @@
 import {
-  ContextMenuOption,
+  type ContextMenuOption,
   buildContextMenuParams,
 } from '@fiahfy/electron-context-menu/renderer'
-import { MouseEvent } from 'react'
+import type { MouseEvent } from 'react'
 
 export const createContextMenuHandler = (options: ContextMenuOption[] = []) => {
   return async (e: MouseEvent) => {

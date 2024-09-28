@@ -1,6 +1,6 @@
 import { Close as CloseIcon } from '@mui/icons-material'
 import { Box, IconButton, Tab, Typography } from '@mui/material'
-import { MouseEvent, useCallback, useMemo } from 'react'
+import { type MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'

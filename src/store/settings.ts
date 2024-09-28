@@ -1,6 +1,10 @@
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { Settings } from '~/interfaces'
-import { AppState, AppThunk } from '~/store'
+import {
+  type PayloadAction,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit'
+import type { Settings } from '~/interfaces'
+import type { AppState, AppThunk } from '~/store'
 import { detectFileType } from '~/utils/file'
 
 type State = Settings

@@ -1,6 +1,6 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
-import { MouseEvent, useCallback } from 'react'
-import { Content } from '~/interfaces'
+import { type MouseEvent, useCallback } from 'react'
+import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDirectoryPathByTabId,

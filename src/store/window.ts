@@ -1,6 +1,10 @@
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { Content } from '~/interfaces'
-import { AppState, AppThunk } from '~/store'
+import {
+  type PayloadAction,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit'
+import type { Content } from '~/interfaces'
+import type { AppState, AppThunk } from '~/store'
 import {
   addTab,
   copyTab,

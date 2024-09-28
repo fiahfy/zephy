@@ -4,7 +4,7 @@ import ExplorerTableCell from '~/components/ExplorerTableCell'
 import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
 import ExplorerTableRow from '~/components/ExplorerTableRow'
 import useExplorerList from '~/hooks/useExplorerList'
-import { Content } from '~/interfaces'
+import type { Content } from '~/interfaces'
 
 const headerHeight = 32
 const rowHeight = 20

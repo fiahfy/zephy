@@ -1,5 +1,5 @@
 import { TableRow } from '@mui/material'
-import { ReactNode, useCallback, useMemo } from 'react'
+import { type ReactNode, useCallback, useMemo } from 'react'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'

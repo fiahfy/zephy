@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { createContextMenuHandler } from '~/utils/contextMenu'

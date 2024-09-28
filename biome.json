@@ -13,14 +13,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "style": {
-        "useExponentiationOperator": "off",
-        "noNonNullAssertion": "off",
-        "noUselessElse": "off",
-        "useImportType": "off",
-        "useNumberNamespace": "off",
-        "useTemplate": "off"
-      },
       "performance": {
         "noAccumulatingSpread": "off"
       }

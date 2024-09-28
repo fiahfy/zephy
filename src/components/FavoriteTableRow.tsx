@@ -1,8 +1,8 @@
 import { TableRow } from '@mui/material'
-import { ReactNode, useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
-import { Entry } from '~/interfaces'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { changeDirectory } from '~/store/window'
 
