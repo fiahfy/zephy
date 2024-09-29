@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.2",
+    "@fiahfy/biome-config": "^0.0.1",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-esm-shim": "^0.1.7",
     "@types/fluent-ffmpeg": "^2.1.26",
@@ -53,13 +54,13 @@
   "productName": "Zephy",
   "scripts": {
     "build": "tsc && vite build",
-    "check": "biome check",
     "dev": "vite",
+    "lint": "biome check",
     "package": "electron-builder",
-    "package-dir": "npm run package -- --dir",
+    "package-dir": "yarn package --dir",
     "prepare": "husky",
     "release": "electron-builder",
-    "test": "npm run check && npm run type-check",
+    "test": "yarn lint && yarn type-check",
     "type-check": "tsc"
   },
   "type": "module"

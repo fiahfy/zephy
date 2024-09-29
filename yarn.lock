@@ -758,6 +758,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fiahfy/biome-config@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@fiahfy/biome-config@npm:0.0.1"
+  checksum: 10c0/3329487249b5a2c68c08bbe116bfc7c1775cd760151cd9899333ddd4e82c11a06d264b39aa946dfd82a38b010006bee5714db33c2c502e51c94e92ee8cf7c028
+  languageName: node
+  linkType: hard
+
 "@fiahfy/electron-context-menu@npm:^0.1.2":
   version: 0.1.2
   resolution: "@fiahfy/electron-context-menu@npm:0.1.2"
@@ -5568,6 +5575,7 @@ __metadata:
     "@biomejs/biome": "npm:^1.9.2"
     "@emotion/react": "npm:^11.13.3"
     "@emotion/styled": "npm:^11.13.0"
+    "@fiahfy/biome-config": "npm:^0.0.1"
     "@fiahfy/electron-context-menu": "npm:^0.1.2"
     "@fiahfy/electron-window": "npm:^0.1.0"
     "@fontsource/roboto": "npm:^5.1.0"

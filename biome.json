@@ -1,34 +1,4 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
-  "files": {
-    "ignoreUnknown": false,
-    "ignore": []
-  },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "nursery": {
-        "useComponentExportOnlyModules": "error"
-      }
-    }
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space"
-  },
-  "organizeImports": {
-    "enabled": true
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "asNeeded"
-    }
-  }
+  "extends": ["@fiahfy/biome-config"]
 }
