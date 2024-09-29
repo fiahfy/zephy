@@ -90,8 +90,6 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
-dist-electron
-dist-package
 
 # Gatsby files
 .cache/
@@ -130,3 +128,7 @@ dist-package
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Electron
+dist-electron
+dist-package
