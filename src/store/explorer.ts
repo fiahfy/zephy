@@ -20,7 +20,6 @@ import {
   selectCurrentDirectoryPath,
   selectCurrentTabId,
   selectDirectoryPathByTabId,
-  selectHistoryByTabId,
   selectSortOptionByTabIdAndDirectoryPath,
   selectTabs,
 } from '~/store/window'
@@ -726,10 +725,9 @@ export const handle =
     const { addEntries, removeEntries } = explorerSlice.actions
     const tabs = selectTabs(getState())
     for (const { id: tabId } of tabs) {
-      const history = selectHistoryByTabId(getState(), tabId)
-      const currentDirectoryPath = history.directoryPath
+      const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
       if (directoryPath !== currentDirectoryPath) {
-        return
+        continue
       }
       switch (eventType) {
         case 'create':
