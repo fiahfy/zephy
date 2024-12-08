@@ -17,7 +17,7 @@ const useExplorerList = (
   tabId: number,
   columns: number,
   estimateSize: number,
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
 ) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),

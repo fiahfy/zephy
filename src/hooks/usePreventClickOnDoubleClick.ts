@@ -5,7 +5,7 @@ const usePreventClickOnDoubleClick = <T>(
   clickCallback: (e: MouseEvent, ...args: T[]) => void,
   doubleClickCallback: (e: MouseEvent, ...args: T[]) => void,
 ) => {
-  const timer = useRef<number>()
+  const timer = useRef(0)
 
   useEffect(() => {
     return () => window.clearTimeout(timer.current)

@@ -7,7 +7,7 @@ import {
 } from 'react'
 
 const useLongPress = (callback: (e: MouseEvent) => void, timeout = 400) => {
-  const timer = useRef<number>()
+  const timer = useRef(0)
   const [pressing, setPressing] = useState(false)
 
   useEffect(() => {

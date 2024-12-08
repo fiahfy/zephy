@@ -32,7 +32,7 @@ import { isZephySchema } from '~/utils/url'
 const useExplorerItem = (
   tabId: number,
   content: Content,
-  ref?: RefObject<HTMLElement>,
+  ref?: RefObject<HTMLElement | null>,
 ) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
