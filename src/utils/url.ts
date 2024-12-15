@@ -16,10 +16,10 @@ export const parseZephyUrl = (url: string) => {
     return undefined
   }
   const u = new URL(url)
-  const path = u.pathname.split('/')[2]
-  switch (path) {
+  const host = u.host
+  switch (host) {
     case 'ratings': {
-      const score = Number(u.pathname.split('/')[3] ?? '')
+      const score = Number(u.pathname.split('/')[1] ?? '')
       return {
         pathname: 'ratings' as const,
         params: { score },
