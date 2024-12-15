@@ -6,7 +6,6 @@ import {
 import type { Content, DetailedEntry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
-import { addQuery } from '~/store/query'
 import {
   changeRatingPath,
   removeRating,
@@ -20,6 +19,7 @@ import {
   selectCurrentDirectoryPath,
   selectCurrentTabId,
   selectDirectoryPathByTabId,
+  selectQueryByTabId,
   selectSortOptionByTabIdAndDirectoryPath,
   selectTabs,
 } from '~/store/window'
@@ -32,7 +32,6 @@ type ExplorerState = {
   error: boolean
   focused: string | undefined
   loading: boolean
-  query: string
   selected: string[]
 }
 
@@ -48,7 +47,6 @@ const defaultExplorerState = {
   error: false,
   focused: undefined,
   loading: false,
-  query: '',
   selected: [],
 }
 
@@ -130,14 +128,8 @@ export const explorerSlice = createSlice({
           entries,
           error,
           loading: false,
-          query: '',
         },
       }
-    },
-    setQuery(state, action: PayloadAction<{ tabId: number; query: string }>) {
-      const { tabId, query } = action.payload
-      const explorer = findExplorer(state, tabId)
-      return { ...state, [tabId]: { ...explorer, query } }
     },
     addEntries(
       state,
@@ -325,7 +317,7 @@ export const explorerSlice = createSlice({
   },
 })
 
-export const { addTab, copyTab, removeTab, removeOtherTabs } =
+export const { addTab, copyTab, removeTab, removeOtherTabs, unselect } =
   explorerSlice.actions
 
 export default explorerSlice.reducer
@@ -353,11 +345,6 @@ export const selectErrorByTabId = createSelector(
 export const selectLoadingByTabId = createSelector(
   selectExplorerByTabId,
   (explorer) => explorer.loading,
-)
-
-export const selectQueryByTabId = createSelector(
-  selectExplorerByTabId,
-  (explorer) => explorer.query,
 )
 
 const selectPath = (_state: AppState, _tabId: number, path: string) => path
@@ -467,11 +454,6 @@ export const selectCurrentLoading = createSelector(
   (currentExplorer) => currentExplorer.loading,
 )
 
-export const selectCurrentQuery = createSelector(
-  selectCurrentExplorer,
-  (currentExplorer) => currentExplorer.query,
-)
-
 export const selectCurrentSelected = (state: AppState) =>
   selectSelectedByTabId(state, selectCurrentTabId(state))
 
@@ -513,22 +495,6 @@ export const refresh = (): AppThunk => async (dispatch, getState) => {
   const tabId = selectCurrentTabId(getState())
   dispatch(load(tabId))
 }
-
-export const search =
-  (query: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { setQuery, unselect } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
-    dispatch(setQuery({ tabId, query }))
-    dispatch(addQuery({ query }))
-    const selected = selectSelectedByTabId(getState(), tabId)
-    const contents = selectContentsByTabId(getState(), tabId)
-    const paths = contents.reduce(
-      (acc, content) => acc.filter((path) => path !== content.path),
-      selected,
-    )
-    dispatch(unselect({ tabId, paths }))
-  }
 
 export const startEditing =
   (path: string): AppThunk =>

@@ -9,9 +9,12 @@ import {
   selectErrorByTabId,
   selectFocusedByTabId,
   selectLoadingByTabId,
-  selectQueryByTabId,
 } from '~/store/explorer'
-import { selectScrollTopByTabId, setScrollTop } from '~/store/window'
+import {
+  selectQueryByTabId,
+  selectScrollTopByTabId,
+  setScrollTop,
+} from '~/store/window'
 
 const useExplorerList = (
   tabId: number,

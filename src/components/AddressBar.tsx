@@ -32,20 +32,17 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import {
-  refresh,
-  search,
-  selectCurrentLoading,
-  selectCurrentQuery,
-} from '~/store/explorer'
+import { refresh, selectCurrentLoading } from '~/store/explorer'
 import { removeQuery, selectQueryHistories } from '~/store/query'
 import {
   back,
   forward,
+  search,
   selectBackHistories,
   selectCanBack,
   selectCanForward,
   selectCurrentDirectoryPath,
+  selectCurrentQuery,
   selectCurrentSortOption,
   selectCurrentViewMode,
   selectForwardHistories,

@@ -10,13 +10,18 @@ import {
   copyTab,
   removeOtherTabs,
   removeTab,
-  selectLoadingByTabId,
+  selectCurrentContents,
+  selectCurrentLoading,
+  selectCurrentSelected,
+  unselect,
 } from '~/store/explorer'
 import { selectWindowId } from '~/store/windowId'
 import { buildZephyUrl, getTitle } from '~/utils/url'
+import { addQuery } from './query'
 
 type History = {
   directoryPath: string
+  query: string
   scrollTop: number
   title: string
 }
@@ -265,7 +270,7 @@ export const windowSlice = createSlice({
       const historyIndex = tab.history.index + 1
       const histories = [
         ...tab.history.histories.slice(0, historyIndex),
-        { directoryPath, scrollTop: 0, title },
+        { directoryPath, query: '', scrollTop: 0, title },
       ]
       const tabs = window.tabs.map((tab) =>
         tab.id === window.tabId
@@ -307,6 +312,35 @@ export const windowSlice = createSlice({
           ? {
               ...tab,
               history: { ...tab.history, index: historyIndex },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [id]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
+    setQuery(state, action: PayloadAction<{ id: number; query: string }>) {
+      const { id, query } = action.payload
+      const window = state[id]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs.find((tab) => tab.id === window.tabId)
+      if (!tab) {
+        return state
+      }
+      const histories = tab.history.histories.map((history, i) =>
+        i === tab.history.index ? { ...history, query } : history,
+      )
+      const tabs = window.tabs.map((tab) =>
+        tab.id === window.tabId
+          ? {
+              ...tab,
+              history: { ...tab.history, histories },
             }
           : tab,
       )
@@ -543,6 +577,7 @@ export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
   return (
     history.histories[history.index] ?? {
       directoryPath: '',
+      query: '',
       scrollTop: 0,
       title: '',
     }
@@ -552,6 +587,11 @@ export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
 export const selectDirectoryPathByTabId = createSelector(
   selectHistoryByTabId,
   (history) => history.directoryPath,
+)
+
+export const selectQueryByTabId = createSelector(
+  selectHistoryByTabId,
+  (history) => history.query,
 )
 
 export const selectScrollTopByTabId = createSelector(
@@ -636,6 +676,11 @@ const selectCurrentHistory = (state: AppState) =>
 export const selectCurrentDirectoryPath = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.directoryPath,
+)
+
+export const selectCurrentQuery = createSelector(
+  selectCurrentHistory,
+  (currentHistory) => currentHistory.query,
 )
 
 export const selectCurrentTitle = createSelector(
@@ -725,33 +770,11 @@ export const changeTab =
 export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { changeDirectory, setViewMode } = windowSlice.actions
+    const { changeDirectory } = windowSlice.actions
     const id = selectWindowId(getState())
-    const tabId = selectCurrentTabId(getState())
-    const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
-    const currentViewMode = selectViewModeByTabIdAndDirectoryPath(
-      getState(),
-      tabId,
-      currentDirectoryPath,
-    )
-    const loading = selectLoadingByTabId(getState(), tabId)
-    const viewMode = selectViewModeByTabIdAndDirectoryPath(
-      getState(),
-      tabId,
-      directoryPath,
-    )
+    const loading = selectCurrentLoading(getState())
     if (loading) {
       return
-    }
-    // inherit view mode if the path is a child of the current directory
-    if (directoryPath.startsWith(currentDirectoryPath)) {
-      if (!viewMode) {
-        if (currentViewMode !== 'list') {
-          dispatch(
-            setViewMode({ id, directoryPath, viewMode: currentViewMode }),
-          )
-        }
-      }
     }
     const title = await getTitle(directoryPath)
     dispatch(changeDirectory({ id, directoryPath, title }))
@@ -763,8 +786,7 @@ export const go =
   async (dispatch, getState) => {
     const { go } = windowSlice.actions
     const id = selectWindowId(getState())
-    const tabId = selectCurrentTabId(getState())
-    const loading = selectLoadingByTabId(getState(), tabId)
+    const loading = selectCurrentLoading(getState())
     if (loading) {
       return
     }
@@ -800,6 +822,23 @@ export const setScrollTop =
     const { setScrollTop } = windowSlice.actions
     const id = selectWindowId(getState())
     dispatch(setScrollTop({ id, scrollTop }))
+  }
+
+export const search =
+  (query: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { setQuery } = windowSlice.actions
+    const id = selectWindowId(getState())
+    const tabId = selectCurrentTabId(getState())
+    dispatch(setQuery({ id, query }))
+    dispatch(addQuery({ query }))
+    const selected = selectCurrentSelected(getState())
+    const contents = selectCurrentContents(getState())
+    const paths = contents.reduce(
+      (acc, content) => acc.filter((path) => path !== content.path),
+      selected,
+    )
+    dispatch(unselect({ tabId, paths }))
   }
 
 export const sort =
