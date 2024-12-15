@@ -37,7 +37,7 @@ const StatusBar = () => {
           px: 1,
         }}
       >
-        <Typography mt={0.25} variant="caption">
+        <Typography sx={{ mt: 0.25 }} variant="caption">
           {message}
         </Typography>
       </Toolbar>

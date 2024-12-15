@@ -106,7 +106,7 @@ const ExplorerGridItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box ml={1} mr={0.5} mt={-2.5}>
+          <Box sx={{ ml: 1, mr: 0.5, mt: -2.5 }}>
             <EntryIcon entry={content} />
           </Box>
         }
@@ -123,7 +123,7 @@ const ExplorerGridItem = (props: Props) => {
               <Rating path={content.path} />
             </Box>
             {itemCount !== undefined && content.type === 'directory' && (
-              <Typography ml={1} noWrap variant="caption">
+              <Typography noWrap sx={{ ml: 1 }} variant="caption">
                 {pluralize('item', itemCount, true)}
               </Typography>
             )}

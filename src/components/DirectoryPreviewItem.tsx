@@ -84,7 +84,7 @@ const DirectoryPreviewItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box ml={1} mr={0.5} mt={-2.5}>
+          <Box sx={{ ml: 1, mr: 0.5, mt: -2.5 }}>
             <EntryIcon entry={entry} />
           </Box>
         }
@@ -101,7 +101,7 @@ const DirectoryPreviewItem = (props: Props) => {
               <Rating path={entry.path} />
             </Box>
             {itemCount !== undefined && entry.type === 'directory' && (
-              <Typography ml={1} noWrap variant="caption">
+              <Typography noWrap sx={{ ml: 1 }} variant="caption">
                 {pluralize('item', itemCount, true)}
               </Typography>
             )}

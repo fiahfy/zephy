@@ -135,10 +135,10 @@ const EntryInformationTable = (props: Props) => {
       <caption style={{ captionSide: 'top', padding: 0 }}>
         <Typography
           align="center"
-          fontWeight="bold"
           paragraph
           sx={{
             color: (theme) => theme.palette.text.primary,
+            fontWeight: 'bold',
             mb: 0,
             overflowWrap: 'break-word',
             pb: 0.5,
