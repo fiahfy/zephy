@@ -4,6 +4,7 @@ import { type MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDropEntry from '~/hooks/useDropEntry'
 import { useAppDispatch, useAppSelector } from '~/store'
+import { selectLoadingByTabId } from '~/store/explorer'
 import { closeTab, selectHistoryByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { getIconType } from '~/utils/url'
@@ -16,6 +17,7 @@ const TabBarItem = (props: Props) => {
   const { tabId, ...others } = props
 
   const history = useAppSelector((state) => selectHistoryByTabId(state, tabId))
+  const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
   const { droppableStyle, ...dropHandlers } = useDropEntry({
@@ -86,7 +88,9 @@ const TabBarItem = (props: Props) => {
             minWidth: 0,
           }}
         >
-          <Icon iconType={getIconType(history.directoryPath)} />
+          <Icon
+            iconType={loading ? 'progress' : getIconType(history.directoryPath)}
+          />
           <Typography noWrap title={history.title} variant="caption">
             {history.title}
           </Typography>

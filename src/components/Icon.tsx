@@ -9,6 +9,7 @@ import {
   Star as StarIcon,
   VideoFile as VideoFileIcon,
 } from '@mui/icons-material'
+import { CircularProgress } from '@mui/material'
 import { blue, green, grey, indigo, red } from '@mui/material/colors'
 
 const icons = {
@@ -57,6 +58,7 @@ type Props = {
     | 'folder'
     | 'image'
     | 'insert-drive-file'
+    | 'progress'
     | 'settings'
     | 'star'
     | 'star-border'
@@ -65,6 +67,15 @@ type Props = {
 
 const Icon = (props: Props) => {
   const { iconType } = props
+
+  if (iconType === 'progress') {
+    return (
+      <CircularProgress
+        size={14}
+        sx={{ boxSizing: 'content-box', flexShrink: 0, p: 0.375 }}
+      />
+    )
+  }
 
   const { Component, color } = icons[iconType]
 

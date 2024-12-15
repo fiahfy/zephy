@@ -1,4 +1,3 @@
-import { CircularProgress } from '@mui/material'
 import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import EntryTreeItem from '~/components/EntryTreeItem'
@@ -10,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
+import Icon from './Icon'
 
 type Props = {
   entry: Entry
@@ -64,9 +64,7 @@ const ExplorerTreeItem = (props: Props) => {
             .map((entry) => <ExplorerTreeItem entry={entry} key={entry.path} />)
         ) : (
           <EntryTreeItem
-            icon={
-              <CircularProgress size={16} sx={{ flexShrink: 0, p: 0.25 }} />
-            }
+            icon={<Icon iconType="progress" />}
             itemId={`${entry.path}<loader>`}
             label="Loading items..."
           />
