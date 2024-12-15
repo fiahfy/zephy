@@ -102,7 +102,6 @@ const Settings = () => {
           </Typography>
           <FormGroup>
             <FormControlLabel
-              componentsProps={{ typography: { variant: 'body2' } }}
               control={
                 <Checkbox
                   checked={shouldOpenWithPhoty}
@@ -128,9 +127,9 @@ const Settings = () => {
                   for Image Files
                 </>
               }
+              slotProps={{ typography: { variant: 'body2' } }}
             />
             <FormControlLabel
-              componentsProps={{ typography: { variant: 'body2' } }}
               control={
                 <Checkbox
                   checked={shouldOpenWithVisty}
@@ -156,6 +155,7 @@ const Settings = () => {
                   for Video and Audio Files
                 </>
               }
+              slotProps={{ typography: { variant: 'body2' } }}
             />
           </FormGroup>
         </Box>
@@ -165,7 +165,6 @@ const Settings = () => {
           </Typography>
           <FormGroup>
             <FormControlLabel
-              componentsProps={{ typography: { variant: 'body2' } }}
               control={
                 <Checkbox
                   checked={shouldShowHiddenFiles}
@@ -174,6 +173,7 @@ const Settings = () => {
                 />
               }
               label="Show Hidden Files"
+              slotProps={{ typography: { variant: 'body2' } }}
             />
           </FormGroup>
         </Box>

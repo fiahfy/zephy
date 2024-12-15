@@ -71,30 +71,32 @@ const AddressTextField = (props: Props) => {
 
   return (
     <RoundedFilledTextField
-      InputProps={{
-        endAdornment: !zephySchema && (
-          <InputAdornment position="end">
-            <IconButton onClick={handleClickFavorite} size="small">
-              <Icon type={favorite ? 'star' : 'star-border'} />
-            </IconButton>
-          </InputAdornment>
-        ),
-        startAdornment: (
-          <InputAdornment position="start">
-            <IconButton
-              disabled={zephySchema}
-              onClick={zephySchema ? undefined : handleClickFolder}
-              size="small"
-            >
-              <Icon type={getIconType(directoryPath)} />
-            </IconButton>
-          </InputAdornment>
-        ),
-      }}
       fullWidth
       onChange={handleChange}
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}
+      slotProps={{
+        input: {
+          endAdornment: !zephySchema && (
+            <InputAdornment position="end">
+              <IconButton onClick={handleClickFavorite} size="small">
+                <Icon type={favorite ? 'star' : 'star-border'} />
+              </IconButton>
+            </InputAdornment>
+          ),
+          startAdornment: (
+            <InputAdornment position="start">
+              <IconButton
+                disabled={zephySchema}
+                onClick={zephySchema ? undefined : handleClickFolder}
+                size="small"
+              >
+                <Icon type={getIconType(directoryPath)} />
+              </IconButton>
+            </InputAdornment>
+          ),
+        },
+      }}
       spellCheck={false}
       value={value}
     />

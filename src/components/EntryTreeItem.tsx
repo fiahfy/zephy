@@ -56,12 +56,12 @@ const EntryTreeItemContent = forwardRef(function EntryContent(
 })
 
 type Props = ComponentProps<typeof TreeItem> & {
-  LabelProps?: BoxProps
   icon: ReactNode
+  slotProps?: { label?: BoxProps }
 }
 
 const EntryTreeItem = (props: Props) => {
-  const { LabelProps, children, icon, label, sx, ...others } = props
+  const { slotProps, children, icon, label, sx, ...others } = props
 
   return (
     <TreeItem
@@ -69,7 +69,7 @@ const EntryTreeItem = (props: Props) => {
       ContentComponent={EntryTreeItemContent}
       label={
         <Box
-          {...LabelProps}
+          {...slotProps?.label}
           sx={{
             alignItems: 'center',
             display: 'flex',

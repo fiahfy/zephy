@@ -39,15 +39,17 @@ const ExplorerTreeItem = (props: Props) => {
 
   return (
     <EntryTreeItem
-      LabelProps={{
-        onClick: handleClick,
-        onContextMenu: onContextMenu,
-        onDoubleClick: handleDoubleClick,
-      }}
       draggable={draggable}
       icon={<EntryIcon entry={entry} />}
       itemId={entry.path}
       label={entry.name}
+      slotProps={{
+        label: {
+          onClick: handleClick,
+          onContextMenu: onContextMenu,
+          onDoubleClick: handleDoubleClick,
+        },
+      }}
       sx={droppableStyle}
       {...dragHandlers}
       {...dropHandlers}

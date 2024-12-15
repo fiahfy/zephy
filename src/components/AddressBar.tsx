@@ -319,7 +319,6 @@ const AddressBar = () => {
           }}
         >
           <Autocomplete
-            ListboxProps={{ sx: { typography: 'body2' } }}
             freeSolo
             fullWidth
             inputValue={queryInput}
@@ -330,19 +329,21 @@ const AddressBar = () => {
             renderInput={(params) => (
               <RoundedFilledTextField
                 {...params}
-                InputProps={{
-                  ...params.InputProps,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <IconButton onClick={handleClickSearch} size="small">
-                        <SearchIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
                 fullWidth
                 inputRef={ref}
                 placeholder="Search..."
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={handleClickSearch} size="small">
+                          <SearchIcon fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             )}
             renderOption={(props, option) => (
