@@ -89,7 +89,7 @@ const TabBarItem = (props: Props) => {
           }}
         >
           <Icon
-            iconType={loading ? 'progress' : getIconType(history.directoryPath)}
+            type={loading ? 'progress' : getIconType(history.directoryPath)}
           />
           <Typography noWrap title={history.title} variant="caption">
             {history.title}

@@ -75,7 +75,7 @@ const AddressTextField = (props: Props) => {
         endAdornment: !zephySchema && (
           <InputAdornment position="end">
             <IconButton onClick={handleClickFavorite} size="small">
-              <Icon iconType={favorite ? 'star' : 'star-border'} />
+              <Icon type={favorite ? 'star' : 'star-border'} />
             </IconButton>
           </InputAdornment>
         ),
@@ -86,7 +86,7 @@ const AddressTextField = (props: Props) => {
               onClick={zephySchema ? undefined : handleClickFolder}
               size="small"
             >
-              <Icon iconType={getIconType(directoryPath)} />
+              <Icon type={getIconType(directoryPath)} />
             </IconButton>
           </InputAdornment>
         ),

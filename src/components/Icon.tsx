@@ -52,7 +52,7 @@ const icons = {
 }
 
 type Props = {
-  iconType:
+  type:
     | 'audio-file'
     | 'description'
     | 'folder'
@@ -66,9 +66,9 @@ type Props = {
 }
 
 const Icon = (props: Props) => {
-  const { iconType } = props
+  const { type } = props
 
-  if (iconType === 'progress') {
+  if (type === 'progress') {
     return (
       <CircularProgress
         size={14}
@@ -77,7 +77,7 @@ const Icon = (props: Props) => {
     )
   }
 
-  const { Component, color } = icons[iconType]
+  const { Component, color } = icons[type]
 
   return <Component fontSize="small" sx={{ color }} />
 }

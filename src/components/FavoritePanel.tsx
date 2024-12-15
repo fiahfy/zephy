@@ -67,7 +67,7 @@ const FavoritePanel = () => {
                     }}
                     title={entry.name}
                   >
-                    <Icon iconType="folder" />
+                    <Icon type="folder" />
                     <Typography noWrap variant="caption">
                       {entry.name}
                     </Typography>

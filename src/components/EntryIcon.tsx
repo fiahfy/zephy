@@ -26,7 +26,7 @@ const EntryIcon = (props: Props) => {
     return iconTypes[fileType]
   }, [entry.path, entry.type])
 
-  return <Icon iconType={iconType} />
+  return <Icon type={iconType} />
 }
 
 export default EntryIcon

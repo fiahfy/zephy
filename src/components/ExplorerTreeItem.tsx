@@ -64,7 +64,7 @@ const ExplorerTreeItem = (props: Props) => {
             .map((entry) => <ExplorerTreeItem entry={entry} key={entry.path} />)
         ) : (
           <EntryTreeItem
-            icon={<Icon iconType="progress" />}
+            icon={<Icon type="progress" />}
             itemId={`${entry.path}<loader>`}
             label="Loading items..."
           />
