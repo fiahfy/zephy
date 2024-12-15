@@ -135,7 +135,7 @@ const EntryInformationTable = (props: Props) => {
       <caption style={{ captionSide: 'top', padding: 0 }}>
         <Typography
           align="center"
-          paragraph
+          component="p"
           sx={{
             color: (theme) => theme.palette.text.primary,
             fontWeight: 'bold',

@@ -14,7 +14,6 @@ const Panel = (props: Props) => {
   return (
     <Box>
       <Typography
-        paragraph
         sx={{
           alignItems: 'center',
           background: (theme) => theme.palette.background.default,

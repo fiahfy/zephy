@@ -29,7 +29,6 @@ const Inspector = () => {
           }}
         >
           <Typography
-            paragraph
             sx={{
               background: (theme) => theme.palette.background.default,
               mb: 0,
