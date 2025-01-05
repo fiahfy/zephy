@@ -63,7 +63,7 @@ const ExplorerTableCell = (props: Props) => {
                 ml: -0.5,
               }}
             >
-              <ExplorerNameTextField content={content} />
+              <ExplorerNameTextField content={content} tabId={tabId} />
             </Box>
           ) : (
             <Typography noWrap title={content.name} variant="caption">

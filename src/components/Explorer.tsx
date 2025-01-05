@@ -5,7 +5,7 @@ import ExplorerTable from '~/components/ExplorerTable'
 import useDropEntry from '~/hooks/useDropEntry'
 import ExplorerProvider from '~/providers/ExplorerProvider'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { blur, unselectAll } from '~/store/explorer'
+import { unselectAll } from '~/store/explorer'
 import {
   selectDirectoryPathByTabId,
   selectSortOptionByTabIdAndDirectoryPath,
@@ -44,10 +44,7 @@ const Explorer = (props: Props) => {
     [directoryPath],
   )
 
-  const handleClick = useCallback(() => {
-    dispatch(unselectAll())
-    dispatch(blur())
-  }, [dispatch])
+  const handleClick = useCallback(() => dispatch(unselectAll()), [dispatch])
 
   const handleContextMenu = useMemo(
     () =>

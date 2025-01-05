@@ -158,7 +158,7 @@ const ExplorerGridItem = (props: Props) => {
                   ml: -0.5,
                 }}
               >
-                <ExplorerNameTextField content={content} />
+                <ExplorerNameTextField content={content} tabId={tabId} />
               </Box>
             ) : (
               <Typography

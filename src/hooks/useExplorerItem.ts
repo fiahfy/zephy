@@ -64,13 +64,13 @@ const useExplorerItem = (
       // prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
-        dispatch(rangeSelect(content.path))
+        dispatch(rangeSelect(tabId, content.path))
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        dispatch(multiSelect(content.path))
+        dispatch(multiSelect(tabId, content.path))
       } else {
-        dispatch(select(content.path))
+        dispatch(select(tabId, content.path))
       }
-      dispatch(focus(content.path))
+      dispatch(focus(tabId, content.path))
     },
     () => {
       if (
@@ -78,7 +78,7 @@ const useExplorerItem = (
         selectedContents.length === 1 &&
         selectedContents[0]?.path === content.path
       ) {
-        dispatch(startEditing(content.path))
+        dispatch(startEditing(tabId, content.path))
       }
     },
     async (e: MouseEvent) => {
@@ -208,22 +208,22 @@ const useExplorerItem = (
             ]
           : contents[0]
       if (newContent) {
-        dispatch(select(newContent.path))
-        dispatch(focus(newContent.path))
+        dispatch(select(tabId, newContent.path))
+        dispatch(focus(tabId, newContent.path))
       }
     },
-    [columns, content.path, contents, dispatch],
+    [columns, content.path, contents, dispatch, tabId],
   )
 
   const focusTo = useCallback(
     (position: 'first' | 'last') => {
       const content = contents[position === 'first' ? 0 : contents.length - 1]
       if (content) {
-        dispatch(select(content.path))
-        dispatch(focus(content.path))
+        dispatch(select(tabId, content.path))
+        dispatch(focus(tabId, content.path))
       }
     },
-    [contents, dispatch],
+    [contents, dispatch, tabId],
   )
 
   const onKeyDown = useCallback(
@@ -231,7 +231,7 @@ const useExplorerItem = (
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
-            dispatch(startEditing(content.path))
+            dispatch(startEditing(tabId, content.path))
           }
           return
         case 'ArrowUp':
@@ -255,7 +255,7 @@ const useExplorerItem = (
           return focusBy(0, e.shiftKey ? -1 : 1)
       }
     },
-    [content.path, dispatch, focusBy, focusTo],
+    [content.path, dispatch, focusBy, focusTo, tabId],
   )
 
   return {

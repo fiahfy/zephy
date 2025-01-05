@@ -491,44 +491,52 @@ export const load =
     }
   }
 
-export const refresh = (): AppThunk => async (dispatch, getState) => {
-  const tabId = selectCurrentTabId(getState())
-  dispatch(load(tabId))
-}
-
 export const startEditing =
-  (path: string): AppThunk =>
-  async (dispatch, getState) => {
+  (tabId: number, path: string): AppThunk =>
+  async (dispatch) => {
     const { startEditing } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
     dispatch(startEditing({ tabId, path }))
   }
 
-export const finishEditing = (): AppThunk => async (dispatch, getState) => {
-  const { finishEditing } = explorerSlice.actions
-  const tabId = selectCurrentTabId(getState())
-  dispatch(finishEditing({ tabId }))
-}
+export const finishEditing =
+  (tabId: number): AppThunk =>
+  async (dispatch) => {
+    const { finishEditing } = explorerSlice.actions
+    dispatch(finishEditing({ tabId }))
+  }
 
 export const focus =
-  (path: string): AppThunk =>
-  async (dispatch, getState) => {
+  (tabId: number, path: string): AppThunk =>
+  async (dispatch) => {
     const { focus } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
     dispatch(focus({ tabId, path }))
   }
 
-export const blur = (): AppThunk => async (dispatch, getState) => {
-  const { blur } = explorerSlice.actions
-  const tabId = selectCurrentTabId(getState())
-  dispatch(blur({ tabId }))
-}
+export const blur =
+  (tabId: number): AppThunk =>
+  async (dispatch) => {
+    const { blur } = explorerSlice.actions
+    dispatch(blur({ tabId }))
+  }
+
+export const select =
+  (tabId: number, path: string): AppThunk =>
+  async (dispatch) => {
+    const { select } = explorerSlice.actions
+    dispatch(select({ tabId, path }))
+  }
+
+export const multiSelect =
+  (tabId: number, path: string): AppThunk =>
+  async (dispatch) => {
+    const { multiSelect } = explorerSlice.actions
+    dispatch(multiSelect({ tabId, path }))
+  }
 
 export const rangeSelect =
-  (path: string): AppThunk =>
+  (tabId: number, path: string): AppThunk =>
   async (dispatch, getState) => {
     const { rangeSelect } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
     const contents = selectContentsByTabId(getState(), tabId)
     const selected = selectSelectedByTabId(getState(), tabId)
     const paths = contents.map((content) => content.path)
@@ -548,21 +556,28 @@ export const rangeSelect =
     dispatch(rangeSelect({ tabId, paths: newPaths }))
   }
 
-export const select =
-  (path: string): AppThunk =>
+export const rename =
+  (tabId: number, path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
-    const { select } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
-    dispatch(select({ tabId, path }))
+    const { addEntries, focus, removeEntries, select } = explorerSlice.actions
+    const entry = await window.electronAPI.renameEntry(path, newName)
+    // get the selected paths after renaming
+    const selected = selectSelectedByTabId(getState(), tabId)
+    dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+    dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+    dispatch(removeEntries({ tabId, paths: [path] }))
+    dispatch(addEntries({ tabId, entries: [entry] }))
+    // do not focus if the renamed entry is not selected
+    if (selected.length === 1 && selected[0] === path) {
+      dispatch(select({ tabId, path: entry.path }))
+      dispatch(focus({ tabId, path: entry.path }))
+    }
   }
 
-export const multiSelect =
-  (path: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { multiSelect } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
-    dispatch(multiSelect({ tabId, path }))
-  }
+export const refresh = (): AppThunk => async (dispatch, getState) => {
+  const tabId = selectCurrentTabId(getState())
+  dispatch(load(tabId))
+}
 
 export const selectAll = (): AppThunk => async (dispatch, getState) => {
   const { selectAll } = explorerSlice.actions
@@ -625,32 +640,14 @@ export const moveToTrash =
 export const startRenaming =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
+    const tabId = selectCurrentTabId(getState())
     const selected = selectCurrentSelected(getState())
     const targetPath = path ?? selected[0]
     if (!targetPath) {
       return
     }
-    dispatch(select(targetPath))
-    dispatch(startEditing(targetPath))
-  }
-
-export const rename =
-  (path: string, newName: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { addEntries, focus, removeEntries, select } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
-    const entry = await window.electronAPI.renameEntry(path, newName)
-    // get the selected paths after renaming
-    const selected = selectSelectedByTabId(getState(), tabId)
-    dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
-    dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-    dispatch(removeEntries({ tabId, paths: [path] }))
-    dispatch(addEntries({ tabId, entries: [entry] }))
-    // do not focus if the renamed entry is not selected
-    if (selected.length === 1 && selected[0] === path) {
-      dispatch(select({ tabId, path: entry.path }))
-      dispatch(focus({ tabId, path: entry.path }))
-    }
+    dispatch(select(tabId, targetPath))
+    dispatch(startEditing(tabId, targetPath))
   }
 
 export const move =

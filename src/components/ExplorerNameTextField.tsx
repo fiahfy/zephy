@@ -15,10 +15,11 @@ import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   content: Content
+  tabId: number
 }
 
 const ExplorerNameTextField = (props: Props) => {
-  const { content } = props
+  const { content, tabId } = props
 
   const dispatch = useAppDispatch()
 
@@ -40,11 +41,11 @@ const ExplorerNameTextField = (props: Props) => {
   }, [content.name, content.type])
 
   const finish = useCallback(() => {
-    dispatch(finishEditing())
+    dispatch(finishEditing(tabId))
     if (name !== content.name) {
-      dispatch(rename(content.path, name))
+      dispatch(rename(tabId, content.path, name))
     }
-  }, [content.name, content.path, dispatch, name])
+  }, [content.name, content.path, dispatch, name, tabId])
 
   const handleBlur = useCallback(
     () => window.setTimeout(() => finish(), 300),
@@ -61,7 +62,7 @@ const ExplorerNameTextField = (props: Props) => {
       e.stopPropagation()
       switch (e.key) {
         case 'Escape':
-          dispatch(finishEditing())
+          dispatch(finishEditing(tabId))
           break
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
@@ -70,7 +71,7 @@ const ExplorerNameTextField = (props: Props) => {
           break
       }
     },
-    [dispatch, finish],
+    [dispatch, finish, tabId],
   )
 
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
