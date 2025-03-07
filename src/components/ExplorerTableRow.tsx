@@ -28,7 +28,7 @@ const ExplorerTableRow = (props: Props) => {
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
-        '&.focused': {
+        '.explorer-container:focus-within &.focused': {
           outline: (theme) => `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

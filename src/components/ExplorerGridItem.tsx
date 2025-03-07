@@ -78,7 +78,7 @@ const ExplorerGridItem = (props: Props) => {
             },
           },
         },
-        '&.focused': {
+        '.explorer-container:focus-within &.focused': {
           outline: (theme) => `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

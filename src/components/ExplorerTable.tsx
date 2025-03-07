@@ -93,6 +93,7 @@ const ExplorerTable = (props: Props) => {
         ))}
       </Box>
       <Box
+        className="explorer-container"
         onClick={onClick}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
