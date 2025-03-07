@@ -53,8 +53,16 @@ const ExplorerTable = (props: Props) => {
 
   const ref = useRef<HTMLDivElement>(null)
 
-  const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabId, 1, rowHeight, ref)
+  const {
+    chunks,
+    loading,
+    noDataText,
+    onClick,
+    onContextMenu,
+    onKeyDown,
+    restoring,
+    virtualizer,
+  } = useExplorerList(tabId, 1, rowHeight, ref)
 
   return (
     <Box
@@ -85,13 +93,18 @@ const ExplorerTable = (props: Props) => {
         ))}
       </Box>
       <Box
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
         ref={ref}
         sx={{
           flexGrow: 1,
+          outline: 'none',
           overflowX: 'hidden',
           overflowY: 'scroll',
           visibility: restoring ? 'hidden' : undefined,
         }}
+        tabIndex={0}
       >
         <Table
           component="div"

@@ -23,8 +23,16 @@ const ExplorerGrid = (props: Props) => {
 
   const ref = useRef<HTMLDivElement>(null)
 
-  const { chunks, loading, noDataText, restoring, virtualizer } =
-    useExplorerList(tabId, columns, size, ref)
+  const {
+    chunks,
+    loading,
+    noDataText,
+    onClick,
+    onContextMenu,
+    onKeyDown,
+    restoring,
+    virtualizer,
+  } = useExplorerList(tabId, columns, size, ref)
 
   useEffect(() => {
     const el = ref.current
@@ -50,13 +58,18 @@ const ExplorerGrid = (props: Props) => {
       }}
     >
       <Box
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
         ref={ref}
         sx={{
           height: '100%',
+          outline: 'none',
           overflowX: 'hidden',
           overflowY: 'scroll',
           visibility: restoring ? 'hidden' : undefined,
         }}
+        tabIndex={0}
       >
         {wrapperWidth > 0 && (
           <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>

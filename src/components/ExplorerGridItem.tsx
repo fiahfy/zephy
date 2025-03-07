@@ -2,7 +2,6 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import { useRef } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
@@ -20,8 +19,6 @@ type Props = {
 const ExplorerGridItem = (props: Props) => {
   const { content, tabId } = props
 
-  const ref = useRef<HTMLDivElement>(null)
-
   const {
     draggingContents,
     editing,
@@ -29,9 +26,8 @@ const ExplorerGridItem = (props: Props) => {
     onClick,
     onContextMenu,
     onDoubleClick,
-    onKeyDown,
     selected,
-  } = useExplorerItem(tabId, content, ref)
+  } = useExplorerItem(tabId, content)
 
   const { itemCount, message, status, thumbnail } = useThumbnailEntry(content)
 
@@ -46,8 +42,6 @@ const ExplorerGridItem = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
-      onKeyDown={onKeyDown}
-      ref={ref}
       sx={{
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
@@ -84,9 +78,12 @@ const ExplorerGridItem = (props: Props) => {
             },
           },
         },
+        '&.focused': {
+          outline: (theme) => `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-1px',
+        },
         ...droppableStyle,
       }}
-      tabIndex={0}
       {...dragHandlers}
       {...dropHandlers}
     >

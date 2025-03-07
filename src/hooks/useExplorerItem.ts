@@ -1,14 +1,5 @@
-import {
-  type KeyboardEvent,
-  type MouseEvent,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react'
-import useExplorer from '~/hooks/useExplorer'
+import { type MouseEvent, useMemo } from 'react'
 import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
-import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -29,11 +20,7 @@ import { changeDirectory, selectDirectoryPathByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
 
-const useExplorerItem = (
-  tabId: number,
-  content: Content,
-  ref?: RefObject<HTMLElement | null>,
-) => {
+const useExplorerItem = (tabId: number, content: Content) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
@@ -56,8 +43,6 @@ const useExplorerItem = (
     selectSelectedContentsByTabId(state, tabId),
   )
   const dispatch = useAppDispatch()
-
-  const { columns } = useExplorer()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
     (e: MouseEvent) => {
@@ -92,28 +77,6 @@ const useExplorerItem = (
         : dispatch(openEntry(content.path))
     },
   )
-
-  const previousEditing = usePrevious(editing)
-
-  useEffect(() => {
-    const el = ref?.current
-    if (!el) {
-      return
-    }
-    if (focused) {
-      el.focus()
-    }
-  }, [focused, ref])
-
-  useEffect(() => {
-    const el = ref?.current
-    if (!el) {
-      return
-    }
-    if (focused && previousEditing && !editing) {
-      el.focus()
-    }
-  }, [editing, focused, previousEditing, ref])
 
   const draggingContents = useMemo(
     () => (editing ? [] : selected ? selectedContents : [content]),
@@ -196,77 +159,14 @@ const useExplorerItem = (
     zephySchema,
   ])
 
-  const focusBy = useCallback(
-    (rowOffset: number, columnOffset: number) => {
-      const index = contents.findIndex((c) => c.path === content.path)
-      const rowIndex = Math.floor(index / columns)
-      const columnIndex = index % columns
-      const newContent =
-        index >= 0
-          ? contents[
-              columns * (rowIndex + rowOffset) + columnIndex + columnOffset
-            ]
-          : contents[0]
-      if (newContent) {
-        dispatch(select(tabId, newContent.path))
-        dispatch(focus(tabId, newContent.path))
-      }
-    },
-    [columns, content.path, contents, dispatch, tabId],
-  )
-
-  const focusTo = useCallback(
-    (position: 'first' | 'last') => {
-      const content = contents[position === 'first' ? 0 : contents.length - 1]
-      if (content) {
-        dispatch(select(tabId, content.path))
-        dispatch(focus(tabId, content.path))
-      }
-    },
-    [contents, dispatch, tabId],
-  )
-
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'Enter':
-          if (!e.nativeEvent.isComposing) {
-            dispatch(startEditing(tabId, content.path))
-          }
-          return
-        case 'ArrowUp':
-          e.preventDefault()
-          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('first')
-            : focusBy(-1, 0)
-        case 'ArrowDown':
-          e.preventDefault()
-          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('last')
-            : focusBy(1, 0)
-        case 'ArrowLeft':
-          e.preventDefault()
-          return focusBy(0, -1)
-        case 'ArrowRight':
-          e.preventDefault()
-          return focusBy(0, 1)
-        case 'Tab':
-          e.preventDefault()
-          return focusBy(0, e.shiftKey ? -1 : 1)
-      }
-    },
-    [content.path, dispatch, focusBy, focusTo, tabId],
-  )
-
   return {
     contents,
     draggingContents,
     editing,
-    focused,
+    focused: focused && !editing,
     onClick,
     onContextMenu,
     onDoubleClick,
-    onKeyDown,
     selected,
   }
 }

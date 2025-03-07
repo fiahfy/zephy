@@ -1,20 +1,36 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { type RefObject, useEffect, useMemo, useState } from 'react'
-import useExplorer from '~/hooks/useExplorer'
+import {
+  type KeyboardEvent,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  focus,
+  select,
   selectContentsByTabId,
+  selectEditingByTabId,
   selectErrorByTabId,
   selectFocusedByTabId,
   selectLoadingByTabId,
+  startEditing,
+  unselectAll,
 } from '~/store/explorer'
 import {
+  selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectScrollTopByTabId,
+  selectSortOptionByTabIdAndDirectoryPath,
+  selectViewModeByTabIdAndDirectoryPath,
   setScrollTop,
 } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/contextMenu'
+import { isZephySchema } from '~/utils/url'
 
 const useExplorerList = (
   tabId: number,
@@ -25,6 +41,10 @@ const useExplorerList = (
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabId(state, tabId),
+  )
+  const editing = useAppSelector((state) => selectEditingByTabId(state, tabId))
   const error = useAppSelector((state) => selectErrorByTabId(state, tabId))
   const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
@@ -32,9 +52,13 @@ const useExplorerList = (
   const scrollTop = useAppSelector((state) =>
     selectScrollTopByTabId(state, tabId),
   )
+  const sortOption = useAppSelector((state) =>
+    selectSortOptionByTabIdAndDirectoryPath(state, tabId, directoryPath),
+  )
+  const viewMode = useAppSelector((state) =>
+    selectViewModeByTabIdAndDirectoryPath(state, tabId, directoryPath),
+  )
   const dispatch = useAppDispatch()
-
-  const { setColumns } = useExplorer()
 
   const chunks = useMemo(
     () =>
@@ -53,14 +77,11 @@ const useExplorerList = (
     getScrollElement: () => ref.current,
   })
 
+  const previousEditing = usePrevious(editing)
   const previousFocused = usePrevious(focused)
   const previousLoading = usePrevious(loading)
 
   const [restoring, setRestoring] = useState(false)
-
-  useEffect(() => {
-    setColumns(columns)
-  }, [columns, setColumns])
 
   useEffect(() => {
     const el = ref.current
@@ -100,6 +121,16 @@ const useExplorerList = (
     }
   }, [columns, contents, focused, previousFocused, virtualizer])
 
+  useEffect(() => {
+    const el = ref?.current
+    if (!el) {
+      return
+    }
+    if (focused && previousEditing && !editing) {
+      el.focus()
+    }
+  }, [editing, focused, previousEditing, ref])
+
   const noDataText = useMemo(
     () =>
       loading
@@ -112,10 +143,105 @@ const useExplorerList = (
     [error, loading, query],
   )
 
+  const zephySchema = useMemo(
+    () => isZephySchema(directoryPath),
+    [directoryPath],
+  )
+
+  const onClick = useCallback(() => dispatch(unselectAll()), [dispatch])
+
+  const onContextMenu = useMemo(
+    () =>
+      createContextMenuHandler([
+        {
+          type: 'newFolder',
+          data: { path: zephySchema ? undefined : directoryPath },
+        },
+        { type: 'separator' },
+        { type: 'cutEntries', data: { paths: [] } },
+        { type: 'copyEntries', data: { paths: [] } },
+        {
+          type: 'pasteEntries',
+          data: { path: zephySchema ? undefined : directoryPath },
+        },
+        { type: 'separator' },
+        { type: 'view', data: { viewMode } },
+        { type: 'separator' },
+        {
+          type: 'sortBy',
+          data: { orderBy: sortOption.orderBy },
+        },
+      ]),
+    [directoryPath, sortOption.orderBy, viewMode, zephySchema],
+  )
+
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!focused) {
+        return
+      }
+
+      const focusBy = (rowOffset: number, columnOffset: number) => {
+        const index = contents.findIndex((c) => c.path === focused)
+        const rowIndex = Math.floor(index / columns)
+        const columnIndex = index % columns
+        const newContent =
+          index >= 0
+            ? contents[
+                columns * (rowIndex + rowOffset) + columnIndex + columnOffset
+              ]
+            : contents[0]
+        if (newContent) {
+          dispatch(select(tabId, newContent.path))
+          dispatch(focus(tabId, newContent.path))
+        }
+      }
+
+      const focusTo = (position: 'first' | 'last') => {
+        const content = contents[position === 'first' ? 0 : contents.length - 1]
+        if (content) {
+          dispatch(select(tabId, content.path))
+          dispatch(focus(tabId, content.path))
+        }
+      }
+
+      switch (e.key) {
+        case 'Enter':
+          if (!e.nativeEvent.isComposing) {
+            dispatch(startEditing(tabId, focused))
+          }
+          return
+        case 'ArrowUp':
+          e.preventDefault()
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo('first')
+            : focusBy(-1, 0)
+        case 'ArrowDown':
+          e.preventDefault()
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? focusTo('last')
+            : focusBy(1, 0)
+        case 'ArrowLeft':
+          e.preventDefault()
+          return focusBy(0, -1)
+        case 'ArrowRight':
+          e.preventDefault()
+          return focusBy(0, 1)
+        case 'Tab':
+          e.preventDefault()
+          return focusBy(0, e.shiftKey ? -1 : 1)
+      }
+    },
+    [columns, contents, focused, dispatch, tabId],
+  )
+
   return {
     chunks,
     loading,
     noDataText,
+    onClick,
+    onContextMenu,
+    onKeyDown,
     restoring,
     virtualizer,
   }

@@ -1,6 +1,5 @@
 import { TableRow } from '@mui/material'
 import clsx from 'clsx'
-import { useRef } from 'react'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
 
@@ -13,16 +12,8 @@ type Props = {
 const ExplorerTableRow = (props: Props) => {
   const { children, content, tabId } = props
 
-  const ref = useRef<HTMLDivElement>(null)
-
-  const {
-    focused,
-    onClick,
-    onContextMenu,
-    onDoubleClick,
-    onKeyDown,
-    selected,
-  } = useExplorerItem(tabId, content, ref)
+  const { focused, onClick, onContextMenu, onDoubleClick, selected } =
+    useExplorerItem(tabId, content)
 
   return (
     <TableRow
@@ -32,15 +23,16 @@ const ExplorerTableRow = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
-      onKeyDown={onKeyDown}
-      ref={ref}
       selected={selected}
       sx={{
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
+        '&.focused': {
+          outline: (theme) => `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-1px',
+        },
       }}
-      tabIndex={0}
     >
       {children}
     </TableRow>
