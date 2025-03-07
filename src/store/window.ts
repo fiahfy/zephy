@@ -16,9 +16,9 @@ import {
   unfocus,
   unselect,
 } from '~/store/explorer'
+import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/windowId'
 import { buildZephyUrl, getTitle } from '~/utils/url'
-import { addQuery } from './query'
 
 type History = {
   directoryPath: string
