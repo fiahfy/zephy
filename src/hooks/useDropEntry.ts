@@ -3,7 +3,7 @@ import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { move } from '~/store/explorer'
+import { moveFromCurrentTab } from '~/store/explorer'
 
 const mime = 'application/zephy.path-list'
 
@@ -99,7 +99,7 @@ const useDropEntry = (entry: Entry) => {
       e.stopPropagation()
       setEnterCount(0)
       const paths = getPaths(e)
-      dispatch(move(paths, entry.path))
+      dispatch(moveFromCurrentTab(paths, entry.path))
     },
     [dispatch, droppable, entry.path],
   )

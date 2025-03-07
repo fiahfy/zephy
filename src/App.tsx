@@ -11,13 +11,13 @@ import useTheme from '~/hooks/useTheme'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  copy,
-  moveToTrash,
-  newFolder,
-  open,
-  paste,
-  selectAll,
-  startRenaming,
+  copyFromCurrentTab,
+  moveToTrashFromCurrentTab,
+  newFolderInCurrentTab,
+  openFromCurrentTab,
+  pasteToCurrentTab,
+  selectAllInCurrentTab,
+  startRenamingInCurrentTab,
 } from '~/store/explorer'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
@@ -71,7 +71,7 @@ const App = () => {
             if (isEditable() || window.getSelection()?.toString()) {
               return document.execCommand('copy')
             }
-            return dispatch(copy())
+            return dispatch(copyFromCurrentTab())
           case 'cut':
             if (isEditable()) {
               return document.execCommand('cut')
@@ -87,27 +87,27 @@ const App = () => {
           case 'goToSettings':
             return dispatch(goToSettings())
           case 'moveToTrash':
-            return dispatch(moveToTrash(data?.paths))
+            return dispatch(moveToTrashFromCurrentTab(data?.paths))
           case 'newFolder':
-            return dispatch(newFolder(data.path))
+            return dispatch(newFolderInCurrentTab(data.path))
           case 'newTab':
             return dispatch(newTab(data.path, data.tabId))
           case 'open':
-            return dispatch(open(data?.path))
+            return dispatch(openFromCurrentTab(data?.path))
           case 'removeFromFavorites':
             return dispatch(removeFromFavorites(data.path))
           case 'rename':
-            return dispatch(startRenaming(data?.path))
+            return dispatch(startRenamingInCurrentTab(data?.path))
           case 'paste':
             if (isEditable()) {
               return document.execCommand('paste')
             }
-            return dispatch(paste())
+            return dispatch(pasteToCurrentTab())
           case 'selectAll':
             if (isEditable()) {
               return document.execCommand('selectall')
             }
-            return dispatch(selectAll())
+            return dispatch(selectAllInCurrentTab())
           case 'sort':
             return dispatch(sort(data.orderBy))
         }

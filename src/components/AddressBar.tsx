@@ -32,7 +32,7 @@ import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { refresh, selectCurrentLoading } from '~/store/explorer'
+import { refreshInCurrentTab, selectCurrentLoading } from '~/store/explorer'
 import { removeQuery, selectQueryHistories } from '~/store/query'
 import {
   back,
@@ -151,7 +151,7 @@ const AddressBar = () => {
 
   const handleClickRefresh = useCallback(async () => {
     setDirectoryPathInput(directoryPath)
-    dispatch(refresh())
+    dispatch(refreshInCurrentTab())
   }, [directoryPath, dispatch])
 
   const handleClickSearch = useCallback(

@@ -11,6 +11,7 @@ import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  blur,
   focus,
   select,
   selectContentsByTabId,
@@ -148,7 +149,10 @@ const useExplorerList = (
     [directoryPath],
   )
 
-  const onClick = useCallback(() => dispatch(unselectAll()), [dispatch])
+  const onClick = useCallback(() => {
+    dispatch(blur(tabId))
+    dispatch(unselectAll(tabId))
+  }, [dispatch, tabId])
 
   const onContextMenu = useMemo(
     () =>

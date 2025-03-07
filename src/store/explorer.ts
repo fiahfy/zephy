@@ -578,6 +578,13 @@ export const rangeSelect =
     dispatch(rangeSelect({ tabId, paths: newPaths }))
   }
 
+export const unselectAll =
+  (tabId: number): AppThunk =>
+  async (dispatch) => {
+    const { unselectAll } = explorerSlice.actions
+    dispatch(unselectAll({ tabId }))
+  }
+
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
@@ -596,26 +603,22 @@ export const rename =
     }
   }
 
-export const refresh = (): AppThunk => async (dispatch, getState) => {
-  const tabId = selectCurrentTabId(getState())
-  dispatch(load(tabId))
-}
+export const refreshInCurrentTab =
+  (): AppThunk => async (dispatch, getState) => {
+    const tabId = selectCurrentTabId(getState())
+    dispatch(load(tabId))
+  }
 
-export const selectAll = (): AppThunk => async (dispatch, getState) => {
-  const { selectAll } = explorerSlice.actions
-  const tabId = selectCurrentTabId(getState())
-  const contents = selectContentsByTabId(getState(), tabId)
-  const paths = contents.map((content) => content.path)
-  dispatch(selectAll({ tabId, paths }))
-}
+export const selectAllInCurrentTab =
+  (): AppThunk => async (dispatch, getState) => {
+    const { selectAll } = explorerSlice.actions
+    const tabId = selectCurrentTabId(getState())
+    const contents = selectContentsByTabId(getState(), tabId)
+    const paths = contents.map((content) => content.path)
+    dispatch(selectAll({ tabId, paths }))
+  }
 
-export const unselectAll = (): AppThunk => async (dispatch, getState) => {
-  const { unselectAll } = explorerSlice.actions
-  const tabId = selectCurrentTabId(getState())
-  dispatch(unselectAll({ tabId }))
-}
-
-export const newFolder =
+export const newFolderInCurrentTab =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntries, focus, select, startEditing } = explorerSlice.actions
@@ -627,7 +630,7 @@ export const newFolder =
     dispatch(startEditing({ tabId, path: entry.path }))
   }
 
-export const open =
+export const openFromCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
     const contents = selectCurrentContents(getState())
@@ -644,7 +647,7 @@ export const open =
     dispatch(action)
   }
 
-export const moveToTrash =
+export const moveToTrashFromCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
     const { unfocus, unselect } = explorerSlice.actions
@@ -660,7 +663,7 @@ export const moveToTrash =
     dispatch(unselect({ tabId, paths: targetPaths }))
   }
 
-export const startRenaming =
+export const startRenamingInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
     const tabId = selectCurrentTabId(getState())
@@ -673,7 +676,7 @@ export const startRenaming =
     dispatch(startEditing(tabId, targetPath))
   }
 
-export const move =
+export const moveFromCurrentTab =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { unselect } = explorerSlice.actions
@@ -688,12 +691,12 @@ export const move =
     dispatch(unselect({ tabId, paths }))
   }
 
-export const copy = (): AppThunk => async (_, getState) => {
+export const copyFromCurrentTab = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
   await window.electronAPI.copyEntries(selected)
 }
 
-export const paste = (): AppThunk => async (_, getState) => {
+export const pasteToCurrentTab = (): AppThunk => async (_, getState) => {
   const directoryPath = selectCurrentDirectoryPath(getState())
   const zephyUrl = parseZephyUrl(directoryPath)
   if (zephyUrl) {
