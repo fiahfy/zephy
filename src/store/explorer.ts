@@ -217,6 +217,21 @@ export const explorerSlice = createSlice({
         },
       }
     },
+    unfocus(state, action: PayloadAction<{ tabId: number; paths: string[] }>) {
+      const { tabId, paths } = action.payload
+      const explorer = findExplorer(state, tabId)
+      const focused =
+        explorer.focused && paths.includes(explorer.focused)
+          ? undefined
+          : explorer.focused
+      return {
+        ...state,
+        [tabId]: {
+          ...explorer,
+          focused,
+        },
+      }
+    },
     blur(
       state,
       action: PayloadAction<{
@@ -317,8 +332,14 @@ export const explorerSlice = createSlice({
   },
 })
 
-export const { addTab, copyTab, removeTab, removeOtherTabs, unselect } =
-  explorerSlice.actions
+export const {
+  addTab,
+  copyTab,
+  removeTab,
+  removeOtherTabs,
+  unfocus,
+  unselect,
+} = explorerSlice.actions
 
 export default explorerSlice.reducer
 
@@ -466,13 +487,14 @@ export const selectCurrentSelectedContents = (state: AppState) =>
 export const load =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
-    const { loaded, loading, unselectAll } = explorerSlice.actions
+    const { blur, loaded, loading, unselectAll } = explorerSlice.actions
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const pathsMap = selectPathsByScore(getState())
     if (!directoryPath) {
       return
     }
     const url = parseZephyUrl(directoryPath)
+    dispatch(blur({ tabId }))
     dispatch(unselectAll({ tabId }))
     dispatch(loading({ tabId }))
     try {
@@ -625,7 +647,7 @@ export const open =
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { unselect } = explorerSlice.actions
+    const { unfocus, unselect } = explorerSlice.actions
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
@@ -634,6 +656,7 @@ export const moveToTrash =
       dispatch(removeFromFavorites(path))
       dispatch(removeRating({ path }))
     }
+    dispatch(unfocus({ tabId, paths: targetPaths }))
     dispatch(unselect({ tabId, paths: targetPaths }))
   }
 
@@ -661,6 +684,7 @@ export const move =
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
     })
+    dispatch(unfocus({ tabId, paths }))
     dispatch(unselect({ tabId, paths }))
   }
 

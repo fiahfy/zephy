@@ -13,6 +13,7 @@ import {
   selectCurrentContents,
   selectCurrentLoading,
   selectCurrentSelected,
+  unfocus,
   unselect,
 } from '~/store/explorer'
 import { selectWindowId } from '~/store/windowId'
@@ -838,6 +839,7 @@ export const search =
       (acc, content) => acc.filter((path) => path !== content.path),
       selected,
     )
+    dispatch(unfocus({ tabId, paths }))
     dispatch(unselect({ tabId, paths }))
   }
 
