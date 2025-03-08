@@ -1,10 +1,11 @@
 import { TableRow } from '@mui/material'
 import clsx from 'clsx'
+import type { ReactNode } from 'react'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
 
 type Props = {
-  children: React.ReactNode
+  children: ReactNode
   content: Content
   tabId: number
 }
@@ -17,7 +18,7 @@ const ExplorerTableRow = (props: Props) => {
 
   return (
     <TableRow
-      className={clsx({ focused })}
+      className={clsx({ 'Mui-focused': focused })}
       component="div"
       hover
       onClick={onClick}
@@ -28,7 +29,7 @@ const ExplorerTableRow = (props: Props) => {
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
-        '.explorer-container:focus-within &.focused': {
+        '.explorer-container:focus-within &.Mui-focused': {
           outline: (theme) => `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

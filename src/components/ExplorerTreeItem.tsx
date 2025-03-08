@@ -1,24 +1,69 @@
-import { useCallback } from 'react'
+import { Collapse, Typography, alpha, styled } from '@mui/material'
+import {
+  TreeItem2Checkbox,
+  TreeItem2Content,
+  TreeItem2DragAndDropOverlay,
+  TreeItem2Icon,
+  TreeItem2IconContainer,
+  TreeItem2Label,
+  TreeItem2Provider,
+  TreeItem2Root,
+  type UseTreeItem2Parameters,
+  useTreeItem2,
+} from '@mui/x-tree-view'
+import clsx from 'clsx'
+import {
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+  forwardRef,
+  useCallback,
+} from 'react'
 import EntryIcon from '~/components/EntryIcon'
-import EntryTreeItem from '~/components/EntryTreeItem'
+import Icon from '~/components/Icon'
 import useDragEntry from '~/hooks/useDragEntry'
 import useDropEntry from '~/hooks/useDropEntry'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
+import { useAppDispatch } from '~/store'
+import { openEntry } from '~/store/settings'
 import { changeDirectory } from '~/store/window'
-import { isHiddenFile } from '~/utils/file'
-import Icon from './Icon'
 
-type Props = {
+const StyledTreeItemRoot = styled(TreeItem2Root)(() => ({
+  position: 'relative',
+})) as unknown as typeof TreeItem2Root
+
+const StyledTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
+  flexDirection: 'row-reverse',
+  borderRadius: theme.spacing(0.5),
+  marginBottom: theme.spacing(0),
+  marginTop: theme.spacing(0),
+  padding: theme.spacing(0),
+  paddingLeft: theme.spacing(1),
+  paddingRight: theme.spacing(1),
+  '&.Mui-focused': {
+    outline: `${theme.palette.primary.main} solid 1px`,
+    outlineOffset: '-1px',
+    backgroundColor: alpha(
+      theme.palette.primary.main,
+      theme.palette.action.selectedOpacity,
+    ),
+    '&:hover': {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        theme.palette.action.selectedOpacity +
+          theme.palette.action.hoverOpacity,
+      ),
+    },
+  },
+}))
+
+interface CustomLabelProps {
+  children: ReactNode
   entry: Entry
 }
 
-const ExplorerTreeItem = (props: Props) => {
-  const { entry } = props
-
-  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+function CustomLabel({ children, entry, ...other }: CustomLabelProps) {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
@@ -38,41 +83,104 @@ const ExplorerTreeItem = (props: Props) => {
   }, [dispatch, entry.path, entry.type])
 
   return (
-    <EntryTreeItem
+    <TreeItem2Label
       draggable={draggable}
-      icon={<EntryIcon entry={entry} />}
-      itemId={entry.path}
-      label={entry.name}
-      slotProps={{
-        label: {
-          onClick: handleClick,
-          onContextMenu: onContextMenu,
-          onDoubleClick: handleDoubleClick,
-        },
-      }}
-      sx={droppableStyle}
+      onClick={handleClick}
+      onContextMenu={onContextMenu}
+      onDoubleClick={handleDoubleClick}
       {...dragHandlers}
       {...dropHandlers}
+      {...other}
+      sx={{
+        ...droppableStyle,
+        alignItems: 'center',
+        display: 'flex',
+        gap: 0.5,
+      }}
     >
-      {entry.type === 'directory' &&
-        (entry.children ? (
-          entry.children
-            .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name))
-            // limit entry size for performance issue
-            .slice(0, 100)
-            .map((entry) => <ExplorerTreeItem entry={entry} key={entry.path} />)
-        ) : (
-          <EntryTreeItem
-            icon={<Icon type="progress" />}
-            itemId={`${entry.path}<loader>`}
-            label="Loading items..."
-          />
-        ))}
-    </EntryTreeItem>
+      <EntryIcon entry={entry} />
+      <Typography
+        noWrap
+        title={typeof children === 'string' ? children : undefined}
+        variant="caption"
+      >
+        {children}
+      </Typography>
+    </TreeItem2Label>
   )
 }
+
+interface ExplorerTreeItemProps
+  extends Omit<UseTreeItem2Parameters, 'rootRef'>,
+    Omit<HTMLAttributes<HTMLLIElement>, 'onFocus'> {}
+
+const ExplorerTreeItem = forwardRef(function ExplorerTreeItem(
+  props: ExplorerTreeItemProps,
+  ref: Ref<HTMLLIElement>,
+) {
+  const { id, itemId, label, disabled, children, ...other } = props
+
+  const {
+    getRootProps,
+    getContentProps,
+    getIconContainerProps,
+    getCheckboxProps,
+    getLabelProps,
+    getGroupTransitionProps,
+    getDragAndDropOverlayProps,
+    status,
+    publicAPI,
+  } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref })
+
+  const item = publicAPI.getItem(itemId)
+  const entry: Entry | undefined = item.entry
+
+  return (
+    <TreeItem2Provider itemId={itemId}>
+      <StyledTreeItemRoot {...getRootProps(other)}>
+        <StyledTreeItemContent
+          {...getContentProps({
+            className: clsx('content', {
+              'Mui-expanded': status.expanded,
+              'Mui-selected': status.selected,
+              'Mui-focused': status.focused,
+              'Mui-disabled': status.disabled,
+            }),
+          })}
+        >
+          <TreeItem2IconContainer {...getIconContainerProps()}>
+            <TreeItem2Icon status={status} />
+          </TreeItem2IconContainer>
+          <TreeItem2Checkbox {...getCheckboxProps()} />
+          {entry ? (
+            <CustomLabel {...getLabelProps({ entry })} />
+          ) : (
+            <TreeItem2Label
+              {...getLabelProps()}
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+                gap: 0.5,
+              }}
+            >
+              <Icon type="progress" />
+              <Typography
+                noWrap
+                title={typeof children === 'string' ? children : undefined}
+                variant="caption"
+              >
+                {children}
+              </Typography>
+            </TreeItem2Label>
+          )}
+          <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
+        </StyledTreeItemContent>
+        <Collapse {...getGroupTransitionProps()} sx={{ pl: 1.25 }}>
+          {children}
+        </Collapse>
+      </StyledTreeItemRoot>
+    </TreeItem2Provider>
+  )
+})
 
 export default ExplorerTreeItem

@@ -1,6 +1,12 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { type MouseEvent, useCallback, useEffect, useMemo } from 'react'
+import {
+  type MouseEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectSidebarHiddenByVariant,
@@ -23,7 +29,7 @@ const Drawer = styled(MuiDrawer, {
 }))
 
 type Props = {
-  children: React.ReactNode
+  children: ReactNode
   variant: 'primary' | 'secondary'
 }
 

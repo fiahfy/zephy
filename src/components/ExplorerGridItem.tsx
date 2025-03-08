@@ -36,7 +36,7 @@ const ExplorerGridItem = (props: Props) => {
 
   return (
     <ImageListItem
-      className={clsx({ focused, selected })}
+      className={clsx({ 'Mui-focused': focused, 'Mui-selected': selected })}
       component="div"
       draggable={draggable}
       onClick={onClick}
@@ -59,7 +59,7 @@ const ExplorerGridItem = (props: Props) => {
             backgroundColor: (theme) => theme.palette.action.hover,
           },
         },
-        '&.selected': {
+        '&.Mui-selected': {
           '&::before': {
             backgroundColor: (theme) =>
               alpha(
@@ -78,7 +78,7 @@ const ExplorerGridItem = (props: Props) => {
             },
           },
         },
-        '.explorer-container:focus-within &.focused': {
+        '.explorer-container:focus-within &.Mui-focused': {
           outline: (theme) => `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

@@ -231,6 +231,7 @@ const useExplorerList = (
         case 'ArrowRight':
           e.preventDefault()
           return focusBy(0, 1)
+        // TODO: focus external previous/next element
         case 'Tab':
           e.preventDefault()
           return focusBy(0, e.shiftKey ? -1 : 1)

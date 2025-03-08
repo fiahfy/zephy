@@ -1,8 +1,4 @@
-import {
-  ChevronRight as ChevronRightIcon,
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material'
-import { SimpleTreeView } from '@mui/x-tree-view'
+import { RichTreeView, type TreeViewBaseItem } from '@mui/x-tree-view'
 import {
   type SyntheticEvent,
   useCallback,
@@ -15,7 +11,9 @@ import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
+import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { selectCurrentDirectoryPath } from '~/store/window'
+import { isHiddenFile } from '~/utils/file'
 import { isZephySchema } from '~/utils/url'
 
 const getLoadedDirectories = (entry: Entry) => {
@@ -30,11 +28,12 @@ const getLoadedDirectories = (entry: Entry) => {
 
 const ExplorerPanel = () => {
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const { watch } = useWatcher()
 
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<string | null>(null)
   const [root, setRoot] = useState<Entry>()
 
   const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
@@ -53,6 +52,7 @@ const ExplorerPanel = () => {
       )
       const expandedItems = getLoadedDirectories(entry)
       setExpandedItems(expandedItems)
+      setSelectedItems(directoryPath)
       setRoot(entry)
     })()
   }, [directoryPath, root, zephySchema])
@@ -117,8 +117,7 @@ const ExplorerPanel = () => {
   const handleClickRefresh = useCallback(() => setRoot(undefined), [])
 
   const handleSelectedItemsChange = useCallback(
-    (_e: SyntheticEvent, itemIds: string[] | string) =>
-      setSelectedItems(Array.isArray(itemIds) ? itemIds : [itemIds]),
+    (_e: SyntheticEvent, itemIds: string | null) => setSelectedItems(itemIds),
     [],
   )
 
@@ -166,18 +165,50 @@ const ExplorerPanel = () => {
     [entryMap, expandedItems],
   )
 
+  const items = useMemo(() => {
+    const mapper = (
+      e: Entry,
+    ): TreeViewBaseItem<{ entry?: Entry; id: string; label: string }> => {
+      return {
+        id: e.path,
+        label: e.name,
+        entry: e,
+        children:
+          e.type === 'directory'
+            ? e.children
+              ? e.children
+                  .filter(
+                    (entry) =>
+                      shouldShowHiddenFiles || !isHiddenFile(entry.name),
+                  )
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  // limit entry size for performance issue
+                  .slice(0, 100)
+                  .map(mapper)
+              : [
+                  {
+                    id: `${e.path}_loading`,
+                    label: 'Loading items...',
+                  },
+                ]
+            : [],
+      }
+    }
+
+    return (root ? [root] : []).map(mapper)
+  }, [root, shouldShowHiddenFiles])
+
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">
-      <SimpleTreeView
+      <RichTreeView
         expandedItems={expandedItems}
-        multiSelect
+        expansionTrigger="iconContainer"
+        items={items}
         onExpandedItemsChange={handleExpandedItemsChange}
         onSelectedItemsChange={handleSelectedItemsChange}
         selectedItems={selectedItems}
-        slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-      >
-        {root && <ExplorerTreeItem entry={root} />}
-      </SimpleTreeView>
+        slots={{ item: ExplorerTreeItem }}
+      />
     </Panel>
   )
 }
