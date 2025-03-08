@@ -1,4 +1,5 @@
-import { Collapse, Typography, alpha, styled } from '@mui/material'
+import { Collapse, Typography } from '@mui/material'
+import { alpha, styled } from '@mui/material/styles'
 import {
   TreeItem2Checkbox,
   TreeItem2Content,

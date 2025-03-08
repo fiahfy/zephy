@@ -1,4 +1,5 @@
-import { type SxProps, type Theme, alpha } from '@mui/system'
+import type { SxProps, Theme } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import type { Entry } from '~/interfaces'
