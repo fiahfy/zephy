@@ -187,7 +187,7 @@ const ExplorerPanel = () => {
                   .map(mapper)
               : [
                   {
-                    id: `${e.path}_loading`,
+                    id: `__loading__${e.path}`,
                     label: 'Loading items...',
                   },
                 ]

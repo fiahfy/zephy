@@ -630,39 +630,6 @@ export const newFolderInCurrentTab =
     dispatch(startEditing({ tabId, path: entry.path }))
   }
 
-export const openFromCurrentTab =
-  (path?: string): AppThunk =>
-  async (dispatch, getState) => {
-    const contents = selectCurrentContents(getState())
-    const selected = selectCurrentSelected(getState())
-    const targetPath = path ?? selected[0]
-    const content = contents.find((content) => content.path === targetPath)
-    if (!content) {
-      return
-    }
-    const action =
-      content.type === 'directory'
-        ? changeDirectory(content.path)
-        : openEntry(content.path)
-    dispatch(action)
-  }
-
-export const moveToTrashFromCurrentTab =
-  (paths?: string[]): AppThunk =>
-  async (dispatch, getState) => {
-    const { unfocus, unselect } = explorerSlice.actions
-    const tabId = selectCurrentTabId(getState())
-    const selected = selectSelectedByTabId(getState(), tabId)
-    const targetPaths = paths ?? selected
-    await window.electronAPI.moveEntriesToTrash(targetPaths)
-    for (const path of targetPaths) {
-      dispatch(removeFromFavorites(path))
-      dispatch(removeRating({ path }))
-    }
-    dispatch(unfocus({ tabId, paths: targetPaths }))
-    dispatch(unselect({ tabId, paths: targetPaths }))
-  }
-
 export const startRenamingInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
@@ -704,6 +671,40 @@ export const pasteToCurrentTab = (): AppThunk => async (_, getState) => {
   }
   await window.electronAPI.pasteEntries(directoryPath)
 }
+
+// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
+export const moveToTrashFromCurrentTab =
+  (paths?: string[]): AppThunk =>
+  async (dispatch, getState) => {
+    const { unfocus, unselect } = explorerSlice.actions
+    const tabId = selectCurrentTabId(getState())
+    const selected = selectSelectedByTabId(getState(), tabId)
+    const targetPaths = paths ?? selected
+    await window.electronAPI.moveEntriesToTrash(targetPaths)
+    for (const path of targetPaths) {
+      dispatch(removeFromFavorites(path))
+      dispatch(removeRating({ path }))
+    }
+    dispatch(unfocus({ tabId, paths: targetPaths }))
+    dispatch(unselect({ tabId, paths: targetPaths }))
+  }
+
+// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
+export const openFromCurrentTab =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const selected = selectCurrentSelected(getState())
+    const targetPath = path ?? selected[0]
+    if (!targetPath) {
+      return
+    }
+    const entry = await window.electronAPI.getDetailedEntry(targetPath)
+    const action =
+      entry.type === 'directory'
+        ? changeDirectory(entry.path)
+        : openEntry(entry.path)
+    dispatch(action)
+  }
 
 export const handle =
   (
