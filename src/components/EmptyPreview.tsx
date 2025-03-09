@@ -16,6 +16,7 @@ const EmptyPreview = (props: Props) => {
         aspectRatio: '16 / 9',
         display: 'flex',
         justifyContent: 'center',
+        minHeight: 128,
         ...sx,
       }}
     >

@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  FullscreenExit as FullscreenExitIcon,
+  Fullscreen as FullscreenIcon,
+} from '@mui/icons-material'
+import { Box, IconButton } from '@mui/material'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import EmptyPreview from '~/components/EmptyPreview'
 import type { Entry } from '~/interfaces'
 
@@ -12,6 +17,9 @@ const ImagePreview = (props: Props) => {
   const [status, setStatus] = useState<'error' | 'loaded' | 'loading'>(
     'loading',
   )
+  const [fullscreen, setFullscreen] = useState(false)
+
+  const ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -44,19 +52,60 @@ const ImagePreview = (props: Props) => {
     }
   }, [status])
 
+  const title = useMemo(
+    () => (fullscreen ? 'Exit full screen' : 'Full screen'),
+    [fullscreen],
+  )
+
+  const Icon = useMemo(
+    () => (fullscreen ? FullscreenExitIcon : FullscreenIcon),
+    [fullscreen],
+  )
+
+  const handleClick = useCallback(() => {
+    const img = ref.current
+    if (!img) {
+      return
+    }
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+      setFullscreen(false)
+    } else {
+      img.requestFullscreen()
+      setFullscreen(true)
+    }
+  }, [])
+
   return (
     <>
       {status === 'loaded' ? (
-        <img
-          alt=""
-          src={entry.url}
-          style={{
-            backgroundColor: 'black',
-            minHeight: 128,
-            objectFit: 'contain',
-            width: '100%',
-          }}
-        />
+        <Box ref={ref} sx={{ maxHeight: '100%', position: 'relative' }}>
+          <img
+            alt=""
+            src={entry.url}
+            style={{
+              backgroundColor: 'black',
+              display: 'block',
+              height: '100%',
+              minHeight: 128,
+              objectFit: 'contain',
+              width: '100%',
+            }}
+          />
+          <IconButton
+            onClick={handleClick}
+            size="small"
+            sx={{
+              bottom: 0,
+              m: 1,
+              position: 'absolute',
+              right: 0,
+            }}
+            title={title}
+          >
+            <Icon fontSize="small" />
+          </IconButton>
+        </Box>
       ) : (
         <EmptyPreview message={message} />
       )}
