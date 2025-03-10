@@ -112,6 +112,9 @@ const useExplorerList = (
     }
   }, [loading, previousLoading, scrollTop, virtualizer])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => virtualizer.scrollToOffset(0), [sortOption])
+
   useEffect(() => {
     if (focused && previousFocused !== focused) {
       const index = contents.findIndex((content) => content.path === focused)
@@ -185,24 +188,80 @@ const useExplorerList = (
         return
       }
 
-      const focusBy = (rowOffset: number, columnOffset: number) => {
+      const focusBy = (offset: number) => {
         const index = contents.findIndex((c) => c.path === focused)
+        if (index < 0) {
+          return
+        }
+
+        const newIndex = index + offset
+        const content = contents[newIndex]
+        if (content) {
+          dispatch(select(tabId, content.path))
+          dispatch(focus(tabId, content.path))
+        }
+      }
+
+      const focusByHorizontal = (offset: number) => {
+        const index = contents.findIndex((c) => c.path === focused)
+        if (index < 0) {
+          return
+        }
+
         const rowIndex = Math.floor(index / columns)
         const columnIndex = index % columns
-        const newContent =
-          index >= 0
-            ? contents[
-                columns * (rowIndex + rowOffset) + columnIndex + columnOffset
-              ]
-            : contents[0]
-        if (newContent) {
-          dispatch(select(tabId, newContent.path))
-          dispatch(focus(tabId, newContent.path))
+        const newColumnIndex = columnIndex + offset
+
+        if (newColumnIndex < 0 || newColumnIndex >= columns) {
+          return
+        }
+
+        const newIndex = columns * rowIndex + newColumnIndex
+        const content = contents[newIndex]
+        if (content) {
+          dispatch(select(tabId, content.path))
+          dispatch(focus(tabId, content.path))
+        }
+      }
+
+      const focusByVertical = (offset: number) => {
+        const index = contents.findIndex((c) => c.path === focused)
+        if (index < 0) {
+          return
+        }
+
+        const rowIndex = Math.floor(index / columns)
+        const columnIndex = index % columns
+        const newRowIndex = rowIndex + offset
+
+        const newIndex = columns * newRowIndex + columnIndex
+        const content = contents[newIndex]
+        if (content) {
+          dispatch(select(tabId, content.path))
+          dispatch(focus(tabId, content.path))
         }
       }
 
       const focusTo = (position: 'first' | 'last') => {
-        const content = contents[position === 'first' ? 0 : contents.length - 1]
+        const index = contents.findIndex((c) => c.path === focused)
+        const columnIndex = index % columns
+        const maxRowIndex = Math.floor(contents.length / columns)
+
+        let newIndex: number
+        if (index >= 0) {
+          if (position === 'first') {
+            newIndex = columnIndex
+          } else {
+            newIndex = maxRowIndex * columns + columnIndex
+            if (newIndex >= contents.length) {
+              newIndex -= columns
+            }
+          }
+        } else {
+          newIndex = 0
+        }
+
+        const content = contents[newIndex]
         if (content) {
           dispatch(select(tabId, content.path))
           dispatch(focus(tabId, content.path))
@@ -219,22 +278,22 @@ const useExplorerList = (
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
             ? focusTo('first')
-            : focusBy(-1, 0)
+            : focusByVertical(-1)
         case 'ArrowDown':
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
             ? focusTo('last')
-            : focusBy(1, 0)
+            : focusByVertical(1)
         case 'ArrowLeft':
           e.preventDefault()
-          return focusBy(0, -1)
+          return focusByHorizontal(-1)
         case 'ArrowRight':
           e.preventDefault()
-          return focusBy(0, 1)
+          return focusByHorizontal(1)
         // TODO: focus external previous/next element
         case 'Tab':
           e.preventDefault()
-          return focusBy(0, e.shiftKey ? -1 : 1)
+          return focusBy(e.shiftKey ? -1 : 1)
       }
     },
     [columns, contents, focused, dispatch, tabId],
