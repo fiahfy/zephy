@@ -3,15 +3,19 @@ import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-win
 import { type IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 import type { ApplicationMenuParams } from './applicationMenu'
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  addMessageListener: (callback: (message: any) => void) => {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    const listener = (_event: IpcRendererEvent, message: any) =>
-      callback(message)
-    ipcRenderer.on('sendMessage', listener)
-    return () => ipcRenderer.off('sendMessage', listener)
-  },
+const applicationMenuOperations = {
+  updateApplicationMenu: (params: ApplicationMenuParams) =>
+    ipcRenderer.invoke('updateApplicationMenu', params),
+}
+
+const editOperations = {
+  copy: () => ipcRenderer.invoke('copy'),
+  cut: () => ipcRenderer.invoke('cut'),
+  paste: () => ipcRenderer.invoke('paste'),
+  selectAll: () => ipcRenderer.invoke('selectAll'),
+}
+
+const entryOperations = {
   copyEntries: (paths: string[]) => ipcRenderer.invoke('copyEntries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('createDirectory', directoryPath),
@@ -34,14 +38,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   moveEntriesToTrash: (paths: string[]) =>
     ipcRenderer.invoke('moveEntriesToTrash', paths),
   openEntry: (path: string) => ipcRenderer.invoke('openEntry', path),
-  openTab: () => ipcRenderer.invoke('openTab'),
-  openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
   pasteEntries: (directoryPath: string) =>
     ipcRenderer.invoke('pasteEntries', directoryPath),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('renameEntry', path, newName),
-  updateApplicationMenu: (params: ApplicationMenuParams) =>
-    ipcRenderer.invoke('updateApplicationMenu', params),
+}
+
+const messageOperations = {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  addMessageListener: (callback: (message: any) => void) => {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    const listener = (_event: IpcRendererEvent, message: any) =>
+      callback(message)
+    ipcRenderer.on('sendMessage', listener)
+    return () => ipcRenderer.off('sendMessage', listener)
+  },
+}
+
+const watcherOperations = {
   watchDirectories: (
     directoryPaths: string[],
     callback: (
@@ -62,6 +76,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     )
     return ipcRenderer.invoke('watchDirectories', directoryPaths)
   },
+}
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  openTab: () => ipcRenderer.invoke('openTab'),
+  openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
+  ...applicationMenuOperations,
+  ...editOperations,
+  ...entryOperations,
+  ...messageOperations,
+  ...watcherOperations,
   ...exposeContextMenuOperations(),
   ...exposeWindowOperations(),
 })

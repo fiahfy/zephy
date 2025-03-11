@@ -1,5 +1,11 @@
 import { dirname, join } from 'node:path'
-import { type IpcMainInvokeEvent, app, ipcMain, shell } from 'electron'
+import {
+  BrowserWindow,
+  type IpcMainInvokeEvent,
+  app,
+  ipcMain,
+  shell,
+} from 'electron'
 import { readPaths, writePaths } from './utils/clipboard'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
@@ -17,7 +23,62 @@ import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
-const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
+const registerEditHandlers = () => {
+  ipcMain.handle('copy', (event: IpcMainInvokeEvent) => {
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!browserWindow) {
+      return
+    }
+    const webContents = browserWindow.webContents.isDevToolsFocused()
+      ? browserWindow.webContents.devToolsWebContents
+      : browserWindow.webContents
+    if (!webContents) {
+      return
+    }
+    webContents.copy()
+  })
+  ipcMain.handle('cut', (event: IpcMainInvokeEvent) => {
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!browserWindow) {
+      return
+    }
+    const webContents = browserWindow.webContents.isDevToolsFocused()
+      ? browserWindow.webContents.devToolsWebContents
+      : browserWindow.webContents
+    if (!webContents) {
+      return
+    }
+    webContents.cut()
+  })
+  ipcMain.handle('paste', (event: IpcMainInvokeEvent) => {
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!browserWindow) {
+      return
+    }
+    const webContents = browserWindow.webContents.isDevToolsFocused()
+      ? browserWindow.webContents.devToolsWebContents
+      : browserWindow.webContents
+    if (!webContents) {
+      return
+    }
+    webContents.paste()
+  })
+  ipcMain.handle('selectAll', (event: IpcMainInvokeEvent) => {
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!browserWindow) {
+      return
+    }
+    const webContents = browserWindow.webContents.isDevToolsFocused()
+      ? browserWindow.webContents.devToolsWebContents
+      : browserWindow.webContents
+    if (!webContents) {
+      return
+    }
+    webContents.selectAll()
+  })
+}
+
+const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
     writePaths(paths),
   )
@@ -83,15 +144,6 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
   )
-  ipcMain.handle('openTab', (event: IpcMainInvokeEvent) =>
-    event.sender.send('sendMessage', {
-      type: 'newTab',
-      data: { path: app.getPath('home') },
-    }),
-  )
-  ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
-    shell.openExternal(url),
-  )
   ipcMain.handle(
     'pasteEntries',
     (_event: IpcMainInvokeEvent, directoryPath) => {
@@ -104,6 +156,20 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
       renameEntry(path, newName),
   )
+}
+
+const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
+  ipcMain.handle('openTab', (event: IpcMainInvokeEvent) =>
+    event.sender.send('sendMessage', {
+      type: 'newTab',
+      data: { path: app.getPath('home') },
+    }),
+  )
+  ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
+    shell.openExternal(url),
+  )
+  registerEditHandlers()
+  registerEntryHandlers(watcher)
 }
 
 export default registerHandlers

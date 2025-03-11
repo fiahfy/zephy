@@ -69,12 +69,12 @@ const App = () => {
             return dispatch(closeTab(data?.tabId))
           case 'copy':
             if (isEditable() || window.getSelection()?.toString()) {
-              return document.execCommand('copy')
+              return window.electronAPI.copy()
             }
             return dispatch(copyFromCurrentTab())
           case 'cut':
             if (isEditable()) {
-              return document.execCommand('cut')
+              return window.electronAPI.cut()
             }
             // TODO: implement
             return
@@ -100,12 +100,12 @@ const App = () => {
             return dispatch(startRenamingInCurrentTab(data?.path))
           case 'paste':
             if (isEditable()) {
-              return document.execCommand('paste')
+              return window.electronAPI.paste()
             }
             return dispatch(pasteToCurrentTab())
           case 'selectAll':
             if (isEditable()) {
-              return document.execCommand('selectall')
+              return window.electronAPI.selectAll()
             }
             return dispatch(selectAllInCurrentTab())
           case 'sort':

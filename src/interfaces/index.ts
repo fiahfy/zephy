@@ -6,9 +6,18 @@
 import type { Operations as ContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import type { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
-export type IElectronAPI = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  addMessageListener: (callback: (message: any) => void) => () => void
+export type ApplicationMenuOperations = {
+  updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
+}
+
+export type EditOperations = {
+  copy: () => Promise<void>
+  cut: () => Promise<void>
+  paste: () => Promise<void>
+  selectAll: () => Promise<void>
+}
+
+export type EntryOperations = {
   copyEntries: (paths: string[]) => Promise<void>
   createDirectory: (directoryPath: string) => Promise<DetailedEntry>
   createEntryThumbnailUrl: (
@@ -27,11 +36,16 @@ export type IElectronAPI = {
   ) => Promise<DetailedEntry[]>
   moveEntriesToTrash: (paths: string[]) => Promise<void>
   openEntry: (path: string) => Promise<void>
-  openTab: () => Promise<void>
-  openUrl: (url: string) => Promise<void>
   pasteEntries: (directoryPath: string) => Promise<void>
   renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
-  updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
+}
+
+export type MessageOperations = {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  addMessageListener: (callback: (message: any) => void) => () => void
+}
+
+export type WatcherOperations = {
   watchDirectories: (
     directoryPaths: string[],
     callback: (
@@ -40,7 +54,17 @@ export type IElectronAPI = {
       filePath: string,
     ) => void,
   ) => Promise<void>
-} & ContextMenuOperations &
+}
+
+export type IElectronAPI = {
+  openTab: () => Promise<void>
+  openUrl: (url: string) => Promise<void>
+} & ApplicationMenuOperations &
+  EditOperations &
+  EntryOperations &
+  MessageOperations &
+  WatcherOperations &
+  ContextMenuOperations &
   WindowOperations<{ directoryPath: string }>
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
