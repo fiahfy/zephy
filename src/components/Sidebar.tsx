@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useState,
 } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -54,6 +55,8 @@ const Sidebar = (props: Props) => {
   )
   const dispatch = useAppDispatch()
 
+  const [resizing, setResizing] = useState(false)
+
   const position = useMemo(
     () => (variant === 'primary' ? 'left' : 'right'),
     [variant],
@@ -95,6 +98,7 @@ const Sidebar = (props: Props) => {
   )
 
   const handleMouseUp = useCallback(() => {
+    setResizing(false)
     document.body.classList.remove('col-resizing')
     document.removeEventListener('mouseup', handleMouseUp, true)
     document.removeEventListener('mousemove', handleMouseMove, true)
@@ -104,6 +108,7 @@ const Sidebar = (props: Props) => {
     (e: MouseEvent) => {
       // prevent dragging on tree view
       e.preventDefault()
+      setResizing(true)
       document.body.classList.add('col-resizing')
       document.addEventListener('mouseup', handleMouseUp, true)
       document.addEventListener('mousemove', handleMouseMove, true)
@@ -145,15 +150,22 @@ const Sidebar = (props: Props) => {
         onMouseDown={handleMouseDown}
         sx={{
           backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[100]
-              : theme.palette.grey[900],
+            resizing
+              ? theme.palette.primary.main
+              : theme.palette.mode === 'light'
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
           bottom: 0,
           cursor: 'col-resize',
           position: 'absolute',
           top: 0,
-          width: (theme) => theme.spacing(0.625),
+          transition: (theme) =>
+            `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.easeOut}`,
+          width: (theme) => theme.spacing(0.5),
           [position === 'left' ? 'right' : 'left']: 0,
+          '&:hover': {
+            backgroundColor: (theme) => theme.palette.primary.main,
+          },
         }}
       />
     </Drawer>

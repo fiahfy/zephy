@@ -24,7 +24,7 @@ const RoundedFilledTextField = styled((props: TextFieldProps) => (
         pointerEvents: 'none',
         position: 'absolute',
         transform: 'unset',
-        transition: `opacity ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeOut}}`,
+        transition: `opacity ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeOut}`,
       },
       '.MuiFilledInput-input': {
         py: 0.5,

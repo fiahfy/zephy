@@ -26,12 +26,12 @@ const ThemeProvider = (props: Props) => {
       : themeSetting
 
   useEffect(() => {
-    if (mode === 'dark') {
-      document.body.classList.remove('theme-light')
-      document.body.classList.add('theme-dark')
-    } else {
+    if (mode === 'light') {
       document.body.classList.remove('theme-dark')
       document.body.classList.add('theme-light')
+    } else {
+      document.body.classList.remove('theme-light')
+      document.body.classList.add('theme-dark')
     }
   }, [mode])
 
