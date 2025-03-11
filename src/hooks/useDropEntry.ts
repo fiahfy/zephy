@@ -4,7 +4,7 @@ import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { moveFromCurrentTab } from '~/store/explorer'
+import { moveFromCurrentTab } from '~/store/explorer-list'
 
 const mime = 'application/zephy.path-list'
 

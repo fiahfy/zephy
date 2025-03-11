@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import TabPanel from '~/components/TabPanel'
 import useWatcher from '~/hooks/useWatcher'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { handle } from '~/store/explorer'
+import { handle } from '~/store/explorer-list'
 import {
   selectCurrentTabId,
   selectDirectoryPaths,

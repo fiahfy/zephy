@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import EntryInformationTable from '~/components/EntryInformationTable'
 import Preview from '~/components/Preview'
 import { useAppSelector } from '~/store'
-import { selectCurrentSelectedContents } from '~/store/explorer'
+import { selectCurrentSelectedContents } from '~/store/explorer-list'
 
 const Inspector = () => {
   const contents = useAppSelector(selectCurrentSelectedContents)

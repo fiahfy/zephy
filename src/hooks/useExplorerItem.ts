@@ -13,7 +13,7 @@ import {
   selectSelectedByTabIdAndPath,
   selectSelectedContentsByTabId,
   startEditing,
-} from '~/store/explorer'
+} from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
 import { changeDirectory, selectDirectoryPathByTabId } from '~/store/window'

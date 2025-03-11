@@ -21,7 +21,7 @@ import {
   selectLoadingByTabId,
   startEditing,
   unselectAll,
-} from '~/store/explorer'
+} from '~/store/explorer-list'
 import {
   selectDirectoryPathByTabId,
   selectQueryByTabId,

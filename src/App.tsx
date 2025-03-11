@@ -18,7 +18,7 @@ import {
   pasteToCurrentTab,
   selectAllInCurrentTab,
   startRenamingInCurrentTab,
-} from '~/store/explorer'
+} from '~/store/explorer-list'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
   back,

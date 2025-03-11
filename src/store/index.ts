@@ -21,7 +21,7 @@ import {
   persistStore,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import explorerReducer from '~/store/explorer'
+import explorerReducer from '~/store/explorer-list'
 import favoriteReducer from '~/store/favorite'
 import previewReducer from '~/store/preview'
 import queryReducer from '~/store/query'

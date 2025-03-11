@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import Explorer from '~/components/Explorer'
 import Settings from '~/components/Settings'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { load } from '~/store/explorer'
+import { load } from '~/store/explorer-list'
 import { selectDirectoryPathByTabId } from '~/store/window'
 
 type Props = {

@@ -10,7 +10,7 @@ import {
 import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
 import type { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { finishEditing, rename } from '~/store/explorer'
+import { finishEditing, rename } from '~/store/explorer-list'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type Props = {

@@ -15,7 +15,7 @@ import {
   selectCurrentSelected,
   unfocus,
   unselect,
-} from '~/store/explorer'
+} from '~/store/explorer-list'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/windowId'
 import { buildZephyUrl, getTitle } from '~/utils/url'

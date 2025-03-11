@@ -2,7 +2,10 @@ import { AppBar, Divider, Toolbar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
 import { useMemo } from 'react'
 import { useAppSelector } from '~/store'
-import { selectCurrentContents, selectCurrentSelected } from '~/store/explorer'
+import {
+  selectCurrentContents,
+  selectCurrentSelected,
+} from '~/store/explorer-list'
 
 const StatusBar = () => {
   const contents = useAppSelector(selectCurrentContents)
