@@ -118,7 +118,6 @@ const ExplorerTreeItemRoot = forwardRef(
       (e: MouseEvent) => {
         e.stopPropagation()
         if (entry.type === 'directory') {
-          console.log(entry.path)
           dispatch(changeDirectory(entry.path))
         }
       },

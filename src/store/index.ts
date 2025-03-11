@@ -22,7 +22,7 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import explorerListReducer from '~/store/explorer-list'
-import explorerTreeViewReducer from '~/store/explorer-tree-view'
+import explorerTreeReducer from '~/store/explorer-tree'
 import favoriteReducer from '~/store/favorite'
 import previewReducer from '~/store/preview'
 import queryReducer from '~/store/query'
@@ -33,7 +33,7 @@ import windowIdReducer from '~/store/windowId'
 
 const reducers = combineReducers({
   explorerList: explorerListReducer,
-  explorerTreeView: explorerTreeViewReducer,
+  explorerTree: explorerTreeReducer,
   favorite: favoriteReducer,
   preview: previewReducer,
   query: queryReducer,

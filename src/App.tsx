@@ -36,7 +36,7 @@ import {
   updateApplicationMenu,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
-import { setPath } from './store/explorer-tree-view'
+import { setPath } from './store/explorer-tree'
 
 const isEditable = () => {
   const el = document.activeElement

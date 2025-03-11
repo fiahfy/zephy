@@ -15,7 +15,7 @@ import {
   setPath,
   setRoot,
   setSelectedItems,
-} from '~/store/explorer-tree-view'
+} from '~/store/explorer-tree'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { selectCurrentDirectoryPath } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'

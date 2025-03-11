@@ -31,8 +31,8 @@ const getLoadedDirectories = (entry: Entry) => {
   return [entry].reduce(reducer, [])
 }
 
-export const explorerTreeViewSlice = createSlice({
-  name: 'explorer-tree-view',
+export const explorerTreeSlice = createSlice({
+  name: 'explorer-tree',
   initialState,
   reducers: {
     setSelectedItems(
@@ -61,39 +61,38 @@ export const explorerTreeViewSlice = createSlice({
 })
 
 export const { setExpandedItems, setPath, setRoot, setSelectedItems } =
-  explorerTreeViewSlice.actions
+  explorerTreeSlice.actions
 
-export default explorerTreeViewSlice.reducer
+export default explorerTreeSlice.reducer
 
-export const selectExplorerTreeView = (state: AppState) =>
-  state.explorerTreeView
+export const selectExplorerTree = (state: AppState) => state.explorerTree
 
 export const selectPath = createSelector(
-  selectExplorerTreeView,
-  (explorerTreeView) => explorerTreeView.path,
+  selectExplorerTree,
+  (explorerTree) => explorerTree.path,
 )
 
 export const selectRoot = createSelector(
-  selectExplorerTreeView,
-  (explorerTreeView) => explorerTreeView.root,
+  selectExplorerTree,
+  (explorerTree) => explorerTree.root,
 )
 
 export const selectSelectedItems = createSelector(
-  selectExplorerTreeView,
-  (explorerTreeView) => explorerTreeView.selectedItems,
+  selectExplorerTree,
+  (explorerTree) => explorerTree.selectedItems,
 )
 
 export const selectExpandedItems = createSelector(
-  selectExplorerTreeView,
-  (explorerTreeView) => explorerTreeView.expandedItems,
+  selectExplorerTree,
+  (explorerTree) => explorerTree.expandedItems,
 )
 
 export const load =
   (directoryPath: string | undefined): AppThunk =>
   async (dispatch) => {
     const { setExpandedItems, setRoot, setSelectedItems } =
-      explorerTreeViewSlice.actions
-    console.log('directoryPath', directoryPath)
+      explorerTreeSlice.actions
+
     const path =
       directoryPath && isZephySchema(directoryPath) ? undefined : directoryPath
     const entry = await window.electronAPI.getRootEntry(path)
