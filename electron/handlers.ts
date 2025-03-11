@@ -24,58 +24,30 @@ import type createWatcher from './watcher'
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 const registerEditHandlers = () => {
-  ipcMain.handle('copy', (event: IpcMainInvokeEvent) => {
+  const getWebContents = (event: IpcMainInvokeEvent) => {
     const browserWindow = BrowserWindow.fromWebContents(event.sender)
     if (!browserWindow) {
       return
     }
-    const webContents = browserWindow.webContents.isDevToolsFocused()
-      ? browserWindow.webContents.devToolsWebContents
-      : browserWindow.webContents
-    if (!webContents) {
-      return
-    }
-    webContents.copy()
-  })
-  ipcMain.handle('cut', (event: IpcMainInvokeEvent) => {
-    const browserWindow = BrowserWindow.fromWebContents(event.sender)
-    if (!browserWindow) {
-      return
-    }
-    const webContents = browserWindow.webContents.isDevToolsFocused()
-      ? browserWindow.webContents.devToolsWebContents
-      : browserWindow.webContents
-    if (!webContents) {
-      return
-    }
-    webContents.cut()
-  })
-  ipcMain.handle('paste', (event: IpcMainInvokeEvent) => {
-    const browserWindow = BrowserWindow.fromWebContents(event.sender)
-    if (!browserWindow) {
-      return
-    }
-    const webContents = browserWindow.webContents.isDevToolsFocused()
-      ? browserWindow.webContents.devToolsWebContents
-      : browserWindow.webContents
-    if (!webContents) {
-      return
-    }
-    webContents.paste()
-  })
-  ipcMain.handle('selectAll', (event: IpcMainInvokeEvent) => {
-    const browserWindow = BrowserWindow.fromWebContents(event.sender)
-    if (!browserWindow) {
-      return
-    }
-    const webContents = browserWindow.webContents.isDevToolsFocused()
-      ? browserWindow.webContents.devToolsWebContents
-      : browserWindow.webContents
-    if (!webContents) {
-      return
-    }
-    webContents.selectAll()
-  })
+
+    const webContents = browserWindow.webContents
+    return webContents.isDevToolsFocused()
+      ? webContents.devToolsWebContents
+      : webContents
+  }
+
+  ipcMain.handle('copy', (event: IpcMainInvokeEvent) =>
+    getWebContents(event)?.copy(),
+  )
+  ipcMain.handle('cut', (event: IpcMainInvokeEvent) =>
+    getWebContents(event)?.cut(),
+  )
+  ipcMain.handle('paste', (event: IpcMainInvokeEvent) =>
+    getWebContents(event)?.paste(),
+  )
+  ipcMain.handle('selectAll', (event: IpcMainInvokeEvent) =>
+    getWebContents(event)?.selectAll(),
+  )
 }
 
 const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
