@@ -1,20 +1,24 @@
 import { RichTreeView, type TreeViewBaseItem } from '@mui/x-tree-view'
-import {
-  type SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { type SyntheticEvent, useCallback, useEffect, useMemo } from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import type { Entry } from '~/interfaces'
-import { useAppSelector } from '~/store'
+import { useAppDispatch, useAppSelector } from '~/store'
+import {
+  load,
+  selectExpandedItems,
+  selectPath,
+  selectRoot,
+  selectSelectedItems,
+  setExpandedItems,
+  setPath,
+  setRoot,
+  setSelectedItems,
+} from '~/store/explorer-tree-view'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { selectCurrentDirectoryPath } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { isZephySchema } from '~/utils/url'
 
 const getLoadedDirectories = (entry: Entry) => {
   const reducer = (acc: string[], entry: Entry): string[] => {
@@ -28,71 +32,64 @@ const getLoadedDirectories = (entry: Entry) => {
 
 const ExplorerPanel = () => {
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const expandedItems = useAppSelector(selectExpandedItems)
+  const path = useAppSelector(selectPath)
+  const root = useAppSelector(selectRoot)
+  const selectedItems = useAppSelector(selectSelectedItems)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const dispatch = useAppDispatch()
 
   const { watch } = useWatcher()
 
-  const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const [selectedItems, setSelectedItems] = useState<string | null>(null)
-  const [root, setRoot] = useState<Entry>()
-
-  const loaded = useMemo(() => (root ? getLoadedDirectories(root) : []), [root])
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
+  const loadedDirectoryPaths = useMemo(
+    () => (root ? getLoadedDirectories(root) : []),
+    [root],
   )
 
   useEffect(() => {
-    ;(async () => {
-      if (root) {
-        return
-      }
-      const entry = await window.electronAPI.getRootEntry(
-        zephySchema ? undefined : directoryPath,
-      )
-      const expandedItems = getLoadedDirectories(entry)
-      setExpandedItems(expandedItems)
-      setSelectedItems(directoryPath)
-      setRoot(entry)
-    })()
-  }, [directoryPath, root, zephySchema])
+    dispatch(load(path))
+  }, [dispatch, path])
 
   useEffect(
     () =>
-      watch('explorer', loaded, async (eventType, directoryPath, filePath) => {
-        const entry =
-          eventType === 'delete'
-            ? undefined
-            : await window.electronAPI.getDetailedEntry(filePath)
+      watch(
+        'explorer',
+        loadedDirectoryPaths,
+        async (eventType, directoryPath, filePath) => {
+          const entry =
+            eventType === 'delete'
+              ? undefined
+              : await window.electronAPI.getDetailedEntry(filePath)
 
-        const mapper = (e: Entry): Entry => {
-          if (e.type === 'directory') {
-            if (e.path === directoryPath && e.children) {
-              // イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
-              let children = e.children.filter(
-                (entry) => entry.path !== filePath,
-              )
-              if (entry) {
-                children = [...children, entry]
+          const mapper = (e: Entry): Entry => {
+            if (e.type === 'directory') {
+              if (e.path === directoryPath && e.children) {
+                // イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
+                let children = e.children.filter(
+                  (entry) => entry.path !== filePath,
+                )
+                if (entry) {
+                  children = [...children, entry]
+                }
+                return {
+                  ...e,
+                  children,
+                }
               }
-              return {
-                ...e,
-                children,
+              if (e.children) {
+                return {
+                  ...e,
+                  children: e.children.map(mapper),
+                }
               }
             }
-            if (e.children) {
-              return {
-                ...e,
-                children: e.children.map(mapper),
-              }
-            }
+            return e
           }
-          return e
-        }
 
-        setRoot((root) => (root ? mapper(root) : root))
-      }),
-    [loaded, watch],
+          dispatch(setRoot({ root: root ? mapper(root) : root }))
+        },
+      ),
+    [dispatch, loadedDirectoryPaths, root, watch],
   )
 
   const entryMap = useMemo(() => {
@@ -114,16 +111,20 @@ const ExplorerPanel = () => {
     return [root].reduce(reducer, {})
   }, [root])
 
-  const handleClickRefresh = useCallback(() => setRoot(undefined), [])
+  const handleClickRefresh = useCallback(
+    () => dispatch(setPath({ path: directoryPath })),
+    [directoryPath, dispatch],
+  )
 
   const handleSelectedItemsChange = useCallback(
-    (_e: SyntheticEvent, itemIds: string | null) => setSelectedItems(itemIds),
-    [],
+    (_e: SyntheticEvent, itemIds: string | null) =>
+      dispatch(setSelectedItems({ selectedItems: itemIds ?? undefined })),
+    [dispatch],
   )
 
   const handleExpandedItemsChange = useCallback(
     async (_e: SyntheticEvent, itemIds: string[]) => {
-      setExpandedItems(itemIds)
+      dispatch(setExpandedItems({ expandedItems: itemIds }))
 
       const expandingItemId = itemIds.find(
         (itemId) => !expandedItems.includes(itemId),
@@ -157,12 +158,9 @@ const ExplorerPanel = () => {
         return e
       }
 
-      setRoot((root) => {
-        const [newRoot] = (root ? [root] : []).map(mapper)
-        return newRoot
-      })
+      dispatch(setRoot({ root: root ? mapper(root) : root }))
     },
-    [entryMap, expandedItems],
+    [dispatch, entryMap, expandedItems, root],
   )
 
   const items = useMemo(() => {
@@ -206,7 +204,7 @@ const ExplorerPanel = () => {
         items={items}
         onExpandedItemsChange={handleExpandedItemsChange}
         onSelectedItemsChange={handleSelectedItemsChange}
-        selectedItems={selectedItems}
+        selectedItems={selectedItems ?? null}
         slots={{ item: ExplorerTreeItem }}
       />
     </Panel>

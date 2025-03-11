@@ -36,6 +36,7 @@ import {
   updateApplicationMenu,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
+import { setPath } from './store/explorer-tree-view'
 
 const isEditable = () => {
   const el = document.activeElement
@@ -98,6 +99,8 @@ const App = () => {
             return dispatch(removeFromFavorites(data.path))
           case 'rename':
             return dispatch(startRenamingInCurrentTab(data?.path))
+          case 'revealInExplorer':
+            return dispatch(setPath({ path: data.path }))
           case 'paste':
             if (isEditable()) {
               return window.electronAPI.paste()

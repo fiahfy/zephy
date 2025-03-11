@@ -78,6 +78,7 @@ export const addToFavorites =
   (path: string): AppThunk =>
   async (dispatch) => {
     const { addToFavorites } = favoriteSlice.actions
+
     dispatch(addToFavorites({ path }))
   }
 
@@ -85,6 +86,7 @@ export const removeFromFavorites =
   (path: string): AppThunk =>
   async (dispatch) => {
     const { removeFromFavorites } = favoriteSlice.actions
+
     dispatch(removeFromFavorites({ path }))
   }
 

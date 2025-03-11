@@ -707,6 +707,7 @@ export const newWindow =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { newWindow } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(newWindow({ id }))
     dispatch(newTab(directoryPath))
@@ -716,6 +717,7 @@ export const newTab =
   (directoryPath: string, srcTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(newTab({ id, srcTabId }))
     const tabId = selectCurrentTabId(getState())
@@ -727,6 +729,7 @@ export const duplicateTab =
   (srcTabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { duplicateTab } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(duplicateTab({ id, srcTabId }))
     const destTabId = selectCurrentTabId(getState())
@@ -738,6 +741,7 @@ export const closeTab =
   (targetTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const tabId = targetTabId ?? selectCurrentTabId(getState())
     const canCloseTab = selectCanCloseTab(getState())
@@ -753,6 +757,7 @@ export const closeOtherTabs =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeOtherTabs } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(closeOtherTabs({ id, tabId }))
     dispatch(removeOtherTabs({ tabId }))
@@ -763,6 +768,7 @@ export const changeTab =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
     const { changeTab } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(changeTab({ id, tabId }))
     dispatch(updateApplicationMenu())
@@ -772,6 +778,7 @@ export const changeDirectory =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { changeDirectory } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const loading = selectCurrentLoading(getState())
     if (loading) {
@@ -786,6 +793,7 @@ export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
     const { go } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const loading = selectCurrentLoading(getState())
     if (loading) {
@@ -821,6 +829,7 @@ export const setScrollTop =
   (scrollTop: number): AppThunk =>
   async (dispatch, getState) => {
     const { setScrollTop } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(setScrollTop({ id, scrollTop }))
   }
@@ -829,6 +838,7 @@ export const search =
   (query: string): AppThunk =>
   async (dispatch, getState) => {
     const { setQuery } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const tabId = selectCurrentTabId(getState())
     dispatch(setQuery({ id, query }))
@@ -847,6 +857,7 @@ export const sort =
   (orderBy: SortOption['orderBy']): AppThunk =>
   async (dispatch, getState) => {
     const { sort } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     dispatch(
@@ -863,6 +874,7 @@ export const setCurrentViewMode =
   (viewMode: ViewMode): AppThunk =>
   async (dispatch, getState) => {
     const { setViewMode } = windowSlice.actions
+
     const id = selectWindowId(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
@@ -873,6 +885,7 @@ export const setSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarHidden } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(setSidebarHidden({ id, variant, hidden }))
     dispatch(updateApplicationMenu())
@@ -882,6 +895,7 @@ export const setSidebarWidth =
   (variant: 'primary' | 'secondary', width: number): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarWidth } = windowSlice.actions
+
     const id = selectWindowId(getState())
     dispatch(setSidebarWidth({ id, variant, width }))
   }

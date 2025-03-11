@@ -113,6 +113,10 @@ const useExplorerItem = (tabId: number, content: Content) => {
                 ]
               : []),
             {
+              type: 'revealInExplorer',
+              data: { path },
+            },
+            {
               type: 'revealInFinder',
               data: { path },
             },

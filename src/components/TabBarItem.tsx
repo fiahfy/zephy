@@ -20,9 +20,11 @@ const TabBarItem = (props: Props) => {
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
+  const path = history.directoryPath
+
   const { droppableStyle, ...dropHandlers } = useDropEntry({
     name: '',
-    path: history.directoryPath,
+    path,
     type: 'directory',
     url: '',
   })
@@ -41,6 +43,15 @@ const TabBarItem = (props: Props) => {
         },
         { type: 'separator' },
         {
+          type: 'revealInExplorer',
+          data: { path },
+        },
+        {
+          type: 'revealInFinder',
+          data: { path },
+        },
+        { type: 'separator' },
+        {
           type: 'closeTab',
           data: { tabId },
         },
@@ -49,7 +60,7 @@ const TabBarItem = (props: Props) => {
           data: { tabId },
         },
       ]),
-    [tabId],
+    [path, tabId],
   )
 
   const handleClick = useCallback(

@@ -77,6 +77,10 @@ const registerContextMenu = (
       click: () => send(event, { type: 'rename', data: { path } }),
       label: 'Rename...',
     }),
+    revealInExplorer: (event, _params, { path }) => ({
+      click: () => send(event, { type: 'revealInExplorer', data: { path } }),
+      label: 'Reveal in Explorer',
+    }),
     revealInFinder: (_event, _params, { path }) => ({
       click: () => shell.showItemInFolder(path),
       label: 'Reveal in Finder',

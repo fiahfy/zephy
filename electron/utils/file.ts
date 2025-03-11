@@ -164,7 +164,8 @@ export const getDetailedEntries = async (
 export const getRootEntry = async (
   path: string,
 ): Promise<Entry | undefined> => {
-  const dirnames = parsePath(path)
+  const parentPath = dirname(path)
+  const dirnames = parsePath(parentPath)
 
   const rootPath = dirnames[0] ?? ''
 

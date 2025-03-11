@@ -53,8 +53,8 @@ const defaultExplorerState = {
 const findExplorer = (state: State, tabId: number) =>
   state[tabId] ?? defaultExplorerState
 
-export const explorerSlice = createSlice({
-  name: 'explorer',
+export const explorerListSlice = createSlice({
+  name: 'explorer-list',
   initialState,
   reducers: {
     addTab(state, action: PayloadAction<{ tabId: number }>) {
@@ -339,16 +339,16 @@ export const {
   removeOtherTabs,
   unfocus,
   unselect,
-} = explorerSlice.actions
+} = explorerListSlice.actions
 
-export default explorerSlice.reducer
+export default explorerListSlice.reducer
 
-export const selectExplorer = (state: AppState) => state.explorer
+export const selectExplorerList = (state: AppState) => state.explorerList
 
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
 export const selectExplorerByTabId = createSelector(
-  selectExplorer,
+  selectExplorerList,
   selectTabId,
   (explorer, tabId) => explorer[tabId] ?? defaultExplorerState,
 )
@@ -487,7 +487,8 @@ export const selectCurrentSelectedContents = (state: AppState) =>
 export const load =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
-    const { blur, loaded, loading, unselectAll } = explorerSlice.actions
+    const { blur, loaded, loading, unselectAll } = explorerListSlice.actions
+
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const pathsMap = selectPathsByScore(getState())
     if (!directoryPath) {
@@ -516,49 +517,56 @@ export const load =
 export const startEditing =
   (tabId: number, path: string): AppThunk =>
   async (dispatch) => {
-    const { startEditing } = explorerSlice.actions
+    const { startEditing } = explorerListSlice.actions
+
     dispatch(startEditing({ tabId, path }))
   }
 
 export const finishEditing =
   (tabId: number): AppThunk =>
   async (dispatch) => {
-    const { finishEditing } = explorerSlice.actions
+    const { finishEditing } = explorerListSlice.actions
+
     dispatch(finishEditing({ tabId }))
   }
 
 export const focus =
   (tabId: number, path: string): AppThunk =>
   async (dispatch) => {
-    const { focus } = explorerSlice.actions
+    const { focus } = explorerListSlice.actions
+
     dispatch(focus({ tabId, path }))
   }
 
 export const blur =
   (tabId: number): AppThunk =>
   async (dispatch) => {
-    const { blur } = explorerSlice.actions
+    const { blur } = explorerListSlice.actions
+
     dispatch(blur({ tabId }))
   }
 
 export const select =
   (tabId: number, path: string): AppThunk =>
   async (dispatch) => {
-    const { select } = explorerSlice.actions
+    const { select } = explorerListSlice.actions
+
     dispatch(select({ tabId, path }))
   }
 
 export const multiSelect =
   (tabId: number, path: string): AppThunk =>
   async (dispatch) => {
-    const { multiSelect } = explorerSlice.actions
+    const { multiSelect } = explorerListSlice.actions
+
     dispatch(multiSelect({ tabId, path }))
   }
 
 export const rangeSelect =
   (tabId: number, path: string): AppThunk =>
   async (dispatch, getState) => {
-    const { rangeSelect } = explorerSlice.actions
+    const { rangeSelect } = explorerListSlice.actions
+
     const contents = selectContentsByTabId(getState(), tabId)
     const selected = selectSelectedByTabId(getState(), tabId)
     const paths = contents.map((content) => content.path)
@@ -581,14 +589,16 @@ export const rangeSelect =
 export const unselectAll =
   (tabId: number): AppThunk =>
   async (dispatch) => {
-    const { unselectAll } = explorerSlice.actions
+    const { unselectAll } = explorerListSlice.actions
     dispatch(unselectAll({ tabId }))
   }
 
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, focus, removeEntries, select } = explorerSlice.actions
+    const { addEntries, focus, removeEntries, select } =
+      explorerListSlice.actions
+
     const entry = await window.electronAPI.renameEntry(path, newName)
     // get the selected paths after renaming
     const selected = selectSelectedByTabId(getState(), tabId)
@@ -611,9 +621,11 @@ export const refreshInCurrentTab =
 
 export const selectAllInCurrentTab =
   (): AppThunk => async (dispatch, getState) => {
-    const { selectAll } = explorerSlice.actions
+    const { selectAll } = explorerListSlice.actions
+
     const tabId = selectCurrentTabId(getState())
     const contents = selectContentsByTabId(getState(), tabId)
+
     const paths = contents.map((content) => content.path)
     dispatch(selectAll({ tabId, paths }))
   }
@@ -621,7 +633,9 @@ export const selectAllInCurrentTab =
 export const newFolderInCurrentTab =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, focus, select, startEditing } = explorerSlice.actions
+    const { addEntries, focus, select, startEditing } =
+      explorerListSlice.actions
+
     const tabId = selectCurrentTabId(getState())
     const entry = await window.electronAPI.createDirectory(directoryPath)
     dispatch(addEntries({ tabId, entries: [entry] }))
@@ -646,7 +660,8 @@ export const startRenamingInCurrentTab =
 export const moveFromCurrentTab =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { unselect } = explorerSlice.actions
+    const { unselect } = explorerListSlice.actions
+
     const tabId = selectCurrentTabId(getState())
     const entries = await window.electronAPI.moveEntries(paths, directoryPath)
     paths.forEach((path, i) => {
@@ -676,7 +691,8 @@ export const pasteToCurrentTab = (): AppThunk => async (_, getState) => {
 export const moveToTrashFromCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { unfocus, unselect } = explorerSlice.actions
+    const { unfocus, unselect } = explorerListSlice.actions
+
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
@@ -713,7 +729,8 @@ export const handle =
     filePath: string,
   ): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, removeEntries } = explorerSlice.actions
+    const { addEntries, removeEntries } = explorerListSlice.actions
+
     const tabs = selectTabs(getState())
     for (const { id: tabId } of tabs) {
       const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
