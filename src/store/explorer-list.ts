@@ -25,6 +25,7 @@ import {
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 import { parseZephyUrl } from '~/utils/url'
+import { showNotification } from './notification'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -51,6 +52,9 @@ const defaultExplorerState = {
   loading: false,
   selected: [],
 }
+
+const getErrorMessage = (e: Error): string =>
+  e.message.includes('Error: ') ? e.message.split('Error: ')[1] : e.message
 
 const findExplorer = (state: State, tabId: number) =>
   state[tabId] ?? defaultExplorerState
@@ -637,17 +641,25 @@ export const rename =
     const { addEntries, focus, removeEntries, select } =
       explorerListSlice.actions
 
-    const entry = await window.electronAPI.renameEntry(path, newName)
-    // get the selected paths after renaming
-    const selected = selectSelectedByTabId(getState(), tabId)
-    dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
-    dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-    dispatch(removeEntries({ tabId, paths: [path] }))
-    dispatch(addEntries({ tabId, entries: [entry] }))
-    // do not focus if the renamed entry is not selected
-    if (selected.length === 1 && selected[0] === path) {
-      dispatch(select({ tabId, path: entry.path }))
-      dispatch(focus({ tabId, path: entry.path }))
+    try {
+      const entry = await window.electronAPI.renameEntry(path, newName)
+      // get the selected paths after renaming
+      const selected = selectSelectedByTabId(getState(), tabId)
+      dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+      dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+      dispatch(removeEntries({ tabId, paths: [path] }))
+      dispatch(addEntries({ tabId, entries: [entry] }))
+      // do not focus if the renamed entry is not selected
+      if (selected.length === 1 && selected[0] === path) {
+        dispatch(select({ tabId, path: entry.path }))
+        dispatch(focus({ tabId, path: entry.path }))
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        dispatch(
+          showNotification({ message: getErrorMessage(e), type: 'error' }),
+        )
+      }
     }
   }
 
@@ -701,12 +713,20 @@ export const startRenamingInCurrentTab =
 export const moveFromCurrentTab =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {
-    const entries = await window.electronAPI.moveEntries(paths, directoryPath)
-    for (let i = 0; i < paths.length; i++) {
-      const path = paths[i]
-      const entry = entries[i]
-      dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
-      dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+    try {
+      const entries = await window.electronAPI.moveEntries(paths, directoryPath)
+      for (let i = 0; i < paths.length; i++) {
+        const path = paths[i]
+        const entry = entries[i]
+        dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+        dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        dispatch(
+          showNotification({ message: getErrorMessage(e), type: 'error' }),
+        )
+      }
     }
   }
 

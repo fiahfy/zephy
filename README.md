@@ -8,15 +8,14 @@
 
 - Favorites
 - Rating
-- Image, Text and Video Preview
+- Text, Image and Video Preview
 - Tree View Display
 - Tabbed Browsing
 - Dark Mode Support
 - Cross-Platform Compatibility
 
 ## TODOs
-
-- [ ] Copy & Move Duplicated Item
+ 
 - [ ] Show progress when copying & moving large files
 - [ ] Sort Favorites
 - [ ] Draggable tabs

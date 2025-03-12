@@ -251,10 +251,10 @@ const AddressBar = () => {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
+            display: { sm: 'none', md: 'block' },
             flex: '1 1 0',
-            [theme.breakpoints.down('md')]: { display: 'none' },
-          })}
+          }}
         />
         <Box
           sx={{
@@ -307,10 +307,10 @@ const AddressBar = () => {
           />
         </Box>
         <Box
-          sx={(theme) => ({
+          sx={{
+            display: { sm: 'none', md: 'block' },
             flex: '1 1 0',
-            [theme.breakpoints.down('md')]: { display: 'none' },
-          })}
+          }}
         />
         <Box
           sx={{

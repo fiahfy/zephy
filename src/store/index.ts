@@ -24,6 +24,7 @@ import storage from 'redux-persist/lib/storage'
 import explorerListReducer from '~/store/explorer-list'
 import explorerTreeReducer from '~/store/explorer-tree'
 import favoriteReducer from '~/store/favorite'
+import notificationReducer from '~/store/notification'
 import previewReducer from '~/store/preview'
 import queryReducer from '~/store/query'
 import ratingReducer from '~/store/rating'
@@ -35,6 +36,7 @@ const reducers = combineReducers({
   explorerList: explorerListReducer,
   explorerTree: explorerTreeReducer,
   favorite: favoriteReducer,
+  notification: notificationReducer,
   preview: previewReducer,
   query: queryReducer,
   rating: ratingReducer,

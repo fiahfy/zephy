@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
 import Navigator from '~/components/Navigator'
+import NotificationBar from '~/components/NotificationBar'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
 import TabBar from '~/components/TabBar'
@@ -258,6 +259,7 @@ const App = () => {
       </Box>
       <Sidebar variant="secondary">
         <Inspector />
+        <NotificationBar />
       </Sidebar>
       <StatusBar />
     </Box>
