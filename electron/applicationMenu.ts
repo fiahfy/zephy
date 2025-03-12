@@ -26,10 +26,25 @@ type State = {
 
 export type ApplicationMenuParams = Partial<State>
 
+const isEditType = (
+  type: string,
+): type is 'copy' | 'cut' | 'paste' | 'selectAll' =>
+  ['copy', 'cut', 'paste', 'selectAll'].includes(type)
+
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const send = (message: any) => {
+const send = (message: { type: string; data?: any }) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
-  activeWindow?.webContents.send('sendMessage', message)
+  if (!activeWindow) {
+    return
+  }
+
+  const type = message.type
+  if (isEditType(type) && activeWindow.webContents.isDevToolsFocused()) {
+    activeWindow.webContents.devToolsWebContents?.[type]()
+    return
+  }
+
+  activeWindow.webContents.send('sendMessage', message)
 }
 
 const registerApplicationMenu = (

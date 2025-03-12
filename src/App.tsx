@@ -38,9 +38,9 @@ import {
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { setPath } from './store/explorer-tree'
 
-const isEditable = () => {
-  const el = document.activeElement
-  return el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+const isFocused = () => {
+  const elements = document.querySelectorAll('.explorer-list')
+  return Array.from(elements).some((el) => el === document.activeElement)
 }
 
 const App = () => {
@@ -69,16 +69,16 @@ const App = () => {
           case 'closeTab':
             return dispatch(closeTab(data?.tabId))
           case 'copy':
-            if (isEditable() || window.getSelection()?.toString()) {
-              return window.electronAPI.copy()
+            if (isFocused()) {
+              return dispatch(copyFromCurrentTab())
             }
-            return dispatch(copyFromCurrentTab())
+            return window.electronAPI.copy()
           case 'cut':
-            if (isEditable()) {
-              return window.electronAPI.cut()
+            if (isFocused()) {
+              // TODO: implement
+              return
             }
-            // TODO: implement
-            return
+            return window.electronAPI.cut()
           case 'duplicateTab':
             return dispatch(duplicateTab(data.tabId))
           case 'forward':
@@ -102,15 +102,15 @@ const App = () => {
           case 'revealInExplorer':
             return dispatch(setPath({ path: data.path }))
           case 'paste':
-            if (isEditable()) {
-              return window.electronAPI.paste()
+            if (isFocused()) {
+              return dispatch(pasteToCurrentTab())
             }
-            return dispatch(pasteToCurrentTab())
+            return window.electronAPI.paste()
           case 'selectAll':
-            if (isEditable()) {
-              return window.electronAPI.selectAll()
+            if (isFocused()) {
+              return dispatch(selectAllInCurrentTab())
             }
-            return dispatch(selectAllInCurrentTab())
+            return window.electronAPI.selectAll()
           case 'sort':
             return dispatch(sort(data.orderBy))
         }

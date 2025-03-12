@@ -29,7 +29,7 @@ const ExplorerTableRow = (props: Props) => {
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
-        '.explorer-container:focus-within &.Mui-focused': {
+        '.explorer-list:focus-within &.Mui-focused': {
           outline: (theme) => `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

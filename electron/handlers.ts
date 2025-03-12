@@ -24,29 +24,17 @@ import type createWatcher from './watcher'
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
 const registerEditHandlers = () => {
-  const getWebContents = (event: IpcMainInvokeEvent) => {
-    const browserWindow = BrowserWindow.fromWebContents(event.sender)
-    if (!browserWindow) {
-      return
-    }
-
-    const webContents = browserWindow.webContents
-    return webContents.isDevToolsFocused()
-      ? webContents.devToolsWebContents
-      : webContents
-  }
-
   ipcMain.handle('copy', (event: IpcMainInvokeEvent) =>
-    getWebContents(event)?.copy(),
+    BrowserWindow.fromWebContents(event.sender)?.webContents.copy(),
   )
   ipcMain.handle('cut', (event: IpcMainInvokeEvent) =>
-    getWebContents(event)?.cut(),
+    BrowserWindow.fromWebContents(event.sender)?.webContents.cut(),
   )
   ipcMain.handle('paste', (event: IpcMainInvokeEvent) =>
-    getWebContents(event)?.paste(),
+    BrowserWindow.fromWebContents(event.sender)?.webContents.paste(),
   )
   ipcMain.handle('selectAll', (event: IpcMainInvokeEvent) =>
-    getWebContents(event)?.selectAll(),
+    BrowserWindow.fromWebContents(event.sender)?.webContents.selectAll(),
   )
 }
 

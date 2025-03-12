@@ -58,7 +58,7 @@ const ExplorerGrid = (props: Props) => {
       }}
     >
       <Box
-        className="explorer-container"
+        className="explorer-list"
         onClick={onClick}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
