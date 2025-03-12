@@ -3,9 +3,8 @@ import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  addSelection,
   focus,
-  multiSelect,
-  rangeSelect,
   select,
   selectContentsByTabId,
   selectEditingByTabIdAndPath,
@@ -13,6 +12,7 @@ import {
   selectSelectedByTabIdAndPath,
   selectSelectedContentsByTabId,
   startEditing,
+  toggleSelection,
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
@@ -49,9 +49,15 @@ const useExplorerItem = (tabId: number, content: Content) => {
       // prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
-        dispatch(rangeSelect(tabId, content.path))
+        dispatch(
+          addSelection(
+            tabId,
+            content.path,
+            selectedContents[selectedContents.length - 1]?.path,
+          ),
+        )
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        dispatch(multiSelect(tabId, content.path))
+        dispatch(toggleSelection(tabId, content.path))
       } else {
         dispatch(select(tabId, content.path))
       }

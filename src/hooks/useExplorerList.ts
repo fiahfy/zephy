@@ -11,14 +11,17 @@ import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  addSelection,
   blur,
   focus,
   select,
+  selectAnchorByTabId,
   selectContentsByTabId,
   selectEditingByTabId,
   selectErrorByTabId,
   selectFocusedByTabId,
   selectLoadingByTabId,
+  setAnchor,
   startEditing,
   unselectAll,
 } from '~/store/explorer-list'
@@ -39,6 +42,7 @@ const useExplorerList = (
   estimateSize: number,
   ref: RefObject<HTMLElement | null>,
 ) => {
+  const anchor = useAppSelector((state) => selectAnchorByTabId(state, tabId))
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
@@ -196,13 +200,15 @@ const useExplorerList = (
 
         const newIndex = index + offset
         const content = contents[newIndex]
-        if (content) {
-          dispatch(select(tabId, content.path))
-          dispatch(focus(tabId, content.path))
+        if (!content) {
+          return
         }
+
+        dispatch(select(tabId, content.path))
+        dispatch(focus(tabId, content.path))
       }
 
-      const focusByHorizontal = (offset: number) => {
+      const focusByHorizontal = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
           return
@@ -218,13 +224,20 @@ const useExplorerList = (
 
         const newIndex = columns * rowIndex + newColumnIndex
         const content = contents[newIndex]
-        if (content) {
-          dispatch(select(tabId, content.path))
-          dispatch(focus(tabId, content.path))
+        if (!content) {
+          return
         }
+
+        if (multiSelect) {
+          dispatch(unselectAll(tabId))
+          dispatch(addSelection(tabId, content.path, anchor))
+        } else {
+          dispatch(select(tabId, content.path))
+        }
+        dispatch(focus(tabId, content.path))
       }
 
-      const focusByVertical = (offset: number) => {
+      const focusByVertical = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
           return
@@ -236,13 +249,20 @@ const useExplorerList = (
 
         const newIndex = columns * newRowIndex + columnIndex
         const content = contents[newIndex]
-        if (content) {
-          dispatch(select(tabId, content.path))
-          dispatch(focus(tabId, content.path))
+        if (!content) {
+          return
         }
+
+        if (multiSelect) {
+          dispatch(unselectAll(tabId))
+          dispatch(addSelection(tabId, content.path, anchor))
+        } else {
+          dispatch(select(tabId, content.path))
+        }
+        dispatch(focus(tabId, content.path))
       }
 
-      const focusTo = (position: 'first' | 'last') => {
+      const focusTo = (position: 'first' | 'last', multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         const columnIndex = index % columns
         const maxRowIndex = Math.floor(contents.length / columns)
@@ -262,10 +282,17 @@ const useExplorerList = (
         }
 
         const content = contents[newIndex]
-        if (content) {
-          dispatch(select(tabId, content.path))
-          dispatch(focus(tabId, content.path))
+        if (!content) {
+          return
         }
+
+        if (multiSelect) {
+          dispatch(unselectAll(tabId))
+          dispatch(addSelection(tabId, content.path, anchor))
+        } else {
+          dispatch(select(tabId, content.path))
+        }
+        dispatch(focus(tabId, content.path))
       }
 
       switch (e.key) {
@@ -277,26 +304,29 @@ const useExplorerList = (
         case 'ArrowUp':
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('first')
-            : focusByVertical(-1)
+            ? focusTo('first', e.shiftKey)
+            : focusByVertical(-1, e.shiftKey)
         case 'ArrowDown':
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('last')
-            : focusByVertical(1)
+            ? focusTo('last', e.shiftKey)
+            : focusByVertical(1, e.shiftKey)
         case 'ArrowLeft':
           e.preventDefault()
-          return focusByHorizontal(-1)
+          return focusByHorizontal(-1, e.shiftKey)
         case 'ArrowRight':
           e.preventDefault()
-          return focusByHorizontal(1)
+          return focusByHorizontal(1, e.shiftKey)
         // TODO: focus external previous/next element
         case 'Tab':
           e.preventDefault()
           return focusBy(e.shiftKey ? -1 : 1)
+        case 'Shift':
+          e.preventDefault()
+          return dispatch(setAnchor({ tabId, anchor: focused }))
       }
     },
-    [columns, contents, focused, dispatch, tabId],
+    [anchor, columns, contents, focused, dispatch, tabId],
   )
 
   return {

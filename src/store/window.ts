@@ -9,12 +9,12 @@ import {
   addTab,
   copyTab,
   removeOtherTabs,
+  removeSelection,
   removeTab,
   selectCurrentContents,
   selectCurrentLoading,
   selectCurrentSelected,
   unfocus,
-  unselect,
 } from '~/store/explorer-list'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/windowId'
@@ -853,7 +853,7 @@ export const search =
       selected,
     )
     dispatch(unfocus({ tabId, paths }))
-    dispatch(unselect({ tabId, paths }))
+    dispatch(removeSelection({ tabId, paths }))
   }
 
 export const sort =
