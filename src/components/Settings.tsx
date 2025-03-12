@@ -111,7 +111,7 @@ const Settings = () => {
               }
               label={
                 <>
-                  Open with{' '}
+                  Open Image Files with{' '}
                   {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
                   <a
                     href="#"
@@ -123,8 +123,7 @@ const Settings = () => {
                     }}
                   >
                     Photy
-                  </a>{' '}
-                  for Image Files
+                  </a>
                 </>
               }
               slotProps={{ typography: { variant: 'body2' } }}
@@ -139,7 +138,7 @@ const Settings = () => {
               }
               label={
                 <>
-                  Open with{' '}
+                  Open Video and Audio Files with{' '}
                   {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
                   <a
                     href="#"
@@ -151,8 +150,7 @@ const Settings = () => {
                     }}
                   >
                     Visty
-                  </a>{' '}
-                  for Video and Audio Files
+                  </a>
                 </>
               }
               slotProps={{ typography: { variant: 'body2' } }}
