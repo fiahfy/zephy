@@ -83,6 +83,10 @@ const defaultOrders = {
   size: 'desc',
 } as const
 
+const defaultSortOption = { order: 'asc', orderBy: 'name' }
+
+const defaultViewMode = 'list'
+
 const defaultWindowState: WindowState = {
   sidebar: {
     primary: {
@@ -609,14 +613,13 @@ const selectDirectoryPath = (
 export const selectSortOptionByTabIdAndDirectoryPath = createSelector(
   selectTabByTabId,
   selectDirectoryPath,
-  (tab, directoryPath) =>
-    tab.sorting[directoryPath] ?? ({ order: 'asc', orderBy: 'name' } as const),
+  (tab, directoryPath) => tab.sorting[directoryPath] ?? defaultSortOption,
 )
 
 export const selectViewModeByTabIdAndDirectoryPath = createSelector(
   selectTabByTabId,
   selectDirectoryPath,
-  (tab, directoryPath) => tab.viewMode[directoryPath] ?? 'list',
+  (tab, directoryPath) => tab.viewMode[directoryPath] ?? defaultViewMode,
 )
 
 // selectSidebar
