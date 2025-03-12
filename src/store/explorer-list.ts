@@ -121,13 +121,21 @@ export const explorerListSlice = createSlice({
     ) {
       const { tabId, entries = [], error = false } = action.payload
       const explorer = findExplorer(state, tabId)
+      const paths = entries.map((entry) => entry.path)
+      const focused =
+        explorer.focused && paths.includes(explorer.focused)
+          ? explorer.focused
+          : undefined
+      const selected = explorer.selected.filter((path) => paths.includes(path))
       return {
         ...state,
         [tabId]: {
           ...explorer,
           entries,
           error,
+          focused,
           loading: false,
+          selected,
         },
       }
     },
@@ -165,11 +173,18 @@ export const explorerListSlice = createSlice({
       const entries = explorer.entries.filter(
         (entry) => !paths.includes(entry.path),
       )
+      const focused =
+        explorer.focused && paths.includes(explorer.focused)
+          ? undefined
+          : explorer.focused
+      const selected = explorer.selected.filter((path) => !paths.includes(path))
       return {
         ...state,
         [tabId]: {
           ...explorer,
           entries,
+          focused,
+          selected,
         },
       }
     },
@@ -487,7 +502,7 @@ export const selectCurrentSelectedContents = (state: AppState) =>
 export const load =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
-    const { blur, loaded, loading, unselectAll } = explorerListSlice.actions
+    const { loaded, loading } = explorerListSlice.actions
 
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const pathsMap = selectPathsByScore(getState())
@@ -495,8 +510,6 @@ export const load =
       return
     }
     const url = parseZephyUrl(directoryPath)
-    dispatch(blur({ tabId }))
-    dispatch(unselectAll({ tabId }))
     dispatch(loading({ tabId }))
     try {
       let entries: DetailedEntry[] = []
@@ -659,18 +672,14 @@ export const startRenamingInCurrentTab =
 
 export const moveFromCurrentTab =
   (paths: string[], directoryPath: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { unselect } = explorerListSlice.actions
-
-    const tabId = selectCurrentTabId(getState())
+  async (dispatch) => {
     const entries = await window.electronAPI.moveEntries(paths, directoryPath)
-    paths.forEach((path, i) => {
+    for (let i = 0; i < paths.length; i++) {
+      const path = paths[i]
       const entry = entries[i]
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-    })
-    dispatch(unfocus({ tabId, paths }))
-    dispatch(unselect({ tabId, paths }))
+    }
   }
 
 export const copyFromCurrentTab = (): AppThunk => async (_, getState) => {
@@ -691,8 +700,6 @@ export const pasteToCurrentTab = (): AppThunk => async (_, getState) => {
 export const moveToTrashFromCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { unfocus, unselect } = explorerListSlice.actions
-
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
@@ -701,8 +708,6 @@ export const moveToTrashFromCurrentTab =
       dispatch(removeFromFavorites(path))
       dispatch(removeRating({ path }))
     }
-    dispatch(unfocus({ tabId, paths: targetPaths }))
-    dispatch(unselect({ tabId, paths: targetPaths }))
   }
 
 // TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
