@@ -18,7 +18,6 @@
  
 - [ ] Show progress when copying & moving large files
 - [ ] Sort Favorites
-- [ ] Draggable tabs
 - [ ] Change Thumbnail Size
 - [ ] Use Electron Forge
 
