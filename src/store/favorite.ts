@@ -58,20 +58,22 @@ export const selectFavorite = (state: AppState) => state.favorite
 
 export const selectFavorites = (favorite: State) => favorite.favorites
 
-export const selectFavoriteMap = createSelector(selectFavorites, (favorites) =>
-  favorites.reduce(
-    (acc, favorite) => {
-      acc[favorite.path] = true
-      return acc
-    },
-    {} as { [path: string]: boolean },
-  ),
+export const selectPathToFavoriteMap = createSelector(
+  selectFavorites,
+  (favorites) =>
+    favorites.reduce(
+      (acc, favorite) => {
+        acc[favorite.path] = true
+        return acc
+      },
+      {} as { [path: string]: boolean },
+    ),
 )
 
 export const selectFavoriteByPath = createSelector(
-  selectFavoriteMap,
+  selectPathToFavoriteMap,
   (_favorite: State, path: string) => path,
-  (favoriteMap, path) => favoriteMap[path] ?? false,
+  (pathToFavoriteMap, path) => pathToFavoriteMap[path] ?? false,
 )
 
 export const addToFavorites =

@@ -58,8 +58,8 @@ export const selectRating = (state: AppState) => state.rating
 
 export const selectRatings = (rating: State) => rating.ratings
 
-export const selectPathToScoreMap = createSelector(selectRatings, (favorites) =>
-  favorites.reduce(
+export const selectPathToScoreMap = createSelector(selectRatings, (ratings) =>
+  ratings.reduce(
     (acc, rating) => {
       acc[rating.path] = rating.score
       return acc
@@ -71,7 +71,7 @@ export const selectPathToScoreMap = createSelector(selectRatings, (favorites) =>
 export const selectScoreByPath = createSelector(
   selectPathToScoreMap,
   (_rating: State, path: string) => path,
-  (ratingMap, path) => ratingMap[path] ?? 0,
+  (pathToScoreMap, path) => pathToScoreMap[path] ?? 0,
 )
 
 export const selectScoreToPathsMap = createSelector(selectRating, (rating) =>

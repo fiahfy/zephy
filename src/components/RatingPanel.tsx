@@ -2,20 +2,27 @@ import { Rating, Table, TableBody, TableCell } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import Panel from '~/components/Panel'
 import RatingTableRow from '~/components/RatingTableRow'
-import useWatcher from '~/hooks/useWatcher'
 import { useAppSelector } from '~/store'
 import { selectScoreToPathsMap } from '~/store/rating'
 
 const RatingPanel = () => {
   const scoreToPathsMap = useAppSelector(selectScoreToPathsMap)
 
-  const { watch } = useWatcher()
-
-  const [items, setItems] = useState<{ score: number }[]>([])
+  const [items, setItems] = useState<{ count: number; score: number }[]>([])
 
   const load = useCallback(async () => {
-    const items = Object.keys(scoreToPathsMap)
-      .map((score) => ({ score: Number(score) }))
+    let items = await Promise.all(
+      Object.keys(scoreToPathsMap).map(async (score) => {
+        const paths = scoreToPathsMap[Number(score)] ?? []
+        const items = await window.electronAPI.getDetailedEntriesForPaths(paths)
+        return {
+          score: Number(score),
+          count: items.length,
+        }
+      }),
+    )
+    items = items
+      .filter((item) => item.count > 0)
       .sort((a, b) => b.score - a.score)
     setItems(items)
   }, [scoreToPathsMap])
@@ -23,17 +30,6 @@ const RatingPanel = () => {
   useEffect(() => {
     load()
   }, [load])
-
-  useEffect(
-    () =>
-      watch('rating', [], async (_eventType, _directoryPath, filePath) => {
-        const paths = Object.values(scoreToPathsMap).flat()
-        if (paths.includes(filePath)) {
-          load()
-        }
-      }),
-    [load, scoreToPathsMap, watch],
-  )
 
   return (
     <>

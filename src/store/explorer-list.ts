@@ -794,10 +794,14 @@ export const handle =
         case 'create':
         case 'update': {
           const entry = await window.electronAPI.getDetailedEntry(filePath)
-          return dispatch(addEntries({ tabId, entries: [entry] }))
+          dispatch(addEntries({ tabId, entries: [entry] }))
+          break
         }
         case 'delete':
-          return dispatch(removeEntries({ tabId, paths: [filePath] }))
+          dispatch(removeEntries({ tabId, paths: [filePath] }))
+          dispatch(removeFromFavorites(filePath))
+          dispatch(removeRating({ path: filePath }))
+          break
       }
     }
   }
