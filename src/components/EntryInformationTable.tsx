@@ -7,20 +7,20 @@ import {
 } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
-import type { DetailedEntry, Metadata } from '~/interfaces'
+import type { Entry, Metadata } from '~/interfaces'
 import {
   formatDateTime,
   formatDuration,
   formatFileSize,
 } from '~/utils/formatter'
 
-const getTotalFileSize = (entries: DetailedEntry[]) =>
+const getTotalFileSize = (entries: Entry[]) =>
   entries
     .filter((entry) => entry.type !== 'directory')
     .reduce((acc, entry) => acc + entry.size, 0)
 
 const formatDateRange = (
-  entries: DetailedEntry[],
+  entries: Entry[],
   dateProperty: 'dateCreated' | 'dateModified' | 'dateLastOpened',
 ) => {
   const entry = entries[0]
@@ -39,7 +39,7 @@ const formatDateRange = (
 }
 
 type Props = {
-  entries: DetailedEntry[]
+  entries: Entry[]
 }
 
 const EntryInformationTable = (props: Props) => {

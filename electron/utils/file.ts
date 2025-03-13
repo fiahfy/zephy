@@ -1,5 +1,5 @@
 import type { Dirent, Stats } from 'node:fs'
-import { mkdir, readdir, rename, stat } from 'node:fs/promises'
+import { mkdir, opendir, rename, stat } from 'node:fs/promises'
 import { basename, dirname, join, parse, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { copy, move, pathExists } from 'fs-extra'
@@ -17,8 +17,7 @@ type Directory = {
   type: 'directory'
   url: string
 }
-type Entry = File | Directory
-type DetailedEntry = Entry & {
+type Entry = (File | Directory) & {
   dateCreated: number
   dateModified: number
   dateLastOpened: number
@@ -102,27 +101,7 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
     : `${name} copy ${missingNumber}${ext}`
 }
 
-export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
-  const dirents = await readdir(directoryPath, { withFileTypes: true })
-  return dirents.reduce((acc, dirent) => {
-    const type = getEntryType(dirent)
-    if (type === 'other') {
-      return acc
-    }
-    const path = join(directoryPath, dirent.name)
-    acc.push({
-      name: dirent.name.normalize('NFC'),
-      path,
-      type,
-      url: pathToFileURL(path).href,
-    })
-    return acc
-  }, [] as Entry[])
-}
-
-export const getDetailedEntry = async (
-  path: string,
-): Promise<DetailedEntry> => {
+export const getEntry = async (path: string): Promise<Entry> => {
   const stats = await stat(path)
   const type = getEntryType(stats)
   if (type === 'other') {
@@ -140,25 +119,27 @@ export const getDetailedEntry = async (
   }
 }
 
-export const getDetailedEntriesForPaths = async (
-  paths: string[],
-): Promise<DetailedEntry[]> => {
-  const results = await Promise.allSettled(
-    paths.map((path) => getDetailedEntry(path)),
-  )
-  return results.reduce((acc, result) => {
-    if (result.status === 'fulfilled') {
-      acc.push(result.value)
+export const getEntriesForPaths = async (paths: string[]): Promise<Entry[]> => {
+  const entries = []
+  for (const path of paths) {
+    try {
+      entries.push(await getEntry(path))
+    } catch (e) {
+      // noop
     }
-    return acc
-  }, [] as DetailedEntry[])
+  }
+  return entries
 }
 
-export const getDetailedEntries = async (
-  directoryPath: string,
-): Promise<DetailedEntry[]> => {
-  const entries = await getEntries(directoryPath)
-  return await getDetailedEntriesForPaths(entries.map((entry) => entry.path))
+export const getEntries = async (directoryPath: string): Promise<Entry[]> => {
+  const dir = await opendir(directoryPath)
+
+  const paths = []
+  for await (const dirent of dir) {
+    paths.push(join(directoryPath, dirent.name))
+  }
+
+  return getEntriesForPaths(paths)
 }
 
 export const getRootEntry = async (
@@ -169,16 +150,10 @@ export const getRootEntry = async (
 
   const rootPath = dirnames[0] ?? ''
 
+  const root = await getEntry(rootPath)
+
   let entry: Directory = {
-    children: [
-      {
-        children: [],
-        name: rootPath,
-        path: rootPath,
-        type: 'directory',
-        url: pathToFileURL(rootPath).href,
-      },
-    ],
+    children: [{ ...root, name: rootPath }],
     name: '',
     path: '',
     type: 'directory',
@@ -211,11 +186,11 @@ export const getRootEntry = async (
 
 export const createDirectory = async (
   directoryPath: string,
-): Promise<DetailedEntry> => {
+): Promise<Entry> => {
   const directoryName = await generateNewDirectoryName(directoryPath)
   const path = join(directoryPath, directoryName)
   await mkdir(path)
-  return await getDetailedEntry(path)
+  return await getEntry(path)
 }
 
 export const copyEntries = async (paths: string[], directoryPath: string) =>
@@ -225,16 +200,16 @@ export const copyEntries = async (paths: string[], directoryPath: string) =>
       const filename = await generateCopyFilename(path, directoryPath)
       const newPath = join(directoryPath, filename)
       await copy(path, newPath)
-      const entry = await getDetailedEntry(newPath)
+      const entry = await getEntry(newPath)
       return [...acc, entry]
     },
-    Promise.resolve([]) as Promise<DetailedEntry[]>,
+    Promise.resolve([]) as Promise<Entry[]>,
   )
 
 export const moveEntries = async (
   paths: string[],
   directoryPath: string,
-): Promise<DetailedEntry[]> => {
+): Promise<Entry[]> => {
   return await Promise.all(
     paths.map(async (path) => {
       const newPath = join(directoryPath, basename(path))
@@ -245,7 +220,7 @@ export const moveEntries = async (
         }
         await move(path, newPath)
       }
-      return await getDetailedEntry(newPath)
+      return await getEntry(newPath)
     }),
   )
 }
@@ -253,12 +228,12 @@ export const moveEntries = async (
 export const renameEntry = async (
   path: string,
   newName: string,
-): Promise<DetailedEntry> => {
+): Promise<Entry> => {
   const newPath = join(dirname(path), newName)
   const exists = await pathExists(newPath)
   if (exists) {
     throw new Error('A file or directory with that name already exists.')
   }
   await rename(path, newPath)
-  return await getDetailedEntry(newPath)
+  return await getEntry(newPath)
 }

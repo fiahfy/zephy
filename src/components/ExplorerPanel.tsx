@@ -59,7 +59,7 @@ const ExplorerPanel = () => {
           const entry =
             eventType === 'delete'
               ? undefined
-              : await window.electronAPI.getDetailedEntry(filePath)
+              : await window.electronAPI.getEntry(filePath)
 
           const mapper = (e: Entry): Entry => {
             if (e.type === 'directory') {

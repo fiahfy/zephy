@@ -85,7 +85,7 @@ export const addToFavorites =
   async (dispatch) => {
     const { addToFavorites } = favoriteSlice.actions
 
-    const entry = await window.electronAPI.getDetailedEntry(path)
+    const entry = await window.electronAPI.getEntry(path)
     dispatch(addToFavorites({ ...entry }))
   }
 

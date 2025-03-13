@@ -3,7 +3,7 @@ import {
   createSelector,
   createSlice,
 } from '@reduxjs/toolkit'
-import type { Content, DetailedEntry } from '~/interfaces'
+import type { Content, Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
 import { showNotification } from '~/store/notification'
@@ -30,7 +30,7 @@ import { parseZephyUrl } from '~/utils/url'
 type ExplorerState = {
   anchor: string | undefined
   editing: string | undefined
-  entries: DetailedEntry[]
+  entries: Entry[]
   error: boolean
   focused: string | undefined
   loading: boolean
@@ -121,7 +121,7 @@ export const explorerListSlice = createSlice({
       state,
       action: PayloadAction<{
         tabId: number
-        entries?: DetailedEntry[]
+        entries?: Entry[]
         error?: boolean
       }>,
     ) {
@@ -149,7 +149,7 @@ export const explorerListSlice = createSlice({
       state,
       action: PayloadAction<{
         tabId: number
-        entries: DetailedEntry[]
+        entries: Entry[]
       }>,
     ) {
       const { tabId, entries } = action.payload
@@ -542,14 +542,14 @@ export const load =
     const url = parseZephyUrl(directoryPath)
     dispatch(loading({ tabId }))
     try {
-      let entries: DetailedEntry[] = []
+      let entries: Entry[] = []
       if (url) {
         if (url.pathname === 'ratings') {
           const paths = scoreToPathsMap[Number(url.params.score ?? 0)] ?? []
-          entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
+          entries = await window.electronAPI.getEntriesForPaths(paths)
         }
       } else {
-        entries = await window.electronAPI.getDetailedEntries(directoryPath)
+        entries = await window.electronAPI.getEntries(directoryPath)
       }
       dispatch(loaded({ tabId, entries }))
     } catch (e) {
@@ -767,7 +767,7 @@ export const openFromCurrentTab =
     if (!targetPath) {
       return
     }
-    const entry = await window.electronAPI.getDetailedEntry(targetPath)
+    const entry = await window.electronAPI.getEntry(targetPath)
     const action =
       entry.type === 'directory'
         ? changeDirectory(entry.path)
@@ -793,7 +793,7 @@ export const handle =
       switch (eventType) {
         case 'create':
         case 'update': {
-          const entry = await window.electronAPI.getDetailedEntry(filePath)
+          const entry = await window.electronAPI.getEntry(filePath)
           dispatch(addEntries({ tabId, entries: [entry] }))
           break
         }

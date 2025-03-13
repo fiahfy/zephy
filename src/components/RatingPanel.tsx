@@ -14,7 +14,7 @@ const RatingPanel = () => {
     let items = await Promise.all(
       Object.keys(scoreToPathsMap).map(async (score) => {
         const paths = scoreToPathsMap[Number(score)] ?? []
-        const items = await window.electronAPI.getDetailedEntriesForPaths(paths)
+        const items = await window.electronAPI.getEntriesForPaths(paths)
         return {
           score: Number(score),
           count: items.length,

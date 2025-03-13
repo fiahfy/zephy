@@ -21,14 +21,11 @@ const entryOperations = {
     ipcRenderer.invoke('createDirectory', directoryPath),
   createEntryThumbnailUrl: (paths: string | string[]) =>
     ipcRenderer.invoke('createEntryThumbnailUrl', paths),
-  getDetailedEntries: (directoryPath: string) =>
-    ipcRenderer.invoke('getDetailedEntries', directoryPath),
-  getDetailedEntriesForPaths: (paths: string[]) =>
-    ipcRenderer.invoke('getDetailedEntriesForPaths', paths),
-  getDetailedEntry: (path: string) =>
-    ipcRenderer.invoke('getDetailedEntry', path),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('getEntries', directoryPath),
+  getEntriesForPaths: (paths: string[]) =>
+    ipcRenderer.invoke('getEntriesForPaths', paths),
+  getEntry: (path: string) => ipcRenderer.invoke('getEntry', path),
   getEntryMetadata: (path: string) =>
     ipcRenderer.invoke('getEntryMetadata', path),
   getParentEntry: (path: string) => ipcRenderer.invoke('getParentEntry', path),

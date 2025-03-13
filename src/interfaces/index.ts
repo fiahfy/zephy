@@ -19,25 +19,21 @@ export type EditOperations = {
 
 export type EntryOperations = {
   copyEntries: (paths: string[]) => Promise<void>
-  createDirectory: (directoryPath: string) => Promise<DetailedEntry>
+  createDirectory: (directoryPath: string) => Promise<Entry>
   createEntryThumbnailUrl: (
     paths: string | string[],
   ) => Promise<string | undefined>
-  getDetailedEntries: (directoryPath: string) => Promise<DetailedEntry[]>
-  getDetailedEntriesForPaths: (paths: string[]) => Promise<DetailedEntry[]>
-  getDetailedEntry: (path: string) => Promise<DetailedEntry>
   getEntries: (directoryPath: string) => Promise<Entry[]>
+  getEntriesForPaths: (paths: string[]) => Promise<Entry[]>
+  getEntry: (path: string) => Promise<Entry>
   getEntryMetadata: (path: string) => Promise<Metadata | undefined>
-  getParentEntry: (path: string) => Promise<DetailedEntry>
+  getParentEntry: (path: string) => Promise<Entry>
   getRootEntry: (path?: string) => Promise<Entry>
-  moveEntries: (
-    paths: string[],
-    directoryPath: string,
-  ) => Promise<DetailedEntry[]>
+  moveEntries: (paths: string[], directoryPath: string) => Promise<Entry[]>
   moveEntriesToTrash: (paths: string[]) => Promise<void>
   openEntry: (path: string) => Promise<void>
   pasteEntries: (directoryPath: string) => Promise<void>
-  renameEntry: (path: string, newName: string) => Promise<DetailedEntry>
+  renameEntry: (path: string, newName: string) => Promise<Entry>
 }
 
 export type MessageOperations = {
@@ -90,14 +86,13 @@ type Directory = {
   type: 'directory'
   url: string
 }
-export type Entry = File | Directory
-export type DetailedEntry = Entry & {
+export type Entry = (File | Directory) & {
   dateCreated: number
   dateModified: number
   dateLastOpened: number
   size: number
 }
-export type Content = DetailedEntry & { score: number }
+export type Content = Entry & { score: number }
 
 export type Metadata = {
   duration?: number

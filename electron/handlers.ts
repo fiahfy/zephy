@@ -11,10 +11,9 @@ import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
   copyEntries,
   createDirectory,
-  getDetailedEntries,
-  getDetailedEntriesForPaths,
-  getDetailedEntry,
   getEntries,
+  getEntriesForPaths,
+  getEntry,
   getRootEntry,
   moveEntries,
   renameEntry,
@@ -53,23 +52,16 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
       createThumbnailUrl(path, thumbnailDir),
   )
   ipcMain.handle(
-    'getDetailedEntries',
-    (_event: IpcMainInvokeEvent, directoryPath: string) =>
-      getDetailedEntries(directoryPath),
-  )
-  ipcMain.handle(
-    'getDetailedEntriesForPaths',
-    (_event: IpcMainInvokeEvent, paths: string[]) =>
-      getDetailedEntriesForPaths(paths),
-  )
-  ipcMain.handle(
-    'getDetailedEntry',
-    (_event: IpcMainInvokeEvent, path: string) => getDetailedEntry(path),
-  )
-  ipcMain.handle(
     'getEntries',
     (_event: IpcMainInvokeEvent, directoryPath: string) =>
       getEntries(directoryPath),
+  )
+  ipcMain.handle(
+    'getEntriesForPaths',
+    (_event: IpcMainInvokeEvent, paths: string[]) => getEntriesForPaths(paths),
+  )
+  ipcMain.handle('getEntry', (_event: IpcMainInvokeEvent, path: string) =>
+    getEntry(path),
   )
   ipcMain.handle(
     'getEntryMetadata',
@@ -79,7 +71,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     'getParentEntry',
     (_event: IpcMainInvokeEvent, path: string) => {
       const parentPath = dirname(path)
-      return getDetailedEntry(parentPath)
+      return getEntry(parentPath)
     },
   )
   ipcMain.handle('getRootEntry', (_event: IpcMainInvokeEvent, path?: string) =>
