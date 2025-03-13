@@ -9,9 +9,9 @@ import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
 import {
   changeRatingPath,
   removeRating,
-  selectPathsByScore,
   selectRating,
   selectScoreByPath,
+  selectScoreToPathsMap,
 } from '~/store/rating'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
@@ -535,7 +535,7 @@ export const load =
     const { loaded, loading } = explorerListSlice.actions
 
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
-    const pathsMap = selectPathsByScore(getState())
+    const scoreToPathsMap = selectScoreToPathsMap(getState())
     if (!directoryPath) {
       return
     }
@@ -545,7 +545,7 @@ export const load =
       let entries: DetailedEntry[] = []
       if (url) {
         if (url.pathname === 'ratings') {
-          const paths = pathsMap[Number(url.params.score ?? 0)] ?? []
+          const paths = scoreToPathsMap[Number(url.params.score ?? 0)] ?? []
           entries = await window.electronAPI.getDetailedEntriesForPaths(paths)
         }
       } else {

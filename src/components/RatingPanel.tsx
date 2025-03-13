@@ -1,34 +1,24 @@
-import { Rating, Table, TableBody, TableCell, Typography } from '@mui/material'
+import { Rating, Table, TableBody, TableCell } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import Panel from '~/components/Panel'
 import RatingTableRow from '~/components/RatingTableRow'
 import useWatcher from '~/hooks/useWatcher'
 import { useAppSelector } from '~/store'
-import { selectPathsByScore } from '~/store/rating'
+import { selectRating, selectRatings } from '~/store/rating'
 
 const RatingPanel = () => {
-  const pathsByScore = useAppSelector(selectPathsByScore)
+  const ratings = useAppSelector((state) => selectRatings(selectRating(state)))
 
   const { watch } = useWatcher()
 
-  const [items, setItems] = useState<{ count: number; score: number }[]>([])
+  const [items, setItems] = useState<{ score: number }[]>([])
 
   const load = useCallback(async () => {
-    let items = await Promise.all(
-      Object.keys(pathsByScore).map(async (score) => {
-        const paths = pathsByScore[Number(score)] ?? []
-        const items = await window.electronAPI.getDetailedEntriesForPaths(paths)
-        return {
-          score: Number(score),
-          count: items.length,
-        }
-      }),
-    )
-    items = items
-      .filter((item) => item.count > 0)
+    const items = [...new Set(ratings.map((rating) => rating.score))]
+      .map((score) => ({ score }))
       .sort((a, b) => b.score - a.score)
     setItems(items)
-  }, [pathsByScore])
+  }, [ratings])
 
   useEffect(() => {
     load()
@@ -37,12 +27,12 @@ const RatingPanel = () => {
   useEffect(
     () =>
       watch('rating', [], async (_eventType, _directoryPath, filePath) => {
-        const paths = Object.values(pathsByScore).flat()
+        const paths = ratings.map((rating) => rating.path)
         if (paths.includes(filePath)) {
           load()
         }
       }),
-    [load, pathsByScore, watch],
+    [load, ratings, watch],
   )
 
   return (
@@ -71,9 +61,6 @@ const RatingPanel = () => {
                       size="small"
                       value={item.score}
                     />
-                    <Typography noWrap variant="caption">
-                      ({item.count})
-                    </Typography>
                   </TableCell>
                 </RatingTableRow>
               ))}

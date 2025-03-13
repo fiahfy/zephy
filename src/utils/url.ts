@@ -39,7 +39,7 @@ export const getTitle = async (path: string) => {
   if (parsed) {
     switch (parsed.pathname) {
       case 'ratings':
-        return 'Ratings'
+        return `Ratings (${parsed.params.score})`
       case 'settings':
         return 'Settings'
     }
