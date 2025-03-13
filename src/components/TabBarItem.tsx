@@ -110,16 +110,16 @@ const TabBarItem = (props: Props) => {
         </Box>
       }
       onContextMenu={handleContextMenu}
-      sx={{
-        color: (theme) => theme.palette.text.primary,
-        borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+      sx={(theme) => ({
+        color: theme.palette.text.primary,
+        borderRight: `1px solid ${theme.palette.divider}`,
         minHeight: 0,
         pl: 1.0,
         pr: 0.5,
         py: 0.375,
         textTransform: 'none',
         '&.Mui-selected': {
-          backgroundColor: (theme) => theme.palette.background.default,
+          backgroundColor: theme.palette.background.default,
         },
         '&.Mui-selected, &:hover': {
           '.MuiIconButton-root': {
@@ -130,7 +130,7 @@ const TabBarItem = (props: Props) => {
           opacity: 1,
         },
         ...droppableStyle,
-      }}
+      })}
       {...dropHandlers}
     />
   )

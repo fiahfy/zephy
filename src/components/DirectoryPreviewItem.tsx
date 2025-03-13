@@ -46,8 +46,8 @@ const DirectoryPreviewItem = (props: Props) => {
       draggable={draggable}
       onContextMenu={onContextMenu}
       onDoubleClick={handleDoubleClick}
-      sx={{
-        borderRadius: (theme) => theme.spacing(0.5),
+      sx={(theme) => ({
+        borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         overflow: 'hidden',
         '&::before': {
@@ -58,11 +58,11 @@ const DirectoryPreviewItem = (props: Props) => {
         },
         '&:hover': {
           '&::before': {
-            backgroundColor: (theme) => theme.palette.action.hover,
+            backgroundColor: theme.palette.action.hover,
           },
         },
         ...droppableStyle,
-      }}
+      })}
       tabIndex={0}
       {...dragHandlers}
       {...dropHandlers}

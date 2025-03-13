@@ -25,15 +25,15 @@ const ExplorerTableRow = (props: Props) => {
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
       selected={selected}
-      sx={{
-        borderRadius: (theme) => theme.spacing(0.5),
+      sx={(theme) => ({
+        borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         '.explorer-list:focus-within &.Mui-focused': {
-          outline: (theme) => `${theme.palette.primary.main} solid 1px`,
+          outline: `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },
-      }}
+      })}
     >
       {children}
     </TableRow>

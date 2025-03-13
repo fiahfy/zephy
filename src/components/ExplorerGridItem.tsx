@@ -48,8 +48,8 @@ const ExplorerGridItem = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
-      sx={{
-        borderRadius: (theme) => theme.spacing(0.5),
+      sx={(theme) => ({
+        borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         height: '100%!important',
         overflow: 'hidden',
@@ -62,34 +62,32 @@ const ExplorerGridItem = (props: Props) => {
         },
         '&:hover': {
           '&::before': {
-            backgroundColor: (theme) => theme.palette.action.hover,
+            backgroundColor: theme.palette.action.hover,
           },
         },
         '&.Mui-selected': {
           '&::before': {
-            backgroundColor: (theme) =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.selectedOpacity,
-              ),
+            backgroundColor: alpha(
+              theme.palette.primary.main,
+              theme.palette.action.selectedOpacity,
+            ),
           },
           '&:hover': {
             '&::before': {
-              backgroundColor: (theme) =>
-                alpha(
-                  theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity +
-                    theme.palette.action.hoverOpacity,
-                ),
+              backgroundColor: alpha(
+                theme.palette.primary.main,
+                theme.palette.action.selectedOpacity +
+                  theme.palette.action.hoverOpacity,
+              ),
             },
           },
         },
         '.explorer-list:focus-within &.Mui-focused': {
-          outline: (theme) => `${theme.palette.primary.main} solid 1px`,
+          outline: `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },
         ...droppableStyle,
-      }}
+      })}
       {...dragHandlers}
       {...dropHandlers}
     >

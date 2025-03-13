@@ -44,11 +44,10 @@ const NotificationBar = () => {
       open={open}
       autoHideDuration={autoHideDuration}
       onClose={handleClose}
-      sx={{
-        bottom: (theme) =>
-          `calc(${theme.mixins.statusBar.height} + ${theme.spacing(1)})!important`,
-        left: (theme) => `${theme.spacing(1)}!important`,
-      }}
+      sx={(theme) => ({
+        bottom: `calc(${theme.mixins.statusBar.height} + ${theme.spacing(1)})!important`,
+        left: `${theme.spacing(1)}!important`,
+      })}
     >
       <Alert
         onClose={handleClose}

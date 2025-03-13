@@ -148,25 +148,23 @@ const Sidebar = (props: Props) => {
       />
       <Box
         onMouseDown={handleMouseDown}
-        sx={{
-          backgroundColor: (theme) =>
-            resizing
-              ? theme.palette.primary.main
-              : theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+        sx={(theme) => ({
+          backgroundColor: resizing
+            ? theme.palette.primary.main
+            : theme.palette.mode === 'light'
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
           bottom: 0,
           cursor: 'col-resize',
           position: 'absolute',
           top: 0,
-          transition: (theme) =>
-            `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.easeOut}`,
-          width: (theme) => theme.spacing(0.5),
+          transition: `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.easeOut}`,
+          width: theme.spacing(0.5),
           [position === 'left' ? 'right' : 'left']: 0,
           '&:hover': {
-            backgroundColor: (theme) => theme.palette.primary.main,
+            backgroundColor: theme.palette.primary.main,
           },
-        }}
+        })}
       />
     </Drawer>
   )

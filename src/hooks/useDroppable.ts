@@ -1,5 +1,6 @@
-import type { SxProps, Theme } from '@mui/material'
+import type { Theme } from '@mui/material'
 import { alpha } from '@mui/material/styles'
+import type { SystemStyleObject } from '@mui/system'
 import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import { useAppDispatch } from '~/store'
@@ -52,7 +53,7 @@ const useDroppable = (path?: string) => {
               },
             }
           : {}),
-      }) as SxProps<Theme>,
+      }) as SystemStyleObject<Theme>,
     [dropping, theme],
   )
 
