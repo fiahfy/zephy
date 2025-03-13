@@ -53,7 +53,7 @@ const ExplorerPanel = () => {
   useEffect(
     () =>
       watch(
-        'explorer',
+        'explorer-tree',
         loadedDirectoryPaths,
         async (eventType, directoryPath, filePath) => {
           const entry =
