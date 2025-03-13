@@ -2,12 +2,12 @@ import { Close as CloseIcon } from '@mui/icons-material'
 import { Box, IconButton, Tab, Typography } from '@mui/material'
 import { type MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
-import useDropEntry from '~/hooks/useDropEntry'
+import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoadingByTabId } from '~/store/explorer-list'
 import { closeTab, selectHistoryByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
-import { getIconType } from '~/utils/url'
+import { getIconType, isZephySchema } from '~/utils/url'
 
 type Props = {
   tabId: number
@@ -20,14 +20,16 @@ const TabBarItem = (props: Props) => {
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
-  const path = history.directoryPath
+  const directoryPath = history.directoryPath
 
-  const { droppableStyle, ...dropHandlers } = useDropEntry({
-    name: '',
-    path,
-    type: 'directory',
-    url: '',
-  })
+  const zephySchema = useMemo(
+    () => isZephySchema(directoryPath),
+    [directoryPath],
+  )
+
+  const { droppableStyle, ...dropHandlers } = useDroppable(
+    zephySchema ? undefined : directoryPath,
+  )
 
   const handleContextMenu = useMemo(
     () =>
@@ -44,11 +46,11 @@ const TabBarItem = (props: Props) => {
         { type: 'separator' },
         {
           type: 'revealInExplorer',
-          data: { path },
+          data: { path: directoryPath },
         },
         {
           type: 'revealInFinder',
-          data: { path },
+          data: { path: directoryPath },
         },
         { type: 'separator' },
         {
@@ -60,7 +62,7 @@ const TabBarItem = (props: Props) => {
           data: { tabId },
         },
       ]),
-    [path, tabId],
+    [directoryPath, tabId],
   )
 
   const handleClick = useCallback(

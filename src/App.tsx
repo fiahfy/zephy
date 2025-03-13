@@ -20,6 +20,7 @@ import {
   selectAllInCurrentTab,
   startRenamingInCurrentTab,
 } from '~/store/explorer-list'
+import { setPath } from '~/store/explorer-tree'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
   back,
@@ -37,7 +38,6 @@ import {
   updateApplicationMenu,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
-import { setPath } from './store/explorer-tree'
 
 const isFocused = () => {
   const elements = document.querySelectorAll('.explorer-list')

@@ -2,7 +2,6 @@ import type { SxProps, Theme } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
-import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { moveFromCurrentTab } from '~/store/explorer-list'
 
@@ -21,12 +20,14 @@ const getPaths = (e: DragEvent) => {
   ) as string[]
 }
 
-const useDropEntry = (entry: Entry) => {
+const isDroppable = (path?: string): path is string => path !== undefined
+
+const useDroppable = (path?: string) => {
   const dispatch = useAppDispatch()
 
   const { theme } = useTheme()
 
-  const droppable = useMemo(() => entry.type === 'directory', [entry])
+  const droppable = isDroppable(path)
 
   const [enterCount, setEnterCount] = useState(0)
 
@@ -100,9 +101,9 @@ const useDropEntry = (entry: Entry) => {
       e.stopPropagation()
       setEnterCount(0)
       const paths = getPaths(e)
-      dispatch(moveFromCurrentTab(paths, entry.path))
+      dispatch(moveFromCurrentTab(paths, path))
     },
-    [dispatch, droppable, entry.path],
+    [dispatch, droppable, path],
   )
 
   return {
@@ -114,4 +115,4 @@ const useDropEntry = (entry: Entry) => {
   }
 }
 
-export default useDropEntry
+export default useDroppable

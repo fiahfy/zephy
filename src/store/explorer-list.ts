@@ -6,6 +6,7 @@ import {
 import type { Content, DetailedEntry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
+import { showNotification } from '~/store/notification'
 import {
   changeRatingPath,
   removeRating,
@@ -25,7 +26,6 @@ import {
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 import { parseZephyUrl } from '~/utils/url'
-import { showNotification } from './notification'
 
 type ExplorerState = {
   anchor: string | undefined

@@ -21,10 +21,11 @@ import {
   forwardRef,
   useCallback,
 } from 'react'
+import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import Icon from '~/components/Icon'
-import useDragEntry from '~/hooks/useDragEntry'
-import useDropEntry from '~/hooks/useDropEntry'
+import useDraggable from '~/hooks/useDraggable'
+import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
@@ -111,8 +112,13 @@ const ExplorerTreeItemRoot = forwardRef(
     const dispatch = useAppDispatch()
 
     const { onContextMenu } = useEntryItem(entry)
-    const { draggable, ...dragHandlers } = useDragEntry(entry)
-    const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
+    const { draggable, ...dragHandlers } = useDraggable(
+      entry.path,
+      <EntryDragGhost entries={[entry]} />,
+    )
+    const { droppableStyle, ...dropHandlers } = useDroppable(
+      entry.type === 'directory' ? entry.path : undefined,
+    )
 
     const handleClick = useCallback(
       (e: MouseEvent) => {

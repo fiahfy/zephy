@@ -1,10 +1,11 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
+import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import Rating from '~/components/Rating'
-import useDragEntry from '~/hooks/useDragEntry'
-import useDropEntry from '~/hooks/useDropEntry'
+import useDraggable from '~/hooks/useDraggable'
+import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import useThumbnailEntry from '~/hooks/useThumbnailEntry'
 import type { Entry } from '~/interfaces'
@@ -23,8 +24,13 @@ const DirectoryPreviewItem = (props: Props) => {
 
   const { onContextMenu } = useEntryItem(entry)
   const { itemCount, message, status, thumbnail } = useThumbnailEntry(entry)
-  const { draggable, ...dragHandlers } = useDragEntry(entry)
-  const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
+  const { draggable, ...dragHandlers } = useDraggable(
+    entry.path,
+    <EntryDragGhost entries={[entry]} />,
+  )
+  const { droppableStyle, ...dropHandlers } = useDroppable(
+    entry.type === 'directory' ? entry.path : undefined,
+  )
 
   const handleDoubleClick = useCallback(
     async () =>

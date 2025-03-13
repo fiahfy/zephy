@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { createElement } from 'react'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
-import useDropEntry from '~/hooks/useDropEntry'
+import useDroppable from '~/hooks/useDroppable'
 import ExplorerProvider from '~/providers/ExplorerProvider'
 import { useAppSelector } from '~/store'
 import {
@@ -24,12 +24,7 @@ const Explorer = (props: Props) => {
     selectViewModeByTabIdAndDirectoryPath(state, tabId, directoryPath),
   )
 
-  const { droppableStyle, ...dropHandlers } = useDropEntry({
-    path: directoryPath,
-    name: '',
-    type: 'directory',
-    url: '',
-  })
+  const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
   return (
     <ExplorerProvider>

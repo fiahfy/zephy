@@ -1,22 +1,20 @@
-import { Box, Typography } from '@mui/material'
-import { type DragEvent, useCallback, useMemo } from 'react'
+import { type DragEvent, type JSX, useCallback, useMemo } from 'react'
 import useDragGhost from '~/hooks/useDragGhost'
-import type { Entry } from '~/interfaces'
 
 const mime = 'application/zephy.path-list'
 
 const setPaths = (e: DragEvent, paths: string[]) =>
   e.dataTransfer.setData(mime, JSON.stringify(paths))
 
-const useDragEntry = (entries: Entry | Entry[]) => {
+const useDraggable = (paths: string | string[], ghost: JSX.Element) => {
   const { render } = useDragGhost()
 
-  const targetEntries = useMemo(
-    () => (Array.isArray(entries) ? entries : [entries]),
-    [entries],
+  const targetPaths = useMemo(
+    () => (Array.isArray(paths) ? paths : [paths]),
+    [paths],
   )
 
-  const draggable = useMemo(() => targetEntries.length > 0, [targetEntries])
+  const draggable = useMemo(() => targetPaths.length > 0, [targetPaths])
 
   const onDragEnd = useCallback(
     (e: DragEvent) => {
@@ -40,22 +38,15 @@ const useDragEntry = (entries: Entry | Entry[]) => {
       // e.preventDefault()
       e.stopPropagation()
       e.dataTransfer.effectAllowed = 'move'
-      const ref = render(
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          {targetEntries.map((entry) => (
-            <Typography key={entry.path} variant="caption">
-              {entry.name}
-            </Typography>
-          ))}
-        </Box>,
-      )
+
+      const ref = render(ghost)
       if (ref.current) {
         e.dataTransfer.setDragImage(ref.current, 0, 0)
       }
-      const paths = targetEntries.map((e) => e.path)
-      setPaths(e, paths)
+
+      setPaths(e, targetPaths)
     },
-    [draggable, render, targetEntries],
+    [draggable, ghost, render, targetPaths],
   )
 
   return {
@@ -65,4 +56,4 @@ const useDragEntry = (entries: Entry | Entry[]) => {
   }
 }
 
-export default useDragEntry
+export default useDraggable

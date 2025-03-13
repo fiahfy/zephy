@@ -1,6 +1,6 @@
 import { TableRow } from '@mui/material'
 import { type ReactNode, useCallback } from 'react'
-import useDropEntry from '~/hooks/useDropEntry'
+import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
@@ -17,7 +17,9 @@ const FavoriteTableRow = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { droppableStyle, ...dropHandlers } = useDropEntry(entry)
+  const { droppableStyle, ...dropHandlers } = useDroppable(
+    entry.type === 'directory' ? entry.path : undefined,
+  )
 
   const handleClick = useCallback(
     () => dispatch(changeDirectory(entry.path)),
