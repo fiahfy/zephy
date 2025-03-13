@@ -8,8 +8,8 @@ import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
+import useEntryThumbnail from '~/hooks/useEntryThumbnail'
 import useExplorerItem from '~/hooks/useExplorerItem'
-import useThumbnailEntry from '~/hooks/useThumbnailEntry'
 import type { Content } from '~/interfaces'
 
 type Props = {
@@ -30,7 +30,7 @@ const ExplorerGridItem = (props: Props) => {
     selected,
   } = useExplorerItem(tabId, content)
 
-  const { itemCount, message, status, thumbnail } = useThumbnailEntry(content)
+  const { itemCount, message, status, thumbnail } = useEntryThumbnail(content)
 
   const { draggable, ...dragHandlers } = useDraggable(
     draggingContents.map((c) => c.path),

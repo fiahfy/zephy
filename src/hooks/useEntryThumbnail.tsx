@@ -34,7 +34,7 @@ const reducer = (_state: State, action: Action) => {
   }
 }
 
-const useThumbnailEntry = (entry: Entry) => {
+const useEntryThumbnail = (entry: Entry) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
@@ -122,4 +122,4 @@ const useThumbnailEntry = (entry: Entry) => {
   return { itemCount, message, status, thumbnail }
 }
 
-export default useThumbnailEntry
+export default useEntryThumbnail
