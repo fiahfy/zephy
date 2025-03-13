@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react'
 import FavoriteTableRow from '~/components/FavoriteTableRow'
 import Icon from '~/components/Icon'
 import Panel from '~/components/Panel'
-import useWatcher from '~/hooks/useWatcher'
 import type { DetailedEntry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavorites } from '~/store/favorite'
@@ -12,8 +11,6 @@ const FavoritePanel = () => {
   const favorites = useAppSelector((state) =>
     selectFavorites(selectFavorite(state)),
   )
-
-  const { watch } = useWatcher()
 
   const [entries, setEntries] = useState<DetailedEntry[]>([])
 
@@ -34,17 +31,6 @@ const FavoritePanel = () => {
   useEffect(() => {
     load()
   }, [load])
-
-  useEffect(
-    () =>
-      watch('favorite', [], async (_eventType, _directoryPath, filePath) => {
-        const paths = entries.map((entry) => entry.path)
-        if (paths.includes(filePath)) {
-          load()
-        }
-      }),
-    [entries, load, watch],
-  )
 
   return (
     <>
