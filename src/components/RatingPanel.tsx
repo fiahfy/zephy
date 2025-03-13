@@ -4,21 +4,21 @@ import Panel from '~/components/Panel'
 import RatingTableRow from '~/components/RatingTableRow'
 import useWatcher from '~/hooks/useWatcher'
 import { useAppSelector } from '~/store'
-import { selectRating, selectRatings } from '~/store/rating'
+import { selectScoreToPathsMap } from '~/store/rating'
 
 const RatingPanel = () => {
-  const ratings = useAppSelector((state) => selectRatings(selectRating(state)))
+  const scoreToPathsMap = useAppSelector(selectScoreToPathsMap)
 
   const { watch } = useWatcher()
 
   const [items, setItems] = useState<{ score: number }[]>([])
 
   const load = useCallback(async () => {
-    const items = [...new Set(ratings.map((rating) => rating.score))]
-      .map((score) => ({ score }))
+    const items = Object.keys(scoreToPathsMap)
+      .map((score) => ({ score: Number(score) }))
       .sort((a, b) => b.score - a.score)
     setItems(items)
-  }, [ratings])
+  }, [scoreToPathsMap])
 
   useEffect(() => {
     load()
@@ -27,12 +27,12 @@ const RatingPanel = () => {
   useEffect(
     () =>
       watch('rating', [], async (_eventType, _directoryPath, filePath) => {
-        const paths = ratings.map((rating) => rating.path)
+        const paths = Object.values(scoreToPathsMap).flat()
         if (paths.includes(filePath)) {
           load()
         }
       }),
-    [load, ratings, watch],
+    [load, scoreToPathsMap, watch],
   )
 
   return (
