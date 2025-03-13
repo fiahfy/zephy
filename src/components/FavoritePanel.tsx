@@ -1,9 +1,8 @@
 import { Table, TableBody, TableCell, Typography } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import FavoriteTableRow from '~/components/FavoriteTableRow'
 import Icon from '~/components/Icon'
 import Panel from '~/components/Panel'
-import type { DetailedEntry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavorites } from '~/store/favorite'
 
@@ -12,34 +11,19 @@ const FavoritePanel = () => {
     selectFavorites(selectFavorite(state)),
   )
 
-  const [entries, setEntries] = useState<DetailedEntry[]>([])
-
-  const load = useCallback(async () => {
-    const entries = await (async () => {
-      try {
-        const entries = await window.electronAPI.getDetailedEntriesForPaths(
-          favorites.map((favorite) => favorite.path),
-        )
-        return entries.sort((a, b) => a.name.localeCompare(b.name))
-      } catch (e) {
-        return []
-      }
-    })()
-    setEntries(entries)
-  }, [favorites])
-
-  useEffect(() => {
-    load()
-  }, [load])
+  const items = useMemo(
+    () => favorites.sort((a, b) => a.name.localeCompare(b.name)),
+    [favorites],
+  )
 
   return (
     <>
-      {entries.length > 0 && (
+      {items.length > 0 && (
         <Panel title="Favorites">
           <Table size="small" sx={{ display: 'flex' }}>
             <TableBody sx={{ width: '100%' }}>
-              {entries.map((entry) => (
-                <FavoriteTableRow entry={entry} key={entry.path}>
+              {items.map((item) => (
+                <FavoriteTableRow key={item.path} path={item.path}>
                   <TableCell
                     sx={{
                       alignItems: 'center',
@@ -51,11 +35,11 @@ const FavoritePanel = () => {
                       py: 0,
                       width: '100%',
                     }}
-                    title={entry.name}
+                    title={item.name}
                   >
                     <Icon type="folder" />
                     <Typography noWrap variant="caption">
-                      {entry.name}
+                      {item.name}
                     </Typography>
                   </TableCell>
                 </FavoriteTableRow>

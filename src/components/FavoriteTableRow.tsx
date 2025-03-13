@@ -1,37 +1,55 @@
 import { TableRow } from '@mui/material'
-import { type ReactNode, useCallback } from 'react'
+import { type ReactNode, useCallback, useMemo } from 'react'
 import useDroppable from '~/hooks/useDroppable'
-import useEntryItem from '~/hooks/useEntryItem'
-import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { changeDirectory } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
   children: ReactNode
-  entry: Entry
+  path: string
 }
 
 const FavoriteTableRow = (props: Props) => {
-  const { children, entry, ...others } = props
+  const { children, path, ...others } = props
 
   const dispatch = useAppDispatch()
 
-  const { onContextMenu } = useEntryItem(entry)
-  const { droppableStyle, ...dropHandlers } = useDroppable(
-    entry.type === 'directory' ? entry.path : undefined,
-  )
+  const { droppableStyle, ...dropHandlers } = useDroppable(path)
 
   const handleClick = useCallback(
-    () => dispatch(changeDirectory(entry.path)),
-    [dispatch, entry.path],
+    () => dispatch(changeDirectory(path)),
+    [dispatch, path],
   )
+
+  const handleContextMenu = useMemo(() => {
+    return createContextMenuHandler([
+      {
+        type: 'open',
+        data: { path },
+      },
+      {
+        type: 'openInNewWindow',
+        data: { path },
+      },
+      {
+        type: 'openInNewTab',
+        data: { path },
+      },
+      { type: 'separator' },
+      {
+        type: 'toggleFavorite',
+        data: { path, favorite: true },
+      },
+    ])
+  }, [path])
 
   return (
     <TableRow
       {...others}
       hover
       onClick={handleClick}
-      onContextMenu={onContextMenu}
+      onContextMenu={handleContextMenu}
       sx={{
         borderRadius: (theme) => theme.spacing(0.5),
         cursor: 'pointer',

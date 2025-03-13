@@ -6,6 +6,7 @@ import {
 import type { AppState, AppThunk } from '~/store'
 
 type Favorite = {
+  name: string
   path: string
 }
 
@@ -22,11 +23,14 @@ export const favoriteSlice = createSlice({
     replaceState(_state, action: PayloadAction<{ state: State }>) {
       return action.payload.state
     },
-    addToFavorites(state, action: PayloadAction<{ path: string }>) {
-      const { path } = action.payload
+    addToFavorites(
+      state,
+      action: PayloadAction<{ name: string; path: string }>,
+    ) {
+      const { name, path } = action.payload
       const favorites = [
         ...state.favorites.filter((favorite) => favorite.path !== path),
-        { path },
+        { name, path },
       ]
       return { ...state, favorites }
     },
@@ -81,7 +85,8 @@ export const addToFavorites =
   async (dispatch) => {
     const { addToFavorites } = favoriteSlice.actions
 
-    dispatch(addToFavorites({ path }))
+    const entry = await window.electronAPI.getDetailedEntry(path)
+    dispatch(addToFavorites({ ...entry }))
   }
 
 export const removeFromFavorites =
