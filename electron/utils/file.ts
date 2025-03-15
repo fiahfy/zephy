@@ -5,23 +5,20 @@ import { pathToFileURL } from 'node:url'
 import { copy, move, pathExists } from 'fs-extra'
 
 type File = {
-  name: string
-  path: string
   type: 'file'
-  url: string
 }
 type Directory = {
   children?: Entry[]
-  name: string
-  path: string
   type: 'directory'
-  url: string
 }
 type Entry = (File | Directory) & {
   dateCreated: number
   dateModified: number
   dateLastOpened: number
+  name: string
+  path: string
   size: number
+  url: string
 }
 
 // @see https://stackoverflow.com/a/3561711
@@ -154,10 +151,7 @@ export const getRootEntry = async (
 
   let entry: Directory = {
     children: [{ ...root, name: rootPath }],
-    name: '',
-    path: '',
     type: 'directory',
-    url: '',
   }
 
   entry = await dirnames.reduce(async (promise, _dirname, i) => {
