@@ -737,7 +737,6 @@ export const duplicateTab =
     dispatch(duplicateTab({ id, srcTabId }))
     const destTabId = selectCurrentTabId(getState())
     dispatch(copyTab({ srcTabId, destTabId }))
-    dispatch(updateApplicationMenu())
   }
 
 export const closeTab =
@@ -753,7 +752,6 @@ export const closeTab =
     }
     dispatch(closeTab({ id, tabId }))
     dispatch(removeTab({ tabId }))
-    dispatch(updateApplicationMenu())
   }
 
 export const closeOtherTabs =
@@ -764,7 +762,6 @@ export const closeOtherTabs =
     const id = selectWindowId(getState())
     dispatch(closeOtherTabs({ id, tabId }))
     dispatch(removeOtherTabs({ tabId }))
-    dispatch(updateApplicationMenu())
   }
 
 export const changeTab =
@@ -774,7 +771,6 @@ export const changeTab =
 
     const id = selectWindowId(getState())
     dispatch(changeTab({ id, tabId }))
-    dispatch(updateApplicationMenu())
   }
 
 export const changeDirectory =
@@ -789,7 +785,6 @@ export const changeDirectory =
     }
     const title = await getTitle(directoryPath)
     dispatch(changeDirectory({ id, directoryPath, title }))
-    dispatch(updateApplicationMenu())
   }
 
 export const go =
@@ -803,7 +798,6 @@ export const go =
       return
     }
     dispatch(go({ id, offset }))
-    dispatch(updateApplicationMenu())
   }
 
 export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
@@ -870,7 +864,6 @@ export const sort =
         orderBy,
       }),
     )
-    dispatch(updateApplicationMenu())
   }
 
 export const setCurrentViewMode =
@@ -881,7 +874,6 @@ export const setCurrentViewMode =
     const id = selectWindowId(getState())
     const currentDirectoryPath = selectCurrentDirectoryPath(getState())
     dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
-    dispatch(updateApplicationMenu())
   }
 
 export const setSidebarHidden =
@@ -891,7 +883,6 @@ export const setSidebarHidden =
 
     const id = selectWindowId(getState())
     dispatch(setSidebarHidden({ id, variant, hidden }))
-    dispatch(updateApplicationMenu())
   }
 
 export const setSidebarWidth =
@@ -910,12 +901,13 @@ export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const sidebar = selectSidebar(getState())
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())
+
   await window.electronAPI.updateApplicationMenu({
     canBack,
     canCloseTab,
     canForward,
-    inspectorHidden: sidebar.primary.hidden,
-    navigatorHidden: sidebar.secondary.hidden,
+    inspectorHidden: sidebar.secondary.hidden,
+    navigatorHidden: sidebar.primary.hidden,
     orderBy: sortOption.orderBy,
     viewMode,
   })

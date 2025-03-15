@@ -31,7 +31,11 @@ import {
   go,
   goToSettings,
   newTab,
+  selectCurrentSortOption,
+  selectCurrentTabId,
   selectCurrentTitle,
+  selectCurrentViewMode,
+  selectSidebar,
   setCurrentViewMode,
   setSidebarHidden,
   sort,
@@ -45,6 +49,10 @@ const isFocused = () => {
 }
 
 const App = () => {
+  const currentSortOption = useAppSelector(selectCurrentSortOption)
+  const currentTabId = useAppSelector(selectCurrentTabId)
+  const currentViewMode = useAppSelector(selectCurrentViewMode)
+  const sidebar = useAppSelector(selectSidebar)
   const title = useAppSelector(selectCurrentTitle)
   const dispatch = useAppDispatch()
 
@@ -128,6 +136,16 @@ const App = () => {
     })
     return () => removeListener()
   }, [dispatch])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    ;(async () => {
+      const focused = await window.electronAPI.isFocused()
+      if (focused) {
+        dispatch(updateApplicationMenu())
+      }
+    })()
+  }, [currentSortOption, currentTabId, currentViewMode, dispatch, sidebar])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
