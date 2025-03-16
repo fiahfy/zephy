@@ -15,10 +15,8 @@ const getPaths = (e: DragEvent) => {
   } catch (e) {
     // noop
   }
-  return Array.from(e.dataTransfer.files).map(
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    (file) => (file as any).path,
-  ) as string[]
+
+  return window.electronAPI.getFilePaths(Array.from(e.dataTransfer.files))
 }
 
 const isDroppable = (path?: string): path is string => path !== undefined

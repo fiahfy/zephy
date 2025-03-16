@@ -53,6 +53,7 @@ export type WatcherOperations = {
 }
 
 export type IElectronAPI = {
+  getFilePaths: (files: globalThis.File[]) => string[]
   openTab: () => Promise<void>
   openUrl: (url: string) => Promise<void>
 } & ApplicationMenuOperations &

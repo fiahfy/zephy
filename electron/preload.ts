@@ -1,6 +1,11 @@
 import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
-import { type IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import {
+  type IpcRendererEvent,
+  contextBridge,
+  ipcRenderer,
+  webUtils,
+} from 'electron'
 import type { ApplicationMenuParams } from './applicationMenu'
 
 const applicationMenuOperations = {
@@ -76,6 +81,8 @@ const watcherOperations = {
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  getFilePaths: (files: File[]) =>
+    files.map((file) => webUtils.getPathForFile(file)),
   openTab: () => ipcRenderer.invoke('openTab'),
   openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
   ...applicationMenuOperations,
