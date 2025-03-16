@@ -44,7 +44,7 @@ const send = (message: { type: string; data?: any }) => {
     return
   }
 
-  activeWindow.webContents.send('sendMessage', message)
+  activeWindow.webContents.send('onMessage', message)
 }
 
 const registerApplicationMenu = (

@@ -50,11 +50,11 @@ const entryOperations = {
 
 const messageOperations = {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  addMessageListener: (callback: (message: any) => void) => {
+  onMessage: (callback: (message: any) => void) => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
-    ipcRenderer.on('sendMessage', listener)
+    ipcRenderer.on('onMessage', listener)
     return () => ipcRenderer.off('sendMessage', listener)
   },
 }

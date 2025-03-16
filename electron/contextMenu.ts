@@ -5,7 +5,7 @@ import { copyEntries } from './utils/file'
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const send = (event: IpcMainInvokeEvent, message: any) =>
-  event.sender.send('sendMessage', message)
+  event.sender.send('onMessage', message)
 
 const registerContextMenu = (
   createWindow: (directoryPath?: string) => void,

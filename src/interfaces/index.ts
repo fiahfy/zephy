@@ -38,7 +38,7 @@ export type EntryOperations = {
 
 export type MessageOperations = {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  addMessageListener: (callback: (message: any) => void) => () => void
+  onMessage: (callback: (message: any) => void) => () => void
 }
 
 export type WatcherOperations = {

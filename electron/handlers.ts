@@ -112,7 +112,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle('openTab', (event: IpcMainInvokeEvent) =>
-    event.sender.send('sendMessage', {
+    event.sender.send('onMessage', {
       type: 'newTab',
       data: { path: app.getPath('home') },
     }),

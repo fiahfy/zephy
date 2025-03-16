@@ -53,7 +53,7 @@ const VideoPreview = (props: Props) => {
   const ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const removeListener = window.electronAPI.addMessageListener((message) => {
+    const removeListener = window.electronAPI.onMessage((message) => {
       const { type, data } = message
       if (type !== 'changeLoop') {
         return

@@ -61,70 +61,68 @@ const App = () => {
   useTitle(title)
 
   useEffect(() => {
-    const removeListener = window.electronAPI.addMessageListener(
-      async (message) => {
-        const { type, data } = message
-        switch (type) {
-          case 'addToFavorites':
-            return dispatch(addToFavorites(data.path))
-          case 'back':
-            return dispatch(back())
-          case 'changeSidebarHidden':
-            return dispatch(setSidebarHidden(data.variant, data.hidden))
-          case 'changeViewMode':
-            return dispatch(setCurrentViewMode(data.viewMode))
-          case 'closeOtherTabs':
-            return dispatch(closeOtherTabs(data.tabId))
-          case 'closeTab':
-            return dispatch(closeTab(data?.tabId))
-          case 'copy':
-            if (isFocused()) {
-              return dispatch(copyFromCurrentTab())
-            }
-            return window.electronAPI.copy()
-          case 'cut':
-            if (isFocused()) {
-              // TODO: implement
-              return
-            }
-            return window.electronAPI.cut()
-          case 'duplicateTab':
-            return dispatch(duplicateTab(data.tabId))
-          case 'forward':
-            return dispatch(forward())
-          case 'go':
-            return dispatch(go(data.offset))
-          case 'goToSettings':
-            return dispatch(goToSettings())
-          case 'moveToTrash':
-            return dispatch(moveToTrashFromCurrentTab(data?.paths))
-          case 'newFolder':
-            return dispatch(newFolderInCurrentTab(data.path))
-          case 'newTab':
-            return dispatch(newTab(data.path, data.tabId))
-          case 'open':
-            return dispatch(openFromCurrentTab(data?.path))
-          case 'removeFromFavorites':
-            return dispatch(removeFromFavorites(data.path))
-          case 'rename':
-            return dispatch(startRenamingInCurrentTab(data?.path))
-          case 'revealInExplorer':
-            return dispatch(setPath({ path: data.path }))
-          case 'paste':
-            if (isFocused()) {
-              return dispatch(pasteToCurrentTab())
-            }
-            return window.electronAPI.paste()
-          case 'selectAll':
-            if (isFocused()) {
-              return dispatch(selectAllInCurrentTab())
-            }
-            return window.electronAPI.selectAll()
-          case 'sort':
-            return dispatch(sort(data.orderBy))
-        }
-      },
-    )
+    const removeListener = window.electronAPI.onMessage((message) => {
+      const { type, data } = message
+      switch (type) {
+        case 'addToFavorites':
+          return dispatch(addToFavorites(data.path))
+        case 'back':
+          return dispatch(back())
+        case 'changeSidebarHidden':
+          return dispatch(setSidebarHidden(data.variant, data.hidden))
+        case 'changeViewMode':
+          return dispatch(setCurrentViewMode(data.viewMode))
+        case 'closeOtherTabs':
+          return dispatch(closeOtherTabs(data.tabId))
+        case 'closeTab':
+          return dispatch(closeTab(data?.tabId))
+        case 'copy':
+          if (isFocused()) {
+            return dispatch(copyFromCurrentTab())
+          }
+          return window.electronAPI.copy()
+        case 'cut':
+          if (isFocused()) {
+            // TODO: implement
+            return
+          }
+          return window.electronAPI.cut()
+        case 'duplicateTab':
+          return dispatch(duplicateTab(data.tabId))
+        case 'forward':
+          return dispatch(forward())
+        case 'go':
+          return dispatch(go(data.offset))
+        case 'goToSettings':
+          return dispatch(goToSettings())
+        case 'moveToTrash':
+          return dispatch(moveToTrashFromCurrentTab(data?.paths))
+        case 'newFolder':
+          return dispatch(newFolderInCurrentTab(data.path))
+        case 'newTab':
+          return dispatch(newTab(data.path, data.tabId))
+        case 'open':
+          return dispatch(openFromCurrentTab(data?.path))
+        case 'removeFromFavorites':
+          return dispatch(removeFromFavorites(data.path))
+        case 'rename':
+          return dispatch(startRenamingInCurrentTab(data?.path))
+        case 'revealInExplorer':
+          return dispatch(setPath({ path: data.path }))
+        case 'paste':
+          if (isFocused()) {
+            return dispatch(pasteToCurrentTab())
+          }
+          return window.electronAPI.paste()
+        case 'selectAll':
+          if (isFocused()) {
+            return dispatch(selectAllInCurrentTab())
+          }
+          return window.electronAPI.selectAll()
+        case 'sort':
+          return dispatch(sort(data.orderBy))
+      }
+    })
     return () => removeListener()
   }, [dispatch])
 
