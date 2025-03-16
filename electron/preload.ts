@@ -68,9 +68,9 @@ const watcherOperations = {
       filePath: string,
     ) => void,
   ) => {
-    ipcRenderer.removeAllListeners('notifyToWatcher')
+    ipcRenderer.removeAllListeners('onDirectoryChange')
     ipcRenderer.on(
-      'notifyToWatcher',
+      'onDirectoryChange',
       (
         _event: IpcRendererEvent,
         eventType: 'create' | 'delete',

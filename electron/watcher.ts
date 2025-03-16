@@ -63,7 +63,7 @@ const createWatcher = () => {
     const windows = BrowserWindow.getAllWindows()
     for (const window of windows) {
       window.webContents.send(
-        'notifyToWatcher',
+        'onDirectoryChange',
         eventType,
         directoryPath,
         filePath,
@@ -79,7 +79,7 @@ const createWatcher = () => {
         directoryPaths,
         (eventType, directoryPath, filePath) =>
           event.sender.send(
-            'notifyToWatcher',
+            'onDirectoryChange',
             eventType,
             directoryPath,
             filePath,
