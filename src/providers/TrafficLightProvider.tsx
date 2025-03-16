@@ -11,7 +11,7 @@ const TrafficLightProvider = (props: Props) => {
 
   useEffect(() => {
     const removeListener =
-      window.electronAPI.addTrafficLightListener(setVisibility)
+      window.electronAPI.onTrafficLightVisibilityChange(setVisibility)
     return () => removeListener()
   }, [])
 

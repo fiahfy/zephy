@@ -129,7 +129,7 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.addFocusListener((focused) => {
+    const removeListener = window.electronAPI.onFocusChange((focused) => {
       if (focused) {
         dispatch(updateApplicationMenu())
       }
