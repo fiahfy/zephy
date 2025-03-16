@@ -53,8 +53,10 @@ const defaultExplorerState = {
   selected: [],
 }
 
-const getErrorMessage = (e: Error): string =>
-  e.message.includes('Error: ') ? e.message.split('Error: ')[1] : e.message
+const getErrorMessage = (e: Error): string => {
+  const message = e.message.split(':')[2]
+  return message ? message : e.message
+}
 
 const findExplorer = (state: State, tabId: number) =>
   state[tabId] ?? defaultExplorerState
