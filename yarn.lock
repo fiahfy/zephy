@@ -757,12 +757,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/electron-context-menu@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@fiahfy/electron-context-menu@npm:0.1.2"
+"@fiahfy/electron-context-menu@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "@fiahfy/electron-context-menu@npm:0.1.4"
   peerDependencies:
     electron: ">=27"
-  checksum: 10c0/c373d8c09b455fd0ef5b47c7624569acf6a135b0c3396a9d449fab5b7db889f4007d1ca1fdd050cb2d674d8f80666afd18eece33111ed49221fd555dca67acea
+  checksum: 10c0/62af65ffe9e9b59d6c39e9a2caaacaf7ee942f30b15f9f89dfca91d22967f9ee8e3afff40c51e3e0f1472e848127aac67129e16586b17c2ff5c01d60c6517da1
   languageName: node
   linkType: hard
 

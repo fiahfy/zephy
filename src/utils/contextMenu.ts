@@ -5,11 +5,11 @@ import {
 import type { MouseEvent } from 'react'
 
 export const createContextMenuHandler = (options: ContextMenuOption[] = []) => {
-  return async (e: MouseEvent) => {
+  return (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    await window.electronAPI.showContextMenu(
+    window.electronAPI.showContextMenu(
       buildContextMenuParams(e.nativeEvent, options),
     )
   }

@@ -8,6 +8,8 @@ import {
 } from 'electron'
 import type { ApplicationMenuParams } from './applicationMenu'
 
+// TODO: avoid Promise<void> return types
+
 const applicationMenuOperations = {
   updateApplicationMenu: (params: ApplicationMenuParams) =>
     ipcRenderer.invoke('updateApplicationMenu', params),
