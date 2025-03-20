@@ -13,8 +13,8 @@ type Directory = {
 }
 type Entry = (File | Directory) & {
   dateCreated: number
-  dateModified: number
   dateLastOpened: number
+  dateModified: number
   name: string
   path: string
   size: number
@@ -105,14 +105,14 @@ export const getEntry = async (path: string): Promise<Entry> => {
     throw new Error('Invalid entry type')
   }
   return {
+    dateCreated: stats.birthtimeMs,
+    dateLastOpened: stats.atimeMs,
+    dateModified: stats.mtimeMs,
     name: basename(path).normalize('NFC'),
     path,
+    size: type === 'directory' ? 0 : stats.size,
     type,
     url: pathToFileURL(path).href,
-    dateCreated: stats.birthtimeMs,
-    dateModified: stats.mtimeMs,
-    dateLastOpened: stats.atimeMs,
-    size: type === 'directory' ? 0 : stats.size,
   }
 }
 

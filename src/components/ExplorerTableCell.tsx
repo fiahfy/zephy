@@ -84,9 +84,19 @@ const ExplorerTableCell = (props: Props) => {
           {formatFileSize(content.size)}
         </Typography>
       )}
+      {dataKey === 'dateCreated' && (
+        <Typography noWrap variant="caption">
+          {formatDateTime(content.dateCreated)}
+        </Typography>
+      )}
       {dataKey === 'dateModified' && (
         <Typography noWrap variant="caption">
           {formatDateTime(content.dateModified)}
+        </Typography>
+      )}
+      {dataKey === 'dateLastOpened' && (
+        <Typography noWrap variant="caption">
+          {formatDateTime(content.dateLastOpened)}
         </Typography>
       )}
     </TableCell>

@@ -83,8 +83,8 @@ type Directory = {
 }
 export type Entry = (File | Directory) & {
   dateCreated: number
-  dateModified: number
   dateLastOpened: number
+  dateModified: number
   name: string
   path: string
   size: number

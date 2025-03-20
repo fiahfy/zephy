@@ -21,7 +21,7 @@ const getTotalFileSize = (entries: Entry[]) =>
 
 const formatDateRange = (
   entries: Entry[],
-  dateProperty: 'dateCreated' | 'dateModified' | 'dateLastOpened',
+  dateProperty: 'dateCreated' | 'dateLastOpened' | 'dateModified',
 ) => {
   const entry = entries[0]
   if (!entry) {

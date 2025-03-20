@@ -36,12 +36,24 @@ const columns: ColumnType[] = [
     label: 'Size',
     width: 90,
   },
+  // {
+  //   align: 'left',
+  //   key: 'dateCreated',
+  //   label: 'Date Created',
+  //   width: 130,
+  // },
   {
     align: 'left',
     key: 'dateModified',
     label: 'Date Modified',
     width: 130,
   },
+  // {
+  //   align: 'left',
+  //   key: 'dateLastOpened',
+  //   label: 'Date Last Opened',
+  //   width: 130,
+  // },
 ]
 
 type Props = {

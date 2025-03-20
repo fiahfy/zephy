@@ -15,10 +15,10 @@ type State = {
   inspectorHidden: boolean
   navigatorHidden: boolean
   orderBy:
-    | 'name'
+    | 'dateCreated'
     | 'dateLastOpened'
     | 'dateModified'
-    | 'dateCreated'
+    | 'name'
     | 'score'
     | 'size'
   viewMode: 'list' | 'thumbnail'

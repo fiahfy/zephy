@@ -75,10 +75,10 @@ type State = {
 const initialState: State = {}
 
 const defaultOrders = {
-  name: 'asc',
+  dateCreated: 'desc',
   dateLastOpened: 'desc',
   dateModified: 'desc',
-  dateCreated: 'desc',
+  name: 'asc',
   score: 'desc',
   size: 'desc',
 } as const
