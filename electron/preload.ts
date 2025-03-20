@@ -55,7 +55,7 @@ const messageOperations = {
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
     ipcRenderer.on('onMessage', listener)
-    return () => ipcRenderer.off('sendMessage', listener)
+    return () => ipcRenderer.off('onMessage', listener)
   },
 }
 
