@@ -68,9 +68,14 @@ export type IElectronAPI = {
 export type ApplicationMenuParams = any
 
 export type Settings = {
+  dateCreatedColumnVisible: boolean
+  dateLastOpenedColumnVisible: boolean
+  dateModifiedColumnVisible: boolean
+  ratingColumnVisible: boolean
   shouldOpenWithPhoty: boolean
   shouldOpenWithVisty: boolean
   shouldShowHiddenFiles: boolean
+  sizeColumnVisible: boolean
   theme: 'light' | 'dark' | 'system'
 }
 

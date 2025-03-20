@@ -42,6 +42,13 @@ import {
   updateApplicationMenu,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
+import {
+  toggleDateCreatedColumnVisible,
+  toggleDateLastOpenedColumnVisible,
+  toggleDateModifiedColumnVisible,
+  toggleRatingColumnVisible,
+  toggleSizeColumnVisible,
+} from './store/settings'
 
 const isFocused = () => {
   const elements = document.querySelectorAll('.explorer-list')
@@ -121,6 +128,16 @@ const App = () => {
           return window.electronAPI.selectAll()
         case 'sort':
           return dispatch(sort(data.orderBy))
+        case 'toggleDateCreatedColumn':
+          return dispatch(toggleDateCreatedColumnVisible())
+        case 'toggleDateModifiedColumn':
+          return dispatch(toggleDateModifiedColumnVisible())
+        case 'toggleDateLastOpenedColumn':
+          return dispatch(toggleDateLastOpenedColumnVisible())
+        case 'toggleSizeColumn':
+          return dispatch(toggleSizeColumnVisible())
+        case 'toggleRatingColumn':
+          return dispatch(toggleRatingColumnVisible())
       }
     })
     return () => removeListener()

@@ -106,36 +106,36 @@ const registerContextMenu = (
         type: 'radio',
       })),
     }),
-    // toggleDateCreatedColumn: () => ({
-    //   checked: true,
-    //   click: () => undefined,
-    //   label: 'Date Created',
-    //   type: 'checkbox',
-    // }),
-    // toggleDateModifiedColumn: () => ({
-    //   checked: true,
-    //   click: () => undefined,
-    //   label: 'Date Modified',
-    //   type: 'checkbox',
-    // }),
-    // toggleDateLastOpenedColumn: () => ({
-    //   checked: true,
-    //   click: () => undefined,
-    //   label: 'Date Last Opened',
-    //   type: 'checkbox',
-    // }),
-    // toggleSizeColumn: () => ({
-    //   checked: true,
-    //   click: () => undefined,
-    //   label: 'Size',
-    //   type: 'checkbox',
-    // }),
-    // toggleRatingColumn: () => ({
-    //   checked: true,
-    //   click: () => undefined,
-    //   label: 'Rating',
-    //   type: 'checkbox',
-    // }),
+    toggleDateCreatedColumn: (event, _params, { checked }) => ({
+      checked,
+      click: () => send(event, { type: 'toggleDateCreatedColumn' }),
+      label: 'Date Created',
+      type: 'checkbox',
+    }),
+    toggleDateModifiedColumn: (event, _params, { checked }) => ({
+      checked,
+      click: () => send(event, { type: 'toggleDateModifiedColumn' }),
+      label: 'Date Modified',
+      type: 'checkbox',
+    }),
+    toggleDateLastOpenedColumn: (event, _params, { checked }) => ({
+      checked,
+      click: () => send(event, { type: 'toggleDateLastOpenedColumn' }),
+      label: 'Date Last Opened',
+      type: 'checkbox',
+    }),
+    toggleSizeColumn: (event, _params, { checked }) => ({
+      checked,
+      click: () => send(event, { type: 'toggleSizeColumn' }),
+      label: 'Size',
+      type: 'checkbox',
+    }),
+    toggleRatingColumn: (event, _params, { checked }) => ({
+      checked,
+      click: () => send(event, { type: 'toggleRatingColumn' }),
+      label: 'Rating',
+      type: 'checkbox',
+    }),
     toggleFavorite: (event, _params, { favorite, path }) => ({
       click: () =>
         send(event, {

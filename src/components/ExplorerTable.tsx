@@ -5,6 +5,14 @@ import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
 import ExplorerTableRow from '~/components/ExplorerTableRow'
 import useExplorerList from '~/hooks/useExplorerList'
 import type { Content } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import {
+  selectDateCreatedColumnVisible,
+  selectDateLastOpenedColumnVisible,
+  selectDateModifiedColumnVisible,
+  selectRatingColumnVisible,
+  selectSizeColumnVisible,
+} from '~/store/settings'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const headerHeight = 32
@@ -37,24 +45,24 @@ const columns: ColumnType[] = [
     label: 'Size',
     width: 90,
   },
-  // {
-  //   align: 'left',
-  //   key: 'dateCreated',
-  //   label: 'Date Created',
-  //   width: 130,
-  // },
+  {
+    align: 'left',
+    key: 'dateCreated',
+    label: 'Date Created',
+    width: 130,
+  },
   {
     align: 'left',
     key: 'dateModified',
     label: 'Date Modified',
     width: 130,
   },
-  // {
-  //   align: 'left',
-  //   key: 'dateLastOpened',
-  //   label: 'Date Last Opened',
-  //   width: 130,
-  // },
+  {
+    align: 'left',
+    key: 'dateLastOpened',
+    label: 'Date Last Opened',
+    width: 130,
+  },
 ]
 
 type Props = {
@@ -63,6 +71,18 @@ type Props = {
 
 const ExplorerTable = (props: Props) => {
   const { tabId } = props
+
+  const dateCreatedColumnVisible = useAppSelector(
+    selectDateCreatedColumnVisible,
+  )
+  const dateLastOpenedColumnVisible = useAppSelector(
+    selectDateLastOpenedColumnVisible,
+  )
+  const dateModifiedColumnVisible = useAppSelector(
+    selectDateModifiedColumnVisible,
+  )
+  const ratingColumnVisible = useAppSelector(selectRatingColumnVisible)
+  const sizeColumnVisible = useAppSelector(selectSizeColumnVisible)
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -77,21 +97,64 @@ const ExplorerTable = (props: Props) => {
     virtualizer,
   } = useExplorerList(tabId, 1, rowHeight, ref)
 
+  const filteredColumns = useMemo(
+    () =>
+      columns.filter((column) => {
+        switch (column.key) {
+          case 'dateCreated':
+            return dateCreatedColumnVisible
+          case 'dateModified':
+            return dateModifiedColumnVisible
+          case 'dateLastOpened':
+            return dateLastOpenedColumnVisible
+          case 'score':
+            return ratingColumnVisible
+          case 'size':
+            return sizeColumnVisible
+          default:
+            return true
+        }
+      }),
+    [
+      dateCreatedColumnVisible,
+      dateLastOpenedColumnVisible,
+      dateModifiedColumnVisible,
+      sizeColumnVisible,
+      ratingColumnVisible,
+    ],
+  )
+
   const handleContextMenu = useMemo(
     () =>
-      createContextMenuHandler(
-        [
-          'toggleDateCreatedColumn',
-          'toggleDateModifiedColumn',
-          'toggleDateLastOpenedColumn',
-          'toggleSizeColumn',
-          'toggleRatingColumn',
-        ].map((type) => ({
-          data: {},
-          type,
-        })),
-      ),
-    [],
+      createContextMenuHandler([
+        {
+          type: 'toggleDateCreatedColumn',
+          data: { checked: dateCreatedColumnVisible },
+        },
+        {
+          type: 'toggleDateModifiedColumn',
+          data: { checked: dateModifiedColumnVisible },
+        },
+        {
+          type: 'toggleDateLastOpenedColumn',
+          data: { checked: dateLastOpenedColumnVisible },
+        },
+        {
+          type: 'toggleSizeColumn',
+          data: { checked: sizeColumnVisible },
+        },
+        {
+          type: 'toggleRatingColumn',
+          data: { checked: ratingColumnVisible },
+        },
+      ]),
+    [
+      dateCreatedColumnVisible,
+      dateLastOpenedColumnVisible,
+      dateModifiedColumnVisible,
+      sizeColumnVisible,
+      ratingColumnVisible,
+    ],
   )
 
   return (
@@ -112,7 +175,7 @@ const ExplorerTable = (props: Props) => {
           pr: '10px',
         }}
       >
-        {columns.map((column) => (
+        {filteredColumns.map((column) => (
           <ExplorerTableHeaderCell
             dataKey={column.key}
             height={headerHeight}
@@ -155,7 +218,7 @@ const ExplorerTable = (props: Props) => {
                 }}
               >
                 <ExplorerTableRow content={content} tabId={tabId}>
-                  {columns.map((column) => (
+                  {filteredColumns.map((column) => (
                     <ExplorerTableCell
                       align={column.align}
                       content={content}
