@@ -47,7 +47,7 @@ const ExplorerTableCell = (props: Props) => {
         px: 1,
         py: 0,
         width,
-        ...droppableStyle,
+        ...(dataKey === 'name' ? droppableStyle : {}),
       }}
       {...(dataKey === 'name'
         ? {

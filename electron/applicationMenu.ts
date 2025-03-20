@@ -201,9 +201,9 @@ const registerApplicationMenu = (
             label: 'Sort By',
             submenu: [
               { label: 'Name', orderBy: 'name' },
-              { label: 'Date Last Opened', orderBy: 'dateLastOpened' },
-              { label: 'Date Modified', orderBy: 'dateModified' },
               { label: 'Date Created', orderBy: 'dateCreated' },
+              { label: 'Date Modified', orderBy: 'dateModified' },
+              { label: 'Date Last Opened', orderBy: 'dateLastOpened' },
               { label: 'Size', orderBy: 'size' },
               { label: 'Rating', orderBy: 'score' },
             ].map((menu) => ({

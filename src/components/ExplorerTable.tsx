@@ -1,10 +1,11 @@
 import { Box, LinearProgress, Table, Typography } from '@mui/material'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import ExplorerTableCell from '~/components/ExplorerTableCell'
 import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
 import ExplorerTableRow from '~/components/ExplorerTableRow'
 import useExplorerList from '~/hooks/useExplorerList'
 import type { Content } from '~/interfaces'
+import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const headerHeight = 32
 const rowHeight = 20
@@ -76,6 +77,23 @@ const ExplorerTable = (props: Props) => {
     virtualizer,
   } = useExplorerList(tabId, 1, rowHeight, ref)
 
+  const handleContextMenu = useMemo(
+    () =>
+      createContextMenuHandler(
+        [
+          'toggleDateCreatedColumn',
+          'toggleDateModifiedColumn',
+          'toggleDateLastOpenedColumn',
+          'toggleSizeColumn',
+          'toggleRatingColumn',
+        ].map((type) => ({
+          data: {},
+          type,
+        })),
+      ),
+    [],
+  )
+
   return (
     <Box
       sx={{
@@ -86,6 +104,7 @@ const ExplorerTable = (props: Props) => {
       }}
     >
       <Box
+        onContextMenu={handleContextMenu}
         sx={{
           display: 'flex',
           flexShrink: 0,

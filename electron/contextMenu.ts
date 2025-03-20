@@ -65,13 +65,13 @@ const registerContextMenu = (
       click: () => send(event, { type: 'open', data: { path } }),
       label: 'Open',
     }),
-    openInNewWindow: (_event, _params, { path }) => ({
-      click: () => createWindow(path),
-      label: 'Open in New Window',
-    }),
     openInNewTab: (event, _params, { path, tabId }) => ({
       click: () => send(event, { type: 'newTab', data: { path, tabId } }),
       label: 'Open in New Tab',
+    }),
+    openInNewWindow: (_event, _params, { path }) => ({
+      click: () => createWindow(path),
+      label: 'Open in New Window',
     }),
     rename: (event, _params, { path }) => ({
       click: () => send(event, { type: 'rename', data: { path } }),
@@ -94,9 +94,9 @@ const registerContextMenu = (
       label: 'Sort By',
       submenu: [
         { label: 'Name', value: 'name' },
-        { label: 'Date Last Opened', value: 'dateLastOpened' },
-        { label: 'Date Modified', value: 'dateModified' },
         { label: 'Date Created', value: 'dateCreated' },
+        { label: 'Date Modified', value: 'dateModified' },
+        { label: 'Date Last Opened', value: 'dateLastOpened' },
         { label: 'Size', value: 'size' },
         { label: 'Rating', value: 'score' },
       ].map(({ label, value }) => ({
@@ -106,6 +106,36 @@ const registerContextMenu = (
         type: 'radio',
       })),
     }),
+    // toggleDateCreatedColumn: () => ({
+    //   checked: true,
+    //   click: () => undefined,
+    //   label: 'Date Created',
+    //   type: 'checkbox',
+    // }),
+    // toggleDateModifiedColumn: () => ({
+    //   checked: true,
+    //   click: () => undefined,
+    //   label: 'Date Modified',
+    //   type: 'checkbox',
+    // }),
+    // toggleDateLastOpenedColumn: () => ({
+    //   checked: true,
+    //   click: () => undefined,
+    //   label: 'Date Last Opened',
+    //   type: 'checkbox',
+    // }),
+    // toggleSizeColumn: () => ({
+    //   checked: true,
+    //   click: () => undefined,
+    //   label: 'Size',
+    //   type: 'checkbox',
+    // }),
+    // toggleRatingColumn: () => ({
+    //   checked: true,
+    //   click: () => undefined,
+    //   label: 'Rating',
+    //   type: 'checkbox',
+    // }),
     toggleFavorite: (event, _params, { favorite, path }) => ({
       click: () =>
         send(event, {
