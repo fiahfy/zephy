@@ -107,7 +107,7 @@ const ExplorerGridItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ ml: 1, mr: 0.5, mt: -2.5 }}>
+          <Box sx={{ display: 'flex', ml: 1, mr: 0.5, mt: -3 }}>
             <EntryIcon entry={content} />
           </Box>
         }

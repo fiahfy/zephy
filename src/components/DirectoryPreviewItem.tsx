@@ -1,9 +1,7 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
-import pluralize from 'pluralize'
 import { useCallback } from 'react'
 import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
-import Rating from '~/components/Rating'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
@@ -23,7 +21,7 @@ const DirectoryPreviewItem = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(entry)
-  const { itemCount, message, status, thumbnail } = useEntryThumbnail(entry)
+  const { message, status, thumbnail } = useEntryThumbnail(entry)
   const { draggable, ...dragHandlers } = useDraggable(
     entry.path,
     <EntryDragGhost entries={[entry]} />,
@@ -90,35 +88,16 @@ const DirectoryPreviewItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ ml: 1, mr: 0.5, mt: -2.5 }}>
+          <Box sx={{ display: 'flex', ml: 1, mr: 0.5 }}>
             <EntryIcon entry={entry} />
           </Box>
         }
         actionPosition="left"
-        subtitle={
-          <Box
-            sx={{
-              alignItems: 'end',
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ my: 0.25 }}>
-              <Rating path={entry.path} />
-            </Box>
-            {itemCount !== undefined && entry.type === 'directory' && (
-              <Typography noWrap sx={{ ml: 1 }} variant="caption">
-                {pluralize('item', itemCount, true)}
-              </Typography>
-            )}
-          </Box>
-        }
         sx={{
           '.MuiImageListItemBar-titleWrap': {
             minWidth: 0,
             overflow: 'visible',
             p: 0,
-            pb: 0.5,
             pr: 1,
             '.MuiImageListItemBar-title': {
               overflow: 'visible',
