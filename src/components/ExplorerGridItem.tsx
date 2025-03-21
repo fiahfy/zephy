@@ -107,7 +107,7 @@ const ExplorerGridItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ display: 'flex', ml: 1, mr: 0.5, mt: -3 }}>
+          <Box sx={{ display: 'flex', mt: -2.75 }}>
             <EntryIcon entry={content} />
           </Box>
         }
@@ -131,15 +131,11 @@ const ExplorerGridItem = (props: Props) => {
           </Box>
         }
         sx={{
+          gap: 0.5,
+          px: 1,
+          py: 0.5,
           '.MuiImageListItemBar-titleWrap': {
-            minWidth: 0,
-            overflow: 'visible',
             p: 0,
-            pb: 0.5,
-            pr: 1,
-            '.MuiImageListItemBar-title': {
-              overflow: 'visible',
-            },
           },
         }}
         title={

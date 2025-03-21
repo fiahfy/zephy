@@ -88,40 +88,30 @@ const DirectoryPreviewItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ display: 'flex', ml: 1, mr: 0.5 }}>
+          <Box sx={{ display: 'flex' }}>
             <EntryIcon entry={entry} />
           </Box>
         }
         actionPosition="left"
         sx={{
+          gap: 0.5,
+          px: 1,
+          py: 0.5,
           '.MuiImageListItemBar-titleWrap': {
-            minWidth: 0,
-            overflow: 'visible',
             p: 0,
-            pr: 1,
-            '.MuiImageListItemBar-title': {
-              overflow: 'visible',
-            },
           },
         }}
         title={
           <Box
             sx={{
-              alignItems: 'center',
               display: 'flex',
-              height: (theme) => theme.spacing(5),
             }}
           >
             <Typography
               sx={{
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2,
-                display: '-webkit-box',
-                lineHeight: 1.4,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'initial',
-                wordBreak: 'break-all',
+                whiteSpace: 'nowrap',
               }}
               title={entry.name}
               variant="caption"
