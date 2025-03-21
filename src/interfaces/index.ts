@@ -67,18 +67,6 @@ export type IElectronAPI = {
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type ApplicationMenuParams = any
 
-export type Settings = {
-  dateCreatedColumnVisible: boolean
-  dateLastOpenedColumnVisible: boolean
-  dateModifiedColumnVisible: boolean
-  ratingColumnVisible: boolean
-  shouldOpenWithPhoty: boolean
-  shouldOpenWithVisty: boolean
-  shouldShowHiddenFiles: boolean
-  sizeColumnVisible: boolean
-  theme: 'light' | 'dark' | 'system'
-}
-
 type File = {
   type: 'file'
 }

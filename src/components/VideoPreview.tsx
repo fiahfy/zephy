@@ -8,7 +8,12 @@ import {
 } from 'react'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
+import {
+  selectDefaultLoop,
+  selectDefaultVolume,
+  setDefaultLoop,
+  setDefaultVolume,
+} from '~/store/preferences'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type State = {
@@ -42,8 +47,8 @@ type Props = {
 const VideoPreview = (props: Props) => {
   const { entry } = props
 
-  const loop = useAppSelector(selectLoop)
-  const volume = useAppSelector(selectVolume)
+  const loop = useAppSelector(selectDefaultLoop)
+  const volume = useAppSelector(selectDefaultVolume)
   const appDispatch = useAppDispatch()
 
   const [{ thumbnail }, dispatch] = useReducer(reducer, {
@@ -62,7 +67,7 @@ const VideoPreview = (props: Props) => {
       if (!el) {
         return
       }
-      appDispatch(setLoop({ loop: data.enabled }))
+      appDispatch(setDefaultLoop({ defaultLoop: data.enabled }))
     })
     return () => removeListener()
   }, [appDispatch])
@@ -122,7 +127,7 @@ const VideoPreview = (props: Props) => {
   const handleVolumeChange = useCallback(() => {
     const el = ref.current
     if (el) {
-      appDispatch(setVolume({ volume: el.volume }))
+      appDispatch(setDefaultVolume({ defaultVolume: el.volume }))
     }
   }, [appDispatch])
 

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, storageKey, store } from '~/store'
 import { replaceState as replaceFavoriteState } from '~/store/favorite'
-import { replaceState as replacePreviewState } from '~/store/preview'
+import { replaceState as replacePreferencesState } from '~/store/preferences'
 import { replaceState as replaceQueryState } from '~/store/query'
 import { replaceState as replaceRatingState } from '~/store/rating'
 import { replaceState as replaceSettingsState } from '~/store/settings'
@@ -29,7 +29,9 @@ const StoreProvider = (props: Props) => {
       }
       const newState = JSON.parse(e.newValue)
       dispatch(replaceFavoriteState({ state: JSON.parse(newState.favorite) }))
-      dispatch(replacePreviewState({ state: JSON.parse(newState.preview) }))
+      dispatch(
+        replacePreferencesState({ state: JSON.parse(newState.preferences) }),
+      )
       dispatch(replaceQueryState({ state: JSON.parse(newState.query) }))
       dispatch(replaceRatingState({ state: JSON.parse(newState.rating) }))
       dispatch(replaceSettingsState({ state: JSON.parse(newState.settings) }))

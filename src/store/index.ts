@@ -25,7 +25,7 @@ import explorerListReducer from '~/store/explorer-list'
 import explorerTreeReducer from '~/store/explorer-tree'
 import favoriteReducer from '~/store/favorite'
 import notificationReducer from '~/store/notification'
-import previewReducer from '~/store/preview'
+import preferencesReducer from '~/store/preferences'
 import queryReducer from '~/store/query'
 import ratingReducer from '~/store/rating'
 import settingsReducer from '~/store/settings'
@@ -37,7 +37,7 @@ const reducers = combineReducers({
   explorerTree: explorerTreeReducer,
   favorite: favoriteReducer,
   notification: notificationReducer,
-  preview: previewReducer,
+  preferences: preferencesReducer,
   query: queryReducer,
   rating: ratingReducer,
   settings: settingsReducer,
@@ -49,7 +49,14 @@ const persistConfig = {
   key: 'root',
   storage,
   version: 1,
-  whitelist: ['favorite', 'preview', 'query', 'rating', 'settings', 'window'],
+  whitelist: [
+    'favorite',
+    'preferences',
+    'query',
+    'rating',
+    'settings',
+    'window',
+  ],
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)

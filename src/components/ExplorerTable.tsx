@@ -12,7 +12,7 @@ import {
   selectDateModifiedColumnVisible,
   selectRatingColumnVisible,
   selectSizeColumnVisible,
-} from '~/store/settings'
+} from '~/store/preferences'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 const headerHeight = 32

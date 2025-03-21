@@ -3,21 +3,20 @@ import {
   createSelector,
   createSlice,
 } from '@reduxjs/toolkit'
-import type { Settings } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { detectFileType } from '~/utils/file'
 
-type State = Settings
+type State = {
+  shouldOpenWithPhoty: boolean
+  shouldOpenWithVisty: boolean
+  shouldShowHiddenFiles: boolean
+  theme: 'light' | 'dark' | 'system'
+}
 
 const initialState: State = {
-  dateCreatedColumnVisible: true,
-  dateLastOpenedColumnVisible: true,
-  dateModifiedColumnVisible: true,
-  ratingColumnVisible: true,
   shouldOpenWithPhoty: false,
   shouldOpenWithVisty: false,
   shouldShowHiddenFiles: false,
-  sizeColumnVisible: true,
   theme: 'system',
 }
 
@@ -53,30 +52,6 @@ export const settingsSlice = createSlice({
       const { theme } = action.payload
       return { ...state, theme }
     },
-    toggleDateCreatedColumnVisible(state) {
-      return {
-        ...state,
-        dateCreatedColumnVisible: !state.dateCreatedColumnVisible,
-      }
-    },
-    toggleDateLastOpenedColumnVisible(state) {
-      return {
-        ...state,
-        dateLastOpenedColumnVisible: !state.dateLastOpenedColumnVisible,
-      }
-    },
-    toggleDateModifiedColumnVisible(state) {
-      return {
-        ...state,
-        dateModifiedColumnVisible: !state.dateModifiedColumnVisible,
-      }
-    },
-    toggleRatingColumnVisible(state) {
-      return { ...state, ratingColumnVisible: !state.ratingColumnVisible }
-    },
-    toggleSizeColumnVisible(state) {
-      return { ...state, sizeColumnVisible: !state.sizeColumnVisible }
-    },
   },
 })
 
@@ -86,36 +61,11 @@ export const {
   setShouldOpenWithVisty,
   setShouldShowHiddenFiles,
   setTheme,
-  toggleDateCreatedColumnVisible,
-  toggleDateLastOpenedColumnVisible,
-  toggleDateModifiedColumnVisible,
-  toggleRatingColumnVisible,
-  toggleSizeColumnVisible,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
 
 export const selectSettings = (state: AppState) => state.settings
-
-export const selectDateCreatedColumnVisible = createSelector(
-  selectSettings,
-  (settings) => settings.dateCreatedColumnVisible,
-)
-
-export const selectDateLastOpenedColumnVisible = createSelector(
-  selectSettings,
-  (settings) => settings.dateLastOpenedColumnVisible,
-)
-
-export const selectDateModifiedColumnVisible = createSelector(
-  selectSettings,
-  (settings) => settings.dateModifiedColumnVisible,
-)
-
-export const selectRatingColumnVisible = createSelector(
-  selectSettings,
-  (settings) => settings.ratingColumnVisible,
-)
 
 export const selectShouldOpenWithPhoty = createSelector(
   selectSettings,
@@ -130,11 +80,6 @@ export const selectShouldOpenWithVisty = createSelector(
 export const selectShouldShowHiddenFiles = createSelector(
   selectSettings,
   (settings) => settings.shouldShowHiddenFiles,
-)
-
-export const selectSizeColumnVisible = createSelector(
-  selectSettings,
-  (settings) => settings.sizeColumnVisible,
 )
 
 export const selectTheme = createSelector(

@@ -48,7 +48,7 @@ import {
   toggleDateModifiedColumnVisible,
   toggleRatingColumnVisible,
   toggleSizeColumnVisible,
-} from './store/settings'
+} from './store/preferences'
 
 const isFocused = () => {
   const elements = document.querySelectorAll('.explorer-list')

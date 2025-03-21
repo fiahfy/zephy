@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@mui/material'
 import { type ChangeEvent, useCallback } from 'react'
-import type { Settings as SettingsType } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldOpenWithPhoty,
@@ -40,7 +39,7 @@ const Settings = () => {
 
   const handleChangeTheme = useCallback(
     (e: SelectChangeEvent) => {
-      const theme = e.target.value as SettingsType['theme']
+      const theme = e.target.value as 'light' | 'dark' | 'system'
       dispatch(setTheme({ theme }))
     },
     [dispatch],

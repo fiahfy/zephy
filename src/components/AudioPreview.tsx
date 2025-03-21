@@ -13,7 +13,12 @@ import {
 } from 'react'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectLoop, selectVolume, setLoop, setVolume } from '~/store/preview'
+import {
+  selectDefaultLoop,
+  selectDefaultVolume,
+  setDefaultLoop,
+  setDefaultVolume,
+} from '~/store/preferences'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
 type Props = {
@@ -23,8 +28,8 @@ type Props = {
 const AudioPreview = (props: Props) => {
   const { entry } = props
 
-  const loop = useAppSelector(selectLoop)
-  const volume = useAppSelector(selectVolume)
+  const loop = useAppSelector(selectDefaultLoop)
+  const volume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
 
   const ref = useRef<HTMLAudioElement>(null)
@@ -40,7 +45,7 @@ const AudioPreview = (props: Props) => {
       if (!el) {
         return
       }
-      dispatch(setLoop({ loop: data.enabled }))
+      dispatch(setDefaultLoop({ defaultLoop: data.enabled }))
     })
     return () => removeListener()
   }, [dispatch])
@@ -96,7 +101,7 @@ const AudioPreview = (props: Props) => {
   const handleVolumeChange = useCallback(() => {
     const el = ref.current
     if (el) {
-      dispatch(setVolume({ volume: el.volume }))
+      dispatch(setDefaultVolume({ defaultVolume: el.volume }))
     }
   }, [dispatch])
 
