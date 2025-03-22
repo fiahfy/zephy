@@ -1,5 +1,6 @@
 import { Box, Drawer as MuiDrawer, Toolbar } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import throttle from 'lodash.throttle'
 import {
   type MouseEvent,
   type ReactNode,
@@ -71,29 +72,30 @@ const Sidebar = (props: Props) => {
   )
 
   useEffect(() => {
-    const handler = () => {
+    const handler = throttle(() => {
       if (width + minContentWidth > window.innerWidth) {
         dispatch(setSidebarWidth(variant, window.innerWidth - minContentWidth))
       }
-    }
+    }, 100)
     window.addEventListener('resize', handler)
     return () => window.removeEventListener('resize', handler)
   }, [dispatch, variant, width])
 
-  const handleMouseMove = useCallback(
-    (e: globalThis.MouseEvent) => {
-      const newWidth =
-        position === 'left'
-          ? e.clientX + 3
-          : document.body.offsetWidth - e.clientX + 3
-      if (
-        newWidth > minContentWidth &&
-        document.body.offsetWidth - oppositeWidth - newWidth > minContentWidth
-      ) {
-        dispatch(setSidebarWidth(variant, newWidth))
-      }
-      dispatch(setSidebarHidden(variant, newWidth < minContentWidth / 2))
-    },
+  const handleMouseMove = useMemo(
+    () =>
+      throttle((e: globalThis.MouseEvent) => {
+        const newWidth =
+          position === 'left'
+            ? e.clientX + 3
+            : document.body.offsetWidth - e.clientX + 3
+        if (
+          newWidth > minContentWidth &&
+          document.body.offsetWidth - oppositeWidth - newWidth > minContentWidth
+        ) {
+          dispatch(setSidebarWidth(variant, newWidth))
+        }
+        dispatch(setSidebarHidden(variant, newWidth < minContentWidth / 2))
+      }, 100),
     [dispatch, oppositeWidth, position, variant],
   )
 
