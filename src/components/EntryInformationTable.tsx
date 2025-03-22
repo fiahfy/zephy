@@ -139,7 +139,6 @@ const EntryInformationTable = (props: Props) => {
           sx={{
             color: (theme) => theme.palette.text.primary,
             fontWeight: 'bold',
-            mb: 0,
             overflowWrap: 'break-word',
             pb: 0.5,
             px: 1,

@@ -83,6 +83,7 @@ const PreviewPanel = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: 1,
+              overflowY: type === 'image' ? 'auto' : undefined,
               position: 'sticky',
               py: 1,
               zIndex: 1,
