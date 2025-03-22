@@ -53,7 +53,7 @@ type SortingState = {
   [directoryPath: string]: SortOption
 }
 
-type ViewMode = 'list' | 'thumbnail'
+type ViewMode = 'gallery' | 'list' | 'thumbnail'
 
 type ViewModeState = {
   [directoryPath: string]: ViewMode

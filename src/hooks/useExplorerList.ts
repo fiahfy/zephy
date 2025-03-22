@@ -40,6 +40,7 @@ const useExplorerList = (
   tabId: number,
   columns: number,
   estimateSize: number,
+  horizontal: boolean,
   ref: RefObject<HTMLElement | null>,
 ) => {
   const anchor = useAppSelector((state) => selectAnchorByTabId(state, tabId))
@@ -80,6 +81,7 @@ const useExplorerList = (
     count: chunks.length,
     estimateSize: () => estimateSize,
     getScrollElement: () => ref.current,
+    horizontal,
   })
 
   const previousEditing = usePrevious(editing)

@@ -95,7 +95,7 @@ const ExplorerTable = (props: Props) => {
     onKeyDown,
     restoring,
     virtualizer,
-  } = useExplorerList(tabId, 1, rowHeight, ref)
+  } = useExplorerList(tabId, 1, rowHeight, false, ref)
 
   const filteredColumns = useMemo(
     () =>

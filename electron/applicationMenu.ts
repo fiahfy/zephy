@@ -21,7 +21,7 @@ type State = {
     | 'name'
     | 'score'
     | 'size'
-  viewMode: 'list' | 'thumbnail'
+  viewMode: 'gallery' | 'list' | 'thumbnail'
 }
 
 export type ApplicationMenuParams = Partial<State>
@@ -185,6 +185,11 @@ const registerApplicationMenu = (
               accelerator: 'CmdOrCtrl+2',
               label: 'as Thumbnail',
               viewMode: 'thumbnail',
+            },
+            {
+              accelerator: 'CmdOrCtrl+3',
+              label: 'as Gallery',
+              viewMode: 'gallery',
             },
           ].map((menu) => ({
             ...menu,

@@ -10,11 +10,12 @@ type Props = {
   tabId: number
 }
 
-const ExplorerGrid = (props: Props) => {
+const ExplorerGallery = (props: Props) => {
   const { tabId } = props
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
+  // TODO: 2.2, 3.2, 4.2
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
@@ -32,7 +33,7 @@ const ExplorerGrid = (props: Props) => {
     onKeyDown,
     restoring,
     virtualizer,
-  } = useExplorerList(tabId, columns, size, false, ref)
+  } = useExplorerList(tabId, 1, size, true, ref)
 
   useEffect(() => {
     const el = ref.current
@@ -64,34 +65,38 @@ const ExplorerGrid = (props: Props) => {
         onKeyDown={onKeyDown}
         ref={ref}
         sx={{
-          height: '100%',
           outline: 'none',
-          overflowX: 'hidden',
-          overflowY: 'scroll',
+          overflowX: 'scroll',
+          overflowY: 'hidden',
           visibility: restoring ? 'hidden' : undefined,
+          width: '100%',
         }}
         tabIndex={0}
       >
         {wrapperWidth > 0 && (
-          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
+          <Box
+            sx={{
+              display: 'flex',
+              height: size,
+              width: `${virtualizer.getTotalSize()}px`,
+            }}
+          >
             {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
-              const columns = chunks[virtualRow.index] as Content[]
+              const content = chunks[virtualRow.index][0] as Content
               return (
                 <Box
-                  key={virtualRow.index}
+                  key={content.path}
                   sx={{
                     display: 'flex',
-                    height: size,
-                    transform: `translateY(${
+                    transform: `translateX(${
                       virtualRow.start - rowIndex * virtualRow.size
                     }px)`,
+                    width: size,
                   }}
                 >
-                  {columns.map((content) => (
-                    <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                      <ExplorerGridItem content={content} tabId={tabId} />
-                    </Box>
-                  ))}
+                  <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                    <ExplorerGridItem content={content} tabId={tabId} />
+                  </Box>
                 </Box>
               )
             })}
@@ -121,4 +126,4 @@ const ExplorerGrid = (props: Props) => {
   )
 }
 
-export default ExplorerGrid
+export default ExplorerGallery

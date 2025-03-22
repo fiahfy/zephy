@@ -171,6 +171,7 @@ const registerContextMenu = (
       submenu: [
         { label: 'as List', value: 'list' },
         { label: 'as Thumbnail', value: 'thumbnail' },
+        { label: 'as Gallery', value: 'gallery' },
       ].map(({ label, value }) => ({
         checked: value === viewMode,
         click: () =>

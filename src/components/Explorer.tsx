@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
-import { createElement } from 'react'
+import { createElement, useMemo } from 'react'
+import ExplorerGallery from '~/components/ExplorerGallery'
 import ExplorerGrid from '~/components/ExplorerGrid'
 import ExplorerTable from '~/components/ExplorerTable'
 import useDroppable from '~/hooks/useDroppable'
@@ -26,15 +27,23 @@ const Explorer = (props: Props) => {
 
   const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
+  const Component = useMemo(() => {
+    switch (viewMode) {
+      case 'gallery':
+        return ExplorerGallery
+      case 'thumbnail':
+        return ExplorerGrid
+      default:
+        return ExplorerTable
+    }
+  }, [viewMode])
+
   return (
     <ExplorerProvider>
       <Box sx={{ height: '100%', ...droppableStyle }} {...dropHandlers}>
-        {createElement(
-          viewMode === 'thumbnail' ? ExplorerGrid : ExplorerTable,
-          {
-            tabId,
-          },
-        )}
+        {createElement(Component, {
+          tabId,
+        })}
       </Box>
     </ExplorerProvider>
   )
