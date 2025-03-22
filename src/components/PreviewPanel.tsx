@@ -16,12 +16,17 @@ const PreviewPanel = () => {
   const contents = useAppSelector(selectCurrentSelectedContents)
 
   const ref = useRef<HTMLElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const el = ref.current
     if (el) {
       el.scrollTop = 0
+    }
+    const footerEl = footerRef.current
+    if (footerEl) {
+      footerEl.scrollTop = 0
     }
   }, [contents])
 
@@ -77,6 +82,7 @@ const PreviewPanel = () => {
             <PreviewEmpty message="No preview" />
           )}
           <Box
+            ref={footerRef}
             sx={{
               background: (theme) => theme.palette.background.default,
               bottom: 0,

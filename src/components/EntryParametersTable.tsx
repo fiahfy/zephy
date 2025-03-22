@@ -210,7 +210,6 @@ const EntryParametersTable = (props: Props) => {
                   }}
                 >
                   <Typography
-                    noWrap
                     sx={{
                       display: 'block',
                       userSelect: 'text',
@@ -280,7 +279,6 @@ const EntryParametersTable = (props: Props) => {
                     }}
                   >
                     <Typography
-                      noWrap
                       sx={{ display: 'block', userSelect: 'text' }}
                       variant="caption"
                     >
