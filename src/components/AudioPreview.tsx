@@ -28,8 +28,8 @@ type Props = {
 const AudioPreview = (props: Props) => {
   const { entry } = props
 
-  const loop = useAppSelector(selectDefaultLoop)
-  const volume = useAppSelector(selectDefaultVolume)
+  const defaultLoop = useAppSelector(selectDefaultLoop)
+  const defaultVolume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
 
   const ref = useRef<HTMLAudioElement>(null)
@@ -56,9 +56,9 @@ const AudioPreview = (props: Props) => {
       return
     }
 
-    el.loop = loop
-    el.volume = volume
-  }, [loop, volume])
+    el.loop = defaultLoop
+    el.volume = defaultVolume
+  }, [defaultLoop, defaultVolume])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => setPaused(true), [entry.path])
@@ -79,8 +79,11 @@ const AudioPreview = (props: Props) => {
   }, [])
 
   const handleContextMenu = useMemo(
-    () => createContextMenuHandler([{ type: 'loop', data: { checked: loop } }]),
-    [loop],
+    () =>
+      createContextMenuHandler([
+        { type: 'loop', data: { checked: defaultLoop } },
+      ]),
+    [defaultLoop],
   )
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

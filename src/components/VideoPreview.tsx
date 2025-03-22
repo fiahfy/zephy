@@ -47,8 +47,8 @@ type Props = {
 const VideoPreview = (props: Props) => {
   const { entry } = props
 
-  const loop = useAppSelector(selectDefaultLoop)
-  const volume = useAppSelector(selectDefaultVolume)
+  const defaultLoop = useAppSelector(selectDefaultLoop)
+  const defaultVolume = useAppSelector(selectDefaultVolume)
   const appDispatch = useAppDispatch()
 
   const [{ thumbnail }, dispatch] = useReducer(reducer, {
@@ -78,9 +78,9 @@ const VideoPreview = (props: Props) => {
       return
     }
 
-    el.loop = loop
-    el.volume = volume
-  }, [loop, volume])
+    el.loop = defaultLoop
+    el.volume = defaultVolume
+  }, [defaultLoop, defaultVolume])
 
   useEffect(() => {
     let unmounted = false
@@ -105,8 +105,11 @@ const VideoPreview = (props: Props) => {
   }, [entry.path])
 
   const handleContextMenu = useMemo(
-    () => createContextMenuHandler([{ type: 'loop', data: { checked: loop } }]),
-    [loop],
+    () =>
+      createContextMenuHandler([
+        { type: 'loop', data: { checked: defaultLoop } },
+      ]),
+    [defaultLoop],
   )
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

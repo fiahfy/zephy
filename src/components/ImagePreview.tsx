@@ -51,7 +51,6 @@ const ImagePreview = (props: Props) => {
           alt=""
           src={entry.url}
           style={{
-            backgroundColor: 'black',
             minHeight: 128,
             objectFit: 'contain',
             width: '100%',
