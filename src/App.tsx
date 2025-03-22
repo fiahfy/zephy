@@ -12,11 +12,11 @@ import useTheme from '~/hooks/useTheme'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  copyFromCurrentTab,
-  moveToTrashFromCurrentTab,
+  copyInCurrentTab,
+  moveToTrashInCurrentTab,
   newFolderInCurrentTab,
-  openFromCurrentTab,
-  pasteToCurrentTab,
+  openInCurrentTab,
+  pasteInCurrentTab,
   selectAllInCurrentTab,
   startRenamingInCurrentTab,
 } from '~/store/explorer-list'
@@ -85,7 +85,7 @@ const App = () => {
           return dispatch(closeTab(data?.tabId))
         case 'copy':
           if (isFocused()) {
-            return dispatch(copyFromCurrentTab())
+            return dispatch(copyInCurrentTab())
           }
           return window.electronAPI.copy()
         case 'cut':
@@ -103,13 +103,13 @@ const App = () => {
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'moveToTrash':
-          return dispatch(moveToTrashFromCurrentTab(data?.paths))
+          return dispatch(moveToTrashInCurrentTab(data?.paths))
         case 'newFolder':
           return dispatch(newFolderInCurrentTab(data.path))
         case 'newTab':
           return dispatch(newTab(data.path, data.tabId))
         case 'open':
-          return dispatch(openFromCurrentTab(data?.path))
+          return dispatch(openInCurrentTab(data?.path))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'rename':
@@ -118,7 +118,7 @@ const App = () => {
           return dispatch(setPath({ path: data.path }))
         case 'paste':
           if (isFocused()) {
-            return dispatch(pasteToCurrentTab())
+            return dispatch(pasteInCurrentTab())
           }
           return window.electronAPI.paste()
         case 'selectAll':

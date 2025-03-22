@@ -123,11 +123,10 @@ export const explorerListSlice = createSlice({
       state,
       action: PayloadAction<{
         tabId: number
-        entries?: Entry[]
-        error?: boolean
+        entries: Entry[]
       }>,
     ) {
-      const { tabId, entries = [], error = false } = action.payload
+      const { tabId, entries } = action.payload
       const explorer = findExplorer(state, tabId)
       const paths = entries.map((entry) => entry.path)
       const focused =
@@ -140,10 +139,30 @@ export const explorerListSlice = createSlice({
         [tabId]: {
           ...explorer,
           entries,
-          error,
+          error: false,
           focused,
           loading: false,
           selected,
+        },
+      }
+    },
+    loadFailed(
+      state,
+      action: PayloadAction<{
+        tabId: number
+      }>,
+    ) {
+      const { tabId } = action.payload
+      const explorer = findExplorer(state, tabId)
+      return {
+        ...state,
+        [tabId]: {
+          ...explorer,
+          entries: [],
+          error: true,
+          focused: undefined,
+          loading: false,
+          selected: [],
         },
       }
     },
@@ -534,7 +553,7 @@ export const selectCurrentSelectedContents = (state: AppState) =>
 export const load =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
-    const { loaded, loading } = explorerListSlice.actions
+    const { loaded, loading, loadFailed } = explorerListSlice.actions
 
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
     const scoreToPathsMap = selectScoreToPathsMap(getState())
@@ -555,7 +574,7 @@ export const load =
       }
       dispatch(loaded({ tabId, entries }))
     } catch (e) {
-      dispatch(loaded({ tabId, error: true }))
+      dispatch(loadFailed({ tabId }))
     }
   }
 
@@ -696,6 +715,21 @@ export const newFolderInCurrentTab =
     dispatch(startEditing({ tabId, path: entry.path }))
   }
 
+export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
+  const selected = selectCurrentSelected(getState())
+  await window.electronAPI.copyEntries(selected)
+}
+
+export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
+  const directoryPath = selectCurrentDirectoryPath(getState())
+  const zephyUrl = parseZephyUrl(directoryPath)
+  if (zephyUrl) {
+    return
+  }
+  await window.electronAPI.pasteEntries(directoryPath)
+}
+
+// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
 export const startRenamingInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
@@ -710,6 +744,37 @@ export const startRenamingInCurrentTab =
     dispatch(select({ tabId, path: targetPath }))
     dispatch(focus({ tabId, path: targetPath }))
     dispatch(startEditing({ tabId, path: targetPath }))
+  }
+
+// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
+export const moveToTrashInCurrentTab =
+  (paths?: string[]): AppThunk =>
+  async (dispatch, getState) => {
+    const tabId = selectCurrentTabId(getState())
+    const selected = selectSelectedByTabId(getState(), tabId)
+    const targetPaths = paths ?? selected
+    await window.electronAPI.moveEntriesToTrash(targetPaths)
+    for (const path of targetPaths) {
+      dispatch(removeFromFavorites(path))
+      dispatch(removeRating({ path }))
+    }
+  }
+
+// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
+export const openInCurrentTab =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const selected = selectCurrentSelected(getState())
+    const targetPath = path ?? selected[0]
+    if (!targetPath) {
+      return
+    }
+    const entry = await window.electronAPI.getEntry(targetPath)
+    const action =
+      entry.type === 'directory'
+        ? changeDirectory(entry.path)
+        : openEntry(entry.path)
+    dispatch(action)
   }
 
 export const move =
@@ -730,51 +795,6 @@ export const move =
         )
       }
     }
-  }
-
-export const copyFromCurrentTab = (): AppThunk => async (_, getState) => {
-  const selected = selectCurrentSelected(getState())
-  await window.electronAPI.copyEntries(selected)
-}
-
-export const pasteToCurrentTab = (): AppThunk => async (_, getState) => {
-  const directoryPath = selectCurrentDirectoryPath(getState())
-  const zephyUrl = parseZephyUrl(directoryPath)
-  if (zephyUrl) {
-    return
-  }
-  await window.electronAPI.pasteEntries(directoryPath)
-}
-
-// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
-export const moveToTrashFromCurrentTab =
-  (paths?: string[]): AppThunk =>
-  async (dispatch, getState) => {
-    const tabId = selectCurrentTabId(getState())
-    const selected = selectSelectedByTabId(getState(), tabId)
-    const targetPaths = paths ?? selected
-    await window.electronAPI.moveEntriesToTrash(targetPaths)
-    for (const path of targetPaths) {
-      dispatch(removeFromFavorites(path))
-      dispatch(removeRating({ path }))
-    }
-  }
-
-// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
-export const openFromCurrentTab =
-  (path?: string): AppThunk =>
-  async (dispatch, getState) => {
-    const selected = selectCurrentSelected(getState())
-    const targetPath = path ?? selected[0]
-    if (!targetPath) {
-      return
-    }
-    const entry = await window.electronAPI.getEntry(targetPath)
-    const action =
-      entry.type === 'directory'
-        ? changeDirectory(entry.path)
-        : openEntry(entry.path)
-    dispatch(action)
   }
 
 export const handle =
