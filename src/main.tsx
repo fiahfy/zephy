@@ -5,7 +5,6 @@ import '@fontsource/roboto/700'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '~/App'
-import DragGhostProvider from '~/providers/DragGhostProvider'
 import StoreProvider from '~/providers/StoreProvider'
 import ThemeProvider from '~/providers/ThemeProvider'
 import TrafficLightProvider from '~/providers/TrafficLightProvider'
@@ -17,11 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <StoreProvider>
       <ThemeProvider>
         <TrafficLightProvider>
-          <DragGhostProvider>
-            <WatcherProvider>
-              <App />
-            </WatcherProvider>
-          </DragGhostProvider>
+          <WatcherProvider>
+            <App />
+          </WatcherProvider>
         </TrafficLightProvider>
       </ThemeProvider>
     </StoreProvider>

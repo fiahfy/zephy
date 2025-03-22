@@ -21,7 +21,6 @@ import {
   forwardRef,
   useCallback,
 } from 'react'
-import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import Icon from '~/components/Icon'
 import useDraggable from '~/hooks/useDraggable'
@@ -112,10 +111,7 @@ const ExplorerTreeItemRoot = forwardRef(
     const dispatch = useAppDispatch()
 
     const { onContextMenu } = useEntryItem(entry)
-    const { draggable, ...dragHandlers } = useDraggable(
-      entry.path,
-      <EntryDragGhost entries={[entry]} />,
-    )
+    const { draggable, ...dragHandlers } = useDraggable(entry.path)
     const { droppableStyle, ...dropHandlers } = useDroppable(
       entry.type === 'directory' ? entry.path : undefined,
     )

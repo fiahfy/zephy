@@ -2,7 +2,6 @@ import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
@@ -21,7 +20,7 @@ const ExplorerGridItem = (props: Props) => {
   const { content, tabId } = props
 
   const {
-    draggingContents,
+    draggingPaths,
     editing,
     focused,
     onClick,
@@ -32,10 +31,7 @@ const ExplorerGridItem = (props: Props) => {
 
   const { itemCount, message, status, thumbnail } = useEntryThumbnail(content)
 
-  const { draggable, ...dragHandlers } = useDraggable(
-    draggingContents.map((c) => c.path),
-    <EntryDragGhost entries={draggingContents} />,
-  )
+  const { draggable, ...dragHandlers } = useDraggable(draggingPaths)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,
   )

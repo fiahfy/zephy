@@ -1,6 +1,5 @@
 import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
 import { useCallback } from 'react'
-import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
@@ -22,10 +21,7 @@ const DirectoryPreviewItem = (props: Props) => {
 
   const { onContextMenu } = useEntryItem(entry)
   const { message, status, thumbnail } = useEntryThumbnail(entry)
-  const { draggable, ...dragHandlers } = useDraggable(
-    entry.path,
-    <EntryDragGhost entries={[entry]} />,
-  )
+  const { draggable, ...dragHandlers } = useDraggable(entry.path)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     entry.type === 'directory' ? entry.path : undefined,
   )

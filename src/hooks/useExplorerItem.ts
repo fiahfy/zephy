@@ -9,8 +9,8 @@ import {
   selectContentsByTabId,
   selectEditingByTabIdAndPath,
   selectFocusedByTabIdAndPath,
+  selectSelectedByTabId,
   selectSelectedByTabIdAndPath,
-  selectSelectedContentsByTabId,
   startEditing,
   toggleSelection,
 } from '~/store/explorer-list'
@@ -39,8 +39,8 @@ const useExplorerItem = (tabId: number, content: Content) => {
   const selected = useAppSelector((state) =>
     selectSelectedByTabIdAndPath(state, tabId, content.path),
   )
-  const selectedContents = useAppSelector((state) =>
-    selectSelectedContentsByTabId(state, tabId),
+  const selectedPaths = useAppSelector((state) =>
+    selectSelectedByTabId(state, tabId),
   )
   const dispatch = useAppDispatch()
 
@@ -53,7 +53,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
           addSelection(
             tabId,
             content.path,
-            selectedContents[selectedContents.length - 1]?.path,
+            selectedPaths[selectedPaths.length - 1],
           ),
         )
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
@@ -66,8 +66,8 @@ const useExplorerItem = (tabId: number, content: Content) => {
     () => {
       if (
         !editing &&
-        selectedContents.length === 1 &&
-        selectedContents[0]?.path === content.path
+        selectedPaths.length === 1 &&
+        selectedPaths[0] === content.path
       ) {
         dispatch(startEditing(tabId, content.path))
       }
@@ -84,9 +84,9 @@ const useExplorerItem = (tabId: number, content: Content) => {
     },
   )
 
-  const draggingContents = useMemo(
-    () => (editing ? [] : selected ? selectedContents : [content]),
-    [content, editing, selected, selectedContents],
+  const draggingPaths = useMemo(
+    () => (editing ? [] : selected ? selectedPaths : [content.path]),
+    [content.path, editing, selected, selectedPaths],
   )
 
   const zephySchema = useMemo(
@@ -97,7 +97,6 @@ const useExplorerItem = (tabId: number, content: Content) => {
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
     const path = content.path
-    const selectedPaths = selectedContents.map((content) => content.path)
     const paths = selectedPaths.includes(path) ? selectedPaths : [path]
     return createContextMenuHandler([
       ...(paths.length === 1
@@ -164,14 +163,14 @@ const useExplorerItem = (tabId: number, content: Content) => {
     content.type,
     directoryPath,
     favorite,
-    selectedContents,
+    selectedPaths,
     tabId,
     zephySchema,
   ])
 
   return {
     contents,
-    draggingContents,
+    draggingPaths,
     editing,
     focused: focused && !editing,
     onClick,

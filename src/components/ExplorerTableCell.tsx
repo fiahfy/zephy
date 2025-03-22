@@ -1,5 +1,4 @@
 import { Box, TableCell, type TableCellProps, Typography } from '@mui/material'
-import EntryDragGhost from '~/components/EntryDragGhost'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
@@ -23,12 +22,9 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabId, width } = props
 
-  const { draggingContents, editing } = useExplorerItem(tabId, content)
+  const { draggingPaths, editing } = useExplorerItem(tabId, content)
 
-  const { draggable, ...dragHandlers } = useDraggable(
-    draggingContents.map((c) => c.path),
-    <EntryDragGhost entries={draggingContents} />,
-  )
+  const { draggable, ...dragHandlers } = useDraggable(draggingPaths)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,
   )

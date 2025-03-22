@@ -56,6 +56,7 @@ export type IElectronAPI = {
   getFilePaths: (files: globalThis.File[]) => string[]
   openTab: () => Promise<void>
   openUrl: (url: string) => Promise<void>
+  startDrag: (paths: string[]) => void
 } & ApplicationMenuOperations &
   EditOperations &
   EntryOperations &

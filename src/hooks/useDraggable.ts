@@ -1,14 +1,6 @@
-import { type DragEvent, type JSX, useCallback, useMemo } from 'react'
-import useDragGhost from '~/hooks/useDragGhost'
+import { type DragEvent, useCallback, useMemo } from 'react'
 
-const mime = 'application/zephy.path-list'
-
-const setPaths = (e: DragEvent, paths: string[]) =>
-  e.dataTransfer.setData(mime, JSON.stringify(paths))
-
-const useDraggable = (paths: string | string[], ghost: JSX.Element) => {
-  const { render } = useDragGhost()
-
+const useDraggable = (paths: string | string[]) => {
   const targetPaths = useMemo(
     () => (Array.isArray(paths) ? paths : [paths]),
     [paths],
@@ -23,9 +15,8 @@ const useDraggable = (paths: string | string[], ghost: JSX.Element) => {
       }
       e.preventDefault()
       e.stopPropagation()
-      render(null)
     },
-    [draggable, render],
+    [draggable],
   )
 
   const onDragStart = useCallback(
@@ -33,20 +24,12 @@ const useDraggable = (paths: string | string[], ghost: JSX.Element) => {
       if (!draggable) {
         return
       }
-      // TODO: native drag and drop
-      // @see https://www.electronjs.org/ja/docs/latest/tutorial/native-file-drag-drop
-      // e.preventDefault()
+      e.preventDefault()
       e.stopPropagation()
       e.dataTransfer.effectAllowed = 'move'
-
-      const ref = render(ghost)
-      if (ref.current) {
-        e.dataTransfer.setDragImage(ref.current, 0, 0)
-      }
-
-      setPaths(e, targetPaths)
+      window.electronAPI.startDrag(targetPaths)
     },
-    [draggable, ghost, render, targetPaths],
+    [draggable, targetPaths],
   )
 
   return {

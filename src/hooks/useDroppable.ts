@@ -4,20 +4,7 @@ import type { SystemStyleObject } from '@mui/system'
 import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import { useAppDispatch } from '~/store'
-import { moveFromCurrentTab } from '~/store/explorer-list'
-
-const mime = 'application/zephy.path-list'
-
-const getPaths = (e: DragEvent) => {
-  try {
-    const json = e.dataTransfer.getData(mime)
-    return JSON.parse(json) as string[]
-  } catch (e) {
-    // noop
-  }
-
-  return window.electronAPI.getFilePaths(Array.from(e.dataTransfer.files))
-}
+import { move } from '~/store/explorer-list'
 
 const isDroppable = (path?: string): path is string => path !== undefined
 
@@ -99,8 +86,9 @@ const useDroppable = (path?: string) => {
       e.preventDefault()
       e.stopPropagation()
       setEnterCount(0)
-      const paths = getPaths(e)
-      dispatch(moveFromCurrentTab(paths, path))
+      const files = Array.from(e.dataTransfer.files)
+      const paths = window.electronAPI.getFilePaths(files)
+      dispatch(move(paths, path))
     },
     [dispatch, droppable, path],
   )

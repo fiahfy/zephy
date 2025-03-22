@@ -87,6 +87,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     files.map((file) => webUtils.getPathForFile(file)),
   openTab: () => ipcRenderer.invoke('openTab'),
   openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
+  startDrag: (paths: string[]) => ipcRenderer.send('startDrag', paths),
   ...applicationMenuOperations,
   ...editOperations,
   ...entryOperations,

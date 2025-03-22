@@ -4,6 +4,7 @@ import {
   type IpcMainInvokeEvent,
   app,
   ipcMain,
+  nativeImage,
   shell,
 } from 'electron'
 import { readPaths, writePaths } from './utils/clipboard'
@@ -21,6 +22,11 @@ import {
 import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
+
+// 1x1 transparent png
+const dataUrl =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII='
+const icon = nativeImage.createFromDataURL(dataUrl)
 
 const registerEditHandlers = () => {
   ipcMain.handle('copy', (event: IpcMainInvokeEvent) =>
@@ -119,6 +125,13 @@ const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   )
   ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
     shell.openExternal(url),
+  )
+  ipcMain.on('startDrag', (event: IpcMainInvokeEvent, paths: string[]) =>
+    event.sender.startDrag({
+      file: '',
+      files: paths,
+      icon,
+    }),
   )
   registerEditHandlers()
   registerEntryHandlers(watcher)

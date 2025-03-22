@@ -712,7 +712,7 @@ export const startRenamingInCurrentTab =
     dispatch(startEditing({ tabId, path: targetPath }))
   }
 
-export const moveFromCurrentTab =
+export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {
     try {
