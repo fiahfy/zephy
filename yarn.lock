@@ -1652,6 +1652,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmldom/xmldom@npm:^0.9.4":
+  version: 0.9.8
+  resolution: "@xmldom/xmldom@npm:0.9.8"
+  checksum: 10c0/2ea984270832de2843ab0bbb6df71bde9aa02126b69e5fd56b5512b98ace48e94aff7186e77d0b22fe4b6780483862be752bcf8577436638a9210109029a0503
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -2871,6 +2878,18 @@ __metadata:
   version: 4.0.0
   resolution: "escape-string-regexp@npm:4.0.0"
   checksum: 10c0/9497d4dd307d845bd7f75180d8188bb17ea8c151c1edbf6b6717c100e104d629dc2dfb687686181b0f4b7d732c7dfdc4d5e7a8ff72de1b0ca283a75bbb3a9cd9
+  languageName: node
+  linkType: hard
+
+"exifreader@npm:^4.26.2":
+  version: 4.26.2
+  resolution: "exifreader@npm:4.26.2"
+  dependencies:
+    "@xmldom/xmldom": "npm:^0.9.4"
+  dependenciesMeta:
+    "@xmldom/xmldom":
+      optional: true
+  checksum: 10c0/7237e5e4a9a1db9f3dc8ee9f3f47e0820ec53e504867137a9c1af4dc5c915f179ed227cd38381297e08c1a7c8f7795b9d70640f6317aa99d36e256a37064b3b3
   languageName: node
   linkType: hard
 
@@ -5775,6 +5794,7 @@ __metadata:
     date-fns: "npm:^4.1.0"
     electron: "npm:^35.0.3"
     electron-builder: "npm:^25.1.8"
+    exifreader: "npm:^4.26.2"
     ffmpeg-static-electron: "npm:^2.0.3"
     ffprobe-static-electron: "npm:^2.0.2"
     fluent-ffmpeg: "npm:^2.1.3"

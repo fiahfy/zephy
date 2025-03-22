@@ -8,6 +8,7 @@ import {
   shell,
 } from 'electron'
 import { readPaths, writePaths } from './utils/clipboard'
+import { getEntryParameters } from './utils/exif'
 import { createThumbnailUrl, getMetadata } from './utils/ffmpeg'
 import {
   copyEntries,
@@ -72,6 +73,10 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.handle(
     'getEntryMetadata',
     (_event: IpcMainInvokeEvent, path: string) => getMetadata(path),
+  )
+  ipcMain.handle(
+    'getEntryParameters',
+    (_event: IpcMainInvokeEvent, path: string) => getEntryParameters(path),
   )
   ipcMain.handle(
     'getParentEntry',

@@ -16,6 +16,7 @@
     "chokidar": "~3.6.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "exifreader": "^4.26.2",
     "ffmpeg-static-electron": "^2.0.3",
     "ffprobe-static-electron": "^2.0.2",
     "fluent-ffmpeg": "^2.1.3",

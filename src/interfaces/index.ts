@@ -27,6 +27,7 @@ export type EntryOperations = {
   getEntriesForPaths: (paths: string[]) => Promise<Entry[]>
   getEntry: (path: string) => Promise<Entry>
   getEntryMetadata: (path: string) => Promise<Metadata | undefined>
+  getEntryParameters: (path: string) => Promise<string | undefined>
   getParentEntry: (path: string) => Promise<Entry>
   getRootEntry: (path?: string) => Promise<Entry>
   moveEntries: (paths: string[], directoryPath: string) => Promise<Entry[]>

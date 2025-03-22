@@ -1,5 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef } from 'react'
+import EntryInformationTable from '~/components/EntryInformationTable'
+import EntryParametersTable from '~/components/EntryParametersTable'
 import PreviewAudio from '~/components/PreviewAudio'
 import PreviewDirectory from '~/components/PreviewDirectory'
 import PreviewEmpty from '~/components/PreviewEmpty'
@@ -9,7 +11,6 @@ import PreviewVideo from '~/components/PreviewVideo'
 import { useAppSelector } from '~/store'
 import { selectCurrentSelectedContents } from '~/store/explorer-list'
 import { detectFileType } from '~/utils/file'
-import EntryInformationTable from './EntryInformationTable'
 
 const PreviewPanel = () => {
   const contents = useAppSelector(selectCurrentSelectedContents)
@@ -79,12 +80,16 @@ const PreviewPanel = () => {
             sx={{
               background: (theme) => theme.palette.background.default,
               bottom: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
               position: 'sticky',
               py: 1,
               zIndex: 1,
             }}
           >
             <EntryInformationTable entries={contents} />
+            {type === 'image' && <EntryParametersTable entry={content} />}
           </Box>
         </>
       ) : (

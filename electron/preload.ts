@@ -35,6 +35,8 @@ const entryOperations = {
   getEntry: (path: string) => ipcRenderer.invoke('getEntry', path),
   getEntryMetadata: (path: string) =>
     ipcRenderer.invoke('getEntryMetadata', path),
+  getEntryParameters: (path: string) =>
+    ipcRenderer.invoke('getEntryParameters', path),
   getParentEntry: (path: string) => ipcRenderer.invoke('getParentEntry', path),
   getRootEntry: (path?: string) => ipcRenderer.invoke('getRootEntry', path),
   moveEntries: (paths: string[], directoryPath: string) =>
