@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import EmptyPreview from '~/components/EmptyPreview'
+import PreviewEmpty from '~/components/PreviewEmpty'
 import type { Entry } from '~/interfaces'
 
 type Props = {
   entry: Entry
 }
 
-const ImagePreview = (props: Props) => {
+const PreviewImage = (props: Props) => {
   const { entry } = props
 
   const [status, setStatus] = useState<'error' | 'loaded' | 'loading'>(
@@ -57,10 +57,10 @@ const ImagePreview = (props: Props) => {
           }}
         />
       ) : (
-        <EmptyPreview message={message} />
+        <PreviewEmpty message={message} />
       )}
     </>
   )
 }
 
-export default ImagePreview
+export default PreviewImage

@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
-import AudioPreview from '~/components/AudioPreview'
-import DirectoryPreview from '~/components/DirectoryPreview'
-import EmptyPreview from '~/components/EmptyPreview'
-import ImagePreview from '~/components/ImagePreview'
-import TextPreview from '~/components/TextPreview'
-import VideoPreview from '~/components/VideoPreview'
+import PreviewAudio from '~/components/PreviewAudio'
+import PreviewDirectory from '~/components/PreviewDirectory'
+import PreviewEmpty from '~/components/PreviewEmpty'
+import PreviewImage from '~/components/PreviewImage'
+import PreviewText from '~/components/PreviewText'
+import PreviewVideo from '~/components/PreviewVideo'
 import type { Entry } from '~/interfaces'
 import { detectFileType } from '~/utils/file'
 
@@ -31,17 +31,17 @@ const Preview = (props: Props) => {
     <>
       {entries.length === 1 && entry ? (
         <>
-          {type === 'audio' && <AudioPreview entry={entry} />}
-          {type === 'directory' && <DirectoryPreview entry={entry} />}
-          {type === 'image' && <ImagePreview entry={entry} />}
-          {type === 'text' && <TextPreview entry={entry} />}
-          {type === 'video' && <VideoPreview entry={entry} />}
+          {type === 'audio' && <PreviewAudio entry={entry} />}
+          {type === 'directory' && <PreviewDirectory entry={entry} />}
+          {type === 'image' && <PreviewImage entry={entry} />}
+          {type === 'text' && <PreviewText entry={entry} />}
+          {type === 'video' && <PreviewVideo entry={entry} />}
           {!['audio', 'directory', 'image', 'text', 'video'].includes(type) && (
-            <EmptyPreview message="No preview" />
+            <PreviewEmpty message="No preview" />
           )}
         </>
       ) : (
-        <EmptyPreview message="No preview" />
+        <PreviewEmpty message="No preview" />
       )}
     </>
   )

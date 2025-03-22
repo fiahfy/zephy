@@ -25,7 +25,7 @@ type Props = {
   entry: Entry
 }
 
-const AudioPreview = (props: Props) => {
+const PreviewAudio = (props: Props) => {
   const { entry } = props
 
   const defaultLoop = useAppSelector(selectDefaultLoop)
@@ -162,4 +162,4 @@ const AudioPreview = (props: Props) => {
   )
 }
 
-export default AudioPreview
+export default PreviewAudio

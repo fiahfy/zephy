@@ -1,8 +1,8 @@
 import { Box } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import DirectoryPreviewItem from '~/components/DirectoryPreviewItem'
-import EmptyPreview from '~/components/EmptyPreview'
+import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
+import PreviewEmpty from '~/components/PreviewEmpty'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
@@ -38,7 +38,7 @@ type Props = {
   entry: Entry
 }
 
-const DirectoryPreview = (props: Props) => {
+const PreviewDirectory = (props: Props) => {
   const { entry } = props
 
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
@@ -154,7 +154,7 @@ const DirectoryPreview = (props: Props) => {
                 >
                   {columns.map((entry) => (
                     <Box key={entry.path} sx={{ p: 0.0625, width: size }}>
-                      <DirectoryPreviewItem entry={entry} />
+                      <PreviewDirectoryItem entry={entry} />
                     </Box>
                   ))}
                 </Box>
@@ -163,9 +163,9 @@ const DirectoryPreview = (props: Props) => {
           </Box>
         )}
       </Box>
-      {entries.length === 0 && <EmptyPreview message={noDataText} />}
+      {entries.length === 0 && <PreviewEmpty message={noDataText} />}
     </>
   )
 }
 
-export default DirectoryPreview
+export default PreviewDirectory

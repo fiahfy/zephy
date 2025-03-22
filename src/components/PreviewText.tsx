@@ -34,7 +34,7 @@ type Props = {
   entry: Entry
 }
 
-const TextPreview = (props: Props) => {
+const PreviewText = (props: Props) => {
   const { entry } = props
 
   const [{ status, text }, dispatch] = useReducer(reducer, {
@@ -102,4 +102,4 @@ const TextPreview = (props: Props) => {
   )
 }
 
-export default TextPreview
+export default PreviewText

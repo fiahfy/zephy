@@ -14,7 +14,7 @@ type Props = {
   entry: Entry
 }
 
-const DirectoryPreviewItem = (props: Props) => {
+const PreviewDirectoryItem = (props: Props) => {
   const { entry } = props
 
   const dispatch = useAppDispatch()
@@ -121,4 +121,4 @@ const DirectoryPreviewItem = (props: Props) => {
   )
 }
 
-export default DirectoryPreviewItem
+export default PreviewDirectoryItem

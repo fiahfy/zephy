@@ -44,7 +44,7 @@ type Props = {
   entry: Entry
 }
 
-const VideoPreview = (props: Props) => {
+const PreviewVideo = (props: Props) => {
   const { entry } = props
 
   const defaultLoop = useAppSelector(selectDefaultLoop)
@@ -155,4 +155,4 @@ const VideoPreview = (props: Props) => {
   )
 }
 
-export default VideoPreview
+export default PreviewVideo
