@@ -295,9 +295,9 @@ const App = () => {
       </Box>
       <Sidebar variant="secondary">
         <Inspector />
-        <NotificationBar />
       </Sidebar>
       <StatusBar />
+      <NotificationBar />
     </Box>
   )
 }
