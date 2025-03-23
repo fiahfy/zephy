@@ -1,6 +1,8 @@
-import { Box, LinearProgress, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import ExplorerEmptyState from '~/components/ExplorerEmptyState'
 import ExplorerGridItem from '~/components/ExplorerGridItem'
+import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
 import useExplorerList from '~/hooks/useExplorerList'
 import type { Content } from '~/interfaces'
 
@@ -103,25 +105,8 @@ const ExplorerGallery = (props: Props) => {
           </Box>
         )}
       </Box>
-      {chunks.length === 0 && (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            inset: 0,
-            justifyContent: 'center',
-            position: 'absolute',
-          }}
-        >
-          <Typography variant="caption">{noDataText}</Typography>
-        </Box>
-      )}
-      {loading && (
-        <LinearProgress
-          sx={{ inset: '0 0 auto', position: 'absolute', zIndex: 1 }}
-        />
-      )}
+      {chunks.length === 0 && <ExplorerEmptyState message={noDataText} />}
+      {loading && <ExplorerLoadingProgress />}
     </Box>
   )
 }

@@ -1,5 +1,7 @@
-import { Box, LinearProgress, Table, Typography } from '@mui/material'
+import { Box, Table } from '@mui/material'
 import { useMemo, useRef } from 'react'
+import ExplorerEmptyState from '~/components/ExplorerEmptyState'
+import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
 import ExplorerTableCell from '~/components/ExplorerTableCell'
 import ExplorerTableHeaderCell from '~/components/ExplorerTableHeaderCell'
 import ExplorerTableRow from '~/components/ExplorerTableRow'
@@ -166,26 +168,28 @@ const ExplorerTable = (props: Props) => {
         position: 'relative',
       }}
     >
-      <Box
-        onContextMenu={handleContextMenu}
-        sx={{
-          display: 'flex',
-          flexShrink: 0,
-          overflowX: 'hidden',
-          pr: '10px',
-        }}
-      >
-        {filteredColumns.map((column) => (
-          <ExplorerTableHeaderCell
-            dataKey={column.key}
-            height={headerHeight}
-            key={column.key}
-            label={column.label}
-            tabId={tabId}
-            width={column.width}
-          />
-        ))}
-      </Box>
+      {chunks.length > 0 && (
+        <Box
+          onContextMenu={handleContextMenu}
+          sx={{
+            display: 'flex',
+            flexShrink: 0,
+            overflowX: 'hidden',
+            pr: '10px',
+          }}
+        >
+          {filteredColumns.map((column) => (
+            <ExplorerTableHeaderCell
+              dataKey={column.key}
+              height={headerHeight}
+              key={column.key}
+              label={column.label}
+              tabId={tabId}
+              width={column.width}
+            />
+          ))}
+        </Box>
+      )}
       <Box
         className="explorer-list"
         onClick={onClick}
@@ -203,7 +207,10 @@ const ExplorerTable = (props: Props) => {
       >
         <Table
           component="div"
-          sx={{ display: 'block', height: `${virtualizer.getTotalSize()}px` }}
+          sx={{
+            display: 'block',
+            height: `${virtualizer.getTotalSize()}px`,
+          }}
         >
           {virtualizer.getVirtualItems().map((virtualRow, index) => {
             const content = chunks[virtualRow.index][0] as Content
@@ -235,25 +242,8 @@ const ExplorerTable = (props: Props) => {
           })}
         </Table>
       </Box>
-      {chunks.length === 0 && (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            inset: 0,
-            justifyContent: 'center',
-            position: 'absolute',
-          }}
-        >
-          <Typography variant="caption">{noDataText}</Typography>
-        </Box>
-      )}
-      {loading && (
-        <LinearProgress
-          sx={{ inset: '0 0 auto', position: 'absolute', zIndex: 1 }}
-        />
-      )}
+      {chunks.length === 0 && <ExplorerEmptyState message={noDataText} />}
+      {loading && <ExplorerLoadingProgress />}
     </Box>
   )
 }
