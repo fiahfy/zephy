@@ -1,6 +1,7 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useMemo } from 'react'
 import ExplorerGalleryMainContent from '~/components/ExplorerGalleryMainContent'
+import ExplorerGalleryMainEmptyState from '~/components/ExplorerGalleryMainEmptyState'
 import { useAppSelector } from '~/store'
 import { selectSelectedContentsByTabId } from '~/store/explorer-list'
 
@@ -22,16 +23,7 @@ const ExplorerGalleryMain = (props: Props) => {
       {content ? (
         <ExplorerGalleryMainContent content={content} />
       ) : (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="caption">No selected</Typography>
-        </Box>
+        <ExplorerGalleryMainEmptyState message="No selected" />
       )}
     </Box>
   )

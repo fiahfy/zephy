@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import ExplorerGalleryMainEmptyState from '~/components/ExplorerGalleryMainEmptyState'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
 import type { Content } from '~/interfaces'
 
@@ -12,31 +12,24 @@ const ExplorerGalleryMainContent = (props: Props) => {
   const { message, status, thumbnail } = useEntryThumbnail(content)
 
   return (
-    <Box sx={{ display: 'flex', height: '100%' }}>
+    <>
       {status === 'loaded' && thumbnail ? (
         <img
           alt=""
+          draggable={false}
           src={thumbnail}
           style={{
             display: 'block',
+            height: '100%',
             objectFit: 'contain',
             objectPosition: 'center',
             width: '100%',
           }}
         />
       ) : (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="caption">{message}</Typography>
-        </Box>
+        <ExplorerGalleryMainEmptyState message={message} />
       )}
-    </Box>
+    </>
   )
 }
 
