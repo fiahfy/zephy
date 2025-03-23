@@ -322,9 +322,15 @@ const useExplorerList = (
             : focusByVertical(1, e.shiftKey)
         case 'ArrowLeft':
           e.preventDefault()
+          if (horizontal) {
+            return focusByVertical(-1, e.shiftKey)
+          }
           return focusByHorizontal(-1, e.shiftKey)
         case 'ArrowRight':
           e.preventDefault()
+          if (horizontal) {
+            return focusByVertical(1, e.shiftKey)
+          }
           return focusByHorizontal(1, e.shiftKey)
         // TODO: focus external previous/next element
         case 'Tab':
@@ -335,7 +341,7 @@ const useExplorerList = (
           return dispatch(setAnchor({ tabId, anchor: focused }))
       }
     },
-    [anchor, columns, contents, focused, dispatch, tabId],
+    [anchor, columns, contents, dispatch, focused, horizontal, tabId],
   )
 
   return {
