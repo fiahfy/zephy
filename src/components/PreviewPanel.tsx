@@ -67,20 +67,22 @@ const PreviewPanel = () => {
       </Typography>
       {contents.length > 0 ? (
         <>
-          {contents.length === 1 && content ? (
-            <>
-              {type === 'audio' && <PreviewAudio entry={content} />}
-              {type === 'directory' && <PreviewDirectory entry={content} />}
-              {type === 'image' && <PreviewImage entry={content} />}
-              {type === 'text' && <PreviewText entry={content} />}
-              {type === 'video' && <PreviewVideo entry={content} />}
-              {!['audio', 'directory', 'image', 'text', 'video'].includes(
-                type,
-              ) && <PreviewEmptyState message="No preview" />}
-            </>
-          ) : (
-            <PreviewEmptyState message="No preview" />
-          )}
+          <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+            {contents.length === 1 && content ? (
+              <>
+                {type === 'audio' && <PreviewAudio entry={content} />}
+                {type === 'directory' && <PreviewDirectory entry={content} />}
+                {type === 'image' && <PreviewImage entry={content} />}
+                {type === 'text' && <PreviewText entry={content} />}
+                {type === 'video' && <PreviewVideo entry={content} />}
+                {!['audio', 'directory', 'image', 'text', 'video'].includes(
+                  type,
+                ) && <PreviewEmptyState message="No preview" />}
+              </>
+            ) : (
+              <PreviewEmptyState message="No preview" />
+            )}
+          </Box>
           <Box
             ref={footerRef}
             sx={{

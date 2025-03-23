@@ -1,6 +1,7 @@
 import { Box } from '@mui/material'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
+import ExplorerGalleryMain from '~/components/ExplorerGalleryMain'
 import ExplorerGridItem from '~/components/ExplorerGridItem'
 import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
 import useExplorerList from '~/hooks/useExplorerList'
@@ -56,10 +57,13 @@ const ExplorerGallery = (props: Props) => {
   return (
     <Box
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
         height: '100%',
         position: 'relative',
       }}
     >
+      <ExplorerGalleryMain tabId={tabId} />
       <Box
         className="explorer-list"
         onClick={onClick}
@@ -67,6 +71,7 @@ const ExplorerGallery = (props: Props) => {
         onKeyDown={onKeyDown}
         ref={ref}
         sx={{
+          flexShrink: 0,
           outline: 'none',
           overflowX: 'scroll',
           overflowY: 'hidden',

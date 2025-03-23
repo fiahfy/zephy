@@ -98,13 +98,16 @@ const useExplorerList = (
     const handler = (e: Event) => {
       if (e.target instanceof HTMLElement) {
         if (!loading) {
-          dispatch(setScrollTop(e.target.scrollTop))
+          dispatch(
+            // TODO: rename setScrollTop to setScrollPosition
+            setScrollTop(horizontal ? e.target.scrollLeft : e.target.scrollTop),
+          )
         }
       }
     }
     el.addEventListener('scrollend', handler)
     return () => el.removeEventListener('scrollend', handler)
-  }, [dispatch, loading, ref])
+  }, [dispatch, horizontal, loading, ref])
 
   useEffect(() => {
     if (!previousLoading && loading) {
