@@ -16,7 +16,7 @@ type Props = {
   tabId: number
 }
 
-const ExplorerGridItem = (props: Props) => {
+const ExplorerImageListItem = (props: Props) => {
   const { content, tabId } = props
 
   const {
@@ -178,4 +178,4 @@ const ExplorerGridItem = (props: Props) => {
   )
 }
 
-export default ExplorerGridItem
+export default ExplorerImageListItem

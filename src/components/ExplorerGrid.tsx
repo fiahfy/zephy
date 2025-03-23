@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
-import ExplorerGridItem from '~/components/ExplorerGridItem'
+import ExplorerImageListItem from '~/components/ExplorerImageListItem'
 import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
 import useExplorerList from '~/hooks/useExplorerList'
 import type { Content } from '~/interfaces'
@@ -99,7 +99,7 @@ const ExplorerGrid = (props: Props) => {
                       key={content.path}
                       sx={{ p: 0.0625, width: virtualRow.size }}
                     >
-                      <ExplorerGridItem content={content} tabId={tabId} />
+                      <ExplorerImageListItem content={content} tabId={tabId} />
                     </Box>
                   ))}
                 </Box>

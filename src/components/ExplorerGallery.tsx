@@ -3,7 +3,7 @@ import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
 import ExplorerGalleryMain from '~/components/ExplorerGalleryMain'
-import ExplorerGridItem from '~/components/ExplorerGridItem'
+import ExplorerImageListItem from '~/components/ExplorerImageListItem'
 import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
 import useExplorerList from '~/hooks/useExplorerList'
 import type { Content } from '~/interfaces'
@@ -103,7 +103,7 @@ const ExplorerGallery = (props: Props) => {
                     width: `${virtualColumn.size}px`,
                   }}
                 >
-                  <ExplorerGridItem content={content} tabId={tabId} />
+                  <ExplorerImageListItem content={content} tabId={tabId} />
                 </Box>
               )
             })}
