@@ -123,7 +123,10 @@ const useExplorerList = (
   }, [loading, previousLoading, scrollPosition, virtualizer])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => virtualizer.scrollToOffset(0), [sortOption])
+  useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
 
   useEffect(() => {
     if (focused && previousFocused !== focused) {

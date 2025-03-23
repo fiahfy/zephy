@@ -1,4 +1,5 @@
 import { Box } from '@mui/material'
+import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
 import ExplorerGridItem from '~/components/ExplorerGridItem'
@@ -41,12 +42,12 @@ const ExplorerGrid = (props: Props) => {
     if (!el) {
       return
     }
-    const handleResize = (entries: ResizeObserverEntry[]) => {
+    const handleResize = throttle((entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
       if (entry) {
         setWrapperWidth(entry.contentRect.width)
       }
-    }
+    }, 100)
     const observer = new ResizeObserver(handleResize)
     observer.observe(el)
     return () => observer.disconnect()
@@ -75,22 +76,29 @@ const ExplorerGrid = (props: Props) => {
         tabIndex={0}
       >
         {wrapperWidth > 0 && (
-          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
-            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+          <Box
+            sx={{
+              height: `${virtualizer.getTotalSize()}px`,
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
               const columns = chunks[virtualRow.index] as Content[]
               return (
                 <Box
                   key={virtualRow.index}
                   sx={{
                     display: 'flex',
-                    height: size,
-                    transform: `translateY(${
-                      virtualRow.start - rowIndex * virtualRow.size
-                    }px)`,
+                    height: `${virtualRow.size}px`,
+                    position: 'absolute',
+                    transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
                   {columns.map((content) => (
-                    <Box key={content.path} sx={{ p: 0.0625, width: size }}>
+                    <Box
+                      key={content.path}
+                      sx={{ p: 0.0625, width: virtualRow.size }}
+                    >
                       <ExplorerGridItem content={content} tabId={tabId} />
                     </Box>
                   ))}

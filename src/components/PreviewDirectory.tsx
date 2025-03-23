@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
@@ -48,7 +49,7 @@ const PreviewDirectory = (props: Props) => {
     entries: [],
   })
 
-  const parentRef = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -56,6 +57,9 @@ const PreviewDirectory = (props: Props) => {
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
+
+  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
+
   const rows = useMemo(
     () =>
       entries.reduce((acc, _, i) => {
@@ -66,7 +70,6 @@ const PreviewDirectory = (props: Props) => {
       }, [] as Entry[][]),
     [columns, entries],
   )
-  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
   const noDataText = useMemo(
     () => (loading ? 'Loading...' : 'No items'),
@@ -76,24 +79,28 @@ const PreviewDirectory = (props: Props) => {
   const virtualizer = useVirtualizer({
     count: rows.length,
     estimateSize: () => size,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => ref.current,
   })
 
   useEffect(() => {
-    const el = parentRef.current
+    const el = ref.current
     if (!el) {
       return
     }
-    const handleResize = (entries: ResizeObserverEntry[]) => {
+    const handleResize = throttle((entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
+      console.log(entry)
       if (entry) {
         setWrapperWidth(entry.contentRect.width)
       }
-    }
+    }, 100)
     const observer = new ResizeObserver(handleResize)
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => virtualizer.measure(), [virtualizer, size])
 
   useEffect(() => {
     if (!loading) {
@@ -131,29 +138,36 @@ const PreviewDirectory = (props: Props) => {
   return (
     <>
       <Box
-        ref={parentRef}
+        ref={ref}
         sx={{
           overflowX: 'hidden',
           overflowY: 'scroll',
         }}
       >
         {wrapperWidth > 0 && (
-          <Box sx={{ height: `${virtualizer.getTotalSize()}px` }}>
-            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
+          <Box
+            sx={{
+              height: `${virtualizer.getTotalSize()}px`,
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
               const columns = rows[virtualRow.index] as Entry[]
               return (
                 <Box
                   key={virtualRow.index}
                   sx={{
                     display: 'flex',
-                    height: size,
-                    transform: `translateY(${
-                      virtualRow.start - rowIndex * virtualRow.size
-                    }px)`,
+                    height: `${virtualRow.size}px`,
+                    position: 'absolute',
+                    transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
                   {columns.map((entry) => (
-                    <Box key={entry.path} sx={{ p: 0.0625, width: size }}>
+                    <Box
+                      key={entry.path}
+                      sx={{ p: 0.0625, width: virtualRow.size }}
+                    >
                       <PreviewDirectoryItem entry={entry} />
                     </Box>
                   ))}

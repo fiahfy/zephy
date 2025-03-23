@@ -1,4 +1,5 @@
 import { Box } from '@mui/material'
+import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
 import ExplorerGalleryMain from '~/components/ExplorerGalleryMain'
@@ -43,12 +44,12 @@ const ExplorerGallery = (props: Props) => {
     if (!el) {
       return
     }
-    const handleResize = (entries: ResizeObserverEntry[]) => {
+    const handleResize = throttle((entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
       if (entry) {
         setWrapperWidth(entry.contentRect.width)
       }
-    }
+    }, 100)
     const observer = new ResizeObserver(handleResize)
     observer.observe(el)
     return () => observer.disconnect()
@@ -83,27 +84,26 @@ const ExplorerGallery = (props: Props) => {
         {wrapperWidth > 0 && (
           <Box
             sx={{
-              display: 'flex',
               height: size,
+              position: 'relative',
               width: `${virtualizer.getTotalSize()}px`,
             }}
           >
-            {virtualizer.getVirtualItems().map((virtualRow, rowIndex) => {
-              const content = chunks[virtualRow.index][0] as Content
+            {virtualizer.getVirtualItems().map((virtualColumn) => {
+              const content = chunks[virtualColumn.index][0] as Content
               return (
                 <Box
-                  key={content.path}
+                  key={virtualColumn.index}
                   sx={{
                     display: 'flex',
-                    transform: `translateX(${
-                      virtualRow.start - rowIndex * virtualRow.size
-                    }px)`,
-                    width: size,
+                    height: `${virtualColumn.size}px`,
+                    p: 0.0625,
+                    position: 'absolute',
+                    transform: `translateX(${virtualColumn.start}px)`,
+                    width: `${virtualColumn.size}px`,
                   }}
                 >
-                  <Box key={content.path} sx={{ p: 0.0625, width: size }}>
-                    <ExplorerGridItem content={content} tabId={tabId} />
-                  </Box>
+                  <ExplorerGridItem content={content} tabId={tabId} />
                 </Box>
               )
             })}

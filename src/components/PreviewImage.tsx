@@ -51,6 +51,7 @@ const PreviewImage = (props: Props) => {
           alt=""
           src={entry.url}
           style={{
+            flexShrink: 0,
             minHeight: 128,
             objectFit: 'contain',
             width: '100%',

@@ -210,18 +210,19 @@ const ExplorerTable = (props: Props) => {
           sx={{
             display: 'block',
             height: `${virtualizer.getTotalSize()}px`,
+            position: 'relative',
           }}
         >
-          {virtualizer.getVirtualItems().map((virtualRow, index) => {
+          {virtualizer.getVirtualItems().map((virtualRow) => {
             const content = chunks[virtualRow.index][0] as Content
             return (
               <Box
-                key={content.path}
+                key={virtualRow.index}
                 sx={{
                   height: `${virtualRow.size}px`,
-                  transform: `translateY(${
-                    virtualRow.start - index * virtualRow.size
-                  }px)`,
+                  position: 'absolute',
+                  transform: `translateY(${virtualRow.start}px)`,
+                  width: '100%',
                 }}
               >
                 <ExplorerTableRow content={content} tabId={tabId}>
