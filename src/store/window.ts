@@ -23,7 +23,7 @@ import { buildZephyUrl, getTitle } from '~/utils/url'
 type History = {
   directoryPath: string
   query: string
-  scrollTop: number
+  scrollPosition: number
   title: string
 }
 
@@ -275,7 +275,7 @@ export const windowSlice = createSlice({
       const historyIndex = tab.history.index + 1
       const histories = [
         ...tab.history.histories.slice(0, historyIndex),
-        { directoryPath, query: '', scrollTop: 0, title },
+        { directoryPath, query: '', scrollPosition: 0, title },
       ]
       const tabs = window.tabs.map((tab) =>
         tab.id === window.tabId
@@ -357,11 +357,11 @@ export const windowSlice = createSlice({
         },
       }
     },
-    setScrollTop(
+    setScrollPosition(
       state,
-      action: PayloadAction<{ id: number; scrollTop: number }>,
+      action: PayloadAction<{ id: number; scrollPosition: number }>,
     ) {
-      const { id, scrollTop } = action.payload
+      const { id, scrollPosition } = action.payload
       const window = state[id]
       if (!window) {
         return state
@@ -371,7 +371,7 @@ export const windowSlice = createSlice({
         return state
       }
       const histories = tab.history.histories.map((history, i) =>
-        i === tab.history.index ? { ...history, scrollTop } : history,
+        i === tab.history.index ? { ...history, scrollPosition } : history,
       )
       const tabs = window.tabs.map((tab) =>
         tab.id === window.tabId
@@ -583,7 +583,7 @@ export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
     history.histories[history.index] ?? {
       directoryPath: '',
       query: '',
-      scrollTop: 0,
+      scrollPosition: 0,
       title: '',
     }
   )
@@ -599,9 +599,9 @@ export const selectQueryByTabId = createSelector(
   (history) => history.query,
 )
 
-export const selectScrollTopByTabId = createSelector(
+export const selectScrollPositionByTabId = createSelector(
   selectHistoryByTabId,
-  (history) => history.scrollTop,
+  (history) => history.scrollPosition,
 )
 
 const selectDirectoryPath = (
@@ -822,13 +822,13 @@ export const goToRatings =
 export const goToSettings = (): AppThunk => async (dispatch) =>
   dispatch(changeDirectory(buildZephyUrl({ pathname: 'settings' })))
 
-export const setScrollTop =
-  (scrollTop: number): AppThunk =>
+export const setScrollPosition =
+  (scrollPosition: number): AppThunk =>
   async (dispatch, getState) => {
-    const { setScrollTop } = windowSlice.actions
+    const { setScrollPosition } = windowSlice.actions
 
     const id = selectWindowId(getState())
-    dispatch(setScrollTop({ id, scrollTop }))
+    dispatch(setScrollPosition({ id, scrollPosition }))
   }
 
 export const search =

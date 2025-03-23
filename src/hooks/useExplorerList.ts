@@ -28,10 +28,10 @@ import {
 import {
   selectDirectoryPathByTabId,
   selectQueryByTabId,
-  selectScrollTopByTabId,
+  selectScrollPositionByTabId,
   selectSortOptionByTabIdAndDirectoryPath,
   selectViewModeByTabIdAndDirectoryPath,
-  setScrollTop,
+  setScrollPosition,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 import { isZephySchema } from '~/utils/url'
@@ -55,8 +55,8 @@ const useExplorerList = (
   const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const query = useAppSelector((state) => selectQueryByTabId(state, tabId))
-  const scrollTop = useAppSelector((state) =>
-    selectScrollTopByTabId(state, tabId),
+  const scrollPosition = useAppSelector((state) =>
+    selectScrollPositionByTabId(state, tabId),
   )
   const sortOption = useAppSelector((state) =>
     selectSortOptionByTabIdAndDirectoryPath(state, tabId, directoryPath),
@@ -99,8 +99,9 @@ const useExplorerList = (
       if (e.target instanceof HTMLElement) {
         if (!loading) {
           dispatch(
-            // TODO: rename setScrollTop to setScrollPosition
-            setScrollTop(horizontal ? e.target.scrollLeft : e.target.scrollTop),
+            setScrollPosition(
+              horizontal ? e.target.scrollLeft : e.target.scrollTop,
+            ),
           )
         }
       }
@@ -115,11 +116,11 @@ const useExplorerList = (
     }
     if (previousLoading && !loading) {
       setTimeout(() => {
-        virtualizer.scrollToOffset(scrollTop)
+        virtualizer.scrollToOffset(scrollPosition)
         setRestoring(false)
       })
     }
-  }, [loading, previousLoading, scrollTop, virtualizer])
+  }, [loading, previousLoading, scrollPosition, virtualizer])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => virtualizer.scrollToOffset(0), [sortOption])
