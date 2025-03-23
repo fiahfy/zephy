@@ -1,11 +1,11 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef } from 'react'
-import EntryInformationTable from '~/components/EntryInformationTable'
-import EntryParametersTable from '~/components/EntryParametersTable'
 import PreviewAudio from '~/components/PreviewAudio'
 import PreviewDirectory from '~/components/PreviewDirectory'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
 import PreviewImage from '~/components/PreviewImage'
+import PreviewInformationTable from '~/components/PreviewInformationTable'
+import PreviewParametersTable from '~/components/PreviewParametersTable'
 import PreviewText from '~/components/PreviewText'
 import PreviewVideo from '~/components/PreviewVideo'
 import { useAppSelector } from '~/store'
@@ -95,8 +95,8 @@ const PreviewPanel = () => {
               zIndex: 1,
             }}
           >
-            <EntryInformationTable entries={contents} />
-            {type === 'image' && <EntryParametersTable entry={content} />}
+            <PreviewInformationTable entries={contents} />
+            {type === 'image' && <PreviewParametersTable entry={content} />}
           </Box>
         </>
       ) : (

@@ -42,7 +42,7 @@ type Props = {
   entries: Entry[]
 }
 
-const EntryInformationTable = (props: Props) => {
+const PreviewInformationTable = (props: Props) => {
   const { entries } = props
 
   const [metadata, setMetadata] = useState<Metadata>()
@@ -181,4 +181,4 @@ const EntryInformationTable = (props: Props) => {
   )
 }
 
-export default EntryInformationTable
+export default PreviewInformationTable

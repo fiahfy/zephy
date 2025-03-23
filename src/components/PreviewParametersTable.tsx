@@ -64,7 +64,7 @@ type Props = {
   entry: Entry
 }
 
-const EntryParametersTable = (props: Props) => {
+const PreviewParametersTable = (props: Props) => {
   const { entry } = props
 
   const [parameters, setParameters] = useState<string>()
@@ -295,4 +295,4 @@ const EntryParametersTable = (props: Props) => {
   )
 }
 
-export default EntryParametersTable
+export default PreviewParametersTable
