@@ -6,7 +6,7 @@ type Props = {
   sx?: ComponentProps<typeof Box>['sx']
 }
 
-const PreviewEmpty = (props: Props) => {
+const PreviewEmptyState = (props: Props) => {
   const { message, sx } = props
 
   return (
@@ -25,4 +25,4 @@ const PreviewEmpty = (props: Props) => {
   )
 }
 
-export default PreviewEmpty
+export default PreviewEmptyState

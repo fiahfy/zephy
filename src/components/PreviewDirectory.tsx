@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
-import PreviewEmpty from '~/components/PreviewEmpty'
+import PreviewEmptyState from '~/components/PreviewEmptyState'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
@@ -163,7 +163,7 @@ const PreviewDirectory = (props: Props) => {
           </Box>
         )}
       </Box>
-      {entries.length === 0 && <PreviewEmpty message={noDataText} />}
+      {entries.length === 0 && <PreviewEmptyState message={noDataText} />}
     </>
   )
 }

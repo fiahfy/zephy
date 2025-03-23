@@ -4,7 +4,7 @@ import EntryInformationTable from '~/components/EntryInformationTable'
 import EntryParametersTable from '~/components/EntryParametersTable'
 import PreviewAudio from '~/components/PreviewAudio'
 import PreviewDirectory from '~/components/PreviewDirectory'
-import PreviewEmpty from '~/components/PreviewEmpty'
+import PreviewEmptyState from '~/components/PreviewEmptyState'
 import PreviewImage from '~/components/PreviewImage'
 import PreviewText from '~/components/PreviewText'
 import PreviewVideo from '~/components/PreviewVideo'
@@ -76,10 +76,10 @@ const PreviewPanel = () => {
               {type === 'video' && <PreviewVideo entry={content} />}
               {!['audio', 'directory', 'image', 'text', 'video'].includes(
                 type,
-              ) && <PreviewEmpty message="No preview" />}
+              ) && <PreviewEmptyState message="No preview" />}
             </>
           ) : (
-            <PreviewEmpty message="No preview" />
+            <PreviewEmptyState message="No preview" />
           )}
           <Box
             ref={footerRef}

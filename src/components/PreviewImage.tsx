@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import PreviewEmpty from '~/components/PreviewEmpty'
+import PreviewEmptyState from '~/components/PreviewEmptyState'
 import type { Entry } from '~/interfaces'
 
 type Props = {
@@ -57,7 +57,7 @@ const PreviewImage = (props: Props) => {
           }}
         />
       ) : (
-        <PreviewEmpty message={message} />
+        <PreviewEmptyState message={message} />
       )}
     </>
   )
