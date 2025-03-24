@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
@@ -85,10 +85,10 @@ const ExplorerGrid = (props: Props) => {
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const columns = chunks[virtualRow.index] as Content[]
               return (
-                <Box
+                <Stack
+                  direction="row"
                   key={virtualRow.index}
                   sx={{
-                    display: 'flex',
                     height: `${virtualRow.size}px`,
                     position: 'absolute',
                     transform: `translateY(${virtualRow.start}px)`,
@@ -102,7 +102,7 @@ const ExplorerGrid = (props: Props) => {
                       <ExplorerImageListItem content={content} tabId={tabId} />
                     </Box>
                   ))}
-                </Box>
+                </Stack>
               )
             })}
           </Box>

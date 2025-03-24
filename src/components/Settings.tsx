@@ -9,6 +9,7 @@ import {
   MenuItem,
   Select,
   type SelectChangeEvent,
+  Stack,
   Typography,
 } from '@mui/material'
 import { type ChangeEvent, useCallback } from 'react'
@@ -71,7 +72,7 @@ const Settings = () => {
 
   return (
     <Container>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, my: 2 }}>
+      <Stack spacing={2} sx={{ my: 2 }}>
         <Box>
           <Typography gutterBottom variant="subtitle2">
             Appearance
@@ -174,7 +175,7 @@ const Settings = () => {
             />
           </FormGroup>
         </Box>
-      </Box>
+      </Stack>
     </Container>
   )
 }

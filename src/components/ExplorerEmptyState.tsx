@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 
 type Props = {
   message: string
@@ -8,10 +8,9 @@ const ExplorerEmptyState = (props: Props) => {
   const { message } = props
 
   return (
-    <Box
+    <Stack
       sx={{
         alignItems: 'center',
-        display: 'flex',
         height: '100%',
         inset: 0,
         justifyContent: 'center',
@@ -20,7 +19,7 @@ const ExplorerEmptyState = (props: Props) => {
       }}
     >
       <Typography variant="caption">{message}</Typography>
-    </Box>
+    </Stack>
   )
 }
 

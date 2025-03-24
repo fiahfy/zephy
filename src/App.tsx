@@ -1,4 +1,4 @@
-import { Box, GlobalStyles, Toolbar, darken, lighten } from '@mui/material'
+import { GlobalStyles, Stack, Toolbar, darken, lighten } from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
@@ -207,10 +207,10 @@ const App = () => {
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
-    <Box
+    <Stack
+      direction="row"
       onContextMenu={handleContextMenu}
       sx={{
-        display: 'flex',
         height: '100%',
         overflow: 'hidden',
         userSelect: 'none',
@@ -269,11 +269,9 @@ const App = () => {
       <Sidebar variant="primary">
         <Navigator />
       </Sidebar>
-      <Box
+      <Stack
         component="main"
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
           flexGrow: 1,
           minWidth: 0,
         }}
@@ -292,13 +290,13 @@ const App = () => {
             minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
           }}
         />
-      </Box>
+      </Stack>
       <Sidebar variant="secondary">
         <Inspector />
       </Sidebar>
       <StatusBar />
       <NotificationBar />
-    </Box>
+    </Stack>
   )
 }
 

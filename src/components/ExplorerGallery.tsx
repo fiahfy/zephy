@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
@@ -76,10 +76,8 @@ const ExplorerGallery = (props: Props) => {
   }, [])
 
   return (
-    <Box
+    <Stack
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
         height: '100%',
         position: 'relative',
       }}
@@ -112,10 +110,9 @@ const ExplorerGallery = (props: Props) => {
             {virtualizer.getVirtualItems().map((virtualColumn) => {
               const content = chunks[virtualColumn.index][0] as Content
               return (
-                <Box
+                <Stack
                   key={virtualColumn.index}
                   sx={{
-                    display: 'flex',
                     height: `${virtualColumn.size}px`,
                     p: 0.0625,
                     position: 'absolute',
@@ -124,7 +121,7 @@ const ExplorerGallery = (props: Props) => {
                   }}
                 >
                   <ExplorerImageListItem content={content} tabId={tabId} />
-                </Box>
+                </Stack>
               )
             })}
           </Box>
@@ -132,7 +129,7 @@ const ExplorerGallery = (props: Props) => {
       </Box>
       {chunks.length === 0 && <ExplorerEmptyState message={noDataText} />}
       {loading && <ExplorerLoadingProgress />}
-    </Box>
+    </Stack>
   )
 }
 

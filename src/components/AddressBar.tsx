@@ -14,6 +14,7 @@ import {
   Divider,
   IconButton,
   InputAdornment,
+  Stack,
   Toolbar,
   Typography,
 } from '@mui/material'
@@ -256,13 +257,13 @@ const AddressBar = () => {
             flex: '1 1 0',
           }}
         />
-        <Box
+        <Stack
+          direction="row"
+          spacing={0.5}
           sx={{
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
-            display: 'flex',
             flex: '6 1 0',
-            gap: 0.5,
           }}
         >
           <IconButton
@@ -305,20 +306,20 @@ const AddressBar = () => {
             onChange={handleChangeDirectory}
             value={directoryPathInput}
           />
-        </Box>
+        </Stack>
         <Box
           sx={{
             display: { sm: 'none', md: 'block' },
             flex: '1 1 0',
           }}
         />
-        <Box
+        <Stack
+          direction="row"
+          spacing={1}
           sx={{
             WebkitAppRegion: 'no-drag',
             alignItems: 'center',
-            display: 'flex',
             flex: '3 1 0',
-            gap: 1,
           }}
         >
           <Autocomplete
@@ -350,14 +351,14 @@ const AddressBar = () => {
               />
             )}
             renderOption={(props, option) => (
-              <Box
+              <Stack
                 {...props}
                 component="li"
+                direction="row"
                 key={option}
+                spacing={1}
                 sx={(theme) => ({
-                  display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
                   px: `${theme.spacing(1.5)}!important`,
                   py: `${theme.spacing(0)}!important`,
                 })}
@@ -372,7 +373,7 @@ const AddressBar = () => {
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
-              </Box>
+              </Stack>
             )}
             size="small"
             sx={{
@@ -389,7 +390,7 @@ const AddressBar = () => {
           <IconButton onClick={handleClickMore} size="small" title="Settings">
             <MoreVertIcon fontSize="small" />
           </IconButton>
-        </Box>
+        </Stack>
       </Toolbar>
       <Divider sx={{ inset: 'auto 0 0', position: 'absolute' }} />
     </AppBar>

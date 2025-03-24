@@ -2,7 +2,7 @@ import {
   Pause as PauseIcon,
   PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material'
-import { Box, GlobalStyles } from '@mui/material'
+import { GlobalStyles, Stack } from '@mui/material'
 import {
   type KeyboardEvent,
   useCallback,
@@ -119,28 +119,25 @@ const PreviewAudio = (props: Props) => {
           },
         }}
       />
-      <Box
+      <Stack
         onContextMenu={handleContextMenu}
         sx={{
           aspectRatio: '16 / 9',
           backgroundColor: 'black',
-          display: 'flex',
-          flexDirection: 'column',
           minHeight: 128,
         }}
       >
-        <Box
+        <Stack
           onClick={handleClick}
           sx={{
             alignItems: 'center',
             cursor: 'pointer',
-            display: 'flex',
             flexGrow: 1,
             justifyContent: 'center',
           }}
         >
           <Icon fontSize="large" sx={{ color: 'white' }} />
-        </Box>
+        </Stack>
         {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
         <audio
           controls
@@ -157,7 +154,7 @@ const PreviewAudio = (props: Props) => {
             width: '100%',
           }}
         />
-      </Box>
+      </Stack>
     </>
   )
 }

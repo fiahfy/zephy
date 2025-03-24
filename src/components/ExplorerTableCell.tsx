@@ -1,4 +1,9 @@
-import { Box, TableCell, type TableCellProps, Typography } from '@mui/material'
+import {
+  Stack,
+  TableCell,
+  type TableCellProps,
+  Typography,
+} from '@mui/material'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
@@ -54,25 +59,29 @@ const ExplorerTableCell = (props: Props) => {
         : {})}
     >
       {dataKey === 'name' && (
-        <Box sx={{ display: 'flex', flexGrow: 1, gap: 0.5, maxWidth: '100%' }}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ flexGrow: 1, maxWidth: '100%' }}
+        >
           <EntryIcon entry={content} />
           {editing ? (
-            <Box
+            <Stack
+              direction="row"
               sx={{
                 alignItems: 'center',
-                display: 'flex',
                 flexGrow: 1,
                 ml: -0.5,
               }}
             >
               <ExplorerNameTextField content={content} tabId={tabId} />
-            </Box>
+            </Stack>
           ) : (
             <Typography noWrap title={content.name} variant="caption">
               {content.name}
             </Typography>
           )}
-        </Box>
+        </Stack>
       )}
       {dataKey === 'score' && <Rating path={content.path} />}
       {dataKey === 'size' && content.type !== 'directory' && (

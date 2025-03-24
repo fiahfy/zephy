@@ -1,5 +1,5 @@
 import { Close as CloseIcon } from '@mui/icons-material'
-import { Box, IconButton, Tab, Typography } from '@mui/material'
+import { IconButton, Stack, Tab, Typography } from '@mui/material'
 import { type MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDroppable from '~/hooks/useDroppable'
@@ -92,12 +92,12 @@ const TabBarItem = (props: Props) => {
       }
       iconPosition="end"
       label={
-        <Box
+        <Stack
+          direction="row"
+          spacing={0.5}
           sx={{
             alignItems: 'center',
-            display: 'flex',
             flexGrow: 1,
-            gap: 0.5,
             minWidth: 0,
           }}
         >
@@ -107,7 +107,7 @@ const TabBarItem = (props: Props) => {
           <Typography noWrap title={history.title} variant="caption">
             {history.title}
           </Typography>
-        </Box>
+        </Stack>
       }
       onContextMenu={handleContextMenu}
       sx={(theme) => ({

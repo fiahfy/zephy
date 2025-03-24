@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useRef } from 'react'
 import PreviewAudio from '~/components/PreviewAudio'
 import PreviewDirectory from '~/components/PreviewDirectory'
@@ -100,16 +100,15 @@ const PreviewPanel = () => {
           </Box>
         </>
       ) : (
-        <Box
+        <Stack
           sx={{
             alignItems: 'center',
-            display: 'flex',
             height: '100%',
             justifyContent: 'center',
           }}
         >
           <Typography variant="caption">No selected</Typography>
-        </Box>
+        </Stack>
       )}
     </Box>
   )

@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
@@ -153,10 +153,10 @@ const PreviewDirectory = (props: Props) => {
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const columns = rows[virtualRow.index] as Entry[]
               return (
-                <Box
+                <Stack
+                  direction="row"
                   key={virtualRow.index}
                   sx={{
-                    display: 'flex',
                     height: `${virtualRow.size}px`,
                     position: 'absolute',
                     transform: `translateY(${virtualRow.start}px)`,
@@ -170,7 +170,7 @@ const PreviewDirectory = (props: Props) => {
                       <PreviewDirectoryItem entry={entry} />
                     </Box>
                   ))}
-                </Box>
+                </Stack>
               )
             })}
           </Box>

@@ -49,16 +49,6 @@ const ThemeProvider = (props: Props) => {
       // },
     }
     const components = {
-      MuiTableRow: {
-        styleOverrides: {
-          root: {
-            ':focus-visible': {
-              outline: `${palette.primary.main} solid 1px`,
-              outlineOffset: '-1px',
-            },
-          },
-        },
-      },
       MuiImageListItem: {
         styleOverrides: {
           root: {
@@ -69,16 +59,19 @@ const ThemeProvider = (props: Props) => {
           },
         },
       },
-      MuiTreeItem: {
+      MuiTableRow: {
         styleOverrides: {
           root: {
             ':focus-visible': {
-              '& > .MuiTreeItem-content': {
-                outline: `${palette.primary.main} solid 1px`,
-                outlineOffset: '-1px',
-              },
+              outline: `${palette.primary.main} solid 1px`,
+              outlineOffset: '-1px',
             },
           },
+        },
+      },
+      MuiStack: {
+        defaultProps: {
+          useFlexGap: true,
         },
       },
     }

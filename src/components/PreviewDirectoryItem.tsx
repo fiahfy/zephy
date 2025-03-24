@@ -1,4 +1,9 @@
-import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
+import {
+  ImageListItem,
+  ImageListItemBar,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import useDraggable from '~/hooks/useDraggable'
@@ -71,22 +76,21 @@ const PreviewDirectoryItem = (props: Props) => {
           }}
         />
       ) : (
-        <Box
+        <Stack
           sx={{
             alignItems: 'center',
             aspectRatio: '1 / 1',
-            display: 'flex',
             justifyContent: 'center',
           }}
         >
           <Typography variant="caption">{message}</Typography>
-        </Box>
+        </Stack>
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ display: 'flex' }}>
+          <Stack>
             <EntryIcon entry={entry} />
-          </Box>
+          </Stack>
         }
         actionPosition="left"
         sx={{
@@ -98,11 +102,7 @@ const PreviewDirectoryItem = (props: Props) => {
           },
         }}
         title={
-          <Box
-            sx={{
-              display: 'flex',
-            }}
-          >
+          <Stack>
             <Typography
               sx={{
                 overflow: 'hidden',
@@ -114,7 +114,7 @@ const PreviewDirectoryItem = (props: Props) => {
             >
               {entry.name}
             </Typography>
-          </Box>
+          </Stack>
         }
       />
     </ImageListItem>

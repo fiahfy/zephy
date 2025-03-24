@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useReducer } from 'react'
 import type { Entry } from '~/interfaces'
 
@@ -87,16 +87,15 @@ const PreviewText = (props: Props) => {
           {text}
         </Typography>
       ) : (
-        <Box
+        <Stack
           sx={{
             alignItems: 'center',
-            display: 'flex',
             height: '100%',
             justifyContent: 'center',
           }}
         >
           <Typography variant="caption">{message}</Typography>
-        </Box>
+        </Stack>
       )}
     </>
   )

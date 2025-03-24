@@ -1,4 +1,4 @@
-import { Box, Table } from '@mui/material'
+import { Box, Stack, Table } from '@mui/material'
 import { useMemo, useRef } from 'react'
 import ExplorerEmptyState from '~/components/ExplorerEmptyState'
 import ExplorerLoadingProgress from '~/components/ExplorerLoadingProgress'
@@ -160,19 +160,17 @@ const ExplorerTable = (props: Props) => {
   )
 
   return (
-    <Box
+    <Stack
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
         height: '100%',
         position: 'relative',
       }}
     >
       {chunks.length > 0 && (
-        <Box
+        <Stack
+          direction="row"
           onContextMenu={handleContextMenu}
           sx={{
-            display: 'flex',
             flexShrink: 0,
             overflowX: 'hidden',
             pr: '10px',
@@ -188,7 +186,7 @@ const ExplorerTable = (props: Props) => {
               width={column.width}
             />
           ))}
-        </Box>
+        </Stack>
       )}
       <Box
         className="explorer-list"
@@ -245,7 +243,7 @@ const ExplorerTable = (props: Props) => {
       </Box>
       {chunks.length === 0 && <ExplorerEmptyState message={noDataText} />}
       {loading && <ExplorerLoadingProgress />}
-    </Box>
+    </Stack>
   )
 }
 

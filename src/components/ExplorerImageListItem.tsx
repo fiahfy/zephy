@@ -1,4 +1,10 @@
-import { Box, ImageListItem, ImageListItemBar, Typography } from '@mui/material'
+import {
+  Box,
+  ImageListItem,
+  ImageListItemBar,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
@@ -90,29 +96,28 @@ const ExplorerImageListItem = (props: Props) => {
       {status === 'loaded' && thumbnail ? (
         <img alt="" src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
-        <Box
+        <Stack
           sx={{
             alignItems: 'center',
-            display: 'flex',
             height: '100%',
             justifyContent: 'center',
           }}
         >
           <Typography variant="caption">{message}</Typography>
-        </Box>
+        </Stack>
       )}
       <ImageListItemBar
         actionIcon={
-          <Box sx={{ display: 'flex', mt: -2.75 }}>
+          <Stack sx={{ mt: -2.75 }}>
             <EntryIcon entry={content} />
-          </Box>
+          </Stack>
         }
         actionPosition="left"
         subtitle={
-          <Box
+          <Stack
+            direction="row"
             sx={{
               alignItems: 'end',
-              display: 'flex',
               justifyContent: 'space-between',
             }}
           >
@@ -124,7 +129,7 @@ const ExplorerImageListItem = (props: Props) => {
                 {pluralize('item', itemCount, true)}
               </Typography>
             )}
-          </Box>
+          </Stack>
         }
         sx={{
           gap: 0.5,
@@ -135,24 +140,24 @@ const ExplorerImageListItem = (props: Props) => {
           },
         }}
         title={
-          <Box
+          <Stack
+            direction="row"
             sx={{
               alignItems: 'center',
-              display: 'flex',
               height: (theme) => theme.spacing(5),
             }}
           >
             {editing ? (
-              <Box
+              <Stack
                 sx={{
                   alignItems: 'center',
-                  display: 'flex',
                   flexGrow: 1,
                   ml: -0.5,
                 }}
               >
+                {/* TODO: fix outline */}
                 <ExplorerNameTextField content={content} tabId={tabId} />
-              </Box>
+              </Stack>
             ) : (
               <Typography
                 sx={{
@@ -171,7 +176,7 @@ const ExplorerImageListItem = (props: Props) => {
                 {content.name}
               </Typography>
             )}
-          </Box>
+          </Stack>
         }
       />
     </ImageListItem>
