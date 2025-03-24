@@ -89,7 +89,6 @@ const PreviewDirectory = (props: Props) => {
     }
     const handleResize = throttle((entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
-      console.log(entry)
       if (entry) {
         setWrapperWidth(entry.contentRect.width)
       }

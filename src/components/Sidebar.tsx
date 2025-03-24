@@ -137,7 +137,7 @@ const Sidebar = (props: Props) => {
           flexGrow: 1,
           overflow: 'auto',
           [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
-            theme.spacing(0.625),
+            theme.spacing(0.5),
         }}
       >
         {children}

@@ -55,6 +55,20 @@ const ExplorerGallery = (props: Props) => {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      el.scrollLeft += e.deltaX
+      el.scrollLeft += e.deltaY
+    }
+    el.addEventListener('wheel', handleWheel)
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [])
+
   return (
     <Box
       sx={{
