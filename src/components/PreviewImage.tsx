@@ -49,6 +49,7 @@ const PreviewImage = (props: Props) => {
       {status === 'loaded' ? (
         <img
           alt=""
+          draggable={false}
           src={entry.url}
           style={{
             flexShrink: 0,
