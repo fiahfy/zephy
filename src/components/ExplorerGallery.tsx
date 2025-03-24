@@ -19,12 +19,18 @@ const ExplorerGallery = (props: Props) => {
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
-  // TODO: 2.2, 3.2, 4.2
-  const columns = useMemo(
-    () => Math.ceil(wrapperWidth / maxItemSize) || 1,
-    [wrapperWidth],
-  )
-  const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
+  const size = useMemo(() => {
+    const maxCount = Math.floor(wrapperWidth / maxItemSize)
+    let n = Math.max(1, maxCount)
+
+    while (true) {
+      const candidateSize = wrapperWidth / (n + 0.3)
+      if (candidateSize <= maxItemSize) {
+        return candidateSize
+      }
+      n++
+    }
+  }, [wrapperWidth])
 
   const ref = useRef<HTMLDivElement>(null)
 
