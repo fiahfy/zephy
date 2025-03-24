@@ -313,6 +313,7 @@ const AddressBar = () => {
             flex: '1 1 0',
           }}
         />
+        {/* TODO: add view mode toggle buttons */}
         <Stack
           direction="row"
           spacing={1}
