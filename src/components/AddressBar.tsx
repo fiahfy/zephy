@@ -378,14 +378,12 @@ const AddressBar = () => {
             )}
             size="small"
             sx={{
-              '.MuiFormControl-root': {
-                '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
-                  {
-                    px: 1.5,
-                    py: 0,
-                    '.MuiFilledInput-input': { px: 0, py: 0.5 },
-                  },
-              },
+              '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
+                {
+                  px: 1.5,
+                  py: 0,
+                  '.MuiFilledInput-input': { px: 0, py: 0.5 },
+                },
             }}
           />
           <IconButton onClick={handleClickMore} size="small" title="Settings">

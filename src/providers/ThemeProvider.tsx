@@ -49,26 +49,6 @@ const ThemeProvider = (props: Props) => {
       // },
     }
     const components = {
-      MuiImageListItem: {
-        styleOverrides: {
-          root: {
-            ':focus-visible': {
-              outline: `${palette.primary.main} solid 1px`,
-              outlineOffset: '-1px',
-            },
-          },
-        },
-      },
-      MuiTableRow: {
-        styleOverrides: {
-          root: {
-            ':focus-visible': {
-              outline: `${palette.primary.main} solid 1px`,
-              outlineOffset: '-1px',
-            },
-          },
-        },
-      },
       MuiStack: {
         defaultProps: {
           useFlexGap: true,
