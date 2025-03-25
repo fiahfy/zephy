@@ -159,7 +159,6 @@ const ExplorerImageListItem = (props: Props) => {
                   ml: -0.5,
                 }}
               >
-                {/* TODO: fix outline */}
                 <ExplorerNameTextField content={content} tabId={tabId} />
               </Stack>
             ) : (

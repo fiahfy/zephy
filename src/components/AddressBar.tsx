@@ -29,6 +29,7 @@ import {
   useState,
 } from 'react'
 import AddressTextField from '~/components/AddressTextField'
+import ViewModeToggleButtonGroup from '~/components/ViewModeToggleButtonGroup'
 import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
@@ -310,10 +311,26 @@ const AddressBar = () => {
         <Box
           sx={{
             display: { sm: 'none', md: 'block' },
-            flex: '1 1 0',
+            flex: '0.5 1 0',
           }}
         />
-        {/* TODO: add view mode toggle buttons */}
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            WebkitAppRegion: 'no-drag',
+            alignItems: 'center',
+            flex: '0.5 1 0',
+          }}
+        >
+          <ViewModeToggleButtonGroup />
+        </Stack>
+        <Box
+          sx={{
+            display: { sm: 'none', md: 'block' },
+            flex: '0.5 1 0',
+          }}
+        />
         <Stack
           direction="row"
           spacing={1}
