@@ -6,6 +6,8 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
+import PreviewParametersTableCell from '~/components/PreviewParametersTableCell'
+import PreviewParametersTableHeaderCell from '~/components/PreviewParametersTableHeaderCell'
 import type { Entry } from '~/interfaces'
 
 const parseParameters = (parameters: string) => {
@@ -126,128 +128,27 @@ const PreviewParametersTable = (props: Props) => {
           {parsed.prompt && (
             <TableBody>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  component="th"
-                  sx={{
-                    borderBottom: 0,
-                    height: 20,
-                    px: 1,
-                    py: 0,
-                  }}
-                >
-                  <Typography
-                    noWrap
-                    sx={{
-                      color: (theme) => theme.palette.text.secondary,
-                      display: 'block',
-                      fontWeight: 'bold',
-                    }}
-                    variant="caption"
-                  >
-                    Prompt
-                  </Typography>
-                </TableCell>
+                <PreviewParametersTableHeaderCell label="Prompt" />
               </TableRow>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  sx={{
-                    borderBottom: 0,
-                    height: 20,
-                    px: 1,
-                    py: 0,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      display: 'block',
-                      userSelect: 'text',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                    variant="caption"
-                  >
-                    {parsed.prompt}
-                  </Typography>
-                </TableCell>
+                <PreviewParametersTableCell label={parsed.prompt} />
               </TableRow>
             </TableBody>
           )}
           {parsed.negativePrompt && (
             <TableBody>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  component="th"
-                  sx={{
-                    borderBottom: 0,
-                    height: 20,
-                    px: 1,
-                    py: 0,
-                  }}
-                >
-                  <Typography
-                    noWrap
-                    sx={{
-                      color: (theme) => theme.palette.text.secondary,
-                      display: 'block',
-                      fontWeight: 'bold',
-                    }}
-                    variant="caption"
-                  >
-                    Negative Prompt
-                  </Typography>
-                </TableCell>
+                <PreviewParametersTableHeaderCell label="Negative Prompt" />
               </TableRow>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  sx={{
-                    borderBottom: 0,
-                    height: 20,
-                    px: 1,
-                    py: 0,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      display: 'block',
-                      userSelect: 'text',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                    variant="caption"
-                  >
-                    {parsed.negativePrompt}
-                  </Typography>
-                </TableCell>
+                <PreviewParametersTableCell label={parsed.negativePrompt} />
               </TableRow>
             </TableBody>
           )}
           {parsed.params.length > 0 && (
             <TableBody>
               <TableRow>
-                <TableCell
-                  colSpan={2}
-                  component="th"
-                  sx={{
-                    borderBottom: 0,
-                    height: 20,
-                    px: 1,
-                    py: 0,
-                  }}
-                >
-                  <Typography
-                    noWrap
-                    sx={{
-                      color: (theme) => theme.palette.text.secondary,
-                      display: 'block',
-                      fontWeight: 'bold',
-                    }}
-                    variant="caption"
-                  >
-                    Params
-                  </Typography>
-                </TableCell>
+                <PreviewParametersTableHeaderCell label="Params" />
               </TableRow>
               {parsed.params.map((param) => (
                 <TableRow key={param.label}>

@@ -30,7 +30,14 @@ const TabPanels = () => {
   )
 
   return (
-    <Box sx={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        position: 'relative',
+      }}
+    >
       {tabs.map((tab) => (
         <Box
           key={tab.id}
