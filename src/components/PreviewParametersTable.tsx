@@ -279,7 +279,11 @@ const PreviewParametersTable = (props: Props) => {
                     }}
                   >
                     <Typography
-                      sx={{ display: 'block', userSelect: 'text' }}
+                      sx={{
+                        display: 'block',
+                        userSelect: 'text',
+                        wordBreak: 'break-word',
+                      }}
                       variant="caption"
                     >
                       {param.value}

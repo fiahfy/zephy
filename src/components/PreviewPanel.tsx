@@ -49,6 +49,7 @@ const PreviewPanel = () => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        overflowX: 'hidden',
         overflowY: 'auto',
       }}
     >
@@ -89,6 +90,7 @@ const PreviewPanel = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: 1,
+              overflowX: 'hidden',
               overflowY: type === 'image' ? 'auto' : undefined,
               position: 'sticky',
               py: 1,
