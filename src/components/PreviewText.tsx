@@ -1,5 +1,6 @@
-import { Stack, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useReducer } from 'react'
+import PreviewEmptyState from '~/components/PreviewEmptyState'
 import type { Entry } from '~/interfaces'
 
 type State = {
@@ -69,33 +70,27 @@ const PreviewText = (props: Props) => {
   return (
     <>
       {status === 'loaded' ? (
-        <Typography
-          component="pre"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            p: 1,
-            userSelect: 'text',
-            whiteSpace: 'pre-wrap',
-            width: '100%',
-            wordBreak: 'break-word',
-          }}
-          variant="caption"
-        >
-          {text}
-        </Typography>
+        <Box sx={{ height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
+          <Typography
+            component="pre"
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              p: 1,
+              userSelect: 'text',
+              whiteSpace: 'pre-wrap',
+              width: '100%',
+              wordBreak: 'break-word',
+            }}
+            variant="caption"
+          >
+            {text}
+          </Typography>
+        </Box>
       ) : (
-        <Stack
-          sx={{
-            alignItems: 'center',
-            height: '100%',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="caption">{message}</Typography>
-        </Stack>
+        <PreviewEmptyState message={message} />
       )}
     </>
   )

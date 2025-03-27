@@ -139,6 +139,7 @@ const PreviewDirectory = (props: Props) => {
       <Box
         ref={ref}
         sx={{
+          height: '100%',
           overflowX: 'hidden',
           overflowY: 'scroll',
         }}

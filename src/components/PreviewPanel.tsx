@@ -30,17 +30,41 @@ const PreviewPanel = () => {
     }
   }, [contents])
 
-  const content = useMemo(() => contents[0], [contents])
-
-  const type = useMemo(
-    () =>
-      content
-        ? content.type === 'directory'
-          ? 'directory'
-          : detectFileType(content.path)
-        : 'none',
-    [content],
+  const content = useMemo(
+    () => contents.length === 1 && contents[0],
+    [contents],
   )
+
+  const preview = useMemo(() => {
+    if (!content) {
+      return undefined
+    }
+    const type =
+      content.type === 'directory' ? 'directory' : detectFileType(content.path)
+    return { type, content }
+  }, [content])
+
+  const needsExpand = useMemo(
+    () => preview && ['text', 'directory'].includes(preview.type),
+    [preview],
+  )
+
+  const previewItem = useMemo(() => {
+    switch (preview?.type) {
+      case 'audio':
+        return <PreviewAudio entry={preview.content} />
+      case 'directory':
+        return <PreviewDirectory entry={preview.content} />
+      case 'image':
+        return <PreviewImage entry={preview.content} />
+      case 'text':
+        return <PreviewText entry={preview.content} />
+      case 'video':
+        return <PreviewVideo entry={preview.content} />
+      default:
+        return <PreviewEmptyState message="No preview" />
+    }
+  }, [preview])
 
   return (
     <Box
@@ -68,20 +92,14 @@ const PreviewPanel = () => {
       </Typography>
       {contents.length > 0 ? (
         <>
-          {contents.length === 1 && content ? (
-            <>
-              {type === 'audio' && <PreviewAudio entry={content} />}
-              {type === 'directory' && <PreviewDirectory entry={content} />}
-              {type === 'image' && <PreviewImage entry={content} />}
-              {type === 'text' && <PreviewText entry={content} />}
-              {type === 'video' && <PreviewVideo entry={content} />}
-              {!['audio', 'directory', 'image', 'text', 'video'].includes(
-                type,
-              ) && <PreviewEmptyState message="No preview" />}
-            </>
-          ) : (
-            <PreviewEmptyState message="No preview" />
-          )}
+          <Stack
+            sx={{
+              flexShrink: needsExpand ? undefined : 0,
+              minHeight: needsExpand ? 0 : undefined,
+            }}
+          >
+            {previewItem}
+          </Stack>
           <Box
             ref={footerRef}
             sx={{
@@ -89,16 +107,20 @@ const PreviewPanel = () => {
               bottom: 0,
               display: 'flex',
               flexDirection: 'column',
+              flexShrink: needsExpand ? 0 : undefined,
               gap: 1,
+              minHeight: 115,
               overflowX: 'hidden',
-              overflowY: type === 'image' ? 'auto' : undefined,
+              overflowY: needsExpand ? undefined : 'auto',
               position: 'sticky',
               py: 1,
               zIndex: 1,
             }}
           >
             <PreviewInformationTable entries={contents} />
-            {type === 'image' && <PreviewParametersTable entry={content} />}
+            {preview?.type === 'image' && (
+              <PreviewParametersTable entry={preview.content} />
+            )}
           </Box>
         </>
       ) : (
