@@ -109,7 +109,7 @@ const PreviewPanel = () => {
               flexDirection: 'column',
               flexShrink: needsExpand ? 0 : undefined,
               gap: 1,
-              minHeight: 115,
+              minHeight: needsExpand ? undefined : 100,
               overflowX: 'hidden',
               overflowY: needsExpand ? undefined : 'auto',
               position: 'sticky',
