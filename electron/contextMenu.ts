@@ -205,12 +205,18 @@ const registerContextMenu = (
       enabled: !!path && canReadPaths(),
       label: 'Paste',
     }),
-    search: (event, params) =>
-      params.selectionText.trim().length > 0 && {
+    search: (event, params) => {
+      const text = params.selectionText.trim()
+      if (text.length === 0) {
+        return undefined
+      }
+      const truncated = text.length <= 50 ? text : `${text.slice(0, 49)}...`
+      return {
         accelerator: 'CommandOrControl+F',
         click: () => send(event, { type: 'search' }),
-        label: `Search for “${params.selectionText.trim()}”`,
-      },
+        label: `Search for “${truncated}”`,
+      }
+    },
   }
 
   const defaultActionTypes = [
