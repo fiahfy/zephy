@@ -24,16 +24,34 @@ const ViewModeToggleButtonGroup = () => {
       exclusive
       onChange={handleChange}
       size="small"
-      sx={{ '.MuiToggleButton-root': { p: 0.5 } }}
+      sx={(theme) => ({
+        gap: theme.spacing(0.5),
+        '.MuiToggleButton-root': {
+          border: 0,
+          borderRadius: theme.spacing(0.5),
+          m: 0,
+          p: 0.5,
+        },
+      })}
       value={viewMode}
     >
-      <ToggleButton key="list" title="List" value="list">
+      <ToggleButton color="primary" key="list" title="List" value="list">
         <ViewListIcon fontSize="small" />
       </ToggleButton>
-      <ToggleButton key="thumbnail" title="Thumbnail" value="thumbnail">
+      <ToggleButton
+        color="primary"
+        key="thumbnail"
+        title="Thumbnail"
+        value="thumbnail"
+      >
         <ViewModuleIcon fontSize="small" />
       </ToggleButton>
-      <ToggleButton key="gallery" title="Gallery" value="gallery">
+      <ToggleButton
+        color="primary"
+        key="gallery"
+        title="Gallery"
+        value="gallery"
+      >
         <ViewCarouselIcon fontSize="small" />
       </ToggleButton>
     </ToggleButtonGroup>
