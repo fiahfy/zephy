@@ -82,7 +82,7 @@ const ExplorerGallery = (props: Props) => {
         position: 'relative',
       }}
     >
-      <ExplorerGalleryMain tabId={tabId} />
+      {chunks.length > 0 && <ExplorerGalleryMain tabId={tabId} />}
       <Box
         className="explorer-list"
         onClick={onClick}
