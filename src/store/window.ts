@@ -846,8 +846,8 @@ export const search =
       (acc, content) => acc.filter((path) => path !== content.path),
       selected,
     )
-    dispatch(unfocus({ tabId, paths }))
     dispatch(removeSelection({ tabId, paths }))
+    dispatch(unfocus({ tabId, paths }))
   }
 
 export const sort =

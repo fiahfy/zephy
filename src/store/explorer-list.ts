@@ -560,18 +560,20 @@ export const load =
     if (!directoryPath) {
       return
     }
-    const url = parseZephyUrl(directoryPath)
+
     dispatch(loading({ tabId }))
     try {
-      let entries: Entry[] = []
-      if (url) {
+      const entries: Entry[] = await (async () => {
+        const url = parseZephyUrl(directoryPath)
+        if (!url) {
+          return await window.electronAPI.getEntries(directoryPath)
+        }
         if (url.pathname === 'ratings') {
           const paths = scoreToPathsMap[Number(url.params.score ?? 0)] ?? []
-          entries = await window.electronAPI.getEntriesForPaths(paths)
+          return await window.electronAPI.getEntriesForPaths(paths)
         }
-      } else {
-        entries = await window.electronAPI.getEntries(directoryPath)
-      }
+        return []
+      })()
       dispatch(loaded({ tabId, entries }))
     } catch (e) {
       dispatch(loadFailed({ tabId }))
@@ -653,6 +655,7 @@ export const unselectAll =
   (tabId: number): AppThunk =>
   async (dispatch) => {
     const { unselectAll } = explorerListSlice.actions
+
     dispatch(unselectAll({ tabId }))
   }
 
@@ -687,6 +690,7 @@ export const rename =
 export const refreshInCurrentTab =
   (): AppThunk => async (dispatch, getState) => {
     const tabId = selectCurrentTabId(getState())
+
     dispatch(load(tabId))
   }
 
@@ -708,6 +712,7 @@ export const newFolderInCurrentTab =
       explorerListSlice.actions
 
     const tabId = selectCurrentTabId(getState())
+
     const entry = await window.electronAPI.createDirectory(directoryPath)
     dispatch(addEntries({ tabId, entries: [entry] }))
     dispatch(select({ tabId, path: entry.path }))
@@ -717,11 +722,13 @@ export const newFolderInCurrentTab =
 
 export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
+
   await window.electronAPI.copyEntries(selected)
 }
 
 export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
   const directoryPath = selectCurrentDirectoryPath(getState())
+
   const zephyUrl = parseZephyUrl(directoryPath)
   if (zephyUrl) {
     return
@@ -741,6 +748,7 @@ export const startRenamingInCurrentTab =
     if (!targetPath) {
       return
     }
+
     dispatch(select({ tabId, path: targetPath }))
     dispatch(focus({ tabId, path: targetPath }))
     dispatch(startEditing({ tabId, path: targetPath }))
@@ -750,14 +758,42 @@ export const startRenamingInCurrentTab =
 export const moveToTrashInCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
+    const { blur, focus, select, unselectAll } = explorerListSlice.actions
+
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
+    const contents = selectContentsByTabId(getState(), tabId)
     const targetPaths = paths ?? selected
-    await window.electronAPI.moveEntriesToTrash(targetPaths)
-    for (const path of targetPaths) {
-      dispatch(removeFromFavorites(path))
-      dispatch(removeRating({ path }))
+    if (targetPaths.length === 0) {
+      return
     }
+
+    if (targetPaths.some((targetPath) => selected.includes(targetPath))) {
+      const path = (() => {
+        const lastIndex = Math.max(
+          ...contents.flatMap((content, i) =>
+            targetPaths.includes(content.path) ? [i] : [],
+          ),
+        )
+        if (lastIndex !== contents.length - 1) {
+          return contents[lastIndex + 1]?.path
+        }
+        const filtered = contents.filter(
+          (content) => !targetPaths.includes(content.path),
+        )
+        return filtered[filtered.length - 1]?.path
+      })()
+
+      if (path) {
+        dispatch(select({ tabId, path }))
+        dispatch(focus({ tabId, path }))
+      } else {
+        dispatch(unselectAll({ tabId }))
+        dispatch(blur({ tabId }))
+      }
+    }
+
+    await window.electronAPI.moveEntriesToTrash(targetPaths)
   }
 
 // TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
@@ -769,6 +805,7 @@ export const openInCurrentTab =
     if (!targetPath) {
       return
     }
+
     const entry = await window.electronAPI.getEntry(targetPath)
     const action =
       entry.type === 'directory'
@@ -804,7 +841,8 @@ export const handle =
     filePath: string,
   ): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, removeEntries } = explorerListSlice.actions
+    const { addEntries, removeEntries, removeSelection, unfocus } =
+      explorerListSlice.actions
 
     const tabs = selectTabs(getState())
     for (const { id: tabId } of tabs) {
@@ -812,6 +850,7 @@ export const handle =
       if (directoryPath !== currentDirectoryPath) {
         continue
       }
+
       switch (eventType) {
         case 'create':
         case 'update': {
@@ -823,6 +862,8 @@ export const handle =
           dispatch(removeEntries({ tabId, paths: [filePath] }))
           dispatch(removeFromFavorites(filePath))
           dispatch(removeRating({ path: filePath }))
+          dispatch(removeSelection({ tabId, paths: [filePath] }))
+          dispatch(unfocus({ tabId, paths: [filePath] }))
           break
       }
     }
