@@ -54,7 +54,8 @@ const defaultExplorerState = {
 }
 
 const getErrorMessage = (e: Error): string => {
-  const message = e.message.split(':')[2]
+  console.error(e)
+  const message = e.message.split(':').slice(2).join(':')
   return message ? message : e.message
 }
 
