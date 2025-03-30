@@ -20,7 +20,7 @@ import {
   selectAllInCurrentTab,
   startRenamingInCurrentTab,
 } from '~/store/explorer-list'
-import { setPath } from '~/store/explorer-tree'
+import { load } from '~/store/explorer-tree'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
   back,
@@ -115,7 +115,7 @@ const App = () => {
         case 'rename':
           return dispatch(startRenamingInCurrentTab(data?.path))
         case 'revealInExplorer':
-          return dispatch(setPath({ path: data.path }))
+          return dispatch(load(data.path))
         case 'paste':
           if (isFocused()) {
             return dispatch(pasteInCurrentTab())

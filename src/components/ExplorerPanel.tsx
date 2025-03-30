@@ -1,11 +1,9 @@
-import { RichTreeView, type TreeViewBaseItem } from '@mui/x-tree-view'
 import {
-  type SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
+  RichTreeView,
+  type TreeViewBaseItem,
+  useTreeViewApiRef,
+} from '@mui/x-tree-view'
+import { type SyntheticEvent, useCallback, useEffect, useMemo } from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
@@ -14,11 +12,10 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import {
   load,
   selectExpandedItems,
-  selectPath,
+  selectLoadedDirectoryPaths,
   selectRoot,
   selectSelectedItems,
   setExpandedItems,
-  setPath,
   setRoot,
   setSelectedItems,
 } from '~/store/explorer-tree'
@@ -26,20 +23,10 @@ import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { selectCurrentDirectoryPath } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
 
-const getLoadedDirectories = (entry: Entry) => {
-  const reducer = (acc: string[], entry: Entry): string[] => {
-    if (entry.type === 'directory' && entry.children) {
-      return [entry.path, ...entry.children.reduce(reducer, acc)]
-    }
-    return acc
-  }
-  return [entry].reduce(reducer, [])
-}
-
 const ExplorerPanel = () => {
+  const loadedDirectoryPath = useAppSelector(selectLoadedDirectoryPaths)
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const expandedItems = useAppSelector(selectExpandedItems)
-  const path = useAppSelector(selectPath)
   const root = useAppSelector(selectRoot)
   const selectedItems = useAppSelector(selectSelectedItems)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
@@ -47,38 +34,29 @@ const ExplorerPanel = () => {
 
   const { watch } = useWatcher()
 
-  const ref = useRef<HTMLUListElement>(null)
-
-  const loadedDirectoryPaths = useMemo(
-    () => (root ? getLoadedDirectories(root) : []),
-    [root],
-  )
+  const apiRef = useTreeViewApiRef()
 
   useEffect(() => {
-    dispatch(load(path))
+    dispatch(load(undefined))
+  }, [dispatch])
 
-    // TODO: focus element if the path is already loaded
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    if (!path) {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    if (!selectedItems) {
       return
     }
     setTimeout(() => {
-      const item = el.querySelector(`[id$="${CSS.escape(path)}"]`)
-      if (!item) {
-        return
-      }
-      item.scrollIntoView()
-    }, 600) // transition 300ms + 300ms
-  }, [dispatch, path])
+      apiRef.current
+        ?.getItemDOMElement(selectedItems)
+        ?.scrollIntoView({ block: 'nearest' })
+    }, 300) // transition 300ms + 300ms
+  }, [root, selectedItems])
 
   useEffect(
     () =>
       watch(
         'explorer-tree',
-        loadedDirectoryPaths,
+        loadedDirectoryPath,
         async (eventType, directoryPath, filePath) => {
           const entry =
             eventType === 'delete'
@@ -113,7 +91,7 @@ const ExplorerPanel = () => {
           dispatch(setRoot({ root: root ? mapper(root) : root }))
         },
       ),
-    [dispatch, loadedDirectoryPaths, root, watch],
+    [dispatch, loadedDirectoryPath, root, watch],
   )
 
   const entryMap = useMemo(() => {
@@ -136,7 +114,7 @@ const ExplorerPanel = () => {
   }, [root])
 
   const handleClickRefresh = useCallback(
-    () => dispatch(setPath({ path: directoryPath })),
+    () => dispatch(load(directoryPath)),
     [directoryPath, dispatch],
   )
 
@@ -223,12 +201,12 @@ const ExplorerPanel = () => {
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">
       <RichTreeView
+        apiRef={apiRef}
         expandedItems={expandedItems}
         expansionTrigger="iconContainer"
         items={items}
         onExpandedItemsChange={handleExpandedItemsChange}
         onSelectedItemsChange={handleSelectedItemsChange}
-        ref={ref}
         selectedItems={selectedItems ?? null}
         slots={{ item: ExplorerTreeItem }}
       />

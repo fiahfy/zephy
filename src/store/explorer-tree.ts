@@ -9,26 +9,40 @@ import { isZephySchema } from '~/utils/url'
 
 type State = {
   expandedItems: string[]
-  path: string | undefined
   root: Entry | undefined
   selectedItems: string | undefined
 }
 
 const initialState: State = {
   expandedItems: [],
-  path: undefined,
   root: undefined,
   selectedItems: undefined,
 }
 
-const getLoadedDirectories = (entry: Entry) => {
+const getDirectoryPaths = (entry: Entry, includesLeaf: boolean) => {
   const reducer = (acc: string[], entry: Entry): string[] => {
-    if (entry.type === 'directory' && entry.children) {
-      return [entry.path, ...entry.children.reduce(reducer, acc)]
+    if (entry.type === 'directory' && (includesLeaf || entry.children)) {
+      return [entry.path, ...(entry.children || []).reduce(reducer, acc)]
     }
     return acc
   }
   return [entry].reduce(reducer, [])
+}
+
+const getAncestorPaths = (entry: Entry, directoryPath: string) => {
+  const mapper = (entry: Entry): string[] => {
+    if (entry.path === directoryPath) {
+      return [entry.path]
+    }
+
+    if (entry.type === 'directory' && entry.children) {
+      const items = entry.children.flatMap(mapper)
+      return items.length > 0 ? [...items, entry.path] : []
+    }
+
+    return []
+  }
+  return [entry].flatMap(mapper).slice(1)
 }
 
 export const explorerTreeSlice = createSlice({
@@ -49,10 +63,6 @@ export const explorerTreeSlice = createSlice({
       const { expandedItems } = action.payload
       return { ...state, expandedItems }
     },
-    setPath(state, action: PayloadAction<{ path: string | undefined }>) {
-      const { path } = action.payload
-      return { ...state, path }
-    },
     setRoot(state, action: PayloadAction<{ root: Entry | undefined }>) {
       const { root } = action.payload
       return { ...state, root }
@@ -60,17 +70,12 @@ export const explorerTreeSlice = createSlice({
   },
 })
 
-export const { setExpandedItems, setPath, setRoot, setSelectedItems } =
+export const { setExpandedItems, setRoot, setSelectedItems } =
   explorerTreeSlice.actions
 
 export default explorerTreeSlice.reducer
 
 export const selectExplorerTree = (state: AppState) => state.explorerTree
-
-export const selectPath = createSelector(
-  selectExplorerTree,
-  (explorerTree) => explorerTree.path,
-)
 
 export const selectRoot = createSelector(
   selectExplorerTree,
@@ -87,17 +92,36 @@ export const selectExpandedItems = createSelector(
   (explorerTree) => explorerTree.expandedItems,
 )
 
+export const selectLoadedDirectoryPaths = createSelector(selectRoot, (root) => {
+  if (!root) {
+    return []
+  }
+  return getDirectoryPaths(root, true)
+})
+
 export const load =
   (directoryPath: string | undefined): AppThunk =>
-  async (dispatch) => {
+  async (dispatch, getState) => {
     const { setExpandedItems, setRoot, setSelectedItems } =
       explorerTreeSlice.actions
 
-    const path =
+    const root = selectRoot(getState())
+    const directories = root ? getDirectoryPaths(root, true) : []
+
+    const targetPath =
       directoryPath && isZephySchema(directoryPath) ? undefined : directoryPath
-    const entry = await window.electronAPI.getRootEntry(path)
-    const expandedItems = getLoadedDirectories(entry)
-    dispatch(setExpandedItems({ expandedItems }))
-    dispatch(setSelectedItems({ selectedItems: directoryPath }))
-    dispatch(setRoot({ root: entry }))
+    if (root && targetPath && directories.includes(targetPath)) {
+      const expandedItems = selectExpandedItems(getState())
+      const newExpandedItems = [
+        ...new Set([...expandedItems, ...getAncestorPaths(root, targetPath)]),
+      ]
+      dispatch(setExpandedItems({ expandedItems: newExpandedItems }))
+      dispatch(setSelectedItems({ selectedItems: targetPath }))
+    } else {
+      const root = await window.electronAPI.getRootEntry(targetPath)
+      const expandedItems = getDirectoryPaths(root, false)
+      dispatch(setExpandedItems({ expandedItems }))
+      dispatch(setSelectedItems({ selectedItems: targetPath }))
+      dispatch(setRoot({ root }))
+    }
   }
