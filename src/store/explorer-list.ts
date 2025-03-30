@@ -519,7 +519,7 @@ export const selectContentsByTabId = createSelector(
         ...entry,
         score: selectScoreByPath(rating, entry.path),
       }))
-      .sort((a, b) => comparator(a, b))
+      .toSorted((a, b) => comparator(a, b))
   },
 )
 

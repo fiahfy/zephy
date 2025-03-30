@@ -179,7 +179,7 @@ const ExplorerPanel = () => {
                     (entry) =>
                       shouldShowHiddenFiles || !isHiddenFile(entry.name),
                   )
-                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .toSorted((a, b) => a.name.localeCompare(b.name))
                   // limit entry size for performance issue
                   .slice(0, 100)
                   .map(mapper)

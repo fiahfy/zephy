@@ -105,7 +105,7 @@ const defaultWindowState: WindowState = {
 const findMissingTabId = (tabs: TabState[]) =>
   tabs
     .map((tab) => tab.id)
-    .sort((a, b) => a - b)
+    .toSorted((a, b) => a - b)
     .reduce((acc, i) => (i === acc ? acc + 1 : acc), 1)
 
 export const windowSlice = createSlice({
@@ -667,7 +667,7 @@ export const selectCanForward = createSelector(
 )
 
 export const selectBackHistories = createSelector(selectCurrentTab, (tab) =>
-  tab.history.histories.slice(0, tab.history.index).reverse(),
+  tab.history.histories.slice(0, tab.history.index).toReversed(),
 )
 
 export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>

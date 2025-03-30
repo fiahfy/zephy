@@ -49,7 +49,7 @@ const useEntryThumbnail = (entry: Entry) => {
         const entries = await window.electronAPI.getEntries(path)
         return entries
           .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
-          .sort((a, b) => a.name.localeCompare(b.name))
+          .toSorted((a, b) => a.name.localeCompare(b.name))
           .map((entry) => entry.path)
       } catch (e) {
         return []

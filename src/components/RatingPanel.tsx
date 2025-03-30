@@ -23,7 +23,7 @@ const RatingPanel = () => {
     )
     items = items
       .filter((item) => item.count > 0)
-      .sort((a, b) => b.score - a.score)
+      .toSorted((a, b) => b.score - a.score)
     setItems(items)
   }, [scoreToPathsMap])
 
