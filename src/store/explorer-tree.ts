@@ -118,6 +118,7 @@ export const load =
       dispatch(setExpandedItems({ expandedItems: newExpandedItems }))
       dispatch(setSelectedItems({ selectedItems: targetPath }))
     } else {
+      // TODO: show loading
       const root = await window.electronAPI.getRootEntry(targetPath)
       const expandedItems = getDirectoryPaths(root, false)
       dispatch(setExpandedItems({ expandedItems }))
