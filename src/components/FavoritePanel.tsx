@@ -12,7 +12,7 @@ const FavoritePanel = () => {
   )
 
   const items = useMemo(
-    () => [...favorites].sort((a, b) => a.name.localeCompare(b.name)),
+    () => favorites.toSorted((a, b) => a.name.localeCompare(b.name)),
     [favorites],
   )
 
