@@ -90,7 +90,7 @@ const App = () => {
           return window.electronAPI.copy()
         case 'cut':
           if (isFocused()) {
-            // TODO: implement
+            // TODO: implement cut entries
             return
           }
           return window.electronAPI.cut()

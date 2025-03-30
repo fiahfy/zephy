@@ -1,5 +1,11 @@
 import { RichTreeView, type TreeViewBaseItem } from '@mui/x-tree-view'
-import { type SyntheticEvent, useCallback, useEffect, useMemo } from 'react'
+import {
+  type SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
@@ -41,6 +47,8 @@ const ExplorerPanel = () => {
 
   const { watch } = useWatcher()
 
+  const ref = useRef<HTMLUListElement>(null)
+
   const loadedDirectoryPaths = useMemo(
     () => (root ? getLoadedDirectories(root) : []),
     [root],
@@ -48,6 +56,22 @@ const ExplorerPanel = () => {
 
   useEffect(() => {
     dispatch(load(path))
+
+    // TODO: focus element if the path is already loaded
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    if (!path) {
+      return
+    }
+    setTimeout(() => {
+      const item = el.querySelector(`[id$="${CSS.escape(path)}"]`)
+      if (!item) {
+        return
+      }
+      item.scrollIntoView()
+    }, 600) // transition 300ms + 300ms
   }, [dispatch, path])
 
   useEffect(
@@ -204,6 +228,7 @@ const ExplorerPanel = () => {
         items={items}
         onExpandedItemsChange={handleExpandedItemsChange}
         onSelectedItemsChange={handleSelectedItemsChange}
+        ref={ref}
         selectedItems={selectedItems ?? null}
         slots={{ item: ExplorerTreeItem }}
       />
