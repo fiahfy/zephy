@@ -17,6 +17,7 @@ import {
   newFolderInCurrentTab,
   openInCurrentTab,
   pasteInCurrentTab,
+  refreshInCurrentTab,
   selectAllInCurrentTab,
   startRenamingInCurrentTab,
 } from '~/store/explorer-list'
@@ -112,6 +113,8 @@ const App = () => {
           return dispatch(openInCurrentTab(data?.path))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
+        case 'refresh':
+          return dispatch(refreshInCurrentTab())
         case 'rename':
           return dispatch(startRenamingInCurrentTab(data?.path))
         case 'revealInExplorer':
