@@ -102,7 +102,7 @@ export const explorerListSlice = createSlice({
       const { tabId } = action.payload
       return { [tabId]: findExplorer(state, tabId) }
     },
-    loading(
+    load(
       state,
       action: PayloadAction<{
         tabId: number
@@ -554,15 +554,18 @@ export const selectCurrentSelectedContents = (state: AppState) =>
 export const load =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
-    const { loaded, loading, loadFailed } = explorerListSlice.actions
+    const { load, loaded, loadFailed } = explorerListSlice.actions
 
     const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
-    const scoreToPathsMap = selectScoreToPathsMap(getState())
     if (!directoryPath) {
       return
     }
+    const loading = selectLoadingByTabId(getState(), tabId)
+    if (loading) {
+      return
+    }
 
-    dispatch(loading({ tabId }))
+    dispatch(load({ tabId }))
     try {
       const entries: Entry[] = await (async () => {
         const url = parseZephyUrl(directoryPath)
@@ -570,6 +573,7 @@ export const load =
           return await window.electronAPI.getEntries(directoryPath)
         }
         if (url.pathname === 'ratings') {
+          const scoreToPathsMap = selectScoreToPathsMap(getState())
           const paths = scoreToPathsMap[Number(url.params.score ?? 0)] ?? []
           return await window.electronAPI.getEntriesForPaths(paths)
         }

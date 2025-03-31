@@ -1,3 +1,4 @@
+import { Stack, Typography } from '@mui/material'
 import {
   RichTreeView,
   type TreeViewBaseItem,
@@ -5,6 +6,7 @@ import {
 } from '@mui/x-tree-view'
 import { type SyntheticEvent, useCallback, useEffect, useMemo } from 'react'
 import ExplorerTreeItem from '~/components/ExplorerTreeItem'
+import Icon from '~/components/Icon'
 import Panel from '~/components/Panel'
 import useWatcher from '~/hooks/useWatcher'
 import type { Entry } from '~/interfaces'
@@ -13,6 +15,7 @@ import {
   load,
   selectExpandedItems,
   selectLoadedDirectoryPaths,
+  selectLoading,
   selectRoot,
   selectSelectedItems,
   setExpandedItems,
@@ -25,6 +28,7 @@ import { isHiddenFile } from '~/utils/file'
 
 const ExplorerPanel = () => {
   const loadedDirectoryPath = useAppSelector(selectLoadedDirectoryPaths)
+  const loading = useAppSelector(selectLoading)
   const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const expandedItems = useAppSelector(selectExpandedItems)
   const root = useAppSelector(selectRoot)
@@ -114,7 +118,7 @@ const ExplorerPanel = () => {
   }, [root])
 
   const handleClickRefresh = useCallback(
-    () => dispatch(load(directoryPath)),
+    () => dispatch(load(directoryPath, true)),
     [directoryPath, dispatch],
   )
 
@@ -200,16 +204,29 @@ const ExplorerPanel = () => {
 
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">
-      <RichTreeView
-        apiRef={apiRef}
-        expandedItems={expandedItems}
-        expansionTrigger="iconContainer"
-        items={items}
-        onExpandedItemsChange={handleExpandedItemsChange}
-        onSelectedItemsChange={handleSelectedItemsChange}
-        selectedItems={selectedItems ?? null}
-        slots={{ item: ExplorerTreeItem }}
-      />
+      {loading ? (
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ alignItems: 'center', px: 1 }}
+        >
+          <Icon type="progress" />
+          <Typography noWrap variant="caption">
+            Loading items...
+          </Typography>
+        </Stack>
+      ) : (
+        <RichTreeView
+          apiRef={apiRef}
+          expandedItems={expandedItems}
+          expansionTrigger="iconContainer"
+          items={items}
+          onExpandedItemsChange={handleExpandedItemsChange}
+          onSelectedItemsChange={handleSelectedItemsChange}
+          selectedItems={selectedItems ?? null}
+          slots={{ item: ExplorerTreeItem }}
+        />
+      )}
     </Panel>
   )
 }

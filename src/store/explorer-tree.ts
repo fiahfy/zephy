@@ -9,12 +9,14 @@ import { isZephySchema } from '~/utils/url'
 
 type State = {
   expandedItems: string[]
+  loading: boolean
   root: Entry | undefined
   selectedItems: string | undefined
 }
 
 const initialState: State = {
   expandedItems: [],
+  loading: false,
   root: undefined,
   selectedItems: undefined,
 }
@@ -49,6 +51,26 @@ export const explorerTreeSlice = createSlice({
   name: 'explorer-tree',
   initialState,
   reducers: {
+    load(state) {
+      return {
+        ...state,
+        loading: true,
+        root: undefined,
+      }
+    },
+    loaded(
+      state,
+      action: PayloadAction<{
+        root: Entry
+      }>,
+    ) {
+      const { root } = action.payload
+      return {
+        ...state,
+        loading: false,
+        root,
+      }
+    },
     setSelectedItems(
       state,
       action: PayloadAction<{ selectedItems: string | undefined }>,
@@ -77,6 +99,11 @@ export default explorerTreeSlice.reducer
 
 export const selectExplorerTree = (state: AppState) => state.explorerTree
 
+export const selectLoading = createSelector(
+  selectExplorerTree,
+  (explorerTree) => explorerTree.loading,
+)
+
 export const selectRoot = createSelector(
   selectExplorerTree,
   (explorerTree) => explorerTree.root,
@@ -96,13 +123,13 @@ export const selectLoadedDirectoryPaths = createSelector(selectRoot, (root) => {
   if (!root) {
     return []
   }
-  return getDirectoryPaths(root, true)
+  return getDirectoryPaths(root, false)
 })
 
 export const load =
-  (directoryPath: string | undefined): AppThunk =>
+  (directoryPath: string | undefined, force = false): AppThunk =>
   async (dispatch, getState) => {
-    const { setExpandedItems, setRoot, setSelectedItems } =
+    const { load, loaded, setExpandedItems, setSelectedItems } =
       explorerTreeSlice.actions
 
     const root = selectRoot(getState())
@@ -110,7 +137,7 @@ export const load =
 
     const targetPath =
       directoryPath && isZephySchema(directoryPath) ? undefined : directoryPath
-    if (root && targetPath && directories.includes(targetPath)) {
+    if (!force && root && targetPath && directories.includes(targetPath)) {
       const expandedItems = selectExpandedItems(getState())
       const newExpandedItems = [
         ...new Set([...expandedItems, ...getAncestorPaths(root, targetPath)]),
@@ -118,11 +145,15 @@ export const load =
       dispatch(setExpandedItems({ expandedItems: newExpandedItems }))
       dispatch(setSelectedItems({ selectedItems: targetPath }))
     } else {
-      // TODO: show loading
+      const loading = selectLoading(getState())
+      if (loading) {
+        return
+      }
+      dispatch(load())
       const root = await window.electronAPI.getRootEntry(targetPath)
       const expandedItems = getDirectoryPaths(root, false)
       dispatch(setExpandedItems({ expandedItems }))
       dispatch(setSelectedItems({ selectedItems: targetPath }))
-      dispatch(setRoot({ root }))
+      dispatch(loaded({ root }))
     }
   }
