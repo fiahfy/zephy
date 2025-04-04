@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
-use std::fs::Metadata;
 use std::io;
 use std::path::PathBuf;
+use std::{fs::Metadata, time::UNIX_EPOCH};
 use tokio::fs::{metadata, read_dir};
 use url::Url;
 
@@ -46,17 +46,17 @@ pub async fn get_entry(path: &str) -> Result<Entry, io::Error> {
     let entry = Entry {
         date_created: metadata
             .created()?
-            .elapsed()
+            .duration_since(UNIX_EPOCH)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file time"))?
             .as_millis(),
         date_last_opened: metadata
             .accessed()?
-            .elapsed()
+            .duration_since(UNIX_EPOCH)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file time"))?
             .as_millis(),
         date_modified: metadata
             .modified()?
-            .elapsed()
+            .duration_since(UNIX_EPOCH)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file time"))?
             .as_millis(),
         name: PathBuf::from(&path)
