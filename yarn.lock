@@ -1323,6 +1323,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tauri-apps/plugin-window-state@npm:~2":
+  version: 2.2.2
+  resolution: "@tauri-apps/plugin-window-state@npm:2.2.2"
+  dependencies:
+    "@tauri-apps/api": "npm:^2.0.0"
+  checksum: 10c0/67c6da597034e8068a84bb3f71a66a42fb6e4f29a33b7ebf3662c411750bc8a723f1c1a0da6efb5883960f450a94335dd64a55921f5a9a239a1e450b3868862b
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -3212,6 +3221,7 @@ __metadata:
     "@tauri-apps/api": "npm:^2"
     "@tauri-apps/cli": "npm:^2"
     "@tauri-apps/plugin-opener": "npm:^2"
+    "@tauri-apps/plugin-window-state": "npm:~2"
     "@types/lodash.throttle": "npm:^4"
     "@types/pluralize": "npm:^0.0.33"
     "@types/react": "npm:^19.0.12"
