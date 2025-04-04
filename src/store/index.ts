@@ -63,7 +63,7 @@ const persistedReducer = persistReducer(persistConfig, reducers)
 
 export const store = configureStore({
   reducer: persistedReducer,
-  // @see https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
+  // see https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

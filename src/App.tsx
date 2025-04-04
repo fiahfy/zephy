@@ -221,6 +221,10 @@ const App = () => {
     >
       <GlobalStyles
         styles={{
+          html: {
+            // see https://github.com/tauri-apps/tauri/issues/4309#issuecomment-2247064617
+            overscrollBehavior: 'none',
+          },
           'html, body, #root': {
             height: '100%',
           },

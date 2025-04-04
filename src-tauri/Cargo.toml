@@ -1,7 +1,8 @@
 [package]
-name = "zephy"
+# see https://github.com/tauri-apps/tauri-docs/issues/154
+name = "Zephy"
 version = "0.1.0"
-description = "A Tauri App"
+description = "Simple File Browser based on Electron."
 authors = ["you"]
 edition = "2021"
 

@@ -3,6 +3,19 @@
 version = 4
 
 [[package]]
+name = "Zephy"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5091,19 +5104,6 @@ dependencies = [
  "static_assertions",
  "winnow 0.7.4",
  "zvariant",
-]
-
-[[package]]
-name = "zephy"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-opener",
- "tokio",
- "url",
 ]
 
 [[package]]

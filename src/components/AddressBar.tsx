@@ -239,11 +239,11 @@ const AddressBar = () => {
       elevation={0}
       enableColorOnDark
       sx={{
-        WebkitAppRegion: 'drag',
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Toolbar
+        data-tauri-drag-region
         disableGutters
         sx={{
           minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
