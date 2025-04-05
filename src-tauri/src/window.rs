@@ -2,9 +2,12 @@ use tauri::{
     AppHandle, LogicalPosition, Result, TitleBarStyle, WebviewUrl, WebviewWindow,
     WebviewWindowBuilder,
 };
+use uuid::Uuid;
 
-pub fn create_main_window(app_handle: &AppHandle) -> Result<WebviewWindow> {
-    WebviewWindowBuilder::new(app_handle, "main", WebviewUrl::default())
+pub fn create_window(app_handle: &AppHandle) -> Result<WebviewWindow> {
+    let uuid = Uuid::new_v4().to_string();
+
+    WebviewWindowBuilder::new(app_handle, uuid, WebviewUrl::default())
         .hidden_title(true)
         .inner_size(800.0, 600.0)
         .title_bar_style(TitleBarStyle::Overlay)

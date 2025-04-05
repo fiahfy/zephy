@@ -3,6 +3,8 @@ use tauri::{
     AppHandle, Result, Wry,
 };
 
+use crate::window::create_window;
+
 fn build_app_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
     let settings = MenuItem::with_id(app_handle, "settings", "Settings...", true, Some("Cmd+,"))?;
 
@@ -253,15 +255,12 @@ pub fn build_menu(app_handle: &AppHandle) -> Result<Menu<Wry>> {
 }
 
 pub fn setup_menu_events(app_handle: &AppHandle) {
-    app_handle.on_menu_event(move |_app_handle, event| {
+    app_handle.on_menu_event(move |app_handle, event| {
         println!("menu event: {:?}", event.id());
 
         match event.id().as_ref() {
-            "open" => {
-                println!("open event");
-            }
-            "close" => {
-                println!("close event");
+            "new_window" => {
+                let _ = create_window(app_handle);
             }
             _ => {
                 println!("unexpected menu event");

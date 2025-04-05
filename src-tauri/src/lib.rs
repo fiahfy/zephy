@@ -5,14 +5,14 @@ mod window;
 
 use application_menu::{build_menu, setup_menu_events};
 use commands::{get_entries, get_entries_for_paths, get_entry, get_parent_entry};
-use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, WindowEvent};
-use window::create_main_window;
+use tauri::{generate_context, generate_handler, Builder, Manager, RunEvent};
+use window::create_window;
 
 #[cfg_attr(mobile, mobile_entry_point)]
 pub fn run() {
-    Builder::default()
+    let app = Builder::default()
         .setup(|app| {
-            create_main_window(app.app_handle())?;
+            create_window(app.app_handle())?;
 
             let menu = build_menu(app.app_handle())?;
             app.set_menu(menu)?;
@@ -28,22 +28,15 @@ pub fn run() {
             get_entries,
             get_parent_entry
         ])
-        // see https://github.com/tauri-apps/tauri/issues/3084#issuecomment-1477675840
-        .on_window_event(|window, event| match event {
-            WindowEvent::CloseRequested { api, .. } => {
-                #[cfg(not(target_os = "macos"))]
-                {
-                    event.window().hide().unwrap();
-                }
-
-                #[cfg(target_os = "macos")]
-                {
-                    AppHandle::hide(window.app_handle()).unwrap();
-                }
-                api.prevent_close();
-            }
-            _ => {}
-        })
-        .run(generate_context!())
+        .build(generate_context!())
         .expect("error while running tauri application");
+
+    // TODO: new window when app is activated
+    // see https://github.com/tauri-apps/tauri/issues/9063
+    app.run(|_app_handle, event| match event {
+        RunEvent::ExitRequested { api, .. } => {
+            api.prevent_exit();
+        }
+        _ => {}
+    });
 }
