@@ -230,7 +230,7 @@ pub fn setup_menu_events(app: &App) {
     app.on_menu_event(move |_app_handle, event| {
         println!("menu event: {:?}", event.id());
 
-        match event.id().0.as_str() {
+        match event.id().as_ref() {
             "open" => {
                 println!("open event");
             }
