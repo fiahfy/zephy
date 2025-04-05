@@ -1,9 +1,10 @@
 use tauri::{
-    App, LogicalPosition, Result, TitleBarStyle, WebviewUrl, WebviewWindow, WebviewWindowBuilder,
+    AppHandle, LogicalPosition, Result, TitleBarStyle, WebviewUrl, WebviewWindow,
+    WebviewWindowBuilder,
 };
 
-pub fn create_main_window(app: &App) -> Result<WebviewWindow> {
-    WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
+pub fn create_main_window(app_handle: &AppHandle) -> Result<WebviewWindow> {
+    WebviewWindowBuilder::new(app_handle, "main", WebviewUrl::default())
         .hidden_title(true)
         .inner_size(800.0, 600.0)
         .title_bar_style(TitleBarStyle::Overlay)

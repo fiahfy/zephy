@@ -12,11 +12,11 @@ use window::create_main_window;
 pub fn run() {
     Builder::default()
         .setup(|app| {
-            create_main_window(app)?;
+            create_main_window(app.app_handle())?;
 
-            let menu = build_menu(app)?;
+            let menu = build_menu(app.app_handle())?;
             app.set_menu(menu)?;
-            setup_menu_events(app);
+            setup_menu_events(app.app_handle());
 
             Ok(())
         })

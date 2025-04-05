@@ -1,12 +1,12 @@
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuBuilder, MenuItem, Submenu, SubmenuBuilder},
-    App, Result, Wry,
+    AppHandle, Result, Wry,
 };
 
-fn build_app_menu(app: &App) -> Result<Submenu<Wry>> {
-    let settings = MenuItem::with_id(app, "settings", "Settings...", true, Some("Cmd+,"))?;
+fn build_app_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    let settings = MenuItem::with_id(app_handle, "settings", "Settings...", true, Some("Cmd+,"))?;
 
-    SubmenuBuilder::new(app, "App")
+    SubmenuBuilder::new(app_handle, "App")
         .about(None)
         .separator()
         .item(&settings)
@@ -22,29 +22,30 @@ fn build_app_menu(app: &App) -> Result<Submenu<Wry>> {
         .build()
 }
 
-fn build_file_menu(app: &App) -> Result<Submenu<Wry>> {
-    let new_window = MenuItem::with_id(app, "new_window", "New Window", true, Some("Cmd+N"))?;
-    let new_tab = MenuItem::with_id(app, "new_tab", "New Tab", true, Some("Cmd+T"))?;
+fn build_file_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    let new_window =
+        MenuItem::with_id(app_handle, "new_window", "New Window", true, Some("Cmd+N"))?;
+    let new_tab = MenuItem::with_id(app_handle, "new_tab", "New Tab", true, Some("Cmd+T"))?;
     let close_window = MenuItem::with_id(
-        app,
+        app_handle,
         "close_window",
         "Close Window",
         true,
         Some("Cmd+Shift+W"),
     )?;
-    let close_tab = MenuItem::with_id(app, "close_tab", "Close Tab", true, Some("Cmd+W"))?;
+    let close_tab = MenuItem::with_id(app_handle, "close_tab", "Close Tab", true, Some("Cmd+W"))?;
 
-    let open = MenuItem::with_id(app, "open", "Open", true, Some("Cmd+O"))?;
-    let rename = MenuItem::with_id(app, "rename", "Rename", true, None::<&str>)?;
+    let open = MenuItem::with_id(app_handle, "open", "Open", true, Some("Cmd+O"))?;
+    let rename = MenuItem::with_id(app_handle, "rename", "Rename", true, None::<&str>)?;
     let move_to_trash = MenuItem::with_id(
-        app,
+        app_handle,
         "move_to_trash",
         "Move to Trash",
         true,
         Some("Cmd+Backspace"),
     )?;
 
-    SubmenuBuilder::new(app, "File")
+    SubmenuBuilder::new(app_handle, "File")
         .item(&new_window)
         .item(&new_tab)
         .item(&close_window)
@@ -56,14 +57,15 @@ fn build_file_menu(app: &App) -> Result<Submenu<Wry>> {
         .build()
 }
 
-fn build_edit_menu(app: &App) -> Result<Submenu<Wry>> {
-    let cut = MenuItem::with_id(app, "cut", "Cut", true, Some("Cmd+X"))?;
-    let copy = MenuItem::with_id(app, "copy", "Copy", true, Some("Cmd+C"))?;
-    let paste = MenuItem::with_id(app, "paste", "Paste", true, Some("Cmd+V"))?;
-    let select_all = MenuItem::with_id(app, "select_all", "Select All", true, Some("Cmd+A"))?;
-    let find = MenuItem::with_id(app, "find", "Find", true, Some("Cmd+F"))?;
+fn build_edit_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    let cut = MenuItem::with_id(app_handle, "cut", "Cut", true, Some("Cmd+X"))?;
+    let copy = MenuItem::with_id(app_handle, "copy", "Copy", true, Some("Cmd+C"))?;
+    let paste = MenuItem::with_id(app_handle, "paste", "Paste", true, Some("Cmd+V"))?;
+    let select_all =
+        MenuItem::with_id(app_handle, "select_all", "Select All", true, Some("Cmd+A"))?;
+    let find = MenuItem::with_id(app_handle, "find", "Find", true, Some("Cmd+F"))?;
 
-    SubmenuBuilder::new(app, "Edit")
+    SubmenuBuilder::new(app_handle, "Edit")
         .undo()
         .redo()
         .separator()
@@ -76,11 +78,17 @@ fn build_edit_menu(app: &App) -> Result<Submenu<Wry>> {
         .build()
 }
 
-fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
-    let view_as_list =
-        CheckMenuItem::with_id(app, "view_as_list", "as List", true, false, Some("Cmd+1"))?;
+fn build_view_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    let view_as_list = CheckMenuItem::with_id(
+        app_handle,
+        "view_as_list",
+        "as List",
+        true,
+        false,
+        Some("Cmd+1"),
+    )?;
     let view_as_thumbnail = CheckMenuItem::with_id(
-        app,
+        app_handle,
         "view_as_thumbnail",
         "as Thumbnail",
         true,
@@ -88,7 +96,7 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
         Some("Cmd+2"),
     )?;
     let view_as_gallery = CheckMenuItem::with_id(
-        app,
+        app_handle,
         "view_as_gallery",
         "as Gallery",
         true,
@@ -97,40 +105,46 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
     )?;
 
     let toggle_navigator = MenuItem::with_id(
-        app,
+        app_handle,
         "toggle_navigator",
         "Toggle Navigator",
         true,
         None::<&str>,
     )?;
     let toggle_inspector = MenuItem::with_id(
-        app,
+        app_handle,
         "toggle_inspector",
         "Toggle Inspector",
         true,
         None::<&str>,
     )?;
 
-    let refresh = MenuItem::with_id(app, "refresh", "Refresh", true, Some("Cmd+R"))?;
+    let refresh = MenuItem::with_id(app_handle, "refresh", "Refresh", true, Some("Cmd+R"))?;
     let force_reload = MenuItem::with_id(
-        app,
+        app_handle,
         "force_reload",
         "Force Reload",
         true,
         Some("Cmd+Shift+R"),
     )?;
     let toggle_developer_tools = MenuItem::with_id(
-        app,
+        app_handle,
         "toggle_developer_tools",
         "Toggle Developer Tools",
         true,
         Some("Cmd+Option+I"),
     )?;
 
-    let sort_by_name =
-        CheckMenuItem::with_id(app, "sort_by_name", "Name", true, false, None::<&str>)?;
+    let sort_by_name = CheckMenuItem::with_id(
+        app_handle,
+        "sort_by_name",
+        "Name",
+        true,
+        false,
+        None::<&str>,
+    )?;
     let sort_by_date_created = CheckMenuItem::with_id(
-        app,
+        app_handle,
         "sort_by_date_created",
         "Date Created",
         true,
@@ -138,7 +152,7 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
         None::<&str>,
     )?;
     let sort_by_date_modified = CheckMenuItem::with_id(
-        app,
+        app_handle,
         "sort_by_date_modified",
         "Date Modified",
         true,
@@ -146,18 +160,30 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
         None::<&str>,
     )?;
     let sort_by_date_last_opened = CheckMenuItem::with_id(
-        app,
+        app_handle,
         "sort_by_date_last_opened",
         "Date Opened",
         true,
         false,
         None::<&str>,
     )?;
-    let sort_by_size =
-        CheckMenuItem::with_id(app, "sort_by_size", "Size", true, false, None::<&str>)?;
-    let sort_by_rating =
-        CheckMenuItem::with_id(app, "sort_by_rating", "Rating", true, false, None::<&str>)?;
-    let sort_menu = SubmenuBuilder::new(app, "Sort By")
+    let sort_by_size = CheckMenuItem::with_id(
+        app_handle,
+        "sort_by_size",
+        "Size",
+        true,
+        false,
+        None::<&str>,
+    )?;
+    let sort_by_rating = CheckMenuItem::with_id(
+        app_handle,
+        "sort_by_rating",
+        "Rating",
+        true,
+        false,
+        None::<&str>,
+    )?;
+    let sort_menu = SubmenuBuilder::new(app_handle, "Sort By")
         .items(&[
             &sort_by_name,
             &sort_by_date_created,
@@ -168,7 +194,7 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
         ])
         .build()?;
 
-    SubmenuBuilder::new(app, "View")
+    SubmenuBuilder::new(app_handle, "View")
         .item(&view_as_list)
         .item(&view_as_thumbnail)
         .item(&view_as_gallery)
@@ -188,33 +214,33 @@ fn build_view_menu(app: &App) -> Result<Submenu<Wry>> {
         .build()
 }
 
-fn build_go_menu(app: &App) -> Result<Submenu<Wry>> {
-    let back = MenuItem::with_id(app, "back", "Back", true, Some("Cmd+["))?;
-    let forward = MenuItem::with_id(app, "forward", "Forward", true, Some("Cmd+]"))?;
+fn build_go_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    let back = MenuItem::with_id(app_handle, "back", "Back", true, Some("Cmd+["))?;
+    let forward = MenuItem::with_id(app_handle, "forward", "Forward", true, Some("Cmd+]"))?;
 
-    SubmenuBuilder::new(app, "Go")
+    SubmenuBuilder::new(app_handle, "Go")
         .item(&back)
         .item(&forward)
         .build()
 }
 
-fn build_window_menu(app: &App) -> Result<Submenu<Wry>> {
-    SubmenuBuilder::new(app, "Window")
+fn build_window_menu(app_handle: &AppHandle) -> Result<Submenu<Wry>> {
+    SubmenuBuilder::new(app_handle, "Window")
         .minimize()
         // TODO: zoom, front, window
         .build()
 }
 
-pub fn build_menu(app: &App) -> Result<Menu<Wry>> {
-    let app_menu = build_app_menu(app)?;
-    let file_menu = build_file_menu(app)?;
-    let edit_menu = build_edit_menu(app)?;
-    let view_menu = build_view_menu(app)?;
-    let go_menu = build_go_menu(app)?;
-    let window_menu = build_window_menu(app)?;
+pub fn build_menu(app_handle: &AppHandle) -> Result<Menu<Wry>> {
+    let app_menu = build_app_menu(app_handle)?;
+    let file_menu = build_file_menu(app_handle)?;
+    let edit_menu = build_edit_menu(app_handle)?;
+    let view_menu = build_view_menu(app_handle)?;
+    let go_menu = build_go_menu(app_handle)?;
+    let window_menu = build_window_menu(app_handle)?;
     // TODO: help
 
-    MenuBuilder::new(app)
+    MenuBuilder::new(app_handle)
         .items(&[
             &app_menu,
             &file_menu,
@@ -226,8 +252,8 @@ pub fn build_menu(app: &App) -> Result<Menu<Wry>> {
         .build()
 }
 
-pub fn setup_menu_events(app: &App) {
-    app.on_menu_event(move |_app_handle, event| {
+pub fn setup_menu_events(app_handle: &AppHandle) {
+    app_handle.on_menu_event(move |_app_handle, event| {
         println!("menu event: {:?}", event.id());
 
         match event.id().as_ref() {
