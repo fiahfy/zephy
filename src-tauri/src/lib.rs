@@ -32,6 +32,7 @@ pub fn run() {
         .expect("error while running tauri application");
 
     // TODO: new window when app is activated
+    // see https://github.com/tauri-apps/tao/issues/218
     // see https://github.com/tauri-apps/tauri/issues/9063
     app.run(|_app_handle, event| match event {
         RunEvent::ExitRequested { api, .. } => {
