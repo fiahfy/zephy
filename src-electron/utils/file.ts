@@ -208,8 +208,11 @@ export const moveEntries = async (
 ): Promise<Entry[]> => {
   return await Promise.all(
     paths.map(async (path) => {
-      const newPath = join(directoryPath, basename(path))
-      if (!paths.includes(newPath)) {
+      let newPath = join(directoryPath, basename(path))
+      // skip if moving to the same path or into itself
+      if (newPath === path || paths.includes(directoryPath)) {
+        newPath = path
+      } else {
         const exists = await pathExists(newPath)
         if (exists) {
           throw new Error('A file or directory with that name already exists.')
