@@ -21,7 +21,7 @@ const ExplorerGalleryMainContent = (props: Props) => {
           style={{
             display: 'block',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: 'cover', // TODO: switch fit style
             objectPosition: 'center',
             width: '100%',
           }}
