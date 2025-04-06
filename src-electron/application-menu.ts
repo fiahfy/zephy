@@ -199,7 +199,7 @@ const registerApplicationMenu = (
                 type: 'changeViewMode',
                 data: { viewMode: menu.viewMode },
               }),
-            type: 'checkbox',
+            type: 'radio',
           })),
           { type: 'separator' },
           {
@@ -216,7 +216,7 @@ const registerApplicationMenu = (
               checked: menu.orderBy === state.orderBy,
               click: () =>
                 send({ type: 'sort', data: { orderBy: menu.orderBy } }),
-              type: 'checkbox',
+              type: 'radio',
             })),
           },
           { type: 'separator' },
