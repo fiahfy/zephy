@@ -19,7 +19,7 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
   entry: Entry

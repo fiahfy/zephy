@@ -15,7 +15,7 @@ import {
   selectRatingColumnVisible,
   selectSizeColumnVisible,
 } from '~/store/preferences'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 const headerHeight = 32
 const rowHeight = 20

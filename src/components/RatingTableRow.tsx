@@ -2,7 +2,7 @@ import { TableRow } from '@mui/material'
 import { type ReactNode, useCallback, useMemo } from 'react'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 import { buildZephyUrl } from '~/utils/url'
 
 type Props = {

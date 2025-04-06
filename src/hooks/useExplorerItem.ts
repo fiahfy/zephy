@@ -17,7 +17,7 @@ import {
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
 import { changeDirectory, selectDirectoryPathByTabId } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 import { isZephySchema } from '~/utils/url'
 
 const useExplorerItem = (tabId: number, content: Content) => {

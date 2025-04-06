@@ -54,7 +54,7 @@ import {
   selectSidebarHiddenByVariant,
   upward,
 } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 import { isZephySchema } from '~/utils/url'
 
 const AddressBar = () => {

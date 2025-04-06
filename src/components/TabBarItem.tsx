@@ -6,7 +6,7 @@ import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoadingByTabId } from '~/store/explorer-list'
 import { closeTab, selectHistoryByTabId } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 import { getIconType, isZephySchema } from '~/utils/url'
 
 type Props = {

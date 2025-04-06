@@ -11,7 +11,7 @@ import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
 import type { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { finishEditing, rename } from '~/store/explorer-list'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
   content: Content

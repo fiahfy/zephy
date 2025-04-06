@@ -3,7 +3,7 @@ import { type ReactNode, useCallback, useMemo } from 'react'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
 import { changeDirectory } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
   children: ReactNode

@@ -14,7 +14,7 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 type State = {
   loading: boolean

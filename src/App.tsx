@@ -42,7 +42,7 @@ import {
   sort,
   updateApplicationMenu,
 } from '~/store/window'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 import {
   toggleDateCreatedColumnVisible,
   toggleDateLastOpenedColumnVisible,

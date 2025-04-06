@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 const useEntryItem = (entry: Entry) => {
   const favorite = useAppSelector((state) =>
