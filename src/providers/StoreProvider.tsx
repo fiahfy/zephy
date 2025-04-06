@@ -8,7 +8,7 @@ import { replaceState as replaceQueryState } from '~/store/query'
 import { replaceState as replaceRatingState } from '~/store/rating'
 import { replaceState as replaceSettingsState } from '~/store/settings'
 import { newWindow, replaceState as replaceWindowState } from '~/store/window'
-import { setWindowId } from '~/store/windowId'
+import { setWindowId } from '~/store/window-id'
 
 type Props = { children: ReactNode }
 

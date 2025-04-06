@@ -17,7 +17,7 @@ import {
   unfocus,
 } from '~/store/explorer-list'
 import { addQuery } from '~/store/query'
-import { selectWindowId } from '~/store/windowId'
+import { selectWindowId } from '~/store/window-id'
 import { buildZephyUrl, getTitle } from '~/utils/url'
 
 type History = {

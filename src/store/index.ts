@@ -30,7 +30,7 @@ import queryReducer from '~/store/query'
 import ratingReducer from '~/store/rating'
 import settingsReducer from '~/store/settings'
 import windowReducer from '~/store/window'
-import windowIdReducer from '~/store/windowId'
+import windowIdReducer from '~/store/window-id'
 
 const reducers = combineReducers({
   explorerList: explorerListReducer,
