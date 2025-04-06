@@ -728,7 +728,7 @@ export const newFolderInCurrentTab =
 export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
 
-  await window.electronAPI.copyEntries(selected)
+  window.electronAPI.copyEntries(selected)
 }
 
 export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
@@ -738,7 +738,7 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
   if (zephyUrl) {
     return
   }
-  await window.electronAPI.pasteEntries(directoryPath)
+  window.electronAPI.pasteEntries(directoryPath)
 }
 
 // TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
@@ -798,7 +798,7 @@ export const moveToTrashInCurrentTab =
       }
     }
 
-    await window.electronAPI.moveEntriesToTrash(targetPaths)
+    window.electronAPI.moveEntriesToTrash(targetPaths)
   }
 
 // TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する

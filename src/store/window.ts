@@ -902,7 +902,7 @@ export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())
 
-  await window.electronAPI.updateApplicationMenu({
+  window.electronAPI.updateApplicationMenu({
     canBack,
     canCloseTab,
     canForward,

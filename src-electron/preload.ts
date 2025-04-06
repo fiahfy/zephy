@@ -8,22 +8,20 @@ import {
 } from 'electron'
 import type { ApplicationMenuParams } from './application-menu'
 
-// TODO: avoid Promise<void> return types
-
 const applicationMenuOperations = {
   updateApplicationMenu: (params: ApplicationMenuParams) =>
-    ipcRenderer.invoke('updateApplicationMenu', params),
+    ipcRenderer.send('updateApplicationMenu', params),
 }
 
 const editOperations = {
-  copy: () => ipcRenderer.invoke('copy'),
-  cut: () => ipcRenderer.invoke('cut'),
-  paste: () => ipcRenderer.invoke('paste'),
-  selectAll: () => ipcRenderer.invoke('selectAll'),
+  copy: () => ipcRenderer.send('copy'),
+  cut: () => ipcRenderer.send('cut'),
+  paste: () => ipcRenderer.send('paste'),
+  selectAll: () => ipcRenderer.send('selectAll'),
 }
 
 const entryOperations = {
-  copyEntries: (paths: string[]) => ipcRenderer.invoke('copyEntries', paths),
+  copyEntries: (paths: string[]) => ipcRenderer.send('copyEntries', paths),
   createDirectory: (directoryPath: string) =>
     ipcRenderer.invoke('createDirectory', directoryPath),
   createEntryThumbnailUrl: (paths: string | string[]) =>
@@ -42,10 +40,10 @@ const entryOperations = {
   moveEntries: (paths: string[], directoryPath: string) =>
     ipcRenderer.invoke('moveEntries', paths, directoryPath),
   moveEntriesToTrash: (paths: string[]) =>
-    ipcRenderer.invoke('moveEntriesToTrash', paths),
-  openEntry: (path: string) => ipcRenderer.invoke('openEntry', path),
+    ipcRenderer.send('moveEntriesToTrash', paths),
+  openEntry: (path: string) => ipcRenderer.send('openEntry', path),
   pasteEntries: (directoryPath: string) =>
-    ipcRenderer.invoke('pasteEntries', directoryPath),
+    ipcRenderer.send('pasteEntries', directoryPath),
   renameEntry: (path: string, newName: string) =>
     ipcRenderer.invoke('renameEntry', path, newName),
 }
@@ -80,15 +78,15 @@ const watcherOperations = {
         filePath: string,
       ) => callback(eventType, directoryPath, filePath),
     )
-    return ipcRenderer.invoke('watchDirectories', directoryPaths)
+    ipcRenderer.send('watchDirectories', directoryPaths)
   },
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
   getFilePaths: (files: File[]) =>
     files.map((file) => webUtils.getPathForFile(file)),
-  openTab: () => ipcRenderer.invoke('openTab'),
-  openUrl: (url: string) => ipcRenderer.invoke('openUrl', url),
+  openTab: () => ipcRenderer.send('openTab'),
+  openUrl: (url: string) => ipcRenderer.send('openUrl', url),
   startDrag: (paths: string[]) => ipcRenderer.send('startDrag', paths),
   ...applicationMenuOperations,
   ...editOperations,

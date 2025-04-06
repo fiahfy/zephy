@@ -71,7 +71,7 @@ const createWatcher = () => {
     }
   }
 
-  ipcMain.handle(
+  ipcMain.on(
     'watchDirectories',
     (event: IpcMainInvokeEvent, directoryPaths: string[]) =>
       watch(

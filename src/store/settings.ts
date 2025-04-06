@@ -97,14 +97,14 @@ export const openEntry =
     switch (fileType) {
       case 'image':
         return shouldOpenWithPhoty
-          ? await window.electronAPI.openUrl(`photy://open?path=${encoded}`)
-          : await window.electronAPI.openEntry(filePath)
+          ? window.electronAPI.openUrl(`photy://open?path=${encoded}`)
+          : window.electronAPI.openEntry(filePath)
       case 'video':
       case 'audio':
         return shouldOpenWithVisty
-          ? await window.electronAPI.openUrl(`visty://open?path=${encoded}`)
-          : await window.electronAPI.openEntry(filePath)
+          ? window.electronAPI.openUrl(`visty://open?path=${encoded}`)
+          : window.electronAPI.openEntry(filePath)
       default:
-        return await window.electronAPI.openEntry(filePath)
+        return window.electronAPI.openEntry(filePath)
     }
   }

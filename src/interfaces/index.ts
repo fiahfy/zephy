@@ -7,18 +7,18 @@ import type { Operations as ContextMenuOperations } from '@fiahfy/electron-conte
 import type { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type ApplicationMenuOperations = {
-  updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
+  updateApplicationMenu: (params: ApplicationMenuParams) => void
 }
 
 export type EditOperations = {
-  copy: () => Promise<void>
-  cut: () => Promise<void>
-  paste: () => Promise<void>
-  selectAll: () => Promise<void>
+  copy: () => void
+  cut: () => void
+  paste: () => void
+  selectAll: () => void
 }
 
 export type EntryOperations = {
-  copyEntries: (paths: string[]) => Promise<void>
+  copyEntries: (paths: string[]) => void
   createDirectory: (directoryPath: string) => Promise<Entry>
   createEntryThumbnailUrl: (
     paths: string | string[],
@@ -31,9 +31,9 @@ export type EntryOperations = {
   getParentEntry: (path: string) => Promise<Entry>
   getRootEntry: (path?: string) => Promise<Entry>
   moveEntries: (paths: string[], directoryPath: string) => Promise<Entry[]>
-  moveEntriesToTrash: (paths: string[]) => Promise<void>
-  openEntry: (path: string) => Promise<void>
-  pasteEntries: (directoryPath: string) => Promise<void>
+  moveEntriesToTrash: (paths: string[]) => void
+  openEntry: (path: string) => void
+  pasteEntries: (directoryPath: string) => void
   renameEntry: (path: string, newName: string) => Promise<Entry>
 }
 
@@ -50,13 +50,13 @@ export type WatcherOperations = {
       directoryPath: string,
       filePath: string,
     ) => void,
-  ) => Promise<void>
+  ) => void
 }
 
 export type IElectronAPI = {
   getFilePaths: (files: globalThis.File[]) => string[]
-  openTab: () => Promise<void>
-  openUrl: (url: string) => Promise<void>
+  openTab: () => void
+  openUrl: (url: string) => void
   startDrag: (paths: string[]) => void
 } & ApplicationMenuOperations &
   EditOperations &

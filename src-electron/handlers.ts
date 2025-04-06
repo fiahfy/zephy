@@ -30,22 +30,22 @@ const dataUrl =
 const icon = nativeImage.createFromDataURL(dataUrl)
 
 const registerEditHandlers = () => {
-  ipcMain.handle('copy', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('copy', (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.copy(),
   )
-  ipcMain.handle('cut', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('cut', (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.cut(),
   )
-  ipcMain.handle('paste', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('paste', (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.paste(),
   )
-  ipcMain.handle('selectAll', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('selectAll', (event: IpcMainInvokeEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.selectAll(),
   )
 }
 
 const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.handle('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
+  ipcMain.on('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
     writePaths(paths),
   )
   ipcMain.handle(
@@ -93,7 +93,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
   )
-  ipcMain.handle(
+  ipcMain.on(
     'moveEntriesToTrash',
     (_event: IpcMainInvokeEvent, paths: string[]) =>
       Promise.all(
@@ -104,16 +104,13 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
         }),
       ),
   )
-  ipcMain.handle('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
+  ipcMain.on('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
     shell.openPath(path),
   )
-  ipcMain.handle(
-    'pasteEntries',
-    (_event: IpcMainInvokeEvent, directoryPath) => {
-      const paths = readPaths()
-      return copyEntries(paths, directoryPath)
-    },
-  )
+  ipcMain.on('pasteEntries', (_event: IpcMainInvokeEvent, directoryPath) => {
+    const paths = readPaths()
+    return copyEntries(paths, directoryPath)
+  })
   ipcMain.handle(
     'renameEntry',
     (_event: IpcMainInvokeEvent, path: string, newName: string) =>
@@ -122,13 +119,13 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
 }
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.handle('openTab', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('openTab', (event: IpcMainInvokeEvent) =>
     event.sender.send('onMessage', {
       type: 'newTab',
       data: { path: app.getPath('home') },
     }),
   )
-  ipcMain.handle('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
+  ipcMain.on('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
     shell.openExternal(url),
   )
   ipcMain.on('startDrag', (event: IpcMainInvokeEvent, paths: string[]) =>
