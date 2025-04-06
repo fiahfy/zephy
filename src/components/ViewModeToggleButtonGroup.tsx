@@ -13,7 +13,10 @@ const ViewModeToggleButtonGroup = () => {
   const dispatch = useAppDispatch()
 
   const handleChange = useCallback(
-    (_e: MouseEvent, value: 'list' | 'thumbnail' | 'gallery') => {
+    (_e: MouseEvent, value: 'list' | 'thumbnail' | 'gallery' | null) => {
+      if (!value) {
+        return
+      }
       dispatch(setCurrentViewMode(value))
     },
     [dispatch],
