@@ -10,8 +10,7 @@ import ThemeProvider from '~/providers/ThemeProvider'
 import TrafficLightProvider from '~/providers/TrafficLightProvider'
 import WatcherProvider from '~/providers/WatcherProvider'
 
-// biome-ignore lint/style/noNonNullAssertion: <explanation>
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <StoreProvider>
       <ThemeProvider>
