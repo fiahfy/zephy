@@ -20,7 +20,7 @@ const createWatcher = () => {
   ) => {
     return (path: string) => {
       const directoryPath = dirname(path)
-      // depth: 0 としているが folder をコピー/移動した時に folder 内の file が検出されてしまうため取り除く
+      // NOTE: depth: 0 としているが folder をコピー/移動した時に folder 内の file が検出されてしまうため取り除く
       if (directoryPaths.includes(directoryPath)) {
         callback(eventType, directoryPath, path)
       }

@@ -21,7 +21,7 @@ const Rating = (props: Props) => {
     [dispatch, path],
   )
 
-  // Rating component rendering is slow, so avoid unnecessary rendering
+  // NOTE: Rating component rendering is slow, so avoid unnecessary rendering
   const rating = useMemo(
     () => (
       <MuiRating

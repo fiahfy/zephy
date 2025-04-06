@@ -46,7 +46,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
     (e: MouseEvent) => {
-      // prevent container event
+      // NOTE: prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
         dispatch(
@@ -73,7 +73,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       }
     },
     async (e: MouseEvent) => {
-      // prevent container event
+      // NOTE: prevent container event
       e.stopPropagation()
       if (editing) {
         return

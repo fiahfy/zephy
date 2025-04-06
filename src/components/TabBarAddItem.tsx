@@ -25,7 +25,7 @@ const TabBarAddItem = (props: Props) => {
           <AddIcon sx={{ fontSize: '1rem' }} />
         </IconButton>
       }
-      // prevent tab change event
+      // NOTE: prevent tab change event
       onChange={undefined}
       sx={{
         minHeight: 0,

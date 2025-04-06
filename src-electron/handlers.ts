@@ -24,7 +24,7 @@ import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
-// 1x1 transparent png
+// NOTE: 1x1 transparent png
 const dataUrl =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII='
 const icon = nativeImage.createFromDataURL(dataUrl)
@@ -99,7 +99,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
       Promise.all(
         paths.map(async (path) => {
           await shell.trashItem(path)
-          // notify event manually because chokidar doesn't detect trashItem event
+          // NOTE: notify event manually because chokidar doesn't detect trashItem event
           watcher.notify('delete', dirname(path), path)
         }),
       ),

@@ -672,13 +672,13 @@ export const rename =
 
     try {
       const entry = await window.electronAPI.renameEntry(path, newName)
-      // get the selected paths after renaming
+      // NOTE: get the selected paths after renaming
       const selected = selectSelectedByTabId(getState(), tabId)
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ tabId, paths: [path] }))
       dispatch(addEntries({ tabId, entries: [entry] }))
-      // do not focus if the renamed entry is not selected
+      // NOTE: do not focus if the renamed entry is not selected
       if (selected.length === 1 && selected[0] === path) {
         dispatch(select({ tabId, path: entry.path }))
         dispatch(focus({ tabId, path: entry.path }))

@@ -19,7 +19,7 @@ const TrafficLightProvider = (props: Props) => {
     ;(async () => {
       const visibility = await window.electronAPI.getTrafficLightVisibility()
       setVisibility(visibility)
-      // for initial rendering
+      // NOTE: for initial rendering
       setReady(true)
     })()
   }, [])

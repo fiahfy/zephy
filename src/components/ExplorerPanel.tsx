@@ -53,7 +53,7 @@ const ExplorerPanel = () => {
       apiRef.current
         ?.getItemDOMElement(selectedItems)
         ?.scrollIntoView({ block: 'nearest' })
-    }, 300) // transition 300ms + 300ms
+    }, 300) // NOTE: transition 300ms + 300ms
   }, [root, selectedItems])
 
   useEffect(
@@ -70,7 +70,7 @@ const ExplorerPanel = () => {
           const mapper = (e: Entry): Entry => {
             if (e.type === 'directory') {
               if (e.path === directoryPath && e.children) {
-                // イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
+                // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
                 let children = e.children.filter(
                   (entry) => entry.path !== filePath,
                 )
@@ -186,7 +186,7 @@ const ExplorerPanel = () => {
                       shouldShowHiddenFiles || !isHiddenFile(entry.name),
                   )
                   .toSorted((a, b) => a.name.localeCompare(b.name))
-                  // limit entry size for performance issue
+                  // NOTE: limit entry size for performance issue
                   .slice(0, 100)
                   .map(mapper)
               : [

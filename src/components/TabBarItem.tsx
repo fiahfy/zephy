@@ -67,7 +67,7 @@ const TabBarItem = (props: Props) => {
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
-      // prevent tab change event
+      // NOTE: prevent tab change event
       e.stopPropagation()
       dispatch(closeTab(tabId))
     },
