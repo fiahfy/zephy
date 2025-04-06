@@ -7,8 +7,6 @@ import {
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
 import Rating from '~/components/Rating'
-import useDraggable from '~/hooks/useDraggable'
-import useDroppable from '~/hooks/useDroppable'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
@@ -27,12 +25,7 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabId, width } = props
 
-  const { draggingPaths, editing } = useExplorerItem(tabId, content)
-
-  const { draggable, ...dragHandlers } = useDraggable(draggingPaths)
-  const { droppableStyle, ...dropHandlers } = useDroppable(
-    content.type === 'directory' ? content.path : undefined,
-  )
+  const { editing } = useExplorerItem(tabId, content)
 
   return (
     <TableCell
@@ -48,15 +41,7 @@ const ExplorerTableCell = (props: Props) => {
         px: 1,
         py: 0,
         width,
-        ...(dataKey === 'name' ? droppableStyle : {}),
       }}
-      {...(dataKey === 'name'
-        ? {
-            draggable,
-            ...dragHandlers,
-            ...dropHandlers,
-          }
-        : {})}
     >
       {dataKey === 'name' && (
         <Stack
