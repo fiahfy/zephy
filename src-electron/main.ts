@@ -56,6 +56,10 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
     browserWindow.loadFile(join(RENDERER_DIST, 'index.html'))
   }
 
+  // NOTE: Prevent a new window from occasionally opening when starting a drag operation.
+  // @see https://github.com/electron/electron/issues/39839#issuecomment-1749969317
+  browserWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+
   watcher.handle(browserWindow)
 
   return browserWindow
