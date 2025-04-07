@@ -45,6 +45,7 @@ const TabPanels = () => {
             height: '100%',
             inset: 0,
             position: 'absolute',
+            visibility: tab.id === currentTabId ? 'visible' : 'hidden',
             zIndex: tab.id === currentTabId ? 2 : 0,
           }}
         >

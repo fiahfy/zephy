@@ -201,22 +201,6 @@ const useExplorerList = (
         return
       }
 
-      const focusBy = (offset: number) => {
-        const index = contents.findIndex((c) => c.path === focused)
-        if (index < 0) {
-          return
-        }
-
-        const newIndex = index + offset
-        const content = contents[newIndex]
-        if (!content) {
-          return
-        }
-
-        dispatch(select(tabId, content.path))
-        dispatch(focus(tabId, content.path))
-      }
-
       const focusByHorizontal = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
@@ -332,10 +316,6 @@ const useExplorerList = (
             return focusByVertical(1, e.shiftKey)
           }
           return focusByHorizontal(1, e.shiftKey)
-        // TODO: focus external previous/next element
-        case 'Tab':
-          e.preventDefault()
-          return focusBy(e.shiftKey ? -1 : 1)
         case 'Shift':
           e.preventDefault()
           return dispatch(setAnchor({ tabId, anchor: focused }))
