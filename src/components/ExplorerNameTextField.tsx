@@ -1,3 +1,4 @@
+import { Stack, Typography } from '@mui/material'
 import {
   type ChangeEvent,
   type KeyboardEvent,
@@ -15,11 +16,13 @@ import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
   content: Content
+  multiline?: boolean
+  readOnly: boolean
   tabId: number
 }
 
 const ExplorerNameTextField = (props: Props) => {
-  const { content, tabId } = props
+  const { content, multiline = false, readOnly, tabId } = props
 
   const dispatch = useAppDispatch()
 
@@ -27,6 +30,9 @@ const ExplorerNameTextField = (props: Props) => {
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (readOnly) {
+      return
+    }
     const el = ref.current
     if (!el) {
       return
@@ -38,7 +44,7 @@ const ExplorerNameTextField = (props: Props) => {
     } else {
       el.select()
     }
-  }, [content.name, content.type])
+  }, [content.name, content.type, readOnly])
 
   const finish = useCallback(() => {
     dispatch(finishEditing(tabId))
@@ -77,21 +83,56 @@ const ExplorerNameTextField = (props: Props) => {
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
-    <DenseOutlineTextField
-      fullWidth
-      inputRef={ref}
-      onBlur={handleBlur}
-      onChange={handleChange}
-      onContextMenu={handleContextMenu}
-      onKeyDown={handleKeyDown}
-      spellCheck={false}
-      sx={{
-        '.MuiInputBase-root': {
-          backgroundColor: (theme) => theme.palette.background.default,
-        },
-      }}
-      value={name}
-    />
+    <>
+      {readOnly ? (
+        <Typography
+          noWrap
+          sx={
+            multiline
+              ? {
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 2,
+                  display: '-webkit-box',
+                  lineHeight: 1.4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'initial',
+                  wordBreak: 'break-all',
+                }
+              : undefined
+          }
+          title={content.name}
+          variant="caption"
+        >
+          {content.name}
+        </Typography>
+      ) : (
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: 'center',
+            flexGrow: 1,
+            ml: -0.5,
+          }}
+        >
+          <DenseOutlineTextField
+            fullWidth
+            inputRef={ref}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            onContextMenu={handleContextMenu}
+            onKeyDown={handleKeyDown}
+            spellCheck={false}
+            sx={{
+              '.MuiInputBase-root': {
+                backgroundColor: (theme) => theme.palette.background.default,
+              },
+            }}
+            value={name}
+          />
+        </Stack>
+      )}
+    </>
   )
 }
 

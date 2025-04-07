@@ -50,22 +50,11 @@ const ExplorerTableCell = (props: Props) => {
           sx={{ flexGrow: 1, maxWidth: '100%' }}
         >
           <EntryIcon entry={content} />
-          {editing ? (
-            <Stack
-              direction="row"
-              sx={{
-                alignItems: 'center',
-                flexGrow: 1,
-                ml: -0.5,
-              }}
-            >
-              <ExplorerNameTextField content={content} tabId={tabId} />
-            </Stack>
-          ) : (
-            <Typography noWrap title={content.name} variant="caption">
-              {content.name}
-            </Typography>
-          )}
+          <ExplorerNameTextField
+            content={content}
+            readOnly={!editing}
+            tabId={tabId}
+          />
         </Stack>
       )}
       {dataKey === 'score' && <Rating path={content.path} />}

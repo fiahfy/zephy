@@ -151,34 +151,12 @@ const ExplorerImageListItem = (props: Props) => {
               height: (theme) => theme.spacing(5),
             }}
           >
-            {editing ? (
-              <Stack
-                sx={{
-                  alignItems: 'center',
-                  flexGrow: 1,
-                  ml: -0.5,
-                }}
-              >
-                <ExplorerNameTextField content={content} tabId={tabId} />
-              </Stack>
-            ) : (
-              <Typography
-                sx={{
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
-                  display: '-webkit-box',
-                  lineHeight: 1.4,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'initial',
-                  wordBreak: 'break-all',
-                }}
-                title={content.name}
-                variant="caption"
-              >
-                {content.name}
-              </Typography>
-            )}
+            <ExplorerNameTextField
+              content={content}
+              multiline
+              readOnly={!editing}
+              tabId={tabId}
+            />
           </Stack>
         }
       />
