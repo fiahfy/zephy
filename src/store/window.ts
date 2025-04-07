@@ -540,7 +540,31 @@ export const selectCurrentWindow = createSelector(
   (window, windowId) => window[windowId] ?? defaultWindowState,
 )
 
-// selectTabs
+// Selectors for sidebar
+
+export const selectSidebar = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.sidebar,
+)
+
+const selectSidebarVariant = (
+  _state: AppState,
+  variant: 'primary' | 'secondary',
+) => variant
+
+export const selectSidebarHiddenByVariant = createSelector(
+  selectSidebar,
+  selectSidebarVariant,
+  (sidebar, variant) => sidebar[variant].hidden,
+)
+
+export const selectSidebarWidthByVariant = createSelector(
+  selectSidebar,
+  selectSidebarVariant,
+  (sidebar, variant) => sidebar[variant].width,
+)
+
+// Selector for tabs
 
 export const selectTabs = createSelector(
   selectCurrentWindow,
@@ -622,31 +646,7 @@ export const selectViewModeByTabIdAndDirectoryPath = createSelector(
   (tab, directoryPath) => tab.viewMode[directoryPath] ?? defaultViewMode,
 )
 
-// selectSidebar
-
-export const selectSidebar = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.sidebar,
-)
-
-const selectSidebarVariant = (
-  _state: AppState,
-  variant: 'primary' | 'secondary',
-) => variant
-
-export const selectSidebarHiddenByVariant = createSelector(
-  selectSidebar,
-  selectSidebarVariant,
-  (sidebar, variant) => sidebar[variant].hidden,
-)
-
-export const selectSidebarWidthByVariant = createSelector(
-  selectSidebar,
-  selectSidebarVariant,
-  (sidebar, variant) => sidebar[variant].width,
-)
-
-// selectCurrentTabId
+// Selector for current tab
 
 export const selectCurrentTabId = createSelector(
   selectCurrentWindow,
@@ -705,6 +705,8 @@ export const selectCurrentViewMode = (state: AppState) =>
     selectCurrentTabId(state),
     selectCurrentDirectoryPath(state),
   )
+
+// Operations for windows & tabs
 
 export const newWindow =
   (directoryPath: string): AppThunk =>
@@ -772,6 +774,28 @@ export const changeTab =
     const id = selectWindowId(getState())
     dispatch(changeTab({ id, tabId }))
   }
+
+// Operations for sidebar
+
+export const setSidebarHidden =
+  (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
+  async (dispatch, getState) => {
+    const { setSidebarHidden } = windowSlice.actions
+
+    const id = selectWindowId(getState())
+    dispatch(setSidebarHidden({ id, variant, hidden }))
+  }
+
+export const setSidebarWidth =
+  (variant: 'primary' | 'secondary', width: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { setSidebarWidth } = windowSlice.actions
+
+    const id = selectWindowId(getState())
+    dispatch(setSidebarWidth({ id, variant, width }))
+  }
+
+// Operations for current tab
 
 export const changeDirectory =
   (directoryPath: string): AppThunk =>
@@ -876,23 +900,7 @@ export const setCurrentViewMode =
     dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
   }
 
-export const setSidebarHidden =
-  (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
-  async (dispatch, getState) => {
-    const { setSidebarHidden } = windowSlice.actions
-
-    const id = selectWindowId(getState())
-    dispatch(setSidebarHidden({ id, variant, hidden }))
-  }
-
-export const setSidebarWidth =
-  (variant: 'primary' | 'secondary', width: number): AppThunk =>
-  async (dispatch, getState) => {
-    const { setSidebarWidth } = windowSlice.actions
-
-    const id = selectWindowId(getState())
-    dispatch(setSidebarWidth({ id, variant, width }))
-  }
+// Operations for application menu
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const canBack = selectCanBack(getState())

@@ -407,6 +407,8 @@ export default explorerListSlice.reducer
 
 export const selectExplorerList = (state: AppState) => state.explorerList
 
+// Selectors for tabs
+
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
 export const selectExplorerByTabId = createSelector(
@@ -532,7 +534,7 @@ export const selectSelectedContentsByTabId = createSelector(
     ),
 )
 
-// selectCurrentTabId
+// Selectors for current tab
 
 export const selectCurrentExplorer = (state: AppState) =>
   selectExplorerByTabId(state, selectCurrentTabId(state))
@@ -550,6 +552,8 @@ export const selectCurrentContents = (state: AppState) =>
 
 export const selectCurrentSelectedContents = (state: AppState) =>
   selectSelectedContentsByTabId(state, selectCurrentTabId(state))
+
+// Operations for tabs
 
 export const load =
   (tabId: number): AppThunk =>
@@ -692,6 +696,8 @@ export const rename =
     }
   }
 
+// Operations for current tab
+
 export const refreshInCurrentTab =
   (): AppThunk => async (dispatch, getState) => {
     const tabId = selectCurrentTabId(getState())
@@ -741,7 +747,6 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
   window.electronAPI.pasteEntries(directoryPath)
 }
 
-// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
 export const startRenamingInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
@@ -759,7 +764,6 @@ export const startRenamingInCurrentTab =
     dispatch(startEditing({ tabId, path: targetPath }))
   }
 
-// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
 export const moveToTrashInCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
@@ -801,7 +805,6 @@ export const moveToTrashInCurrentTab =
     window.electronAPI.moveEntriesToTrash(targetPaths)
   }
 
-// TODO: sidebar/tab or application menu から呼び出される、 application menu から呼び出された場合は current tab の選択状態から対象を決定する
 export const openInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
@@ -818,6 +821,8 @@ export const openInCurrentTab =
         : openEntry(entry.path)
     dispatch(action)
   }
+
+// Operations for anywhere
 
 export const move =
   (paths: string[], directoryPath: string): AppThunk =>
