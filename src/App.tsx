@@ -224,9 +224,6 @@ const App = () => {
           'html, body, #root': {
             height: '100%',
           },
-          a: {
-            color: theme.palette.primary.main,
-          },
           '::-webkit-scrollbar': {
             width: 10,
             height: 10,

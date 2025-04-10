@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   FormGroup,
   InputLabel,
+  Link,
   MenuItem,
   Select,
   type SelectChangeEvent,
@@ -112,9 +113,8 @@ const Settings = () => {
               label={
                 <>
                   Open Image Files with{' '}
-                  {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                  <a
-                    href="#"
+                  <Link
+                    component="button"
                     onClick={(e) => {
                       e.preventDefault()
                       window.electronAPI.openUrl(
@@ -123,7 +123,7 @@ const Settings = () => {
                     }}
                   >
                     Photy
-                  </a>
+                  </Link>
                 </>
               }
               slotProps={{ typography: { variant: 'body2' } }}
@@ -139,9 +139,8 @@ const Settings = () => {
               label={
                 <>
                   Open Video and Audio Files with{' '}
-                  {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                  <a
-                    href="#"
+                  <Link
+                    component="button"
                     onClick={(e) => {
                       e.preventDefault()
                       window.electronAPI.openUrl(
@@ -150,7 +149,7 @@ const Settings = () => {
                     }}
                   >
                     Visty
-                  </a>
+                  </Link>
                 </>
               }
               slotProps={{ typography: { variant: 'body2' } }}
