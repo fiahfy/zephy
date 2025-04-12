@@ -32,6 +32,7 @@ const StatusBar = () => {
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
+      <Divider sx={{ inset: '0 0 auto', position: 'absolute' }} />
       <Toolbar
         disableGutters
         sx={{
@@ -44,7 +45,6 @@ const StatusBar = () => {
           {message}
         </Typography>
       </Toolbar>
-      <Divider sx={{ inset: '0 0 auto', position: 'absolute' }} />
     </AppBar>
   )
 }

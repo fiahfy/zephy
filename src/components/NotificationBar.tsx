@@ -29,7 +29,7 @@ const NotificationBar = () => {
   )
 
   const handleClose = useCallback(
-    (_event: SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+    (_e: SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
       if (reason === 'clickaway') {
         return
       }
