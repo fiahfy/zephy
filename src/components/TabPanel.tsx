@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import Explorer from '~/components/Explorer'
 import Settings from '~/components/Settings'
+import usePrevious from '~/hooks/usePrevious'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load } from '~/store/explorer-list'
 import { selectDirectoryPathByTabId } from '~/store/window'
@@ -17,10 +18,13 @@ const TabPanel = (props: Props) => {
   )
   const dispatch = useAppDispatch()
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  const prevDirectoryPath = usePrevious(directoryPath)
+
   useEffect(() => {
-    dispatch(load(tabId))
-  }, [directoryPath, dispatch, tabId])
+    if (prevDirectoryPath !== directoryPath) {
+      dispatch(load(tabId))
+    }
+  }, [directoryPath, dispatch, prevDirectoryPath, tabId])
 
   const Component = useMemo(() => {
     switch (directoryPath) {

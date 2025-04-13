@@ -194,6 +194,41 @@ export const windowSlice = createSlice({
         },
       }
     },
+    moveTab(
+      state,
+      action: PayloadAction<{
+        id: number
+        activeTabId: number
+        overTabId: number
+      }>,
+    ) {
+      const { id, activeTabId, overTabId } = action.payload
+      const window = state[id]
+      if (!window) {
+        return state
+      }
+      const activeTabIndex = window.tabs.findIndex(
+        (tab) => tab.id === activeTabId,
+      )
+      const overTabIndex = window.tabs.findIndex((tab) => tab.id === overTabId)
+      if (activeTabIndex === -1 || overTabIndex === -1) {
+        return state
+      }
+      const activeTab = window.tabs[activeTabIndex]
+      const updatingTabs = window.tabs.filter((_, i) => i !== activeTabIndex)
+      const tabs = [
+        ...updatingTabs.slice(0, overTabIndex),
+        activeTab,
+        ...updatingTabs.slice(overTabIndex),
+      ]
+      return {
+        ...state,
+        [id]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
     closeTab(state, action: PayloadAction<{ id: number; tabId: number }>) {
       const { id, tabId } = action.payload
       const window = state[id]
@@ -741,19 +776,28 @@ export const duplicateTab =
     dispatch(copyTab({ srcTabId, destTabId }))
   }
 
+export const moveTab =
+  (activeTabId: number, overTabId: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { moveTab } = windowSlice.actions
+
+    const id = selectWindowId(getState())
+    dispatch(moveTab({ id, activeTabId, overTabId }))
+  }
+
 export const closeTab =
-  (targetTabId?: number): AppThunk =>
+  (tabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { closeTab } = windowSlice.actions
 
     const id = selectWindowId(getState())
-    const tabId = targetTabId ?? selectCurrentTabId(getState())
+    const targetTabId = tabId ?? selectCurrentTabId(getState())
     const canCloseTab = selectCanCloseTab(getState())
     if (!canCloseTab) {
       return
     }
-    dispatch(closeTab({ id, tabId }))
-    dispatch(removeTab({ tabId }))
+    dispatch(closeTab({ id, tabId: targetTabId }))
+    dispatch(removeTab({ tabId: targetTabId }))
   }
 
 export const closeOtherTabs =

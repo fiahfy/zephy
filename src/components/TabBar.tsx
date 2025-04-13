@@ -1,63 +1,103 @@
+import {
+  DndContext,
+  type DragEndEvent,
+  MouseSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable'
 import { Tabs } from '@mui/material'
-import { type SyntheticEvent, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import TabBarAddItem from '~/components/TabBarAddItem'
 import TabBarItem from '~/components/TabBarItem'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { changeTab, selectCurrentTabId, selectTabs } from '~/store/window'
+import { moveTab, selectCurrentTabId, selectTabs } from '~/store/window'
 
 const TabBar = () => {
   const tabId = useAppSelector(selectCurrentTabId)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 15,
+      },
+    }),
+  )
+
   const tabIndex = useMemo(
     () => tabs.findIndex((tab) => tab.id === tabId),
     [tabId, tabs],
   )
 
-  const handleChange = useCallback(
-    (_e: SyntheticEvent, value: number) => {
-      const tab = tabs[value]
-      if (tab) {
-        dispatch(changeTab(tab.id))
+  const items = useMemo(() => tabs.map((tab) => tab.id), [tabs])
+
+  const handleDragEnd = useCallback(
+    (e: DragEndEvent) => {
+      const { active, over } = e
+      const activeId = active.id
+      const overId = over?.id
+      if (
+        typeof activeId === 'number' &&
+        typeof overId === 'number' &&
+        activeId !== overId
+      ) {
+        dispatch(moveTab(activeId, overId))
       }
     },
-    [dispatch, tabs],
+    [dispatch],
   )
 
   return (
     <>
       {tabs.length > 1 && (
-        <Tabs
-          onChange={handleChange}
-          scrollButtons="auto"
-          sx={{
-            flexShrink: 0,
-            minHeight: 0,
-            position: 'relative',
-            '&::before': {
-              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-              content: '""',
-              inset: 'auto 0 0',
-              position: 'absolute',
-            },
-            '.MuiTabs-indicator': {
-              bottom: 'auto',
-              top: 0,
-              transition: 'none',
-            },
-            '.MuiTabs-scrollButtons.Mui-disabled': {
-              opacity: 0.3,
-            },
-          }}
-          value={tabIndex}
-          variant="scrollable"
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToHorizontalAxis]}
+          sensors={sensors}
         >
-          {tabs.map((tab) => (
-            <TabBarItem key={tab.id} tabId={tab.id} />
-          ))}
-          <TabBarAddItem />
-        </Tabs>
+          <SortableContext
+            items={items}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              scrollButtons="auto"
+              sx={{
+                flexShrink: 0,
+                minHeight: 0,
+                position: 'relative',
+                '&::before': {
+                  borderBottom: (theme) =>
+                    `thin solid ${theme.palette.divider}`,
+                  content: '""',
+                  inset: 'auto 0 0',
+                  position: 'absolute',
+                },
+                '.MuiTabs-indicator': {
+                  display: 'none',
+                },
+                '.MuiTabs-scrollButtons.Mui-disabled': {
+                  opacity: 0.3,
+                },
+              }}
+              value={tabIndex}
+              variant="scrollable"
+            >
+              {items.map((id) => {
+                const tab = tabs.find((tab) => tab.id === id)
+                return tab ? <TabBarItem key={tab.id} tabId={tab.id} /> : null
+              })}
+              <TabBarAddItem />
+            </Tabs>
+          </SortableContext>
+        </DndContext>
       )}
     </>
   )

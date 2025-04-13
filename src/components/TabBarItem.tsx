@@ -1,11 +1,12 @@
+import { useSortable } from '@dnd-kit/sortable'
 import { Close as CloseIcon } from '@mui/icons-material'
-import { IconButton, Stack, Tab, Typography } from '@mui/material'
+import { Divider, IconButton, Stack, Tab, Typography } from '@mui/material'
 import { type MouseEvent, useCallback, useMemo } from 'react'
 import Icon from '~/components/Icon'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoadingByTabId } from '~/store/explorer-list'
-import { closeTab, selectHistoryByTabId } from '~/store/window'
+import { changeTab, closeTab, selectHistoryByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { getIconType, isZephySchema } from '~/utils/url'
 
@@ -29,6 +30,28 @@ const TabBarItem = (props: Props) => {
 
   const { droppableStyle, ...dropHandlers } = useDroppable(
     zephySchema ? undefined : directoryPath,
+  )
+
+  const {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({
+    id: tabId,
+    transition: null,
+  })
+
+  const sortableStyle = useMemo(
+    () => ({
+      transform: transform
+        ? `translate(${transform.x}px, ${transform.y}px)`
+        : undefined,
+      transition,
+    }),
+    [transform, transition],
   )
 
   const handleContextMenu = useMemo(
@@ -65,12 +88,16 @@ const TabBarItem = (props: Props) => {
     [directoryPath, tabId],
   )
 
-  const handleClick = useCallback(
+  const handleMouseDown = useCallback(
     (e: MouseEvent) => {
-      // NOTE: prevent tab change event
-      e.stopPropagation()
-      dispatch(closeTab(tabId))
+      dispatch(changeTab(tabId))
+      listeners?.onMouseDown(e)
     },
+    [dispatch, listeners, tabId],
+  )
+
+  const handleClick = useCallback(
+    () => dispatch(closeTab(tabId)),
     [dispatch, tabId],
   )
 
@@ -78,11 +105,16 @@ const TabBarItem = (props: Props) => {
     <Tab
       // @see https://github.com/mui/material-ui/issues/27947#issuecomment-905318861
       {...others}
+      {...dropHandlers}
+      {...attributes}
+      {...listeners}
       disableRipple
       icon={
         <IconButton
           component="span"
           onClick={handleClick}
+          // NOTE: prevent tab change event & drag event for sortable
+          onMouseDown={(e) => e.stopPropagation()}
           size="small"
           sx={{ opacity: 0 }}
           title="Close"
@@ -101,6 +133,15 @@ const TabBarItem = (props: Props) => {
             minWidth: 0,
           }}
         >
+          <Divider
+            sx={{
+              borderBottomColor: (theme) => theme.palette.primary.main,
+              borderBottomWidth: '2px',
+              height: '1px',
+              inset: '0 0 auto',
+              position: 'absolute',
+            }}
+          />
           <Icon
             type={loading ? 'progress' : getIconType(history.directoryPath)}
           />
@@ -110,16 +151,26 @@ const TabBarItem = (props: Props) => {
         </Stack>
       }
       onContextMenu={handleContextMenu}
+      onMouseDown={handleMouseDown}
+      ref={setNodeRef}
       sx={(theme) => ({
         color: theme.palette.text.primary,
-        borderRight: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.default,
+        borderBottom: `thin solid ${theme.palette.divider}`,
+        borderLeft: `1px solid ${theme.palette.divider}`,
+        borderRight: `thin solid ${theme.palette.divider}`,
+        marginLeft: '-1px',
         minHeight: 0,
         pl: 1.0,
         pr: 0.5,
         py: 0.375,
         textTransform: 'none',
+        zIndex: isDragging ? 1 : undefined,
         '&.Mui-selected': {
-          backgroundColor: theme.palette.background.default,
+          borderBottom: 'thin solid transparent',
+          '.MuiDivider-root': {
+            display: 'block',
+          },
         },
         '&.Mui-selected, &:hover': {
           '.MuiIconButton-root': {
@@ -129,9 +180,12 @@ const TabBarItem = (props: Props) => {
         '.MuiIconButton-root:focus-visible': {
           opacity: 1,
         },
+        '.MuiDivider-root': {
+          display: 'none',
+        },
         ...droppableStyle,
+        ...sortableStyle,
       })}
-      {...dropHandlers}
     />
   )
 }
