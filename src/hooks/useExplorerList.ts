@@ -197,14 +197,19 @@ const useExplorerList = (
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!focused) {
-        return
+      const focusFirst = () => {
+        const content = contents[0]
+        if (!content) {
+          return
+        }
+        dispatch(select(tabId, content.path))
+        dispatch(focus(tabId, content.path))
       }
 
       const focusByHorizontal = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
-          return
+          return focusFirst()
         }
 
         const rowIndex = Math.floor(index / columns)
@@ -233,7 +238,7 @@ const useExplorerList = (
       const focusByVertical = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
-          return
+          return focusFirst()
         }
 
         const rowIndex = Math.floor(index / columns)
@@ -257,21 +262,21 @@ const useExplorerList = (
 
       const focusTo = (position: 'first' | 'last', multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
+        if (index < 0) {
+          return focusFirst()
+        }
+
         const columnIndex = index % columns
         const maxRowIndex = Math.floor(contents.length / columns)
 
         let newIndex: number
-        if (index >= 0) {
-          if (position === 'first') {
-            newIndex = columnIndex
-          } else {
-            newIndex = maxRowIndex * columns + columnIndex
-            if (newIndex >= contents.length) {
-              newIndex -= columns
-            }
-          }
+        if (position === 'first') {
+          newIndex = columnIndex
         } else {
-          newIndex = 0
+          newIndex = maxRowIndex * columns + columnIndex
+          if (newIndex >= contents.length) {
+            newIndex -= columns
+          }
         }
 
         const content = contents[newIndex]
@@ -290,7 +295,7 @@ const useExplorerList = (
 
       switch (e.key) {
         case 'Enter':
-          if (!e.nativeEvent.isComposing) {
+          if (!e.nativeEvent.isComposing && focused) {
             dispatch(startEditing(tabId, focused))
           }
           return
@@ -318,7 +323,10 @@ const useExplorerList = (
           return focusByHorizontal(1, e.shiftKey)
         case 'Shift':
           e.preventDefault()
-          return dispatch(setAnchor({ tabId, anchor: focused }))
+          if (focused) {
+            dispatch(setAnchor({ tabId, anchor: focused }))
+          }
+          return
       }
     },
     [anchor, columns, contents, dispatch, focused, horizontal, tabId],
