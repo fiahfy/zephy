@@ -17,7 +17,8 @@
 ## TODOs
  
 - [ ] Show progress when copying & moving large files
-- [ ] Sort Favorites
+- [ ] Sort & Rename Favorites
+- [ ] Handle focus on favorites, ratings
 - [ ] Change Thumbnail Size
 - [ ] Use Electron Forge
 
