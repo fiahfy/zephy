@@ -123,13 +123,13 @@ const ExplorerPanel = () => {
   )
 
   const handleSelectedItemsChange = useCallback(
-    (_e: SyntheticEvent, itemIds: string | null) =>
+    (_e: SyntheticEvent | null, itemIds: string | null) =>
       dispatch(setSelectedItems({ selectedItems: itemIds ?? undefined })),
     [dispatch],
   )
 
   const handleExpandedItemsChange = useCallback(
-    async (_e: SyntheticEvent, itemIds: string[]) => {
+    async (_e: SyntheticEvent | null, itemIds: string[]) => {
       dispatch(setExpandedItems({ expandedItems: itemIds }))
 
       const expandingItemId = itemIds.find(
