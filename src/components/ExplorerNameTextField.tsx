@@ -26,8 +26,10 @@ const ExplorerNameTextField = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const [name, setName] = useState(content.name)
+  const [name, setName] = useState('')
   const ref = useRef<HTMLInputElement>(null)
+
+  useEffect(() => setName(content.name), [content.name])
 
   useEffect(() => {
     if (readOnly) {
@@ -38,13 +40,13 @@ const ExplorerNameTextField = (props: Props) => {
       return
     }
     el.focus()
-    const index = content.name.lastIndexOf('.')
-    if (content.type !== 'directory' && index > 0) {
+    if (content.type === 'file') {
+      const index = el.value.lastIndexOf('.')
       el.setSelectionRange(0, index)
     } else {
       el.select()
     }
-  }, [content.name, content.type, readOnly])
+  }, [content.type, readOnly])
 
   const finish = useCallback(() => {
     dispatch(finishEditing(tabId))
