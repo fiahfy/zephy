@@ -29,7 +29,7 @@ jobs:
       - run: corepack enable
       - run: yarn
       - run: yarn build
-      - run: yarn release -m
+      - run: yarn publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EP_PRE_RELEASE: true
