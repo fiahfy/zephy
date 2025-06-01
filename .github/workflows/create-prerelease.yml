@@ -31,5 +31,4 @@ jobs:
       - run: yarn build
       - run: yarn publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EP_PRE_RELEASE: true
+          PRE_RELEASE: true

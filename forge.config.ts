@@ -54,6 +54,20 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'fiahfy',
+          name: 'zephy',
+        },
+        prerelease: !!process.env.PRE_RELEASE,
+        draft: !process.env.PRE_RELEASE,
+        generateReleaseNotes: true,
+      },
+    },
+  ],
 }
 
 export default config
