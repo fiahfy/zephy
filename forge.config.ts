@@ -1,7 +1,8 @@
-import { MakerDeb } from '@electron-forge/maker-deb'
-import { MakerRpm } from '@electron-forge/maker-rpm'
-import { MakerSquirrel } from '@electron-forge/maker-squirrel'
-import { MakerZIP } from '@electron-forge/maker-zip'
+// import { MakerDeb } from '@electron-forge/maker-deb'
+import { MakerDMG } from '@electron-forge/maker-dmg'
+// import { MakerRpm } from '@electron-forge/maker-rpm'
+// import { MakerSquirrel } from '@electron-forge/maker-squirrel'
+// import { MakerZIP } from '@electron-forge/maker-zip'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { VitePlugin } from '@electron-forge/plugin-vite'
 import type { ForgeConfig } from '@electron-forge/shared-types'
@@ -10,13 +11,36 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses'
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: 'build/icon',
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    // new MakerSquirrel({}),
+    // new MakerZIP({}, ['darwin']),
+    // new MakerRpm({}),
+    // new MakerDeb({}),
+    new MakerDMG(
+      {
+        icon: 'build/icon.icns',
+        background: 'build/background.png',
+        // @see https://github.com/electron-userland/electron-builder/blob/9272cf33a8e3b788979010706e9c564e954a2ee7/packages/dmg-builder/src/dmg.ts#L182
+        contents: (opts) => [
+          {
+            x: 130,
+            y: 220,
+            type: 'file',
+            path: opts.appPath,
+          },
+          {
+            x: 410,
+            y: 220,
+            type: 'link',
+            path: '/Applications',
+          },
+        ],
+      },
+      ['darwin'],
+    ),
   ],
   plugins: [
     new VitePlugin({
