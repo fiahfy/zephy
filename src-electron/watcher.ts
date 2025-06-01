@@ -1,4 +1,4 @@
-import { dirname } from 'node:path'
+import { dirname, parse, resolve } from 'node:path'
 import chokidar, { type FSWatcher } from 'chokidar'
 import { BrowserWindow, type IpcMainInvokeEvent, ipcMain } from 'electron'
 
@@ -27,6 +27,8 @@ const createWatcher = () => {
     }
   }
 
+  const isRootDirectory = (path: string) => resolve(path) === parse(path).root
+
   const close = async (id: number) => {
     const watcher = watchers[id]
     if (watcher) {
@@ -40,8 +42,12 @@ const createWatcher = () => {
     callback: Callback,
   ) => {
     await close(id)
+    // @see https://github.com/paulmillr/chokidar/issues/1184
+    const targetDirectoryPaths = directoryPaths.filter(
+      (path) => !isRootDirectory(path),
+    )
     watchers[id] = chokidar
-      .watch(directoryPaths, {
+      .watch(targetDirectoryPaths, {
         depth: 0,
         ignoreInitial: true,
       })
