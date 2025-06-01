@@ -3,14 +3,23 @@ import { MakerDMG } from '@electron-forge/maker-dmg'
 // import { MakerRpm } from '@electron-forge/maker-rpm'
 // import { MakerSquirrel } from '@electron-forge/maker-squirrel'
 import { MakerZIP } from '@electron-forge/maker-zip'
+import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { VitePlugin } from '@electron-forge/plugin-vite'
+import { PublisherGithub } from '@electron-forge/publisher-github'
 import type { ForgeConfig } from '@electron-forge/shared-types'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      // @see https://github.com/electron/forge/issues/1693
+      unpack: '**/{.**,**}/**/{ffmpeg,ffprobe}',
+    },
+    // @see https://github.com/electron/forge/issues/3738#issuecomment-2692534953
+    ignore: [
+      /node_modules\/(?!(ffmpeg-static-electron|ffprobe-static-electron|fsevents)\/)/,
+    ],
     icon: 'build/icon',
   },
   rebuildConfig: {},
@@ -77,20 +86,18 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
+    new AutoUnpackNativesPlugin({}),
   ],
   publishers: [
-    {
-      name: '@electron-forge/publisher-github',
-      config: {
-        repository: {
-          owner: 'fiahfy',
-          name: 'zephy',
-        },
-        prerelease: !!process.env.PRE_RELEASE,
-        draft: !process.env.PRE_RELEASE,
-        generateReleaseNotes: true,
+    new PublisherGithub({
+      repository: {
+        owner: 'fiahfy',
+        name: 'zephy',
       },
-    },
+      prerelease: !!process.env.PRE_RELEASE,
+      draft: !process.env.PRE_RELEASE,
+      generateReleaseNotes: true,
+    }),
   ],
 }
 
