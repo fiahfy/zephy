@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: corepack enable
       - run: yarn
-      - run: yarn build
       - run: yarn publish
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PRE_RELEASE: true
