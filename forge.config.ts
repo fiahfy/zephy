@@ -21,6 +21,16 @@ const config: ForgeConfig = {
       /node_modules\/(?!(ffmpeg-static-electron|ffprobe-static-electron|fsevents)\/)/,
     ],
     icon: 'build/icon',
+    // @see https://github.com/electron-userland/electron-builder/blob/a6be444c90e59bbe92c53e94d7a5070f1399651f/packages/app-builder-lib/src/macPackager.ts#L233
+    osxSign: {
+      identity: '-',
+      identityValidation: false,
+      optionsForFile: () => {
+        return {
+          entitlements: 'build/entitlements.plist',
+        }
+      },
+    },
   },
   rebuildConfig: {},
   makers: [
