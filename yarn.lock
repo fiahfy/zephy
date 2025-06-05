@@ -1829,18 +1829,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-alias@npm:^5.1.1":
-  version: 5.1.1
-  resolution: "@rollup/plugin-alias@npm:5.1.1"
-  peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 10c0/00592400563b65689631e820bd72ff440f5cd21021bbd2f21b8558582ab58fd109067da77000091e40fcb8c20cabcd3a09b239a30e012bb47f6bc1a15b68ca59
-  languageName: node
-  linkType: hard
-
 "@rollup/plugin-esm-shim@npm:^0.1.8":
   version: 0.1.8
   resolution: "@rollup/plugin-esm-shim@npm:0.1.8"
@@ -7541,7 +7529,6 @@ __metadata:
     "@mui/material": "npm:^7.1.0"
     "@mui/x-tree-view": "npm:^8.5.0"
     "@reduxjs/toolkit": "npm:^2.8.2"
-    "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-esm-shim": "npm:^0.1.8"
     "@tanstack/react-virtual": "npm:^3.13.9"
     "@types/electron-squirrel-startup": "npm:^1.0.2"

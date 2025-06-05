@@ -48,7 +48,6 @@
     "@electron-forge/publisher-github": "^7.8.1",
     "@electron/fuses": "^1.8.0",
     "@fiahfy/biome-config": "^0.0.1",
-    "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-esm-shim": "^0.1.8",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/fluent-ffmpeg": "^2.1.27",

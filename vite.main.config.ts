@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias'
 import esmShim from '@rollup/plugin-esm-shim'
 import { defineConfig } from 'vite'
 
@@ -16,20 +15,11 @@ export default defineConfig({
         'ffmpeg-static-electron',
         'ffprobe-static-electron',
         // @see https://github.com/paulmillr/chokidar/issues/1000
-        // @see https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/712
+        // @see https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/712#issuecomment-1003447792
         'fsevents',
       ],
-      // @see https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/1210#issuecomment-1614992707
       plugins: [
-        alias({
-          entries: [
-            {
-              find: './lib-cov/fluent-ffmpeg',
-              replacement: './lib/fluent-ffmpeg',
-            },
-          ],
-        }),
-        // for __dirname on fluent-ffmpeg
+        // NOTE: for __dirname on fluent-ffmpeg
         esmShim(),
       ],
     },
