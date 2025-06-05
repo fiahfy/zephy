@@ -69,9 +69,9 @@
   "private": true,
   "productName": "Zephy",
   "scripts": {
-    "build": "electron-forge make",
     "dev": "electron-forge start",
     "lint": "biome check",
+    "make": "electron-forge make",
     "package": "electron-forge package",
     "prepare": "husky",
     "publish": "electron-forge publish",
