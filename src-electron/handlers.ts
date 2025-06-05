@@ -99,7 +99,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
       Promise.all(
         paths.map(async (path) => {
           await shell.trashItem(path)
-          // NOTE: notify event manually because chokidar doesn't detect trashItem event
+          // NOTE: Notify event manually because chokidar doesn't detect trashItem event
           watcher.notify('delete', dirname(path), path)
         }),
       ),

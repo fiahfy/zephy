@@ -113,7 +113,7 @@ const TabBarItem = (props: Props) => {
         <IconButton
           component="span"
           onClick={handleClick}
-          // NOTE: prevent tab change event & drag event for sortable
+          // NOTE: Prevent tab change event & drag event for sortable
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
           sx={{ opacity: 0 }}

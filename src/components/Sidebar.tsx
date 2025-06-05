@@ -108,7 +108,7 @@ const Sidebar = (props: Props) => {
 
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
-      // NOTE: prevent dragging on tree view
+      // NOTE: Prevent dragging on tree view
       e.preventDefault()
       setResizing(true)
       document.body.classList.add('col-resizing')

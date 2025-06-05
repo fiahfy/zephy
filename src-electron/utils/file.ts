@@ -37,7 +37,7 @@ const getEntryType = (obj: Dirent | Stats) => {
 const parsePath = (path: string) => {
   const dirnames = path.split(sep)
   let rootPath = dirnames[0]
-  // NOTE: for darwin
+  // NOTE: For darwin
   if (!rootPath) {
     rootPath = sep
   }
@@ -209,7 +209,7 @@ export const moveEntries = async (
   return await Promise.all(
     paths.map(async (path) => {
       let newPath = join(directoryPath, basename(path))
-      // NOTE: skip if moving to the same path or into itself
+      // NOTE: Skip if moving to the same path or into itself
       if (newPath === path || paths.includes(directoryPath)) {
         newPath = path
       } else {

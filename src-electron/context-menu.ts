@@ -183,7 +183,7 @@ const registerContextMenu = (
         type: 'radio',
       })),
     }),
-    // TODO: implement cut entries
+    // TODO: Implement cut entries
     cutEntries: () => ({
       accelerator: 'CmdOrCtrl+X',
       click: () => undefined,

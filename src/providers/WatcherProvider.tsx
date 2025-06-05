@@ -32,7 +32,7 @@ const WatcherProvider = (props: Props) => {
     window.electronAPI.watchDirectories(
       directoryPaths,
       (eventType, directoryPath, filePath) => {
-        // TODO: remove logging
+        // TODO: Remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
           directoryPaths,
           eventType,
