@@ -15,7 +15,6 @@ jobs:
           node-version: 20
       - run: corepack enable
       - run: yarn
-      - run: yarn build
-      - run: yarn release -mw
+      - run: yarn publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
