@@ -31,7 +31,7 @@ const config: ForgeConfig = {
     },
   },
   // TODO: Remove this workaround
-  // @see https://github.com/electron/forge/issues/3738
+  // @see https://github.com/electron/forge/issues/3738#issuecomment-2622541945
   // @see https://stackoverflow.com/questions/79435783/how-can-i-use-native-node-modules-in-my-packaged-electron-application/79445715#79445715
   hooks: {
     async packageAfterCopy(_forgeConfig, buildPath) {
