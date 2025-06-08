@@ -11,6 +11,7 @@ import { PublisherGithub } from '@electron-forge/publisher-github'
 import type { ForgeConfig } from '@electron-forge/shared-types'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import { copy, mkdirs } from 'fs-extra'
+import packageJson from './package.json'
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -133,7 +134,7 @@ const config: ForgeConfig = {
     new PublisherGithub({
       repository: {
         owner: 'fiahfy',
-        name: 'zephy',
+        name: packageJson.name,
       },
       prerelease: !!process.env.PRE_RELEASE,
       draft: !process.env.PRE_RELEASE,
