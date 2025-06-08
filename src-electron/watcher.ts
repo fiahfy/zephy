@@ -40,6 +40,7 @@ const createWatcher = () => {
     callback: Callback,
   ) => {
     await close(id)
+
     watchers[id] = chokidar
       .watch(directoryPaths, {
         depth: 0,

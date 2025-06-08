@@ -6,32 +6,13 @@ import {
   type BrowserWindowConstructorOptions,
   app,
 } from 'electron'
+import started from 'electron-squirrel-startup'
 import registerApplicationMenu from './application-menu'
 import registerContextMenu from './context-menu'
 import registerHandlers from './handlers'
 import createWatcher from './watcher'
 
 const dirPath = dirname(fileURLToPath(import.meta.url))
-
-// The built directory structure
-//
-// ├─┬─┬ dist
-// │ │ └── index.html
-// │ │
-// │ ├─┬ dist-electron
-// │ │ ├── main.js
-// │ │ └── preload.mjs
-// │
-process.env.APP_ROOT = join(dirPath, '..')
-
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
-export const MAIN_DIST = join(process.env.APP_ROOT, 'dist-electron')
-export const RENDERER_DIST = join(process.env.APP_ROOT, 'dist')
-
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
-  ? join(process.env.APP_ROOT, 'public')
-  : RENDERER_DIST
 
 const watcher = createWatcher()
 
@@ -42,18 +23,20 @@ const baseCreateWindow = (options: BrowserWindowConstructorOptions) => {
     minWidth: 400,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
-      preload: join(dirPath, 'preload.mjs'),
-      webSecurity: !VITE_DEV_SERVER_URL,
+      preload: join(dirPath, 'preload.js'),
+      webSecurity: !MAIN_WINDOW_VITE_DEV_SERVER_URL,
     },
   })
 
-  if (VITE_DEV_SERVER_URL) {
-    browserWindow.loadURL(VITE_DEV_SERVER_URL)
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    browserWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
     browserWindow.on('ready-to-show', () => {
       browserWindow.webContents.openDevTools()
     })
   } else {
-    browserWindow.loadFile(join(RENDERER_DIST, 'index.html'))
+    browserWindow.loadFile(
+      join(dirPath, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    )
   }
 
   // NOTE: Prevent a new window from occasionally opening when starting a drag operation.
@@ -70,6 +53,11 @@ const windowManager = createWindowManager(baseCreateWindow)
 const createWindow = (directoryPath?: string) => {
   const path = directoryPath ?? app.getPath('home')
   windowManager.create({ directoryPath: path })
+}
+
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (started) {
+  app.quit()
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
