@@ -26,11 +26,11 @@ const ExplorerNameTextField = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const [name, setName] = useState('')
+  const [name, setName] = useState(content.name)
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (readOnly) {
+    if (!readOnly) {
       setName(content.name)
     }
   }, [content.name, readOnly])
