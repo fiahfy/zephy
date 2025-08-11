@@ -1,6 +1,6 @@
 import {
-  type ContextMenuOption,
   buildContextMenuParams,
+  type ContextMenuOption,
 } from '@fiahfy/electron-context-menu/renderer'
 import type { MouseEvent } from 'react'
 

@@ -1,10 +1,10 @@
 import {
+  app,
   BrowserWindow,
   type IpcMainInvokeEvent,
+  ipcMain,
   Menu,
   type MenuItemConstructorOptions,
-  app,
-  ipcMain,
   shell,
 } from 'electron'
 
@@ -31,7 +31,7 @@ const isEditType = (
 ): type is 'copy' | 'cut' | 'paste' | 'selectAll' =>
   ['copy', 'cut', 'paste', 'selectAll'].includes(type)
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: false positive
 const send = (message: { type: string; data?: any }) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
   if (!activeWindow) {

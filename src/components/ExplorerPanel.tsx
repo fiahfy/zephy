@@ -44,7 +44,7 @@ const ExplorerPanel = () => {
     dispatch(load(undefined))
   }, [dispatch])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     if (!selectedItems) {
       return

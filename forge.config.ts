@@ -1,4 +1,5 @@
 import { dirname, join, resolve } from 'node:path'
+import { FuseV1Options, FuseVersion } from '@electron/fuses'
 // import { MakerDeb } from '@electron-forge/maker-deb'
 import { MakerDMG } from '@electron-forge/maker-dmg'
 // import { MakerRpm } from '@electron-forge/maker-rpm'
@@ -9,7 +10,6 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { VitePlugin } from '@electron-forge/plugin-vite'
 import { PublisherGithub } from '@electron-forge/publisher-github'
 import type { ForgeConfig } from '@electron-forge/shared-types'
-import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import { copy, mkdirs } from 'fs-extra'
 import packageJson from './package.json'
 

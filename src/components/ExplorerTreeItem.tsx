@@ -16,11 +16,11 @@ import {
 } from '@mui/x-tree-view'
 import clsx from 'clsx'
 import {
+  forwardRef,
   type HTMLAttributes,
   type MouseEvent,
   type ReactNode,
   type Ref,
-  forwardRef,
   useCallback,
 } from 'react'
 import EntryIcon from '~/components/EntryIcon'
@@ -107,7 +107,7 @@ const ExplorerTreeItemRoot = forwardRef(
 
     const iconContainerProps = getIconContainerProps()
 
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    // biome-ignore lint/style/noNonNullAssertion: false positive
     const item = useTreeItemModel<{ entry: Entry; id: string; label: string }>(
       props.itemId,
     )!

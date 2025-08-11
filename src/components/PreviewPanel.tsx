@@ -18,7 +18,7 @@ const PreviewPanel = () => {
   const ref = useRef<HTMLElement>(null)
   const footerRef = useRef<HTMLElement>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     const el = ref.current
     if (el) {

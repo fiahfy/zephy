@@ -1,7 +1,7 @@
 import {
-  type PayloadAction,
   createSelector,
   createSlice,
+  type PayloadAction,
 } from '@reduxjs/toolkit'
 import type { Content, Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
@@ -584,7 +584,7 @@ export const load =
         return []
       })()
       dispatch(loaded({ tabId, entries }))
-    } catch (e) {
+    } catch (_e) {
       dispatch(loadFailed({ tabId }))
     }
   }

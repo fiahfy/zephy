@@ -51,7 +51,7 @@ const useEntryThumbnail = (entry: Entry) => {
           .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
           .toSorted((a, b) => a.name.localeCompare(b.name))
           .map((entry) => entry.path)
-      } catch (e) {
+      } catch (_e) {
         return []
       }
     },
@@ -61,7 +61,7 @@ const useEntryThumbnail = (entry: Entry) => {
   const getThumbnail = useCallback(async (paths: string[]) => {
     try {
       return await window.electronAPI.createEntryThumbnailUrl(paths)
-    } catch (e) {
+    } catch (_e) {
       return undefined
     }
   }, [])
@@ -78,7 +78,7 @@ const useEntryThumbnail = (entry: Entry) => {
         img.src = url
       })
       return true
-    } catch (e) {
+    } catch (_e) {
       return false
     }
   }, [])

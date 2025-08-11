@@ -1,15 +1,15 @@
 import {
+  closestCenter,
   DndContext,
   type DragEndEvent,
   MouseSensor,
-  closestCenter,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
 import {
-  SortableContext,
   horizontalListSortingStrategy,
+  SortableContext,
 } from '@dnd-kit/sortable'
 import { Tabs } from '@mui/material'
 import { useCallback, useMemo } from 'react'

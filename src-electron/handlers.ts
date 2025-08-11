@@ -1,8 +1,8 @@
 import { dirname, join } from 'node:path'
 import {
+  app,
   BrowserWindow,
   type IpcMainInvokeEvent,
-  app,
   ipcMain,
   nativeImage,
   shell,

@@ -98,7 +98,7 @@ const PreviewDirectory = (props: Props) => {
     return () => observer.disconnect()
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.measure(), [virtualizer, size])
 
   useEffect(() => {
@@ -119,7 +119,7 @@ const PreviewDirectory = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .toSorted((a, b) => a.name.localeCompare(b.name))
-        } catch (e) {
+        } catch (_e) {
           return []
         }
       })()

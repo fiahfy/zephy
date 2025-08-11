@@ -1,7 +1,7 @@
 import {
-  type PayloadAction,
   createSelector,
   createSlice,
+  type PayloadAction,
 } from '@reduxjs/toolkit'
 import type { AppState, AppThunk } from '~/store'
 import { detectFileType } from '~/utils/file'

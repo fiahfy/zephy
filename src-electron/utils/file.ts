@@ -123,7 +123,7 @@ export const getEntriesForPaths = async (paths: string[]): Promise<Entry[]> => {
   for (const path of paths) {
     try {
       entries.push(await getEntry(path))
-    } catch (e) {
+    } catch (_e) {
       // noop
     }
   }

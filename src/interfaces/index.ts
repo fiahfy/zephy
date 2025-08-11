@@ -38,7 +38,7 @@ export type EntryOperations = {
 }
 
 export type MessageOperations = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: false positive
   onMessage: (callback: (message: any) => void) => () => void
 }
 
@@ -66,7 +66,7 @@ export type IElectronAPI = {
   ContextMenuOperations &
   WindowOperations<{ directoryPath: string }>
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: false positive
 export type ApplicationMenuParams = any
 
 type File = {

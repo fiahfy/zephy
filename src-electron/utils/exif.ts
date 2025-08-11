@@ -10,7 +10,7 @@ export const getEntryParameters = async (
       async: true,
     })
     return tags.parameters?.value
-  } catch (e) {
+  } catch (_e) {
     return undefined
   }
 }

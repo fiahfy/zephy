@@ -1,7 +1,7 @@
 import {
   CssBaseline,
-  ThemeProvider as MuiThemeProvider,
   createTheme,
+  ThemeProvider as MuiThemeProvider,
   useMediaQuery,
 } from '@mui/material'
 import { type ReactNode, useEffect, useMemo } from 'react'

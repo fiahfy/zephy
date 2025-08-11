@@ -77,7 +77,7 @@ const PreviewParametersTable = (props: Props) => {
       const parameters = await (async () => {
         try {
           return await window.electronAPI.getEntryParameters(entry.path)
-        } catch (e) {
+        } catch (_e) {
           return undefined
         }
       })()

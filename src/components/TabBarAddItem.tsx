@@ -2,7 +2,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { IconButton, Tab } from '@mui/material'
 import { useCallback } from 'react'
 
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
+// biome-ignore lint/complexity/noBannedTypes: false positive
 type Props = {}
 
 const TabBarAddItem = (props: Props) => {

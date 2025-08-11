@@ -122,10 +122,10 @@ const useExplorerList = (
     }
   }, [loading, previousLoading, scrollPosition, virtualizer])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
 
   useEffect(() => {

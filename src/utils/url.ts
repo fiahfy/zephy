@@ -47,7 +47,7 @@ export const getTitle = async (path: string) => {
   try {
     const entry = await window.electronAPI.getEntry(path)
     return entry.name
-  } catch (e) {
+  } catch (_e) {
     return '<Error>'
   }
 }

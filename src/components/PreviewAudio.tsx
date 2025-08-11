@@ -60,7 +60,7 @@ const PreviewAudio = (props: Props) => {
     el.volume = defaultVolume
   }, [defaultLoop, defaultVolume])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => setPaused(true), [entry.path])
 
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
@@ -138,7 +138,7 @@ const PreviewAudio = (props: Props) => {
         >
           <Icon fontSize="large" sx={{ color: 'white' }} />
         </Stack>
-        {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
+        {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
         <audio
           controls
           id="custom-audio"

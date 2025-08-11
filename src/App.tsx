@@ -1,4 +1,4 @@
-import { GlobalStyles, Stack, Toolbar, darken, lighten } from '@mui/material'
+import { darken, GlobalStyles, lighten, Stack, Toolbar } from '@mui/material'
 import { useEffect, useMemo } from 'react'
 import AddressBar from '~/components/AddressBar'
 import Inspector from '~/components/Inspector'
@@ -155,7 +155,7 @@ const App = () => {
     return () => removeListener()
   }, [dispatch])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     ;(async () => {
       const focused = await window.electronAPI.isFocused()

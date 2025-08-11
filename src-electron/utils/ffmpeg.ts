@@ -46,7 +46,7 @@ const createThumbnail = async (path: string, thumbnailDir: string) => {
       })
     }
     return pathToFileURL(thumbnailPath).href
-  } catch (e) {
+  } catch (_e) {
     return undefined
   }
 }
@@ -98,7 +98,7 @@ export const getMetadata = async (
 
   const hasDuration = type.startsWith('video/') || type.startsWith('audio/')
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: false positive
   const metadata: any = await new Promise((resolve, reject) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
       err ? reject(err) : resolve(metadata)

@@ -89,7 +89,7 @@ const PreviewVideo = (props: Props) => {
       const thumbnail = await (async () => {
         try {
           return await window.electronAPI.createEntryThumbnailUrl(entry.path)
-        } catch (e) {
+        } catch (_e) {
           return undefined
         }
       })()
@@ -135,7 +135,7 @@ const PreviewVideo = (props: Props) => {
   }, [appDispatch])
 
   return (
-    // biome-ignore lint/a11y/useMediaCaption: <explanation>
+    // biome-ignore lint/a11y/useMediaCaption: false positive
     <video
       controls
       onContextMenu={handleContextMenu}
