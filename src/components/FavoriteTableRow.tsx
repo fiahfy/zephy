@@ -1,5 +1,6 @@
 import { TableRow } from '@mui/material'
-import { type ReactNode, useCallback, useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
+import useButtonBehavior from '~/hooks/useButtonBehavior'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
 import { changeDirectory } from '~/store/window'
@@ -15,12 +16,11 @@ const FavoriteTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const { droppableStyle, ...dropHandlers } = useDroppable(path)
-
-  const handleClick = useCallback(
-    () => dispatch(changeDirectory(path)),
-    [dispatch, path],
+  const buttonHandlers = useButtonBehavior(() =>
+    dispatch(changeDirectory(path)),
   )
+
+  const { droppableStyle, ...dropHandlers } = useDroppable(path)
 
   const handleContextMenu = useMemo(() => {
     return createContextMenuHandler([
@@ -48,21 +48,20 @@ const FavoriteTableRow = (props: Props) => {
     <TableRow
       {...others}
       hover
-      onClick={handleClick}
       onContextMenu={handleContextMenu}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
-        '&:focus-visible': {
+        '&:focus': {
           outline: `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },
         ...droppableStyle,
       })}
-      tabIndex={0}
       {...dropHandlers}
+      {...buttonHandlers}
     >
       {children}
     </TableRow>

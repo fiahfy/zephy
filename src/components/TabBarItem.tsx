@@ -192,9 +192,6 @@ const TabBarItem = (props: Props) => {
           outline: `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-2px',
         },
-        '.MuiIconButton-root:focus-visible': {
-          opacity: 1,
-        },
         '.MuiDivider-root': {
           display: 'none',
         },

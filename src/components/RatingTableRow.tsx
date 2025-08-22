@@ -1,5 +1,6 @@
 import { TableRow } from '@mui/material'
 import { type ReactNode, useCallback, useMemo } from 'react'
+import useButtonBehavior from '~/hooks/useButtonBehavior'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
@@ -15,10 +16,7 @@ const RatingTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const handleClick = useCallback(
-    () => dispatch(goToRatings(score)),
-    [dispatch, score],
-  )
+  const buttonHandlers = useButtonBehavior(() => dispatch(goToRatings(score)))
 
   const handleContextMenu = useMemo(() => {
     const path = buildZephyUrl({ pathname: 'ratings', params: { score } })
@@ -42,15 +40,18 @@ const RatingTableRow = (props: Props) => {
     <TableRow
       {...others}
       hover
-      onClick={handleClick}
       onContextMenu={handleContextMenu}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
+        '&:focus': {
+          outline: `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-1px',
+        },
       })}
-      tabIndex={0}
+      {...buttonHandlers}
     >
       {children}
     </TableRow>

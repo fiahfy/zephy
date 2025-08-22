@@ -29,9 +29,6 @@ const Panel = (props: Props) => {
               opacity: 1,
             },
           },
-          '.MuiIconButton-root:focus-visible': {
-            opacity: 1,
-          },
         })}
         variant="overline"
       >
@@ -40,7 +37,12 @@ const Panel = (props: Props) => {
           <IconButton
             onClick={onClickRefresh}
             size="small"
-            sx={{ opacity: 0 }}
+            sx={{
+              opacity: 0,
+              '&.MuiIconButton-root:focus-visible': {
+                opacity: 1,
+              },
+            }}
             title="Refresh"
           >
             <RefreshIcon sx={{ fontSize: '1rem' }} />
