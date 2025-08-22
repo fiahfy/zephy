@@ -49,11 +49,12 @@ const ExplorerPanel = () => {
     if (!selectedItems) {
       return
     }
-    setTimeout(() => {
+    const timer = window.setTimeout(() => {
       apiRef.current
         ?.getItemDOMElement(selectedItems)
         ?.scrollIntoView({ block: 'nearest' })
     }, 300) // NOTE: transition 300ms + 300ms
+    return () => clearTimeout(timer)
   }, [root, selectedItems])
 
   useEffect(

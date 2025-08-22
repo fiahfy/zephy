@@ -43,13 +43,16 @@ const ExplorerNameTextField = (props: Props) => {
     if (!el) {
       return
     }
-    el.focus()
-    if (content.type === 'file') {
-      const index = el.value.lastIndexOf('.')
-      el.setSelectionRange(0, index)
-    } else {
-      el.select()
-    }
+    const timer = window.setTimeout(() => {
+      el.focus()
+      if (content.type === 'file') {
+        const index = el.value.lastIndexOf('.')
+        el.setSelectionRange(0, index)
+      } else {
+        el.select()
+      }
+    })
+    return () => clearTimeout(timer)
   }, [content.type, readOnly])
 
   const finish = useCallback(() => {
@@ -60,7 +63,7 @@ const ExplorerNameTextField = (props: Props) => {
   }, [content.name, content.path, dispatch, name, tabId])
 
   const handleBlur = useCallback(
-    () => window.setTimeout(() => finish(), 300),
+    () => window.setTimeout(() => finish()),
     [finish],
   )
 

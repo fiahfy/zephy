@@ -111,15 +111,17 @@ const useExplorerList = (
   }, [dispatch, horizontal, loading, ref])
 
   useEffect(() => {
+    let timer: number
     if (!previousLoading && loading) {
       setRestoring(true)
     }
     if (previousLoading && !loading) {
-      setTimeout(() => {
+      timer = window.setTimeout(() => {
         virtualizer.scrollToOffset(scrollPosition)
         setRestoring(false)
       })
     }
+    return () => clearTimeout(timer)
   }, [loading, previousLoading, scrollPosition, virtualizer])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
