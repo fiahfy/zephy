@@ -138,9 +138,9 @@ const ExplorerImageListItem = (props: Props) => {
           '.MuiImageListItemBar-titleWrap': {
             overflow: 'visible',
             p: 0,
-          },
-          '.MuiImageListItemBar-title': {
-            overflow: 'visible',
+            '.MuiImageListItemBar-title': {
+              overflow: 'visible',
+            },
           },
         }}
         title={

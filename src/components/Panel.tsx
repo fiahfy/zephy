@@ -39,7 +39,7 @@ const Panel = (props: Props) => {
             size="small"
             sx={{
               opacity: 0,
-              '&.MuiIconButton-root:focus-visible': {
+              '&:focus-visible': {
                 opacity: 1,
               },
             }}
