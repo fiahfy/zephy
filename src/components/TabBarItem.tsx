@@ -144,13 +144,13 @@ const TabBarItem = (props: Props) => {
           }}
         >
           <Divider
-            sx={{
-              borderBottomColor: (theme) => theme.palette.primary.main,
+            sx={(theme) => ({
+              borderBottomColor: theme.palette.primary.main,
               borderBottomWidth: '2px',
               height: '1px',
               inset: '0 0 auto',
               position: 'absolute',
-            }}
+            })}
           />
           <Icon
             type={loading ? 'progress' : getIconType(history.directoryPath)}

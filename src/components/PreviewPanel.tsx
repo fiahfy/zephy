@@ -78,14 +78,14 @@ const PreviewPanel = () => {
       }}
     >
       <Typography
-        sx={{
-          background: (theme) => theme.palette.background.default,
+        sx={(theme) => ({
+          background: theme.palette.background.default,
           mb: 0,
           position: 'sticky',
           px: 1,
           top: 0,
           zIndex: 1,
-        }}
+        })}
         variant="overline"
       >
         Preview
@@ -102,8 +102,8 @@ const PreviewPanel = () => {
           </Stack>
           <Box
             ref={footerRef}
-            sx={{
-              background: (theme) => theme.palette.background.default,
+            sx={(theme) => ({
+              background: theme.palette.background.default,
               bottom: 0,
               display: 'flex',
               flexDirection: 'column',
@@ -115,7 +115,7 @@ const PreviewPanel = () => {
               position: 'sticky',
               py: 1,
               zIndex: 1,
-            }}
+            })}
           >
             <PreviewInformationTable entries={contents} />
             {preview?.type === 'image' && (

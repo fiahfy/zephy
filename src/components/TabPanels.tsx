@@ -53,13 +53,13 @@ const TabPanels = () => {
         </Box>
       ))}
       <Box
-        sx={{
+        sx={(theme) => ({
           height: '100%',
           inset: 0,
           position: 'absolute',
           zIndex: 1,
-          backgroundColor: (theme) => theme.palette.background.default,
-        }}
+          backgroundColor: theme.palette.background.default,
+        })}
       />
     </Box>
   )

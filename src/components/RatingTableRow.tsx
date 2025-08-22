@@ -44,12 +44,12 @@ const RatingTableRow = (props: Props) => {
       hover
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      sx={{
-        borderRadius: (theme) => theme.spacing(0.5),
+      sx={(theme) => ({
+        borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
-      }}
+      })}
       tabIndex={0}
     >
       {children}

@@ -73,8 +73,8 @@ const PreviewText = (props: Props) => {
         <Box sx={{ height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
           <Typography
             component="pre"
-            sx={{
-              backgroundColor: (theme) =>
+            sx={(theme) => ({
+              backgroundColor:
                 theme.palette.mode === 'light'
                   ? theme.palette.grey[100]
                   : theme.palette.grey[900],
@@ -83,7 +83,7 @@ const PreviewText = (props: Props) => {
               whiteSpace: 'pre-wrap',
               width: '100%',
               wordBreak: 'break-word',
-            }}
+            })}
             variant="caption"
           >
             {text}

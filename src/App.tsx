@@ -277,18 +277,18 @@ const App = () => {
         }}
       >
         <Toolbar
-          sx={{
+          sx={(theme) => ({
             flexShrink: 0,
-            minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
-          }}
+            minHeight: `${theme.mixins.addressBar.height}!important`,
+          })}
         />
         <TabBar />
         <TabPanels />
         <Toolbar
-          sx={{
+          sx={(theme) => ({
             flexShrink: 0,
-            minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
-          }}
+            minHeight: `${theme.mixins.statusBar.height}!important`,
+          })}
         />
       </Stack>
       <Sidebar variant="secondary">

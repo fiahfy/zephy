@@ -127,26 +127,26 @@ const Sidebar = (props: Props) => {
       variant="permanent"
     >
       <Toolbar
-        sx={{
+        sx={(theme) => ({
           flexShrink: 0,
-          minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
-        }}
+          minHeight: `${theme.mixins.addressBar.height}!important`,
+        })}
       />
       <Box
-        sx={{
+        sx={(theme) => ({
           flexGrow: 1,
           overflow: 'auto',
-          [position === 'left' ? 'marginRight' : 'marginLeft']: (theme) =>
+          [position === 'left' ? 'marginRight' : 'marginLeft']:
             theme.spacing(0.5),
-        }}
+        })}
       >
         {children}
       </Box>
       <Toolbar
-        sx={{
+        sx={(theme) => ({
           flexShrink: 0,
-          minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
-        }}
+          minHeight: `${theme.mixins.statusBar.height}!important`,
+        })}
       />
       <Box
         onMouseDown={handleMouseDown}

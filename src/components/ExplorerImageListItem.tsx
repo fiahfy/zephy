@@ -146,10 +146,10 @@ const ExplorerImageListItem = (props: Props) => {
         title={
           <Stack
             direction="row"
-            sx={{
+            sx={(theme) => ({
               alignItems: 'center',
-              height: (theme) => theme.spacing(5),
-            }}
+              height: theme.spacing(5),
+            })}
           >
             <ExplorerNameTextField
               content={content}

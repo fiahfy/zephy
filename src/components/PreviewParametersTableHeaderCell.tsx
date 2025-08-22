@@ -20,11 +20,11 @@ const PreviewParametersTableHeaderCell = (props: Props) => {
     >
       <Typography
         noWrap
-        sx={{
-          color: (theme) => theme.palette.text.secondary,
+        sx={(theme) => ({
+          color: theme.palette.text.secondary,
           display: 'block',
           fontWeight: 'bold',
-        }}
+        })}
         variant="caption"
       >
         {label}

@@ -102,24 +102,24 @@ const PreviewParametersTable = (props: Props) => {
       {parsed && (
         <Table
           size="small"
-          sx={{
+          sx={(theme) => ({
             tableLayout: 'fixed',
             'tbody + tbody::before': {
               content: '""',
               display: 'table-row',
-              height: (theme) => theme.spacing(0.5),
+              height: theme.spacing(0.5),
             },
-          }}
+          })}
         >
           <caption style={{ captionSide: 'top', padding: 0 }}>
             <Typography
               component="p"
-              sx={{
-                color: (theme) => theme.palette.text.primary,
+              sx={(theme) => ({
+                color: theme.palette.text.primary,
                 fontWeight: 'bold',
                 pb: 0.5,
                 px: 1,
-              }}
+              })}
               variant="caption"
             >
               Parameters

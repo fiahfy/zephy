@@ -14,9 +14,9 @@ const Panel = (props: Props) => {
   return (
     <Box>
       <Typography
-        sx={{
+        sx={(theme) => ({
           alignItems: 'center',
-          background: (theme) => theme.palette.background.default,
+          background: theme.palette.background.default,
           display: 'flex',
           justifyContent: 'space-between',
           mb: 0,
@@ -32,7 +32,7 @@ const Panel = (props: Props) => {
           '.MuiIconButton-root:focus-visible': {
             opacity: 1,
           },
-        }}
+        })}
         variant="overline"
       >
         <span>{title}</span>

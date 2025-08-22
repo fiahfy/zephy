@@ -136,14 +136,14 @@ const PreviewInformationTable = (props: Props) => {
         <Typography
           align="center"
           component="p"
-          sx={{
-            color: (theme) => theme.palette.text.primary,
+          sx={(theme) => ({
+            color: theme.palette.text.primary,
             fontWeight: 'bold',
             overflowWrap: 'break-word',
             pb: 0.5,
             px: 1,
             userSelect: 'text',
-          }}
+          })}
           variant="caption"
         >
           {caption}

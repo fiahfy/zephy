@@ -238,19 +238,19 @@ const AddressBar = () => {
       component="div"
       elevation={0}
       enableColorOnDark
-      sx={{
+      sx={(theme) => ({
         WebkitAppRegion: 'drag',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-      }}
+        zIndex: theme.zIndex.drawer + 1,
+      })}
     >
       <Toolbar
         disableGutters
-        sx={{
-          minHeight: (theme) => `${theme.mixins.addressBar.height}!important`,
+        sx={(theme) => ({
+          minHeight: `${theme.mixins.addressBar.height}!important`,
           gap: 1,
           pl: visible ? 10 : 1,
           pr: 1,
-        }}
+        })}
       >
         <Box
           sx={{

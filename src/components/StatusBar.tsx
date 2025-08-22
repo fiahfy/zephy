@@ -25,21 +25,21 @@ const StatusBar = () => {
       component="div"
       elevation={0}
       enableColorOnDark
-      sx={{
+      sx={(theme) => ({
         WebkitAppRegion: 'drag',
         bottom: 0,
         top: 'auto',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-      }}
+        zIndex: theme.zIndex.drawer + 1,
+      })}
     >
       <Divider sx={{ inset: '0 0 auto', position: 'absolute' }} />
       <Toolbar
         disableGutters
-        sx={{
+        sx={(theme) => ({
           justifyContent: 'center',
-          minHeight: (theme) => `${theme.mixins.statusBar.height}!important`,
+          minHeight: `${theme.mixins.statusBar.height}!important`,
           px: 1,
-        }}
+        })}
       >
         <Typography sx={{ mt: 0.25 }} variant="caption">
           {message}

@@ -50,13 +50,17 @@ const FavoriteTableRow = (props: Props) => {
       hover
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      sx={{
-        borderRadius: (theme) => theme.spacing(0.5),
+      sx={(theme) => ({
+        borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
         display: 'flex',
         width: '100%',
+        '&:focus-visible': {
+          outline: `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-1px',
+        },
         ...droppableStyle,
-      }}
+      })}
       tabIndex={0}
       {...dropHandlers}
     >

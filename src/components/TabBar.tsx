@@ -69,13 +69,12 @@ const TabBar = () => {
           >
             <Tabs
               scrollButtons="auto"
-              sx={{
+              sx={(theme) => ({
                 flexShrink: 0,
                 minHeight: 0,
                 position: 'relative',
                 '&::before': {
-                  borderBottom: (theme) =>
-                    `thin solid ${theme.palette.divider}`,
+                  borderBottom: `thin solid ${theme.palette.divider}`,
                   content: '""',
                   inset: 'auto 0 0',
                   position: 'absolute',
@@ -86,7 +85,7 @@ const TabBar = () => {
                 '.MuiTabs-scrollButtons.Mui-disabled': {
                   opacity: 0.3,
                 },
-              }}
+              })}
               value={tabIndex}
               variant="scrollable"
             >
