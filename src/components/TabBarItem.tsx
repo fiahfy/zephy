@@ -97,7 +97,16 @@ const TabBarItem = (props: Props) => {
   )
 
   const handleClick = useCallback(
-    () => dispatch(closeTab(tabId)),
+    () => dispatch(changeTab(tabId)),
+    [dispatch, tabId],
+  )
+
+  const handleClickClose = useCallback(
+    (e: MouseEvent) => {
+      // NOTE: Prevent tab change event
+      e.stopPropagation()
+      dispatch(closeTab(tabId))
+    },
     [dispatch, tabId],
   )
 
@@ -112,11 +121,12 @@ const TabBarItem = (props: Props) => {
       icon={
         <IconButton
           component="span"
-          onClick={handleClick}
+          onClick={handleClickClose}
           // NOTE: Prevent tab change event & drag event for sortable
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
           sx={{ opacity: 0 }}
+          tabIndex={-1}
           title="Close"
         >
           <CloseIcon sx={{ fontSize: '1rem' }} />
@@ -150,6 +160,7 @@ const TabBarItem = (props: Props) => {
           </Typography>
         </Stack>
       }
+      onClick={handleClick}
       onContextMenu={handleContextMenu}
       onMouseDown={handleMouseDown}
       ref={setNodeRef}
@@ -176,6 +187,10 @@ const TabBarItem = (props: Props) => {
           '.MuiIconButton-root': {
             opacity: 1,
           },
+        },
+        '&:focus-visible': {
+          outline: `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-2px',
         },
         '.MuiIconButton-root:focus-visible': {
           opacity: 1,
