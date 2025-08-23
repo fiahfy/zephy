@@ -119,7 +119,7 @@ const PreviewDirectory = (props: Props) => {
               (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
             )
             .toSorted((a, b) => a.name.localeCompare(b.name))
-        } catch (_e) {
+        } catch {
           return []
         }
       })()

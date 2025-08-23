@@ -1,22 +1,27 @@
 import { Box } from '@mui/material'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import TabPanel from '~/components/TabPanel'
 import useWatcher from '~/hooks/useWatcher'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { handle } from '~/store/explorer-list'
-import {
-  selectCurrentTabId,
-  selectDirectoryPaths,
-  selectTabs,
-} from '~/store/window'
+import { selectCurrentTabId, selectTabs, selectUrls } from '~/store/window'
+import { getPath } from '~/utils/url'
 
 const TabPanels = () => {
   const currentTabId = useAppSelector(selectCurrentTabId)
-  const directoryPaths = useAppSelector(selectDirectoryPaths)
+  const urls = useAppSelector(selectUrls)
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
   const { watch } = useWatcher()
+
+  const directoryPaths = useMemo(
+    () =>
+      urls
+        .map((url) => getPath(url))
+        .filter((url): url is string => typeof url === 'string'),
+    [urls],
+  )
 
   useEffect(
     () =>

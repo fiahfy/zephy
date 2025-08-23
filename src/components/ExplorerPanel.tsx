@@ -23,22 +23,25 @@ import {
   setSelectedItems,
 } from '~/store/explorer-tree'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
-import { selectCurrentDirectoryPath } from '~/store/window'
+import { selectCurrentUrl } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
+import { getPath } from '~/utils/url'
 
 const ExplorerPanel = () => {
   const loadedDirectoryPath = useAppSelector(selectLoadedDirectoryPaths)
   const loading = useAppSelector(selectLoading)
-  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const expandedItems = useAppSelector(selectExpandedItems)
   const root = useAppSelector(selectRoot)
   const selectedItems = useAppSelector(selectSelectedItems)
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
+  const url = useAppSelector(selectCurrentUrl)
   const dispatch = useAppDispatch()
 
   const { watch } = useWatcher()
 
   const apiRef = useTreeViewApiRef()
+
+  const directoryPath = useMemo(() => getPath(url), [url])
 
   useEffect(() => {
     dispatch(load(undefined))

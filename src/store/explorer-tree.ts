@@ -5,7 +5,6 @@ import {
 } from '@reduxjs/toolkit'
 import type { Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
-import { isZephySchema } from '~/utils/url'
 
 type State = {
   expandedItems: string[]
@@ -135,25 +134,31 @@ export const load =
     const root = selectRoot(getState())
     const directories = root ? getDirectoryPaths(root, true) : []
 
-    const targetPath =
-      directoryPath && isZephySchema(directoryPath) ? undefined : directoryPath
-    if (!force && root && targetPath && directories.includes(targetPath)) {
+    if (
+      !force &&
+      root &&
+      directoryPath &&
+      directories.includes(directoryPath)
+    ) {
       const expandedItems = selectExpandedItems(getState())
       const newExpandedItems = [
-        ...new Set([...expandedItems, ...getAncestorPaths(root, targetPath)]),
+        ...new Set([
+          ...expandedItems,
+          ...getAncestorPaths(root, directoryPath),
+        ]),
       ]
       dispatch(setExpandedItems({ expandedItems: newExpandedItems }))
-      dispatch(setSelectedItems({ selectedItems: targetPath }))
+      dispatch(setSelectedItems({ selectedItems: directoryPath }))
     } else {
       const loading = selectLoading(getState())
       if (loading) {
         return
       }
       dispatch(load())
-      const root = await window.electronAPI.getRootEntry(targetPath)
+      const root = await window.electronAPI.getRootEntry(directoryPath)
       const expandedItems = getDirectoryPaths(root, false)
       dispatch(setExpandedItems({ expandedItems }))
-      dispatch(setSelectedItems({ selectedItems: targetPath }))
+      dispatch(setSelectedItems({ selectedItems: directoryPath }))
       dispatch(loaded({ root }))
     }
   }

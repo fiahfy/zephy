@@ -18,13 +18,13 @@ import {
 } from '~/store/explorer-list'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/window-id'
-import { buildZephyUrl, getTitle } from '~/utils/url'
+import { buildZephyUrl, getPath, getTitle } from '~/utils/url'
 
 type History = {
-  directoryPath: string
   query: string
   scrollPosition: number
   title: string
+  url: string
 }
 
 type HistoryState = {
@@ -50,13 +50,13 @@ type SortOption = {
 }
 
 type SortingState = {
-  [directoryPath: string]: SortOption
+  [url: string]: SortOption
 }
 
 type ViewMode = 'gallery' | 'list' | 'thumbnail'
 
 type ViewModeState = {
-  [directoryPath: string]: ViewMode
+  [url: string]: ViewMode
 }
 
 type WindowState = {
@@ -285,15 +285,15 @@ export const windowSlice = createSlice({
         },
       }
     },
-    changeDirectory(
+    changeUrl(
       state,
       action: PayloadAction<{
         id: number
-        directoryPath: string
+        url: string
         title: string
       }>,
     ) {
-      const { id, directoryPath, title } = action.payload
+      const { id, url, title } = action.payload
       const window = state[id]
       if (!window) {
         return state
@@ -302,15 +302,14 @@ export const windowSlice = createSlice({
       if (!tab) {
         return state
       }
-      const currentDirectoryPath =
-        tab.history.histories[tab.history.index]?.directoryPath
-      if (directoryPath === currentDirectoryPath) {
+      const currentUrl = tab.history.histories[tab.history.index]?.url
+      if (url === currentUrl) {
         return
       }
       const historyIndex = tab.history.index + 1
       const histories = [
         ...tab.history.histories.slice(0, historyIndex),
-        { directoryPath, query: '', scrollPosition: 0, title },
+        { query: '', scrollPosition: 0, title, url },
       ]
       const tabs = window.tabs.map((tab) =>
         tab.id === window.tabId
@@ -428,11 +427,11 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         id: number
-        directoryPath: string
+        url: string
         orderBy: SortOption['orderBy']
       }>,
     ) {
-      const { id, directoryPath, orderBy } = action.payload
+      const { id, url, orderBy } = action.payload
       const window = state[id]
       if (!window) {
         return state
@@ -441,7 +440,7 @@ export const windowSlice = createSlice({
       if (!tab) {
         return state
       }
-      const option = tab.sorting[directoryPath]
+      const option = tab.sorting[url]
       const newOrder =
         option && option.orderBy === orderBy
           ? option.order === 'desc'
@@ -454,7 +453,7 @@ export const windowSlice = createSlice({
               ...tab,
               sorting: {
                 ...tab.sorting,
-                [directoryPath]: {
+                [url]: {
                   order: newOrder,
                   orderBy,
                 },
@@ -474,11 +473,11 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         id: number
-        directoryPath: string
+        url: string
         viewMode: ViewMode
       }>,
     ) {
-      const { id, directoryPath, viewMode } = action.payload
+      const { id, url, viewMode } = action.payload
       const window = state[id]
       if (!window) {
         return state
@@ -493,7 +492,7 @@ export const windowSlice = createSlice({
               ...tab,
               viewMode: {
                 ...tab.viewMode,
-                [directoryPath]: viewMode,
+                [url]: viewMode,
               },
             }
           : tab,
@@ -625,12 +624,11 @@ export const selectCanCloseTab = createSelector(
   (tabs) => tabs.length > 1,
 )
 
-export const selectDirectoryPaths = createSelector(selectTabs, (tabs) =>
+export const selectUrls = createSelector(selectTabs, (tabs) =>
   tabs.reduce((acc, tab) => {
-    const directoryPath =
-      tab.history.histories[tab.history.index]?.directoryPath
-    if (directoryPath) {
-      acc.push(directoryPath)
+    const url = tab.history.histories[tab.history.index]?.url
+    if (url) {
+      acc.push(url)
     }
     return acc
   }, [] as string[]),
@@ -640,17 +638,17 @@ export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
   const history = tab.history
   return (
     history.histories[history.index] ?? {
-      directoryPath: '',
       query: '',
       scrollPosition: 0,
       title: '',
+      url: '',
     }
   )
 })
 
-export const selectDirectoryPathByTabId = createSelector(
+export const selectUrlByTabId = createSelector(
   selectHistoryByTabId,
-  (history) => history.directoryPath,
+  (history) => history.url,
 )
 
 export const selectQueryByTabId = createSelector(
@@ -663,22 +661,18 @@ export const selectScrollPositionByTabId = createSelector(
   (history) => history.scrollPosition,
 )
 
-const selectDirectoryPath = (
-  _state: AppState,
-  _tabId: number,
-  directoryPath: string,
-) => directoryPath
+const selectUrl = (_state: AppState, _tabId: number, url: string) => url
 
-export const selectSortOptionByTabIdAndDirectoryPath = createSelector(
+export const selectSortOptionByTabIdAndUrl = createSelector(
   selectTabByTabId,
-  selectDirectoryPath,
-  (tab, directoryPath) => tab.sorting[directoryPath] ?? defaultSortOption,
+  selectUrl,
+  (tab, url) => tab.sorting[url] ?? defaultSortOption,
 )
 
-export const selectViewModeByTabIdAndDirectoryPath = createSelector(
+export const selectViewModeByTabIdAndUrl = createSelector(
   selectTabByTabId,
-  selectDirectoryPath,
-  (tab, directoryPath) => tab.viewMode[directoryPath] ?? defaultViewMode,
+  selectUrl,
+  (tab, url) => tab.viewMode[url] ?? defaultViewMode,
 )
 
 // Selector for current tab
@@ -712,9 +706,9 @@ export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>
 const selectCurrentHistory = (state: AppState) =>
   selectHistoryByTabId(state, selectCurrentTabId(state))
 
-export const selectCurrentDirectoryPath = createSelector(
+export const selectCurrentUrl = createSelector(
   selectCurrentHistory,
-  (currentHistory) => currentHistory.directoryPath,
+  (currentHistory) => currentHistory.url,
 )
 
 export const selectCurrentQuery = createSelector(
@@ -728,17 +722,17 @@ export const selectCurrentTitle = createSelector(
 )
 
 export const selectCurrentSortOption = (state: AppState) =>
-  selectSortOptionByTabIdAndDirectoryPath(
+  selectSortOptionByTabIdAndUrl(
     state,
     selectCurrentTabId(state),
-    selectCurrentDirectoryPath(state),
+    selectCurrentUrl(state),
   )
 
 export const selectCurrentViewMode = (state: AppState) =>
-  selectViewModeByTabIdAndDirectoryPath(
+  selectViewModeByTabIdAndUrl(
     state,
     selectCurrentTabId(state),
-    selectCurrentDirectoryPath(state),
+    selectCurrentUrl(state),
   )
 
 // Operations for windows & tabs
@@ -758,11 +752,14 @@ export const newTab =
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
 
+    // TODO: Handle error
+    const entry = await window.electronAPI.getEntry(directoryPath)
+
     const id = selectWindowId(getState())
     dispatch(newTab({ id, srcTabId }))
     const tabId = selectCurrentTabId(getState())
     dispatch(addTab({ tabId }))
-    dispatch(changeDirectory(directoryPath))
+    dispatch(changeUrl(entry.url))
   }
 
 export const duplicateTab =
@@ -841,18 +838,18 @@ export const setSidebarWidth =
 
 // Operations for current tab
 
-export const changeDirectory =
-  (directoryPath: string): AppThunk =>
+export const changeUrl =
+  (url: string): AppThunk =>
   async (dispatch, getState) => {
-    const { changeDirectory } = windowSlice.actions
+    const { changeUrl } = windowSlice.actions
 
     const id = selectWindowId(getState())
     const loading = selectCurrentLoading(getState())
     if (loading) {
       return
     }
-    const title = await getTitle(directoryPath)
-    dispatch(changeDirectory({ id, directoryPath, title }))
+    const title = await getTitle(url)
+    dispatch(changeUrl({ id, title, url }))
   }
 
 export const go =
@@ -873,22 +870,26 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
-  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+  const currentUrl = selectCurrentUrl(getState())
+
+  const currentDirectoryPath = getPath(currentUrl)
+  if (!currentDirectoryPath) {
+    return
+  }
+
   const parent = await window.electronAPI.getParentEntry(currentDirectoryPath)
-  dispatch(changeDirectory(parent.path))
+  dispatch(changeUrl(parent.url))
 }
 
 export const goToRatings =
   (score: number): AppThunk =>
   async (dispatch) =>
     dispatch(
-      changeDirectory(
-        buildZephyUrl({ pathname: 'ratings', params: { score } }),
-      ),
+      changeUrl(buildZephyUrl({ pathname: 'ratings', params: { score } })),
     )
 
 export const goToSettings = (): AppThunk => async (dispatch) =>
-  dispatch(changeDirectory(buildZephyUrl({ pathname: 'settings' })))
+  dispatch(changeUrl(buildZephyUrl({ pathname: 'settings' })))
 
 export const setScrollPosition =
   (scrollPosition: number): AppThunk =>
@@ -924,11 +925,11 @@ export const sort =
     const { sort } = windowSlice.actions
 
     const id = selectWindowId(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+    const currentUrl = selectCurrentUrl(getState())
     dispatch(
       sort({
         id,
-        directoryPath: currentDirectoryPath,
+        url: currentUrl,
         orderBy,
       }),
     )
@@ -940,8 +941,8 @@ export const setCurrentViewMode =
     const { setViewMode } = windowSlice.actions
 
     const id = selectWindowId(getState())
-    const currentDirectoryPath = selectCurrentDirectoryPath(getState())
-    dispatch(setViewMode({ id, directoryPath: currentDirectoryPath, viewMode }))
+    const currentUrl = selectCurrentUrl(getState())
+    dispatch(setViewMode({ id, url: currentUrl, viewMode }))
   }
 
 // Operations for application menu

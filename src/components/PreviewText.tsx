@@ -50,7 +50,7 @@ const PreviewText = (props: Props) => {
         const res = await fetch(entry.url)
         const text = await res.text()
         dispatch({ type: 'loaded', payload: { text } })
-      } catch (_e) {
+      } catch {
         dispatch({ type: 'error' })
       }
     })()

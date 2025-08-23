@@ -13,7 +13,7 @@ import useEntryThumbnail from '~/hooks/useEntryThumbnail'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { openEntry } from '~/store/settings'
-import { changeDirectory } from '~/store/window'
+import { changeUrl } from '~/store/window'
 
 type Props = {
   entry: Entry
@@ -34,9 +34,9 @@ const PreviewDirectoryItem = (props: Props) => {
   const handleDoubleClick = useCallback(
     async () =>
       entry.type === 'directory'
-        ? dispatch(changeDirectory(entry.path))
+        ? dispatch(changeUrl(entry.url))
         : dispatch(openEntry(entry.path)),
-    [dispatch, entry.path, entry.type],
+    [dispatch, entry.path, entry.type, entry.url],
   )
 
   return (

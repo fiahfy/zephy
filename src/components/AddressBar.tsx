@@ -46,22 +46,21 @@ import {
   selectBackHistories,
   selectCanBack,
   selectCanForward,
-  selectCurrentDirectoryPath,
   selectCurrentQuery,
   selectCurrentSortOption,
+  selectCurrentUrl,
   selectCurrentViewMode,
   selectForwardHistories,
   selectSidebarHiddenByVariant,
   upward,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { isZephySchema } from '~/utils/url'
+import { getPath, isFileUrl } from '~/utils/url'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
-  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const forwardHistories = useAppSelector(selectForwardHistories)
   const primarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'primary'),
@@ -73,6 +72,7 @@ const AddressBar = () => {
   const query = useAppSelector(selectCurrentQuery)
   const queryHistories = useAppSelector(selectQueryHistories)
   const sortOption = useAppSelector(selectCurrentSortOption)
+  const url = useAppSelector(selectCurrentUrl)
   const viewMode = useAppSelector(selectCurrentViewMode)
   const dispatch = useAppDispatch()
 
@@ -108,14 +108,13 @@ const AddressBar = () => {
   const backLongPressHandlers = useLongPress(backHistoryMenuHandler)
   const forwardLongPressHandlers = useLongPress(forwardHistoryMenuHandler)
 
-  const [directoryPathInput, setDirectoryPathInput] = useState('')
+  const [urlInput, setUrlInput] = useState('')
   const [queryInput, setQueryInput] = useState('')
+
   const ref = useRef<HTMLInputElement>(null)
 
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
-  )
+  const directoryPath = useMemo(() => getPath(url), [url])
+  const fileUrl = useMemo(() => isFileUrl(url), [url])
 
   const searchBy = useCallback(
     (query: string) => {
@@ -141,7 +140,7 @@ const AddressBar = () => {
     return () => removeListener()
   }, [searchBy])
 
-  useEffect(() => setDirectoryPathInput(directoryPath), [directoryPath])
+  useEffect(() => setUrlInput(url), [url])
 
   useEffect(() => setQueryInput(query), [query])
 
@@ -155,9 +154,9 @@ const AddressBar = () => {
   )
 
   const handleClickRefresh = useCallback(async () => {
-    setDirectoryPathInput(directoryPath)
+    setUrlInput(url)
     dispatch(refreshInCurrentTab())
-  }, [directoryPath, dispatch])
+  }, [dispatch, url])
 
   const handleClickSearch = useCallback(
     () => searchBy(queryInput),
@@ -177,7 +176,7 @@ const AddressBar = () => {
       createContextMenuHandler([
         {
           type: 'newFolder',
-          data: { path: zephySchema ? undefined : directoryPath },
+          data: { path: directoryPath },
         },
         { type: 'separator' },
         { type: 'view', data: { viewMode: viewMode } },
@@ -204,12 +203,11 @@ const AddressBar = () => {
       secondarySidebarHidden,
       sortOption.orderBy,
       viewMode,
-      zephySchema,
     ],
   )
 
-  const handleChangeDirectory = useCallback((value: string) => {
-    setDirectoryPathInput(value)
+  const handleChangeUrl = useCallback((value: string) => {
+    setUrlInput(value)
   }, [])
 
   const handleChangeQuery = useCallback(
@@ -288,7 +286,7 @@ const AddressBar = () => {
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
           <IconButton
-            disabled={loading || zephySchema}
+            disabled={loading || !fileUrl}
             onClick={handleClickUpward}
             size="small"
             title="Go up"
@@ -303,10 +301,7 @@ const AddressBar = () => {
           >
             <RefreshIcon fontSize="small" />
           </IconButton>
-          <AddressTextField
-            onChange={handleChangeDirectory}
-            value={directoryPathInput}
-          />
+          <AddressTextField onChange={handleChangeUrl} value={urlInput} />
         </Stack>
         <Box
           sx={{

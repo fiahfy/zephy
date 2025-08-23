@@ -1,5 +1,5 @@
 import { TableRow } from '@mui/material'
-import { type ReactNode, useCallback, useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import { useAppDispatch } from '~/store'
 import { goToRatings } from '~/store/window'

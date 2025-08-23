@@ -8,12 +8,10 @@ import { move } from '~/store/explorer-list'
 
 const isDroppable = (path?: string): path is string => path !== undefined
 
-const useDroppable = (path?: string) => {
+const useDroppable = (directoryPath?: string) => {
   const dispatch = useAppDispatch()
 
   const { theme } = useTheme()
-
-  const droppable = isDroppable(path)
 
   const [enterCount, setEnterCount] = useState(0)
 
@@ -44,43 +42,43 @@ const useDroppable = (path?: string) => {
 
   const onDragEnter = useCallback(
     (e: DragEvent) => {
-      if (!droppable) {
+      if (!isDroppable(directoryPath)) {
         return
       }
       e.preventDefault()
       e.stopPropagation()
       setEnterCount((count) => count + 1)
     },
-    [droppable],
+    [directoryPath],
   )
 
   const onDragLeave = useCallback(
     (e: DragEvent) => {
-      if (!droppable) {
+      if (!isDroppable(directoryPath)) {
         return
       }
       e.preventDefault()
       e.stopPropagation()
       setEnterCount((count) => count - 1)
     },
-    [droppable],
+    [directoryPath],
   )
 
   const onDragOver = useCallback(
     (e: DragEvent) => {
-      if (!droppable) {
+      if (!isDroppable(directoryPath)) {
         return
       }
       e.preventDefault()
       e.stopPropagation()
       e.dataTransfer.dropEffect = 'move'
     },
-    [droppable],
+    [directoryPath],
   )
 
   const onDrop = useCallback(
     (e: DragEvent) => {
-      if (!droppable) {
+      if (!isDroppable(directoryPath)) {
         return
       }
       e.preventDefault()
@@ -88,9 +86,9 @@ const useDroppable = (path?: string) => {
       setEnterCount(0)
       const files = Array.from(e.dataTransfer.files)
       const paths = window.electronAPI.getFilePaths(files)
-      dispatch(move(paths, path))
+      dispatch(move(paths, directoryPath))
     },
-    [dispatch, droppable, path],
+    [dispatch, directoryPath],
   )
 
   return {

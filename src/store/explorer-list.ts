@@ -16,16 +16,16 @@ import {
 } from '~/store/rating'
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
-  changeDirectory,
-  selectCurrentDirectoryPath,
+  changeUrl,
   selectCurrentTabId,
-  selectDirectoryPathByTabId,
+  selectCurrentUrl,
   selectQueryByTabId,
-  selectSortOptionByTabIdAndDirectoryPath,
+  selectSortOptionByTabIdAndUrl,
   selectTabs,
+  selectUrlByTabId,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { parseZephyUrl } from '~/utils/url'
+import { getPath, parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -485,11 +485,7 @@ export const selectContentsByTabId = createSelector(
   selectEntriesByTabId,
   selectQueryByTabId,
   (state: AppState, tabId: number) =>
-    selectSortOptionByTabIdAndDirectoryPath(
-      state,
-      tabId,
-      selectDirectoryPathByTabId(state, tabId),
-    ),
+    selectSortOptionByTabIdAndUrl(state, tabId, selectUrlByTabId(state, tabId)),
   selectRating,
   selectShouldShowHiddenFiles,
   (entries, query, sortOption, rating, shouldShowHiddenFiles) => {
@@ -560,8 +556,8 @@ export const load =
   async (dispatch, getState) => {
     const { load, loaded, loadFailed } = explorerListSlice.actions
 
-    const directoryPath = selectDirectoryPathByTabId(getState(), tabId)
-    if (!directoryPath) {
+    const url = selectUrlByTabId(getState(), tabId)
+    if (!url) {
       return
     }
     const loading = selectLoadingByTabId(getState(), tabId)
@@ -572,19 +568,30 @@ export const load =
     dispatch(load({ tabId }))
     try {
       const entries: Entry[] = await (async () => {
-        const url = parseZephyUrl(directoryPath)
-        if (!url) {
-          return await window.electronAPI.getEntries(directoryPath)
+        const u = new URL(url)
+        switch (u.protocol) {
+          case 'file:': {
+            const directoryPath = getPath(url)
+            if (!directoryPath) {
+              throw new Error()
+            }
+            return await window.electronAPI.getEntries(directoryPath)
+          }
+          case 'zephy:': {
+            const parsed = parseZephyUrl(url)
+            if (parsed?.pathname === 'ratings') {
+              const scoreToPathsMap = selectScoreToPathsMap(getState())
+              const paths = scoreToPathsMap[parsed.params.score] ?? []
+              return await window.electronAPI.getEntriesForPaths(paths)
+            }
+            return []
+          }
+          default:
+            return []
         }
-        if (url.pathname === 'ratings') {
-          const scoreToPathsMap = selectScoreToPathsMap(getState())
-          const paths = scoreToPathsMap[Number(url.params.score ?? 0)] ?? []
-          return await window.electronAPI.getEntriesForPaths(paths)
-        }
-        return []
       })()
       dispatch(loaded({ tabId, entries }))
-    } catch (_e) {
+    } catch {
       dispatch(loadFailed({ tabId }))
     }
   }
@@ -738,10 +745,10 @@ export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
 }
 
 export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
-  const directoryPath = selectCurrentDirectoryPath(getState())
+  const url = selectCurrentUrl(getState())
 
-  const zephyUrl = parseZephyUrl(directoryPath)
-  if (zephyUrl) {
+  const directoryPath = getPath(url)
+  if (!directoryPath) {
     return
   }
   window.electronAPI.pasteEntries(directoryPath)
@@ -816,9 +823,7 @@ export const openInCurrentTab =
 
     const entry = await window.electronAPI.getEntry(targetPath)
     const action =
-      entry.type === 'directory'
-        ? changeDirectory(entry.path)
-        : openEntry(entry.path)
+      entry.type === 'directory' ? changeUrl(entry.url) : openEntry(entry.path)
     dispatch(action)
   }
 
@@ -856,7 +861,8 @@ export const handle =
 
     const tabs = selectTabs(getState())
     for (const { id: tabId } of tabs) {
-      const currentDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
+      const url = selectUrlByTabId(getState(), tabId)
+      const currentDirectoryPath = getPath(url)
       if (directoryPath !== currentDirectoryPath) {
         continue
       }

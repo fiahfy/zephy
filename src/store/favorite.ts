@@ -76,31 +76,44 @@ export const selectPathToFavoriteMap = createSelector(
 
 export const selectFavoriteByPath = createSelector(
   selectPathToFavoriteMap,
-  (_favorite: State, path: string) => path,
-  (pathToFavoriteMap, path) => pathToFavoriteMap[path] ?? false,
+  (_favorite: State, path?: string) => path,
+  (pathToFavoriteMap, path) => {
+    if (!path) {
+      return false
+    }
+    return pathToFavoriteMap[path] ?? false
+  },
 )
 
 export const addToFavorites =
-  (path: string): AppThunk =>
+  (directoryPath: string): AppThunk =>
   async (dispatch) => {
     const { addToFavorites } = favoriteSlice.actions
 
-    const entry = await window.electronAPI.getEntry(path)
+    const entry = await window.electronAPI.getEntry(directoryPath)
     dispatch(addToFavorites({ ...entry }))
   }
 
 export const removeFromFavorites =
-  (path: string): AppThunk =>
+  (directoryPath: string): AppThunk =>
   async (dispatch) => {
     const { removeFromFavorites } = favoriteSlice.actions
 
-    dispatch(removeFromFavorites({ path }))
+    dispatch(removeFromFavorites({ path: directoryPath }))
   }
 
 export const toggleFavorite =
-  (path: string): AppThunk =>
+  (directoryPath?: string): AppThunk =>
   async (dispatch, getState) => {
-    const favorite = selectFavoriteByPath(selectFavorite(getState()), path)
-    const action = favorite ? removeFromFavorites(path) : addToFavorites(path)
+    if (!directoryPath) {
+      return
+    }
+    const favorite = selectFavoriteByPath(
+      selectFavorite(getState()),
+      directoryPath,
+    )
+    const action = favorite
+      ? removeFromFavorites(directoryPath)
+      : addToFavorites(directoryPath)
     dispatch(action)
   }

@@ -25,7 +25,7 @@ const PreviewImage = (props: Props) => {
             img.src = entry.url
           })
           return true
-        } catch (_e) {
+        } catch {
           return false
         }
       })()

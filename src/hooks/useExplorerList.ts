@@ -26,15 +26,15 @@ import {
   unselectAll,
 } from '~/store/explorer-list'
 import {
-  selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectScrollPositionByTabId,
-  selectSortOptionByTabIdAndDirectoryPath,
-  selectViewModeByTabIdAndDirectoryPath,
+  selectSortOptionByTabIdAndUrl,
+  selectUrlByTabId,
+  selectViewModeByTabIdAndUrl,
   setScrollPosition,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { isZephySchema } from '~/utils/url'
+import { getPath } from '~/utils/url'
 
 const useExplorerList = (
   tabId: number,
@@ -47,9 +47,6 @@ const useExplorerList = (
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
-  const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabId(state, tabId),
-  )
   const editing = useAppSelector((state) => selectEditingByTabId(state, tabId))
   const error = useAppSelector((state) => selectErrorByTabId(state, tabId))
   const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
@@ -58,11 +55,12 @@ const useExplorerList = (
   const scrollPosition = useAppSelector((state) =>
     selectScrollPositionByTabId(state, tabId),
   )
+  const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const sortOption = useAppSelector((state) =>
-    selectSortOptionByTabIdAndDirectoryPath(state, tabId, directoryPath),
+    selectSortOptionByTabIdAndUrl(state, tabId, url),
   )
   const viewMode = useAppSelector((state) =>
-    selectViewModeByTabIdAndDirectoryPath(state, tabId, directoryPath),
+    selectViewModeByTabIdAndUrl(state, tabId, url),
   )
   const dispatch = useAppDispatch()
 
@@ -111,17 +109,17 @@ const useExplorerList = (
   }, [dispatch, horizontal, loading, ref])
 
   useEffect(() => {
-    let timer: number
     if (!previousLoading && loading) {
       setRestoring(true)
     }
     if (previousLoading && !loading) {
-      timer = window.setTimeout(() => {
+      window.setTimeout(() => {
         virtualizer.scrollToOffset(scrollPosition)
         setRestoring(false)
       })
     }
-    return () => clearTimeout(timer)
+    // NOTE: Do not clear timer
+    // return () => clearTimeout(timer)
   }, [loading, previousLoading, scrollPosition, virtualizer])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
@@ -162,10 +160,7 @@ const useExplorerList = (
     [error, loading, query],
   )
 
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
-  )
+  const directoryPath = useMemo(() => getPath(url), [url])
 
   const onClick = useCallback(() => {
     dispatch(blur(tabId))
@@ -177,14 +172,14 @@ const useExplorerList = (
       createContextMenuHandler([
         {
           type: 'newFolder',
-          data: { path: zephySchema ? undefined : directoryPath },
+          data: { path: directoryPath },
         },
         { type: 'separator' },
         { type: 'cutEntries', data: { paths: [] } },
         { type: 'copyEntries', data: { paths: [] } },
         {
           type: 'pasteEntries',
-          data: { path: zephySchema ? undefined : directoryPath },
+          data: { path: directoryPath },
         },
         { type: 'separator' },
         { type: 'view', data: { viewMode } },
@@ -194,7 +189,7 @@ const useExplorerList = (
           data: { orderBy: sortOption.orderBy },
         },
       ]),
-    [directoryPath, sortOption.orderBy, viewMode, zephySchema],
+    [directoryPath, sortOption.orderBy, viewMode],
   )
 
   const onKeyDown = useCallback(

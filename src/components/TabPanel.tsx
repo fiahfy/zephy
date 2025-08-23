@@ -4,7 +4,7 @@ import Settings from '~/components/Settings'
 import usePrevious from '~/hooks/usePrevious'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load } from '~/store/explorer-list'
-import { selectDirectoryPathByTabId } from '~/store/window'
+import { selectUrlByTabId } from '~/store/window'
 
 type Props = {
   tabId: number
@@ -13,27 +13,25 @@ type Props = {
 const TabPanel = (props: Props) => {
   const { tabId } = props
 
-  const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabId(state, tabId),
-  )
+  const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
-  const prevDirectoryPath = usePrevious(directoryPath)
+  const prevUrl = usePrevious(url)
 
   useEffect(() => {
-    if (prevDirectoryPath !== directoryPath) {
+    if (prevUrl !== url) {
       dispatch(load(tabId))
     }
-  }, [directoryPath, dispatch, prevDirectoryPath, tabId])
+  }, [dispatch, prevUrl, tabId, url])
 
   const Component = useMemo(() => {
-    switch (directoryPath) {
+    switch (url) {
       case 'zephy://settings':
         return Settings
       default:
         return Explorer
     }
-  }, [directoryPath])
+  }, [url])
 
   return <Component tabId={tabId} />
 }

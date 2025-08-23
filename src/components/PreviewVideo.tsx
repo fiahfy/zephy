@@ -89,7 +89,7 @@ const PreviewVideo = (props: Props) => {
       const thumbnail = await (async () => {
         try {
           return await window.electronAPI.createEntryThumbnailUrl(entry.path)
-        } catch (_e) {
+        } catch {
           return undefined
         }
       })()

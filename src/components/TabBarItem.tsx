@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoadingByTabId } from '~/store/explorer-list'
 import { changeTab, closeTab, selectHistoryByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { getIconType, isZephySchema } from '~/utils/url'
+import { getIconType, getPath } from '~/utils/url'
 
 type Props = {
   tabId: number
@@ -21,16 +21,9 @@ const TabBarItem = (props: Props) => {
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
-  const directoryPath = history.directoryPath
+  const directoryPath = useMemo(() => getPath(history.url), [history.url])
 
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
-  )
-
-  const { droppableStyle, ...dropHandlers } = useDroppable(
-    zephySchema ? undefined : directoryPath,
-  )
+  const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
   const {
     attributes,
@@ -152,9 +145,7 @@ const TabBarItem = (props: Props) => {
               position: 'absolute',
             })}
           />
-          <Icon
-            type={loading ? 'progress' : getIconType(history.directoryPath)}
-          />
+          <Icon type={loading ? 'progress' : getIconType(history.url)} />
           <Typography noWrap title={history.title} variant="caption">
             {history.title}
           </Typography>

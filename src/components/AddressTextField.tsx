@@ -15,8 +15,8 @@ import {
   toggleFavorite,
 } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import { changeDirectory, selectCurrentDirectoryPath } from '~/store/window'
-import { getIconType, isZephySchema } from '~/utils/url'
+import { changeUrl, selectCurrentUrl } from '~/store/window'
+import { getIconType, getPath, isFileUrl } from '~/utils/url'
 
 type Props = {
   onChange: (value: string) => void
@@ -26,16 +26,16 @@ type Props = {
 const AddressTextField = (props: Props) => {
   const { onChange, value } = props
 
-  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const url = useAppSelector(selectCurrentUrl)
+
+  const directoryPath = useMemo(() => getPath(url), [url])
+
   const favorite = useAppSelector((state) =>
     selectFavoriteByPath(selectFavorite(state), directoryPath),
   )
   const dispatch = useAppDispatch()
 
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
-  )
+  const fileUrl = useMemo(() => isFileUrl(url), [url])
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +53,7 @@ const AddressTextField = (props: Props) => {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.nativeEvent.isComposing && value) {
-        dispatch(changeDirectory(value))
+        dispatch(changeUrl(value))
       }
     },
     [dispatch, value],
@@ -77,7 +77,7 @@ const AddressTextField = (props: Props) => {
       onKeyDown={handleKeyDown}
       slotProps={{
         input: {
-          endAdornment: !zephySchema && (
+          endAdornment: fileUrl && (
             <InputAdornment position="end">
               <IconButton onClick={handleClickFavorite} size="small">
                 <Icon type={favorite ? 'star' : 'star-border'} />
@@ -87,11 +87,11 @@ const AddressTextField = (props: Props) => {
           startAdornment: (
             <InputAdornment position="start">
               <IconButton
-                disabled={zephySchema}
-                onClick={zephySchema ? undefined : handleClickFolder}
+                disabled={!fileUrl}
+                onClick={handleClickFolder}
                 size="small"
               >
-                <Icon type={getIconType(directoryPath)} />
+                <Icon type={getIconType(url)} />
               </IconButton>
             </InputAdornment>
           ),

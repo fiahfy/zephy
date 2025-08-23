@@ -46,7 +46,7 @@ const createThumbnail = async (path: string, thumbnailDir: string) => {
       })
     }
     return pathToFileURL(thumbnailPath).href
-  } catch (_e) {
+  } catch {
     return undefined
   }
 }

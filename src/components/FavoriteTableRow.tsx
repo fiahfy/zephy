@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
-import { changeDirectory } from '~/store/window'
+import { changeUrl } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
@@ -16,9 +16,11 @@ const FavoriteTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const buttonHandlers = useButtonBehavior(() =>
-    dispatch(changeDirectory(path)),
-  )
+  const buttonHandlers = useButtonBehavior(async () => {
+    // TODO: Handle error
+    const entry = await window.electronAPI.getEntry(path)
+    dispatch(changeUrl(entry.url))
+  })
 
   const { droppableStyle, ...dropHandlers } = useDroppable(path)
 

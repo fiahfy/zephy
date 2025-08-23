@@ -88,22 +88,27 @@ export const selectTheme = createSelector(
 )
 
 export const openEntry =
-  (filePath: string): AppThunk =>
+  (filePath?: string): AppThunk =>
   async (_, getState) => {
-    const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
-    const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
-    const fileType = detectFileType(filePath)
+    if (!filePath) {
+      return
+    }
     const encoded = encodeURIComponent(filePath)
+    const fileType = detectFileType(filePath)
     switch (fileType) {
-      case 'image':
+      case 'image': {
+        const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
         return shouldOpenWithPhoty
           ? window.electronAPI.openUrl(`photy://open?path=${encoded}`)
           : window.electronAPI.openEntry(filePath)
+      }
       case 'video':
-      case 'audio':
+      case 'audio': {
+        const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
         return shouldOpenWithVisty
           ? window.electronAPI.openUrl(`visty://open?path=${encoded}`)
           : window.electronAPI.openEntry(filePath)
+      }
       default:
         return window.electronAPI.openEntry(filePath)
     }

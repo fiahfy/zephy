@@ -16,16 +16,13 @@ import {
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { openEntry } from '~/store/settings'
-import { changeDirectory, selectDirectoryPathByTabId } from '~/store/window'
+import { changeUrl, selectUrlByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { isZephySchema } from '~/utils/url'
+import { getPath } from '~/utils/url'
 
 const useExplorerItem = (tabId: number, content: Content) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
-  )
-  const directoryPath = useAppSelector((state) =>
-    selectDirectoryPathByTabId(state, tabId),
   )
   const editing = useAppSelector((state) =>
     selectEditingByTabIdAndPath(state, tabId, content.path),
@@ -42,6 +39,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
   const selectedPaths = useAppSelector((state) =>
     selectSelectedByTabId(state, tabId),
   )
+  const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
@@ -79,7 +77,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
         return
       }
       content.type === 'directory'
-        ? dispatch(changeDirectory(content.path))
+        ? dispatch(changeUrl(content.url))
         : dispatch(openEntry(content.path))
     },
   )
@@ -89,10 +87,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
     [content.path, editing, selected, selectedPaths],
   )
 
-  const zephySchema = useMemo(
-    () => isZephySchema(directoryPath),
-    [directoryPath],
-  )
+  const directoryPath = useMemo(() => getPath(url), [url])
 
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
@@ -155,7 +150,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       { type: 'copyEntries', data: { paths } },
       {
         type: 'pasteEntries',
-        data: { path: zephySchema ? undefined : directoryPath },
+        data: { path: directoryPath },
       },
     ])
   }, [
@@ -165,7 +160,6 @@ const useExplorerItem = (tabId: number, content: Content) => {
     favorite,
     selectedPaths,
     tabId,
-    zephySchema,
   ])
 
   return {
