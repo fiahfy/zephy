@@ -579,15 +579,19 @@ export const load =
           }
           case 'zephy:': {
             const parsed = parseZephyUrl(url)
-            if (parsed?.pathname === 'ratings') {
+            if (!parsed) {
+              throw new Error()
+            }
+            if (parsed.pathname === 'ratings') {
               const scoreToPathsMap = selectScoreToPathsMap(getState())
               const paths = scoreToPathsMap[parsed.params.score] ?? []
               return await window.electronAPI.getEntriesForPaths(paths)
+            } else {
+              return []
             }
-            return []
           }
           default:
-            return []
+            throw new Error()
         }
       })()
       dispatch(loaded({ tabId, entries }))

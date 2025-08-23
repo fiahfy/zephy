@@ -62,10 +62,16 @@ export const getTitle = async (url: string) => {
     const u = new URL(url)
     switch (u.protocol) {
       case 'file:': {
-        const entry = await window.electronAPI.getEntry(
-          decodeURIComponent(u.pathname),
-        )
-        return entry.name
+        try {
+          const directoryPath = getPath(url)
+          if (!directoryPath) {
+            throw new Error()
+          }
+          const entry = await window.electronAPI.getEntry(directoryPath)
+          return entry.name
+        } catch {
+          return '<Error>'
+        }
       }
       case 'zephy:':
         switch (u.host) {
@@ -82,7 +88,7 @@ export const getTitle = async (url: string) => {
         throw new Error()
     }
   } catch {
-    return '<Error>'
+    return url
   }
 }
 
@@ -106,6 +112,6 @@ export const getIconType = (url: string) => {
         throw new Error()
     }
   } catch {
-    return 'folder'
+    return 'error-outline'
   }
 }

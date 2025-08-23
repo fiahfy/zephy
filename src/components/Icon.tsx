@@ -1,6 +1,7 @@
 import {
   AudioFile as AudioFileIcon,
   Description as DescriptionIcon,
+  ErrorOutline,
   Folder as FolderIcon,
   Image as ImageIcon,
   InsertDriveFile as InsertDriveFileIcon,
@@ -19,6 +20,10 @@ const icons = {
   },
   description: {
     Component: DescriptionIcon,
+    color: grey['500'],
+  },
+  'error-outline': {
+    Component: ErrorOutline,
     color: grey['500'],
   },
   folder: {
@@ -52,17 +57,7 @@ const icons = {
 }
 
 type Props = {
-  type:
-    | 'audio-file'
-    | 'description'
-    | 'folder'
-    | 'image'
-    | 'insert-drive-file'
-    | 'progress'
-    | 'settings'
-    | 'star'
-    | 'star-border'
-    | 'video-file'
+  type: keyof typeof icons | 'progress'
 }
 
 const Icon = (props: Props) => {
