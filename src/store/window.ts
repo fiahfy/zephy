@@ -16,7 +16,7 @@ import {
   selectCurrentSelected,
   unfocus,
 } from '~/store/explorer-list'
-import { showError, showNotification } from '~/store/notification'
+import { showError } from '~/store/notification'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/window-id'
 import { buildZephyUrl, getPath, getTitle } from '~/utils/url'

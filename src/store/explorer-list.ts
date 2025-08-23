@@ -6,7 +6,7 @@ import {
 import type { Content, Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
-import { showError, showNotification } from '~/store/notification'
+import { showError } from '~/store/notification'
 import {
   changeRatingPath,
   removeRating,
