@@ -2,34 +2,12 @@ import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
   ArrowUpward as ArrowUpwardIcon,
-  Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
-  Search as SearchIcon,
 } from '@mui/icons-material'
-import {
-  AppBar,
-  Autocomplete,
-  Box,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Stack,
-  Toolbar,
-  Typography,
-} from '@mui/material'
-import {
-  type KeyboardEvent,
-  type MouseEvent,
-  type SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from '@mui/material'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import AddressTextField from '~/components/AddressTextField'
-import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import ViewModeToggleButtonGroup from '~/components/ViewModeToggleButtonGroup'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
@@ -38,15 +16,12 @@ import {
   refreshInCurrentTab,
   selectCurrentLoading,
 } from '~/store/explorer-list'
-import { removeQuery, selectQueryHistories } from '~/store/query'
 import {
   back,
   forward,
-  search,
   selectBackHistories,
   selectCanBack,
   selectCanForward,
-  selectCurrentQuery,
   selectCurrentSortOption,
   selectCurrentUrl,
   selectCurrentViewMode,
@@ -56,6 +31,7 @@ import {
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { getPath, isFileUrl } from '~/utils/url'
+import SearchAutocomplete from './SearchAutocomplete'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)
@@ -69,8 +45,6 @@ const AddressBar = () => {
     selectSidebarHiddenByVariant(state, 'secondary'),
   )
   const loading = useAppSelector(selectCurrentLoading)
-  const query = useAppSelector(selectCurrentQuery)
-  const queryHistories = useAppSelector(selectQueryHistories)
   const sortOption = useAppSelector(selectCurrentSortOption)
   const url = useAppSelector(selectCurrentUrl)
   const viewMode = useAppSelector(selectCurrentViewMode)
@@ -109,40 +83,11 @@ const AddressBar = () => {
   const forwardLongPressHandlers = useLongPress(forwardHistoryMenuHandler)
 
   const [urlInput, setUrlInput] = useState('')
-  const [queryInput, setQueryInput] = useState('')
-
-  const ref = useRef<HTMLInputElement>(null)
 
   const directoryPath = useMemo(() => getPath(url), [url])
   const fileUrl = useMemo(() => isFileUrl(url), [url])
 
-  const searchBy = useCallback(
-    (query: string) => {
-      setQueryInput(query)
-      dispatch(search(query))
-    },
-    [dispatch],
-  )
-
-  useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
-      const { type } = message
-      switch (type) {
-        case 'find':
-          ref.current?.focus()
-          return
-        case 'search':
-          searchBy(document.getSelection()?.toString() ?? '')
-          ref.current?.focus()
-          return
-      }
-    })
-    return () => removeListener()
-  }, [searchBy])
-
   useEffect(() => setUrlInput(url), [url])
-
-  useEffect(() => setQueryInput(query), [query])
 
   const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
 
@@ -157,19 +102,6 @@ const AddressBar = () => {
     setUrlInput(url)
     dispatch(refreshInCurrentTab())
   }, [dispatch, url])
-
-  const handleClickSearch = useCallback(
-    () => searchBy(queryInput),
-    [queryInput, searchBy],
-  )
-
-  const handleClickRemove = useCallback(
-    (e: MouseEvent, query: string) => {
-      e.stopPropagation()
-      dispatch(removeQuery({ query }))
-    },
-    [dispatch],
-  )
 
   const handleClickMore = useMemo(
     () =>
@@ -209,26 +141,6 @@ const AddressBar = () => {
   const handleChangeUrl = useCallback((value: string) => {
     setUrlInput(value)
   }, [])
-
-  const handleChangeQuery = useCallback(
-    (_e: SyntheticEvent, value: string | null) => searchBy(value ?? ''),
-    [searchBy],
-  )
-
-  const handleInputChangeQuery = useCallback(
-    (_e: SyntheticEvent, value: string) =>
-      value ? setQueryInput(value) : searchBy(value),
-    [searchBy],
-  )
-
-  const handleKeyDownQuery = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-        searchBy(queryInput)
-      }
-    },
-    [queryInput, searchBy],
-  )
 
   return (
     <AppBar
@@ -335,69 +247,7 @@ const AddressBar = () => {
             flex: '3 1 0',
           }}
         >
-          <Autocomplete
-            freeSolo
-            fullWidth
-            inputValue={queryInput}
-            onChange={handleChangeQuery}
-            onInputChange={handleInputChangeQuery}
-            onKeyDown={handleKeyDownQuery}
-            options={queryHistories.concat().reverse()}
-            renderInput={(params) => (
-              <RoundedFilledTextField
-                {...params}
-                fullWidth
-                inputRef={ref}
-                placeholder="Search..."
-                slotProps={{
-                  input: {
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <IconButton onClick={handleClickSearch} size="small">
-                          <SearchIcon fontSize="small" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-            )}
-            renderOption={(props, option) => (
-              <Stack
-                {...props}
-                component="li"
-                direction="row"
-                key={option}
-                spacing={1}
-                sx={(theme) => ({
-                  alignItems: 'center',
-                  px: `${theme.spacing(1.5)}!important`,
-                  py: `${theme.spacing(0)}!important`,
-                })}
-              >
-                <Typography noWrap sx={{ flexGrow: 1 }} variant="caption">
-                  {option}
-                </Typography>
-                <IconButton
-                  onClick={(e) => handleClickRemove(e, option)}
-                  size="small"
-                  title="Remove"
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Stack>
-            )}
-            size="small"
-            sx={{
-              '.MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall':
-                {
-                  px: 1.5,
-                  py: 0,
-                  '.MuiFilledInput-input': { px: 0, py: 0.5 },
-                },
-            }}
-          />
+          <SearchAutocomplete />
           <IconButton onClick={handleClickMore} size="small" title="Settings">
             <MoreVertIcon fontSize="small" />
           </IconButton>
