@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
-import ffmpeg from 'fluent-ffmpeg'
+import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg'
 import { pathExists } from 'fs-extra'
 import mime from 'mime'
 
@@ -98,10 +98,9 @@ export const getMetadata = async (
 
   const hasDuration = type.startsWith('video/') || type.startsWith('audio/')
 
-  // biome-ignore lint/suspicious/noExplicitAny: false positive
-  const metadata: any = await new Promise((resolve, reject) => {
+  const metadata = await new Promise<FfprobeData | undefined>((resolve) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
-      err ? reject(err) : resolve(metadata)
+      resolve(err ? undefined : metadata)
     })
   })
 

@@ -74,13 +74,7 @@ const PreviewParametersTable = (props: Props) => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      const parameters = await (async () => {
-        try {
-          return await window.electronAPI.getEntryParameters(entry.path)
-        } catch {
-          return undefined
-        }
-      })()
+      const parameters = await window.electronAPI.getEntryParameters(entry.path)
       if (unmounted) {
         return
       }

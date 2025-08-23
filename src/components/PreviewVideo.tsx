@@ -86,13 +86,9 @@ const PreviewVideo = (props: Props) => {
     let unmounted = false
     ;(async () => {
       dispatch({ type: 'loading' })
-      const thumbnail = await (async () => {
-        try {
-          return await window.electronAPI.createEntryThumbnailUrl(entry.path)
-        } catch {
-          return undefined
-        }
-      })()
+      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(
+        entry.path,
+      )
       if (unmounted) {
         return
       }

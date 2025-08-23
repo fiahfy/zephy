@@ -58,31 +58,6 @@ const useEntryThumbnail = (entry: Entry) => {
     [shouldShowHiddenFiles],
   )
 
-  const getThumbnail = useCallback(async (paths: string[]) => {
-    try {
-      return await window.electronAPI.createEntryThumbnailUrl(paths)
-    } catch {
-      return undefined
-    }
-  }, [])
-
-  const loadImage = useCallback(async (url?: string) => {
-    if (!url) {
-      return true
-    }
-    try {
-      await new Promise((resolve, reject) => {
-        const img = new Image()
-        img.onload = () => resolve(undefined)
-        img.onerror = (e) => reject(e)
-        img.src = url
-      })
-      return true
-    } catch {
-      return false
-    }
-  }, [])
-
   useEffect(() => {
     let unmounted = false
     ;(async () => {
@@ -90,8 +65,16 @@ const useEntryThumbnail = (entry: Entry) => {
 
       const paths =
         entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
-      const thumbnail = await getThumbnail(paths)
-      const success = await loadImage(thumbnail)
+      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
+      const success = await new Promise<boolean>((resolve, reject) => {
+        if (!thumbnail) {
+          return resolve(true)
+        }
+        const img = new Image()
+        img.onload = () => resolve(true)
+        img.onerror = () => reject(false)
+        img.src = thumbnail
+      })
 
       if (unmounted) {
         return
@@ -106,7 +89,7 @@ const useEntryThumbnail = (entry: Entry) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path, entry.type, getPaths, getThumbnail, loadImage])
+  }, [entry.path, entry.type, getPaths])
 
   const message = useMemo(() => {
     switch (status) {

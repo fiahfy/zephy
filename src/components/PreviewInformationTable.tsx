@@ -58,13 +58,7 @@ const PreviewInformationTable = (props: Props) => {
       if (!entry.path) {
         return
       }
-      const metadata = await (async () => {
-        try {
-          return await window.electronAPI.getEntryMetadata(entry.path)
-        } catch {
-          return undefined
-        }
-      })()
+      const metadata = await window.electronAPI.getEntryMetadata(entry.path)
       if (unmounted) {
         return
       }

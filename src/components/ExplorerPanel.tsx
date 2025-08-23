@@ -66,37 +66,41 @@ const ExplorerPanel = () => {
         'explorer-tree',
         loadedDirectoryPath,
         async (eventType, directoryPath, filePath) => {
-          const entry =
-            eventType === 'delete'
-              ? undefined
-              : await window.electronAPI.getEntry(filePath)
+          try {
+            const entry =
+              eventType === 'delete'
+                ? undefined
+                : await window.electronAPI.getEntry(filePath)
 
-          const mapper = (e: Entry): Entry => {
-            if (e.type === 'directory') {
-              if (e.path === directoryPath && e.children) {
-                // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
-                let children = e.children.filter(
-                  (entry) => entry.path !== filePath,
-                )
-                if (entry) {
-                  children = [...children, entry]
+            const mapper = (e: Entry): Entry => {
+              if (e.type === 'directory') {
+                if (e.path === directoryPath && e.children) {
+                  // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
+                  let children = e.children.filter(
+                    (entry) => entry.path !== filePath,
+                  )
+                  if (entry) {
+                    children = [...children, entry]
+                  }
+                  return {
+                    ...e,
+                    children,
+                  }
                 }
-                return {
-                  ...e,
-                  children,
+                if (e.children) {
+                  return {
+                    ...e,
+                    children: e.children.map(mapper),
+                  }
                 }
               }
-              if (e.children) {
-                return {
-                  ...e,
-                  children: e.children.map(mapper),
-                }
-              }
+              return e
             }
-            return e
-          }
 
-          dispatch(setRoot({ root: root ? mapper(root) : root }))
+            dispatch(setRoot({ root: root ? mapper(root) : root }))
+          } catch {
+            // noop
+          }
         },
       ),
     [dispatch, loadedDirectoryPath, root, watch],
@@ -147,28 +151,32 @@ const ExplorerPanel = () => {
         return
       }
 
-      const children = await window.electronAPI.getEntries(entry.path)
+      try {
+        const children = await window.electronAPI.getEntries(entry.path)
 
-      const mapper = (e: Entry): Entry => {
-        if (e.type !== 'directory') {
+        const mapper = (e: Entry): Entry => {
+          if (e.type !== 'directory') {
+            return e
+          }
+          if (e.path === entry.path) {
+            return {
+              ...e,
+              children,
+            }
+          }
+          if (e.children) {
+            return {
+              ...e,
+              children: e.children.map(mapper),
+            }
+          }
           return e
         }
-        if (e.path === entry.path) {
-          return {
-            ...e,
-            children,
-          }
-        }
-        if (e.children) {
-          return {
-            ...e,
-            children: e.children.map(mapper),
-          }
-        }
-        return e
-      }
 
-      dispatch(setRoot({ root: root ? mapper(root) : root }))
+        dispatch(setRoot({ root: root ? mapper(root) : root }))
+      } catch {
+        // noop
+      }
     },
     [dispatch, entryMap, expandedItems, root],
   )

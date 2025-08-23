@@ -8,6 +8,7 @@ import {
 import { AppBar, Box, Divider, IconButton, Stack, Toolbar } from '@mui/material'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AddressTextField from '~/components/AddressTextField'
+import SearchAutocomplete from '~/components/SearchAutocomplete'
 import ViewModeToggleButtonGroup from '~/components/ViewModeToggleButtonGroup'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
@@ -31,7 +32,6 @@ import {
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { getPath, isFileUrl } from '~/utils/url'
-import SearchAutocomplete from './SearchAutocomplete'
 
 const AddressBar = () => {
   const backHistories = useAppSelector(selectBackHistories)

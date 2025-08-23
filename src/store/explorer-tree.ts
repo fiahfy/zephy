@@ -70,6 +70,13 @@ export const explorerTreeSlice = createSlice({
         root,
       }
     },
+    loadFailed(state) {
+      return {
+        ...state,
+        loading: false,
+        root: undefined,
+      }
+    },
     setSelectedItems(
       state,
       action: PayloadAction<{ selectedItems: string | undefined }>,
@@ -128,7 +135,7 @@ export const selectLoadedDirectoryPaths = createSelector(selectRoot, (root) => {
 export const load =
   (directoryPath: string | undefined, force = false): AppThunk =>
   async (dispatch, getState) => {
-    const { load, loaded, setExpandedItems, setSelectedItems } =
+    const { load, loaded, loadFailed, setExpandedItems, setSelectedItems } =
       explorerTreeSlice.actions
 
     const root = selectRoot(getState())
@@ -155,10 +162,14 @@ export const load =
         return
       }
       dispatch(load())
-      const root = await window.electronAPI.getRootEntry(directoryPath)
-      const expandedItems = getDirectoryPaths(root, false)
-      dispatch(setExpandedItems({ expandedItems }))
-      dispatch(setSelectedItems({ selectedItems: directoryPath }))
-      dispatch(loaded({ root }))
+      try {
+        const root = await window.electronAPI.getRootEntry(directoryPath)
+        const expandedItems = getDirectoryPaths(root, false)
+        dispatch(setExpandedItems({ expandedItems }))
+        dispatch(setSelectedItems({ selectedItems: directoryPath }))
+        dispatch(loaded({ root }))
+      } catch {
+        dispatch(loadFailed())
+      }
     }
   }

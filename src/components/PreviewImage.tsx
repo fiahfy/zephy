@@ -16,19 +16,12 @@ const PreviewImage = (props: Props) => {
   useEffect(() => {
     ;(async () => {
       setStatus('loading')
-      const success = await (async () => {
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(undefined)
-            img.onerror = (e) => reject(e)
-            img.src = entry.url
-          })
-          return true
-        } catch {
-          return false
-        }
-      })()
+      const success = await new Promise<boolean>((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(true)
+        img.onerror = () => reject(false)
+        img.src = entry.url
+      })
       setStatus(success ? 'loaded' : 'error')
     })()
   }, [entry.url])

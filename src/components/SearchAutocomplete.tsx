@@ -15,10 +15,10 @@ import {
   useRef,
   useState,
 } from 'react'
+import RoundedFilledTextField from '~/components/mui/RoundedFilledTextField'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { removeQuery, selectQueryHistories } from '~/store/query'
 import { search, selectCurrentQuery } from '~/store/window'
-import RoundedFilledTextField from './mui/RoundedFilledTextField'
 
 const SearchAutocomplete = () => {
   const query = useAppSelector(selectCurrentQuery)

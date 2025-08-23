@@ -3,7 +3,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { AppState } from '~/store'
+import type { AppState, AppThunk } from '~/store'
 
 type State = {
   notification?: {
@@ -13,6 +13,12 @@ type State = {
 }
 
 const initialState: State = { notification: undefined }
+
+const getErrorMessage = (e: Error): string => {
+  console.error(e)
+  const message = e.message.split(':').slice(2).join(':')
+  return message ? message : e.message
+}
 
 export const notificationSlice = createSlice({
   name: 'notification',
@@ -33,3 +39,13 @@ export const selectNotification = createSelector(
   (state: AppState) => state.notification,
   (notification) => notification.notification,
 )
+
+export const showError =
+  (error: Error | unknown): AppThunk =>
+  async (dispatch) => {
+    if (error instanceof Error) {
+      dispatch(
+        showNotification({ message: getErrorMessage(error), type: 'error' }),
+      )
+    }
+  }

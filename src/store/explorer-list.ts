@@ -6,7 +6,7 @@ import {
 import type { Content, Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
-import { showNotification } from '~/store/notification'
+import { showError, showNotification } from '~/store/notification'
 import {
   changeRatingPath,
   removeRating,
@@ -51,12 +51,6 @@ const defaultExplorerState = {
   focused: undefined,
   loading: false,
   selected: [],
-}
-
-const getErrorMessage = (e: Error): string => {
-  console.error(e)
-  const message = e.message.split(':').slice(2).join(':')
-  return message ? message : e.message
 }
 
 const findExplorer = (state: State, tabId: number) =>
@@ -699,11 +693,7 @@ export const rename =
         dispatch(focus({ tabId, path: entry.path }))
       }
     } catch (e) {
-      if (e instanceof Error) {
-        dispatch(
-          showNotification({ message: getErrorMessage(e), type: 'error' }),
-        )
-      }
+      dispatch(showError(e))
     }
   }
 
@@ -825,10 +815,16 @@ export const openInCurrentTab =
       return
     }
 
-    const entry = await window.electronAPI.getEntry(targetPath)
-    const action =
-      entry.type === 'directory' ? changeUrl(entry.url) : openEntry(entry.path)
-    dispatch(action)
+    try {
+      const entry = await window.electronAPI.getEntry(targetPath)
+      const action =
+        entry.type === 'directory'
+          ? changeUrl(entry.url)
+          : openEntry(entry.path)
+      dispatch(action)
+    } catch (e) {
+      showError(e)
+    }
   }
 
 // Operations for anywhere
@@ -845,11 +841,7 @@ export const move =
         dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       }
     } catch (e) {
-      if (e instanceof Error) {
-        dispatch(
-          showNotification({ message: getErrorMessage(e), type: 'error' }),
-        )
-      }
+      dispatch(showError(e))
     }
   }
 
@@ -874,8 +866,12 @@ export const handle =
       switch (eventType) {
         case 'create':
         case 'update': {
-          const entry = await window.electronAPI.getEntry(filePath)
-          dispatch(addEntries({ tabId, entries: [entry] }))
+          try {
+            const entry = await window.electronAPI.getEntry(filePath)
+            dispatch(addEntries({ tabId, entries: [entry] }))
+          } catch {
+            // noop
+          }
           break
         }
         case 'delete':

@@ -16,6 +16,7 @@ import {
   selectCurrentSelected,
   unfocus,
 } from '~/store/explorer-list'
+import { showError, showNotification } from '~/store/notification'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/window-id'
 import { buildZephyUrl, getPath, getTitle } from '~/utils/url'
@@ -752,14 +753,17 @@ export const newTab =
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
 
-    // TODO: Handle error
-    const entry = await window.electronAPI.getEntry(directoryPath)
+    try {
+      const entry = await window.electronAPI.getEntry(directoryPath)
 
-    const id = selectWindowId(getState())
-    dispatch(newTab({ id, srcTabId }))
-    const tabId = selectCurrentTabId(getState())
-    dispatch(addTab({ tabId }))
-    dispatch(changeUrl(entry.url))
+      const id = selectWindowId(getState())
+      dispatch(newTab({ id, srcTabId }))
+      const tabId = selectCurrentTabId(getState())
+      dispatch(addTab({ tabId }))
+      dispatch(changeUrl(entry.url))
+    } catch (e) {
+      showError(e)
+    }
   }
 
 export const duplicateTab =
@@ -852,6 +856,17 @@ export const changeUrl =
     dispatch(changeUrl({ id, title, url }))
   }
 
+export const changeDirectoryPath =
+  (directoryPath: string): AppThunk =>
+  async (dispatch) => {
+    try {
+      const entry = await window.electronAPI.getEntry(directoryPath)
+      dispatch(changeUrl(entry.url))
+    } catch (e) {
+      dispatch(showError(e))
+    }
+  }
+
 export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
@@ -877,8 +892,12 @@ export const upward = (): AppThunk => async (dispatch, getState) => {
     return
   }
 
-  const parent = await window.electronAPI.getParentEntry(currentDirectoryPath)
-  dispatch(changeUrl(parent.url))
+  try {
+    const parent = await window.electronAPI.getParentEntry(currentDirectoryPath)
+    dispatch(changeUrl(parent.url))
+  } catch (e) {
+    showError(e)
+  }
 }
 
 export const goToRatings =

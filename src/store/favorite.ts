@@ -4,6 +4,7 @@ import {
   type PayloadAction,
 } from '@reduxjs/toolkit'
 import type { AppState, AppThunk } from '~/store'
+import { showError } from '~/store/notification'
 
 type Favorite = {
   name: string
@@ -90,8 +91,12 @@ export const addToFavorites =
   async (dispatch) => {
     const { addToFavorites } = favoriteSlice.actions
 
-    const entry = await window.electronAPI.getEntry(directoryPath)
-    dispatch(addToFavorites({ ...entry }))
+    try {
+      const entry = await window.electronAPI.getEntry(directoryPath)
+      dispatch(addToFavorites({ ...entry }))
+    } catch (e) {
+      showError(e)
+    }
   }
 
 export const removeFromFavorites =

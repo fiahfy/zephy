@@ -24,6 +24,13 @@ import {
 import { load } from '~/store/explorer-tree'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
 import {
+  toggleDateCreatedColumnVisible,
+  toggleDateLastOpenedColumnVisible,
+  toggleDateModifiedColumnVisible,
+  toggleRatingColumnVisible,
+  toggleSizeColumnVisible,
+} from '~/store/preferences'
+import {
   back,
   closeOtherTabs,
   closeTab,
@@ -43,13 +50,6 @@ import {
   updateApplicationMenu,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import {
-  toggleDateCreatedColumnVisible,
-  toggleDateLastOpenedColumnVisible,
-  toggleDateModifiedColumnVisible,
-  toggleRatingColumnVisible,
-  toggleSizeColumnVisible,
-} from './store/preferences'
 
 const isFocused = () => {
   const elements = document.querySelectorAll('.explorer-list')
