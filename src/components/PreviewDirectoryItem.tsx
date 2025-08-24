@@ -32,6 +32,7 @@ type Props = {
   content: Content
 }
 
+// TODO: Impl editing, DnD, copy/paste
 const PreviewDirectoryItem = (props: Props) => {
   const { content } = props
 

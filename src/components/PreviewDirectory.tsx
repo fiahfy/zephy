@@ -16,6 +16,7 @@ import {
 
 const maxItemSize = 256
 
+// TODO: Impl events, loading progress
 const PreviewDirectory = () => {
   const contents = useAppSelector(selectContents)
   const error = useAppSelector(selectError)
