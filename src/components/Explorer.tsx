@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import { createElement, useMemo } from 'react'
 import ExplorerGallery from '~/components/ExplorerGallery'
-import ExplorerGrid from '~/components/ExplorerGrid'
+import ExplorerImageList from '~/components/ExplorerImageList'
 import ExplorerTable from '~/components/ExplorerTable'
 import useDroppable from '~/hooks/useDroppable'
 import ExplorerProvider from '~/providers/ExplorerProvider'
@@ -30,7 +30,7 @@ const Explorer = (props: Props) => {
       case 'gallery':
         return ExplorerGallery
       case 'thumbnail':
-        return ExplorerGrid
+        return ExplorerImageList
       default:
         return ExplorerTable
     }

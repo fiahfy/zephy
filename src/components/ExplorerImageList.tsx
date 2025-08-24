@@ -13,7 +13,7 @@ type Props = {
   tabId: number
 }
 
-const ExplorerGrid = (props: Props) => {
+const ExplorerImageList = (props: Props) => {
   const { tabId } = props
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
@@ -114,4 +114,4 @@ const ExplorerGrid = (props: Props) => {
   )
 }
 
-export default ExplorerGrid
+export default ExplorerImageList
