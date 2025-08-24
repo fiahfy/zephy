@@ -30,7 +30,7 @@ import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { openEntry } from '~/store/settings'
+import { open } from '~/store/settings'
 import { changeUrl } from '~/store/window'
 
 const StyledTreeItemRoot = styled(TreeItemRoot)(() => ({
@@ -136,7 +136,7 @@ const ExplorerTreeItemRoot = forwardRef(
       (e: MouseEvent) => {
         e.stopPropagation()
         if (entry.type !== 'directory') {
-          dispatch(openEntry(entry.path))
+          dispatch(open(entry.path))
         }
       },
       [dispatch, entry.path, entry.type],

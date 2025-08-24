@@ -14,7 +14,7 @@ import {
   selectScoreByPath,
   selectScoreToPathsMap,
 } from '~/store/rating'
-import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
+import { open, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   changeUrl,
   selectCurrentDirectoryPath,
@@ -822,9 +822,7 @@ export const openInCurrentTab =
     try {
       const entry = await window.electronAPI.getEntry(targetPath)
       const action =
-        entry.type === 'directory'
-          ? changeUrl(entry.url)
-          : openEntry(entry.path)
+        entry.type === 'directory' ? changeUrl(entry.url) : open(entry.path)
       dispatch(action)
     } catch (e) {
       showError(e)

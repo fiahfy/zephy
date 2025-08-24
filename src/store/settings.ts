@@ -87,7 +87,7 @@ export const selectTheme = createSelector(
   (settings) => settings.theme,
 )
 
-export const openEntry =
+export const open =
   (filePath?: string): AppThunk =>
   async (_, getState) => {
     if (!filePath) {

@@ -15,7 +15,7 @@ import {
   toggleSelection,
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
-import { openEntry } from '~/store/settings'
+import { open } from '~/store/settings'
 import { changeUrl, selectUrlByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { getPath } from '~/utils/url'
@@ -72,7 +72,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       }
       content.type === 'directory'
         ? dispatch(changeUrl(content.url))
-        : dispatch(openEntry(content.path))
+        : dispatch(open(content.path))
     },
   )
 

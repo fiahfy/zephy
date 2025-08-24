@@ -14,7 +14,7 @@ import {
   selectFavoriteByPath,
   toggleFavorite,
 } from '~/store/favorite'
-import { openEntry } from '~/store/settings'
+import { open } from '~/store/settings'
 import { changeUrl, selectCurrentUrl } from '~/store/window'
 import { getIconType, getPath, isFileUrl } from '~/utils/url'
 
@@ -65,7 +65,7 @@ const AddressTextField = (props: Props) => {
   )
 
   const handleClickFolder = useCallback(
-    async () => dispatch(openEntry(directoryPath)),
+    async () => dispatch(open(directoryPath)),
     [directoryPath, dispatch],
   )
 
