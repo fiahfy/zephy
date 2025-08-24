@@ -9,7 +9,8 @@ import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
 import type { Content, Metadata } from '~/interfaces'
 import { useAppSelector } from '~/store'
-import { selectPreviewContent, selectPreviewContents } from '~/store/preview'
+import { selectCurrentSelectedContents } from '~/store/explorer-list'
+import { selectPreviewContent } from '~/store/preview'
 import {
   formatDateTime,
   formatDuration,
@@ -41,7 +42,7 @@ const formatDateRange = (
 }
 
 const PreviewInformationTable = () => {
-  const contents = useAppSelector(selectPreviewContents)
+  const contents = useAppSelector(selectCurrentSelectedContents)
   const content = useAppSelector(selectPreviewContent)
 
   const [metadata, setMetadata] = useState<Metadata>()

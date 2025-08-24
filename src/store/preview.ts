@@ -231,13 +231,8 @@ export const selectContents = createSelector(
       .toSorted((a, b) => a.name.localeCompare(b.name)),
 )
 
-export const selectPreviewContents = createSelector(
-  selectCurrentSelectedContents,
-  (currentSelectedContents) => currentSelectedContents,
-)
-
 export const selectPreviewContent = createSelector(
-  selectPreviewContents,
+  selectCurrentSelectedContents,
   (previewContents) =>
     previewContents.length === 1 ? previewContents[0] : undefined,
 )

@@ -9,11 +9,12 @@ import PreviewParametersTable from '~/components/PreviewParametersTable'
 import PreviewText from '~/components/PreviewText'
 import PreviewVideo from '~/components/PreviewVideo'
 import { useAppSelector } from '~/store'
-import { selectPreviewContent, selectPreviewContents } from '~/store/preview'
+import { selectCurrentSelectedContents } from '~/store/explorer-list'
+import { selectPreviewContent } from '~/store/preview'
 import { detectFileType } from '~/utils/file'
 
 const PreviewPanel = () => {
-  const contents = useAppSelector(selectPreviewContents)
+  const contents = useAppSelector(selectCurrentSelectedContents)
   const content = useAppSelector(selectPreviewContent)
 
   const ref = useRef<HTMLElement>(null)
