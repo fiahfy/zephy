@@ -141,6 +141,7 @@ const useExplorerList = (
         dispatch(focus(tabId, content.path))
       }
 
+      // TODO: Move to store
       const focusByHorizontal = (offset: number, multiSelect: boolean) => {
         const index = contents.findIndex((c) => c.path === focused)
         if (index < 0) {
