@@ -6,7 +6,7 @@ import {
 } from '@mui/material'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import Rating from '~/components/Rating'
+import ExplorerRating from '~/components/ExplorerRating'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
@@ -57,7 +57,7 @@ const ExplorerTableCell = (props: Props) => {
           />
         </Stack>
       )}
-      {dataKey === 'score' && <Rating path={content.path} />}
+      {dataKey === 'score' && <ExplorerRating path={content.path} />}
       {dataKey === 'size' && content.type !== 'directory' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}

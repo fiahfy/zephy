@@ -10,7 +10,7 @@ import clsx from 'clsx'
 import pluralize from 'pluralize'
 import EntryIcon from '~/components/EntryIcon'
 import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import Rating from '~/components/Rating'
+import ExplorerRating from '~/components/ExplorerRating'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
@@ -122,7 +122,7 @@ const ExplorerImageListItem = (props: Props) => {
             }}
           >
             <Box sx={{ my: 0.25 }}>
-              <Rating path={content.path} />
+              <ExplorerRating path={content.path} />
             </Box>
             {itemCount !== undefined && content.type === 'directory' && (
               <Typography noWrap sx={{ ml: 1 }} variant="caption">
