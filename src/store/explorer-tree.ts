@@ -98,9 +98,6 @@ export const explorerTreeSlice = createSlice({
   },
 })
 
-export const { setExpandedItems, setRoot, setSelectedItems } =
-  explorerTreeSlice.actions
-
 export default explorerTreeSlice.reducer
 
 export const selectExplorerTree = (state: AppState) => state.explorerTree
@@ -130,6 +127,27 @@ export const selectLoadedDirectoryPaths = createSelector(selectRoot, (root) => {
     return []
   }
   return getDirectoryPaths(root, false)
+})
+
+export const selectEntryMap = createSelector(selectRoot, (root) => {
+  if (!root) {
+    return {}
+  }
+
+  const reducer = (
+    acc: { [path: string]: Entry },
+    entry: Entry,
+  ): { [path: string]: Entry } => {
+    return {
+      [entry.path]: entry,
+      ...(entry.type === 'directory' ? (entry.children ?? []) : []).reduce(
+        reducer,
+        acc,
+      ),
+    }
+  }
+
+  return [root].reduce(reducer, {})
 })
 
 export const load =
@@ -171,5 +189,111 @@ export const load =
       } catch {
         dispatch(loadFailed())
       }
+    }
+  }
+
+export const selectItems =
+  (itemIds: string | undefined): AppThunk =>
+  async (dispatch) => {
+    const { setSelectedItems } = explorerTreeSlice.actions
+
+    dispatch(setSelectedItems({ selectedItems: itemIds }))
+  }
+
+export const expandItems =
+  (itemIds: string[]): AppThunk =>
+  async (dispatch, getState) => {
+    const { setExpandedItems, setRoot } = explorerTreeSlice.actions
+
+    const expandedItems = selectExpandedItems(getState())
+
+    dispatch(setExpandedItems({ expandedItems: itemIds }))
+
+    const expandingItemId = itemIds.find(
+      (itemId) => !expandedItems.includes(itemId),
+    )
+    if (!expandingItemId) {
+      return
+    }
+
+    const entryMap = selectEntryMap(getState())
+    const entry = entryMap[expandingItemId]
+    if (!entry || entry.type !== 'directory' || entry.children) {
+      return
+    }
+
+    try {
+      const children = await window.electronAPI.getEntries(entry.path)
+
+      const mapper = (e: Entry): Entry => {
+        if (e.type !== 'directory') {
+          return e
+        }
+        if (e.path === entry.path) {
+          return {
+            ...e,
+            children,
+          }
+        }
+        if (e.children) {
+          return {
+            ...e,
+            children: e.children.map(mapper),
+          }
+        }
+        return e
+      }
+
+      const root = selectRoot(getState())
+
+      dispatch(setRoot({ root: root ? mapper(root) : root }))
+    } catch {
+      // noop
+    }
+  }
+
+export const handle =
+  (
+    eventType: 'create' | 'update' | 'delete',
+    directoryPath: string,
+    filePath: string,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const { setRoot } = explorerTreeSlice.actions
+
+    try {
+      const entry =
+        eventType === 'delete'
+          ? undefined
+          : await window.electronAPI.getEntry(filePath)
+
+      const mapper = (e: Entry): Entry => {
+        if (e.type === 'directory') {
+          if (e.path === directoryPath && e.children) {
+            // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
+            let children = e.children.filter((entry) => entry.path !== filePath)
+            if (entry) {
+              children = [...children, entry]
+            }
+            return {
+              ...e,
+              children,
+            }
+          }
+          if (e.children) {
+            return {
+              ...e,
+              children: e.children.map(mapper),
+            }
+          }
+        }
+        return e
+      }
+
+      const root = selectRoot(getState())
+
+      dispatch(setRoot({ root: root ? mapper(root) : root }))
+    } catch {
+      // noop
     }
   }

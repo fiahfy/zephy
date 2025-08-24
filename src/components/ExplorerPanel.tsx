@@ -12,15 +12,15 @@ import useWatcher from '~/hooks/useWatcher'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  expandItems,
+  handle,
   load,
   selectExpandedItems,
+  selectItems,
   selectLoadedDirectoryPaths,
   selectLoading,
   selectRoot,
   selectSelectedItems,
-  setExpandedItems,
-  setRoot,
-  setSelectedItems,
 } from '~/store/explorer-tree'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { selectCurrentDirectoryPath } from '~/store/window'
@@ -39,25 +39,6 @@ const ExplorerPanel = () => {
   const { watch } = useWatcher()
 
   const apiRef = useTreeViewApiRef()
-
-  const entryMap = useMemo(() => {
-    if (!root) {
-      return {}
-    }
-    const reducer = (
-      acc: { [path: string]: Entry },
-      entry: Entry,
-    ): { [path: string]: Entry } => {
-      return {
-        [entry.path]: entry,
-        ...(entry.type === 'directory' ? (entry.children ?? []) : []).reduce(
-          reducer,
-          acc,
-        ),
-      }
-    }
-    return [root].reduce(reducer, {})
-  }, [root])
 
   const items = useMemo(() => {
     const mapper = (
@@ -99,53 +80,14 @@ const ExplorerPanel = () => {
 
   const handleSelectedItemsChange = useCallback(
     (_e: SyntheticEvent | null, itemIds: string | null) =>
-      dispatch(setSelectedItems({ selectedItems: itemIds ?? undefined })),
+      dispatch(selectItems(itemIds ?? undefined)),
     [dispatch],
   )
 
   const handleExpandedItemsChange = useCallback(
-    async (_e: SyntheticEvent | null, itemIds: string[]) => {
-      dispatch(setExpandedItems({ expandedItems: itemIds }))
-
-      const expandingItemId = itemIds.find(
-        (itemId) => !expandedItems.includes(itemId),
-      )
-      if (!expandingItemId) {
-        return
-      }
-      const entry = entryMap[expandingItemId]
-      if (!entry || entry.type !== 'directory' || entry.children) {
-        return
-      }
-
-      try {
-        const children = await window.electronAPI.getEntries(entry.path)
-
-        const mapper = (e: Entry): Entry => {
-          if (e.type !== 'directory') {
-            return e
-          }
-          if (e.path === entry.path) {
-            return {
-              ...e,
-              children,
-            }
-          }
-          if (e.children) {
-            return {
-              ...e,
-              children: e.children.map(mapper),
-            }
-          }
-          return e
-        }
-
-        dispatch(setRoot({ root: root ? mapper(root) : root }))
-      } catch {
-        // noop
-      }
-    },
-    [dispatch, entryMap, expandedItems, root],
+    async (_e: SyntheticEvent | null, itemIds: string[]) =>
+      dispatch(expandItems(itemIds)),
+    [dispatch],
   )
 
   useEffect(() => {
@@ -170,45 +112,10 @@ const ExplorerPanel = () => {
       watch(
         'explorer-tree',
         loadedDirectoryPath,
-        async (eventType, directoryPath, filePath) => {
-          try {
-            const entry =
-              eventType === 'delete'
-                ? undefined
-                : await window.electronAPI.getEntry(filePath)
-
-            const mapper = (e: Entry): Entry => {
-              if (e.type === 'directory') {
-                if (e.path === directoryPath && e.children) {
-                  // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
-                  let children = e.children.filter(
-                    (entry) => entry.path !== filePath,
-                  )
-                  if (entry) {
-                    children = [...children, entry]
-                  }
-                  return {
-                    ...e,
-                    children,
-                  }
-                }
-                if (e.children) {
-                  return {
-                    ...e,
-                    children: e.children.map(mapper),
-                  }
-                }
-              }
-              return e
-            }
-
-            dispatch(setRoot({ root: root ? mapper(root) : root }))
-          } catch {
-            // noop
-          }
-        },
+        async (eventType, directoryPath, filePath) =>
+          dispatch(handle(eventType, directoryPath, filePath)),
       ),
-    [dispatch, loadedDirectoryPath, root, watch],
+    [dispatch, loadedDirectoryPath, watch],
   )
 
   return (

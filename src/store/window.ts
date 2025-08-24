@@ -802,6 +802,7 @@ export const closeTab =
     if (!canCloseTab) {
       return
     }
+
     dispatch(closeTab({ id, tabId: targetTabId }))
     dispatch(removeTab({ tabId: targetTabId }))
   }
@@ -857,6 +858,7 @@ export const changeUrl =
     if (loading) {
       return
     }
+
     const title = await getTitle(url)
     dispatch(changeUrl({ id, title, url }))
   }
@@ -882,6 +884,7 @@ export const go =
     if (loading) {
       return
     }
+
     dispatch(go({ id, offset }))
   }
 

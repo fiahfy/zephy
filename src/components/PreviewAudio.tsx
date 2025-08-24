@@ -97,7 +97,6 @@ const PreviewAudio = () => {
     if (!el) {
       return
     }
-
     el.loop = defaultLoop
     el.volume = defaultVolume
   }, [defaultLoop, defaultVolume])

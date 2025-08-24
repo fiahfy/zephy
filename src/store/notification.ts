@@ -31,8 +31,6 @@ export const notificationSlice = createSlice({
   },
 })
 
-export const { showNotification } = notificationSlice.actions
-
 export default notificationSlice.reducer
 
 export const selectNotification = createSelector(
@@ -43,6 +41,8 @@ export const selectNotification = createSelector(
 export const showError =
   (error: Error | unknown): AppThunk =>
   async (dispatch) => {
+    const { showNotification } = notificationSlice.actions
+
     if (error instanceof Error) {
       dispatch(
         showNotification({ message: getErrorMessage(error), type: 'error' }),

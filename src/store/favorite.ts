@@ -113,6 +113,7 @@ export const toggleFavorite =
     if (!directoryPath) {
       return
     }
+
     const favorite = selectFavoriteByPath(
       selectFavorite(getState()),
       directoryPath,

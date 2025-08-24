@@ -93,6 +93,7 @@ export const open =
     if (!filePath) {
       return
     }
+
     const encoded = encodeURIComponent(filePath)
     const fileType = detectFileType(filePath)
     switch (fileType) {
