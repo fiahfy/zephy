@@ -4,7 +4,7 @@ import throttle from 'lodash.throttle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
-import type { Content, Entry } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   load,
@@ -34,32 +34,27 @@ const PreviewDirectory = () => {
 
   const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
 
-  const rows = useMemo(
+  const chunks = useMemo(
     () =>
       contents.reduce((acc, _, i) => {
         if (i % columns === 0) {
           acc.push(contents.slice(i, i + columns))
         }
         return acc
-      }, [] as Entry[][]),
+      }, [] as Content[][]),
     [columns, contents],
   )
 
-  const noDataText = useMemo(
-    () =>
-      loading
-        ? 'Loading items...'
-        : error
-          ? 'The specified directory does not exist'
-          : 'No items',
-    [loading, error],
-  )
-
   const virtualizer = useVirtualizer({
-    count: rows.length,
+    count: chunks.length,
     estimateSize: () => size,
     getScrollElement: () => ref.current,
   })
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => {
+    dispatch(load())
+  }, [dispatch, previewContent?.url])
 
   useEffect(() => {
     const el = ref.current
@@ -77,9 +72,6 @@ const PreviewDirectory = () => {
     return () => observer.disconnect()
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.measure(), [virtualizer, size])
-
   useEffect(() => {
     if (!loading) {
       virtualizer.scrollToOffset(0)
@@ -87,9 +79,17 @@ const PreviewDirectory = () => {
   }, [loading, virtualizer])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => {
-    dispatch(load())
-  }, [dispatch, previewContent?.url])
+  useEffect(() => virtualizer.measure(), [virtualizer, size])
+
+  const noDataText = useMemo(
+    () =>
+      loading
+        ? 'Loading items...'
+        : error
+          ? 'The specified directory does not exist'
+          : 'No items',
+    [loading, error],
+  )
 
   return (
     <>
@@ -99,7 +99,7 @@ const PreviewDirectory = () => {
           height: '100%',
           overflowX: 'hidden',
           overflowY: 'scroll',
-          display: contents.length === 0 ? 'none' : 'block',
+          display: chunks.length === 0 ? 'none' : 'block',
         }}
       >
         {wrapperWidth > 0 && (
@@ -110,7 +110,7 @@ const PreviewDirectory = () => {
             }}
           >
             {virtualizer.getVirtualItems().map((virtualRow) => {
-              const columns = rows[virtualRow.index] as Content[]
+              const columns = chunks[virtualRow.index] as Content[]
               return (
                 <Stack
                   direction="row"
@@ -135,7 +135,7 @@ const PreviewDirectory = () => {
           </Box>
         )}
       </Box>
-      {contents.length === 0 && <PreviewEmptyState message={noDataText} />}
+      {chunks.length === 0 && <PreviewEmptyState message={noDataText} />}
     </>
   )
 }
