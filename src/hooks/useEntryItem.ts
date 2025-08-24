@@ -2,12 +2,14 @@ import { useMemo } from 'react'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
+import { selectCurrentTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const useEntryItem = (entry: Entry) => {
   const favorite = useAppSelector((state) =>
     selectFavoriteByPath(selectFavorite(state), entry.path),
   )
+  const tabId = useAppSelector(selectCurrentTabId)
 
   const onContextMenu = useMemo(() => {
     const directory = entry.type === 'directory'
@@ -25,7 +27,7 @@ const useEntryItem = (entry: Entry) => {
             },
             {
               type: 'openInNewTab',
-              data: { path },
+              data: { path, tabId },
             },
           ]
         : []),
@@ -53,7 +55,7 @@ const useEntryItem = (entry: Entry) => {
         data: { paths: [path] },
       },
     ])
-  }, [entry.path, entry.type, favorite])
+  }, [entry.path, entry.type, favorite, tabId])
 
   return { onContextMenu }
 }
