@@ -641,17 +641,25 @@ export const toggleSelection =
   }
 
 export const addSelection =
-  (tabId: number, path: string, anchorPath?: string): AppThunk =>
+  (tabId: number, path: string, useAnchor: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { addSelection } = explorerListSlice.actions
+
+    let anchor: string | undefined
+    if (useAnchor) {
+      anchor = selectAnchorByTabId(getState(), tabId)
+    } else {
+      const selected = selectSelectedByTabId(getState(), tabId)
+      anchor = selected[selected.length - 1]
+    }
 
     const contents = selectContentsByTabId(getState(), tabId)
     const paths = contents.map((content) => content.path)
 
     let newPaths: string[]
-    if (anchorPath) {
+    if (anchor) {
       const index = paths.indexOf(path)
-      const prevIndex = paths.indexOf(anchorPath)
+      const prevIndex = paths.indexOf(anchor)
       newPaths =
         prevIndex < index
           ? paths.slice(prevIndex, index + 1)

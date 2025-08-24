@@ -265,17 +265,20 @@ export const load = (): AppThunk => async (dispatch, getState) => {
 }
 
 export const addSelection =
-  (path: string, anchorPath?: string): AppThunk =>
+  (path: string): AppThunk =>
   async (dispatch, getState) => {
     const { addSelection } = previewSlice.actions
+
+    const selected = selectSelected(getState())
+    const anchor = selected[selected.length - 1]
 
     const contents = selectContents(getState())
     const paths = contents.map((content) => content.path)
 
     let newPaths: string[]
-    if (anchorPath) {
+    if (anchor) {
       const index = paths.indexOf(path)
-      const prevIndex = paths.indexOf(anchorPath)
+      const prevIndex = paths.indexOf(anchor)
       newPaths =
         prevIndex < index
           ? paths.slice(prevIndex, index + 1)

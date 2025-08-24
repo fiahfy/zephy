@@ -61,9 +61,7 @@ const PreviewDirectoryItem = (props: Props) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
-        dispatch(
-          addSelection(content.path, selectedPaths[selectedPaths.length - 1]),
-        )
+        dispatch(addSelection(content.path))
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
         dispatch(toggleSelection({ path: content.path }))
       } else {

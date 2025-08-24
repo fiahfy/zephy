@@ -15,7 +15,6 @@ import {
   blur,
   focus,
   select,
-  selectAnchorByTabId,
   selectContentsByTabId,
   selectEditingByTabId,
   selectErrorByTabId,
@@ -43,7 +42,6 @@ const useExplorerList = (
   horizontal: boolean,
   ref: RefObject<HTMLElement | null>,
 ) => {
-  const anchor = useAppSelector((state) => selectAnchorByTabId(state, tabId))
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
@@ -165,7 +163,7 @@ const useExplorerList = (
 
         if (multiSelect) {
           dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, anchor))
+          dispatch(addSelection(tabId, content.path, true))
         } else {
           dispatch(select(tabId, content.path))
         }
@@ -190,7 +188,7 @@ const useExplorerList = (
 
         if (multiSelect) {
           dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, anchor))
+          dispatch(addSelection(tabId, content.path, true))
         } else {
           dispatch(select(tabId, content.path))
         }
@@ -223,7 +221,7 @@ const useExplorerList = (
 
         if (multiSelect) {
           dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, anchor))
+          dispatch(addSelection(tabId, content.path, true))
         } else {
           dispatch(select(tabId, content.path))
         }
@@ -266,7 +264,7 @@ const useExplorerList = (
           return
       }
     },
-    [anchor, columns, contents, dispatch, focused, horizontal, tabId],
+    [columns, contents, dispatch, focused, horizontal, tabId],
   )
 
   useEffect(() => {

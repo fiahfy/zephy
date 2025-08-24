@@ -47,13 +47,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
-        dispatch(
-          addSelection(
-            tabId,
-            content.path,
-            selectedPaths[selectedPaths.length - 1],
-          ),
-        )
+        dispatch(addSelection(tabId, content.path, false))
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
         dispatch(toggleSelection(tabId, content.path))
       } else {
