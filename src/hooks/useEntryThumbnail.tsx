@@ -43,6 +43,17 @@ const useEntryThumbnail = (entry: Entry) => {
     thumbnail: undefined,
   })
 
+  const message = useMemo(() => {
+    switch (status) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load'
+      case 'loaded':
+        return 'No preview'
+    }
+  }, [status])
+
   const getPaths = useCallback(
     async (path: string) => {
       try {
@@ -90,17 +101,6 @@ const useEntryThumbnail = (entry: Entry) => {
       unmounted = true
     }
   }, [entry.path, entry.type, getPaths])
-
-  const message = useMemo(() => {
-    switch (status) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load'
-      case 'loaded':
-        return 'No preview'
-    }
-  }, [status])
 
   return { itemCount, message, status, thumbnail }
 }

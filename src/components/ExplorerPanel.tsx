@@ -40,6 +40,114 @@ const ExplorerPanel = () => {
 
   const apiRef = useTreeViewApiRef()
 
+  const entryMap = useMemo(() => {
+    if (!root) {
+      return {}
+    }
+    const reducer = (
+      acc: { [path: string]: Entry },
+      entry: Entry,
+    ): { [path: string]: Entry } => {
+      return {
+        [entry.path]: entry,
+        ...(entry.type === 'directory' ? (entry.children ?? []) : []).reduce(
+          reducer,
+          acc,
+        ),
+      }
+    }
+    return [root].reduce(reducer, {})
+  }, [root])
+
+  const items = useMemo(() => {
+    const mapper = (
+      e: Entry,
+    ): TreeViewBaseItem<{ entry?: Entry; id: string; label: string }> => {
+      return {
+        id: e.path,
+        label: e.name,
+        entry: e,
+        children:
+          e.type === 'directory'
+            ? e.children
+              ? e.children
+                  .filter(
+                    (entry) =>
+                      shouldShowHiddenFiles || !isHiddenFile(entry.name),
+                  )
+                  .toSorted((a, b) => a.name.localeCompare(b.name))
+                  // NOTE: Limit entry size for performance issue
+                  .slice(0, 100)
+                  .map(mapper)
+              : [
+                  {
+                    id: `__loading__${e.path}`,
+                    label: 'Loading items...',
+                  },
+                ]
+            : [],
+      }
+    }
+
+    return (root ? [root] : []).map(mapper)
+  }, [root, shouldShowHiddenFiles])
+
+  const handleClickRefresh = useCallback(
+    () => dispatch(load(directoryPath, true)),
+    [directoryPath, dispatch],
+  )
+
+  const handleSelectedItemsChange = useCallback(
+    (_e: SyntheticEvent | null, itemIds: string | null) =>
+      dispatch(setSelectedItems({ selectedItems: itemIds ?? undefined })),
+    [dispatch],
+  )
+
+  const handleExpandedItemsChange = useCallback(
+    async (_e: SyntheticEvent | null, itemIds: string[]) => {
+      dispatch(setExpandedItems({ expandedItems: itemIds }))
+
+      const expandingItemId = itemIds.find(
+        (itemId) => !expandedItems.includes(itemId),
+      )
+      if (!expandingItemId) {
+        return
+      }
+      const entry = entryMap[expandingItemId]
+      if (!entry || entry.type !== 'directory' || entry.children) {
+        return
+      }
+
+      try {
+        const children = await window.electronAPI.getEntries(entry.path)
+
+        const mapper = (e: Entry): Entry => {
+          if (e.type !== 'directory') {
+            return e
+          }
+          if (e.path === entry.path) {
+            return {
+              ...e,
+              children,
+            }
+          }
+          if (e.children) {
+            return {
+              ...e,
+              children: e.children.map(mapper),
+            }
+          }
+          return e
+        }
+
+        dispatch(setRoot({ root: root ? mapper(root) : root }))
+      } catch {
+        // noop
+      }
+    },
+    [dispatch, entryMap, expandedItems, root],
+  )
+
   useEffect(() => {
     dispatch(load(undefined))
   }, [dispatch])
@@ -102,114 +210,6 @@ const ExplorerPanel = () => {
       ),
     [dispatch, loadedDirectoryPath, root, watch],
   )
-
-  const entryMap = useMemo(() => {
-    if (!root) {
-      return {}
-    }
-    const reducer = (
-      acc: { [path: string]: Entry },
-      entry: Entry,
-    ): { [path: string]: Entry } => {
-      return {
-        [entry.path]: entry,
-        ...(entry.type === 'directory' ? (entry.children ?? []) : []).reduce(
-          reducer,
-          acc,
-        ),
-      }
-    }
-    return [root].reduce(reducer, {})
-  }, [root])
-
-  const handleClickRefresh = useCallback(
-    () => dispatch(load(directoryPath, true)),
-    [directoryPath, dispatch],
-  )
-
-  const handleSelectedItemsChange = useCallback(
-    (_e: SyntheticEvent | null, itemIds: string | null) =>
-      dispatch(setSelectedItems({ selectedItems: itemIds ?? undefined })),
-    [dispatch],
-  )
-
-  const handleExpandedItemsChange = useCallback(
-    async (_e: SyntheticEvent | null, itemIds: string[]) => {
-      dispatch(setExpandedItems({ expandedItems: itemIds }))
-
-      const expandingItemId = itemIds.find(
-        (itemId) => !expandedItems.includes(itemId),
-      )
-      if (!expandingItemId) {
-        return
-      }
-      const entry = entryMap[expandingItemId]
-      if (!entry || entry.type !== 'directory' || entry.children) {
-        return
-      }
-
-      try {
-        const children = await window.electronAPI.getEntries(entry.path)
-
-        const mapper = (e: Entry): Entry => {
-          if (e.type !== 'directory') {
-            return e
-          }
-          if (e.path === entry.path) {
-            return {
-              ...e,
-              children,
-            }
-          }
-          if (e.children) {
-            return {
-              ...e,
-              children: e.children.map(mapper),
-            }
-          }
-          return e
-        }
-
-        dispatch(setRoot({ root: root ? mapper(root) : root }))
-      } catch {
-        // noop
-      }
-    },
-    [dispatch, entryMap, expandedItems, root],
-  )
-
-  const items = useMemo(() => {
-    const mapper = (
-      e: Entry,
-    ): TreeViewBaseItem<{ entry?: Entry; id: string; label: string }> => {
-      return {
-        id: e.path,
-        label: e.name,
-        entry: e,
-        children:
-          e.type === 'directory'
-            ? e.children
-              ? e.children
-                  .filter(
-                    (entry) =>
-                      shouldShowHiddenFiles || !isHiddenFile(entry.name),
-                  )
-                  .toSorted((a, b) => a.name.localeCompare(b.name))
-                  // NOTE: Limit entry size for performance issue
-                  .slice(0, 100)
-                  .map(mapper)
-              : [
-                  {
-                    id: `__loading__${e.path}`,
-                    label: 'Loading items...',
-                  },
-                ]
-            : [],
-      }
-    }
-
-    return (root ? [root] : []).map(mapper)
-  }, [root, shouldShowHiddenFiles])
 
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">

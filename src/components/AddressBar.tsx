@@ -38,13 +38,13 @@ const AddressBar = () => {
   const canBack = useAppSelector(selectCanBack)
   const canForward = useAppSelector(selectCanForward)
   const forwardHistories = useAppSelector(selectForwardHistories)
+  const loading = useAppSelector(selectCurrentLoading)
   const primarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'primary'),
   )
   const secondarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'secondary'),
   )
-  const loading = useAppSelector(selectCurrentLoading)
   const sortOption = useAppSelector(selectCurrentSortOption)
   const url = useAppSelector(selectCurrentUrl)
   const viewMode = useAppSelector(selectCurrentViewMode)
@@ -87,22 +87,6 @@ const AddressBar = () => {
   const directoryPath = useMemo(() => getPath(url), [url])
   const fileUrl = useMemo(() => isFileUrl(url), [url])
 
-  useEffect(() => setUrlInput(url), [url])
-
-  const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
-
-  const handleClickForward = useCallback(() => dispatch(forward()), [dispatch])
-
-  const handleClickUpward = useCallback(
-    async () => dispatch(upward()),
-    [dispatch],
-  )
-
-  const handleClickRefresh = useCallback(async () => {
-    setUrlInput(url)
-    dispatch(refreshInCurrentTab())
-  }, [dispatch, url])
-
   const handleClickMore = useMemo(
     () =>
       createContextMenuHandler([
@@ -138,9 +122,25 @@ const AddressBar = () => {
     ],
   )
 
+  const handleClickBack = useCallback(() => dispatch(back()), [dispatch])
+
+  const handleClickForward = useCallback(() => dispatch(forward()), [dispatch])
+
+  const handleClickUpward = useCallback(
+    async () => dispatch(upward()),
+    [dispatch],
+  )
+
+  const handleClickRefresh = useCallback(async () => {
+    setUrlInput(url)
+    dispatch(refreshInCurrentTab())
+  }, [dispatch, url])
+
   const handleChangeUrl = useCallback((value: string) => {
     setUrlInput(value)
   }, [])
+
+  useEffect(() => setUrlInput(url), [url])
 
   return (
     <AppBar

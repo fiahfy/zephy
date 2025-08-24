@@ -88,66 +88,6 @@ const useExplorerList = (
 
   const [restoring, setRestoring] = useState(false)
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    const handler = (e: Event) => {
-      if (e.target instanceof HTMLElement) {
-        if (!loading) {
-          dispatch(
-            setScrollPosition(
-              horizontal ? e.target.scrollLeft : e.target.scrollTop,
-            ),
-          )
-        }
-      }
-    }
-    el.addEventListener('scrollend', handler)
-    return () => el.removeEventListener('scrollend', handler)
-  }, [dispatch, horizontal, loading, ref])
-
-  useEffect(() => {
-    if (!previousLoading && loading) {
-      setRestoring(true)
-    }
-    if (previousLoading && !loading) {
-      window.setTimeout(() => {
-        virtualizer.scrollToOffset(scrollPosition)
-        setRestoring(false)
-      })
-    }
-    // NOTE: Do not clear timer
-    // return () => clearTimeout(timer)
-  }, [loading, previousLoading, scrollPosition, virtualizer])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
-
-  useEffect(() => {
-    if (focused && previousFocused !== focused) {
-      const index = contents.findIndex((content) => content.path === focused)
-      if (index >= 0) {
-        const rowIndex = Math.floor(index / columns)
-        virtualizer.scrollToIndex(rowIndex)
-      }
-    }
-  }, [columns, contents, focused, previousFocused, virtualizer])
-
-  useEffect(() => {
-    const el = ref?.current
-    if (!el) {
-      return
-    }
-    if (focused && previousEditing && !editing) {
-      el.focus()
-    }
-  }, [editing, focused, previousEditing, ref])
-
   const noDataText = useMemo(
     () =>
       loading
@@ -161,11 +101,6 @@ const useExplorerList = (
   )
 
   const directoryPath = useMemo(() => getPath(url), [url])
-
-  const onClick = useCallback(() => {
-    dispatch(blur(tabId))
-    dispatch(unselectAll(tabId))
-  }, [dispatch, tabId])
 
   const onContextMenu = useMemo(
     () =>
@@ -191,6 +126,11 @@ const useExplorerList = (
       ]),
     [directoryPath, sortOption.orderBy, viewMode],
   )
+
+  const onClick = useCallback(() => {
+    dispatch(blur(tabId))
+    dispatch(unselectAll(tabId))
+  }, [dispatch, tabId])
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -328,6 +268,66 @@ const useExplorerList = (
     },
     [anchor, columns, contents, dispatch, focused, horizontal, tabId],
   )
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    const handler = (e: Event) => {
+      if (e.target instanceof HTMLElement) {
+        if (!loading) {
+          dispatch(
+            setScrollPosition(
+              horizontal ? e.target.scrollLeft : e.target.scrollTop,
+            ),
+          )
+        }
+      }
+    }
+    el.addEventListener('scrollend', handler)
+    return () => el.removeEventListener('scrollend', handler)
+  }, [dispatch, horizontal, loading, ref])
+
+  useEffect(() => {
+    if (!previousLoading && loading) {
+      setRestoring(true)
+    }
+    if (previousLoading && !loading) {
+      window.setTimeout(() => {
+        virtualizer.scrollToOffset(scrollPosition)
+        setRestoring(false)
+      })
+    }
+    // NOTE: Do not clear timer
+    // return () => clearTimeout(timer)
+  }, [loading, previousLoading, scrollPosition, virtualizer])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
+
+  useEffect(() => {
+    if (focused && previousFocused !== focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        const rowIndex = Math.floor(index / columns)
+        virtualizer.scrollToIndex(rowIndex)
+      }
+    }
+  }, [columns, contents, focused, previousFocused, virtualizer])
+
+  useEffect(() => {
+    const el = ref?.current
+    if (!el) {
+      return
+    }
+    if (focused && previousEditing && !editing) {
+      el.focus()
+    }
+  }, [editing, focused, previousEditing, ref])
 
   return {
     chunks,

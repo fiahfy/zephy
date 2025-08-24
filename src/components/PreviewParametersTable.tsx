@@ -68,6 +68,11 @@ const PreviewParametersTable = () => {
 
   const [parameters, setParameters] = useState<string>()
 
+  const parsed = useMemo(
+    () => (parameters ? parseParameters(parameters) : undefined),
+    [parameters],
+  )
+
   useEffect(() => {
     let unmounted = false
     ;(async () => {
@@ -87,11 +92,6 @@ const PreviewParametersTable = () => {
       unmounted = true
     }
   }, [content?.path])
-
-  const parsed = useMemo(
-    () => (parameters ? parseParameters(parameters) : undefined),
-    [parameters],
-  )
 
   return (
     <>

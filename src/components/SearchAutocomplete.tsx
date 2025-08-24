@@ -37,24 +37,6 @@ const SearchAutocomplete = () => {
     [dispatch],
   )
 
-  useEffect(() => setQueryInput(query), [query])
-
-  useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
-      const { type } = message
-      switch (type) {
-        case 'find':
-          ref.current?.focus()
-          return
-        case 'search':
-          searchBy(document.getSelection()?.toString() ?? '')
-          ref.current?.focus()
-          return
-      }
-    })
-    return () => removeListener()
-  }, [searchBy])
-
   const handleClickSearch = useCallback(
     () => searchBy(queryInput),
     [queryInput, searchBy],
@@ -87,6 +69,24 @@ const SearchAutocomplete = () => {
     },
     [queryInput, searchBy],
   )
+
+  useEffect(() => setQueryInput(query), [query])
+
+  useEffect(() => {
+    const removeListener = window.electronAPI.onMessage((message) => {
+      const { type } = message
+      switch (type) {
+        case 'find':
+          ref.current?.focus()
+          return
+        case 'search':
+          searchBy(document.getSelection()?.toString() ?? '')
+          ref.current?.focus()
+          return
+      }
+    })
+    return () => removeListener()
+  }, [searchBy])
 
   return (
     <Autocomplete

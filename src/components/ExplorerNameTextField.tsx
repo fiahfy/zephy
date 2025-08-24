@@ -27,33 +27,10 @@ const ExplorerNameTextField = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const [name, setName] = useState(content.name)
+
   const ref = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (!readOnly) {
-      setName(content.name)
-    }
-  }, [content.name, readOnly])
-
-  useEffect(() => {
-    if (readOnly) {
-      return
-    }
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    const timer = window.setTimeout(() => {
-      el.focus()
-      if (content.type === 'file') {
-        const index = el.value.lastIndexOf('.')
-        el.setSelectionRange(0, index)
-      } else {
-        el.select()
-      }
-    })
-    return () => clearTimeout(timer)
-  }, [content.type, readOnly])
+  const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   const finish = useCallback(() => {
     dispatch(finishEditing(tabId))
@@ -94,7 +71,31 @@ const ExplorerNameTextField = (props: Props) => {
     e.stopPropagation()
   }, [])
 
-  const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
+  useEffect(() => {
+    if (!readOnly) {
+      setName(content.name)
+    }
+  }, [content.name, readOnly])
+
+  useEffect(() => {
+    if (readOnly) {
+      return
+    }
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    const timer = window.setTimeout(() => {
+      el.focus()
+      if (content.type === 'file') {
+        const index = el.value.lastIndexOf('.')
+        el.setSelectionRange(0, index)
+      } else {
+        el.select()
+      }
+    })
+    return () => clearTimeout(timer)
+  }, [content.type, readOnly])
 
   return (
     <>

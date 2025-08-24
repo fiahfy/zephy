@@ -18,12 +18,6 @@ const TabPanel = (props: Props) => {
 
   const prevUrl = usePrevious(url)
 
-  useEffect(() => {
-    if (prevUrl !== url) {
-      dispatch(load(tabId))
-    }
-  }, [dispatch, prevUrl, tabId, url])
-
   const Component = useMemo(() => {
     switch (url) {
       case 'zephy://settings':
@@ -32,6 +26,12 @@ const TabPanel = (props: Props) => {
         return Explorer
     }
   }, [url])
+
+  useEffect(() => {
+    if (prevUrl !== url) {
+      dispatch(load(tabId))
+    }
+  }, [dispatch, prevUrl, tabId, url])
 
   return <Component tabId={tabId} />
 }

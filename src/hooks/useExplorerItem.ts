@@ -82,15 +82,6 @@ const useExplorerItem = (tabId: number, content: Content) => {
     },
   )
 
-  const onMouseDown = useCallback(
-    (e: MouseEvent) => {
-      if (editing) {
-        e.preventDefault()
-      }
-    },
-    [editing],
-  )
-
   const draggingPaths = useMemo(
     () => (editing ? [] : selected ? selectedPaths : [content.path]),
     [content.path, editing, selected, selectedPaths],
@@ -170,6 +161,15 @@ const useExplorerItem = (tabId: number, content: Content) => {
     selectedPaths,
     tabId,
   ])
+
+  const onMouseDown = useCallback(
+    (e: MouseEvent) => {
+      if (editing) {
+        e.preventDefault()
+      }
+    },
+    [editing],
+  )
 
   return {
     contents,

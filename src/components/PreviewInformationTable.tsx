@@ -46,27 +46,6 @@ const PreviewInformationTable = () => {
 
   const [metadata, setMetadata] = useState<Metadata>()
 
-  useEffect(() => {
-    let unmounted = false
-    ;(async () => {
-      if (contents.length > 1) {
-        return
-      }
-      if (!content?.path) {
-        return
-      }
-      const metadata = await window.electronAPI.getEntryMetadata(content.path)
-      if (unmounted) {
-        return
-      }
-      setMetadata(metadata)
-    })()
-
-    return () => {
-      unmounted = true
-    }
-  }, [contents.length, content?.path])
-
   const caption = useMemo(
     () =>
       contents.length > 1
@@ -122,6 +101,27 @@ const PreviewInformationTable = () => {
     ],
     [contents, fileSize, metadata],
   )
+
+  useEffect(() => {
+    let unmounted = false
+    ;(async () => {
+      if (contents.length > 1) {
+        return
+      }
+      if (!content?.path) {
+        return
+      }
+      const metadata = await window.electronAPI.getEntryMetadata(content.path)
+      if (unmounted) {
+        return
+      }
+      setMetadata(metadata)
+    })()
+
+    return () => {
+      unmounted = true
+    }
+  }, [contents.length, content?.path])
 
   return (
     <Table size="small" sx={{ tableLayout: 'fixed' }}>

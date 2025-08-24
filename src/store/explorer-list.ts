@@ -19,7 +19,6 @@ import {
   changeUrl,
   selectCurrentDirectoryPath,
   selectCurrentTabId,
-  selectCurrentUrl,
   selectQueryByTabId,
   selectSortOptionByTabIdAndUrl,
   selectTabs,

@@ -23,9 +23,9 @@ const PreviewDirectory = () => {
   const previewContent = useAppSelector(selectPreviewContent)
   const dispatch = useAppDispatch()
 
-  const ref = useRef<HTMLDivElement>(null)
-
   const [wrapperWidth, setWrapperWidth] = useState(0)
+
+  const ref = useRef<HTMLDivElement>(null)
 
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
@@ -50,6 +50,16 @@ const PreviewDirectory = () => {
     estimateSize: () => size,
     getScrollElement: () => ref.current,
   })
+
+  const noDataText = useMemo(
+    () =>
+      loading
+        ? 'Loading items...'
+        : error
+          ? 'The specified directory does not exist'
+          : 'No items',
+    [loading, error],
+  )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
@@ -80,16 +90,6 @@ const PreviewDirectory = () => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.measure(), [virtualizer, size])
-
-  const noDataText = useMemo(
-    () =>
-      loading
-        ? 'Loading items...'
-        : error
-          ? 'The specified directory does not exist'
-          : 'No items',
-    [loading, error],
-  )
 
   return (
     <>

@@ -27,10 +27,55 @@ const PreviewAudio = () => {
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
 
-  const ref = useRef<HTMLAudioElement>(null)
   const [paused, setPaused] = useState(true)
 
+  const ref = useRef<HTMLAudioElement>(null)
+
   const url = useMemo(() => content?.url, [content?.url])
+  const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
+
+  const handleContextMenu = useMemo(
+    () =>
+      createContextMenuHandler([
+        { type: 'loop', data: { checked: defaultLoop } },
+      ]),
+    [defaultLoop],
+  )
+
+  const handleClick = useCallback(() => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    if (el.paused) {
+      el.play()
+    } else {
+      el.pause()
+    }
+    el.focus()
+  }, [])
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    switch (e.key) {
+      case 'ArrowLeft':
+        el.currentTime -= 5
+        break
+      case 'ArrowRight':
+        el.currentTime += 5
+        break
+    }
+  }, [])
+
+  const handleVolumeChange = useCallback(() => {
+    const el = ref.current
+    if (el) {
+      dispatch(setDefaultVolume({ defaultVolume: el.volume }))
+    }
+  }, [dispatch])
 
   useEffect(() => {
     const removeListener = window.electronAPI.onMessage((message) => {
@@ -59,51 +104,6 @@ const PreviewAudio = () => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => setPaused(true), [url])
-
-  const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
-
-  const handleClick = useCallback(() => {
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    if (el.paused) {
-      el.play()
-    } else {
-      el.pause()
-    }
-    el.focus()
-  }, [])
-
-  const handleContextMenu = useMemo(
-    () =>
-      createContextMenuHandler([
-        { type: 'loop', data: { checked: defaultLoop } },
-      ]),
-    [defaultLoop],
-  )
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    switch (e.key) {
-      case 'ArrowLeft':
-        el.currentTime -= 5
-        break
-      case 'ArrowRight':
-        el.currentTime += 5
-        break
-    }
-  }, [])
-
-  const handleVolumeChange = useCallback(() => {
-    const el = ref.current
-    if (el) {
-      dispatch(setDefaultVolume({ defaultVolume: el.volume }))
-    }
-  }, [dispatch])
 
   return (
     <>

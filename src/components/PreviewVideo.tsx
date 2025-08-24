@@ -50,9 +50,40 @@ const PreviewVideo = () => {
     loading: false,
     thumbnail: undefined,
   })
+
   const ref = useRef<HTMLVideoElement>(null)
 
   const url = useMemo(() => content?.url, [content?.url])
+
+  const handleContextMenu = useMemo(
+    () =>
+      createContextMenuHandler([
+        { type: 'loop', data: { checked: defaultLoop } },
+      ]),
+    [defaultLoop],
+  )
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const el = ref.current
+    if (!el) {
+      return
+    }
+    switch (e.key) {
+      case 'ArrowLeft':
+        el.currentTime -= 5
+        break
+      case 'ArrowRight':
+        el.currentTime += 5
+        break
+    }
+  }, [])
+
+  const handleVolumeChange = useCallback(() => {
+    const el = ref.current
+    if (el) {
+      appDispatch(setDefaultVolume({ defaultVolume: el.volume }))
+    }
+  }, [appDispatch])
 
   useEffect(() => {
     const removeListener = window.electronAPI.onMessage((message) => {
@@ -99,36 +130,6 @@ const PreviewVideo = () => {
       unmounted = true
     }
   }, [content?.path])
-
-  const handleContextMenu = useMemo(
-    () =>
-      createContextMenuHandler([
-        { type: 'loop', data: { checked: defaultLoop } },
-      ]),
-    [defaultLoop],
-  )
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    const el = ref.current
-    if (!el) {
-      return
-    }
-    switch (e.key) {
-      case 'ArrowLeft':
-        el.currentTime -= 5
-        break
-      case 'ArrowRight':
-        el.currentTime += 5
-        break
-    }
-  }, [])
-
-  const handleVolumeChange = useCallback(() => {
-    const el = ref.current
-    if (el) {
-      appDispatch(setDefaultVolume({ defaultVolume: el.volume }))
-    }
-  }, [appDispatch])
 
   return (
     <>

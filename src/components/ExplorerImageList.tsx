@@ -18,13 +18,13 @@ const ExplorerImageList = (props: Props) => {
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
+  const ref = useRef<HTMLDivElement>(null)
+
   const columns = useMemo(
     () => Math.ceil(wrapperWidth / maxItemSize) || 1,
     [wrapperWidth],
   )
   const size = useMemo(() => wrapperWidth / columns, [columns, wrapperWidth])
-
-  const ref = useRef<HTMLDivElement>(null)
 
   const {
     chunks,

@@ -14,12 +14,6 @@ const NotificationBar = () => {
 
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    if (notification) {
-      setOpen(true)
-    }
-  }, [notification])
-
   const autoHideDuration = useMemo(
     () =>
       notification?.type && ['info', 'success'].includes(notification.type)
@@ -38,6 +32,12 @@ const NotificationBar = () => {
     },
     [],
   )
+
+  useEffect(() => {
+    if (notification) {
+      setOpen(true)
+    }
+  }, [notification])
 
   return (
     <Snackbar

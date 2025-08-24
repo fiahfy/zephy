@@ -12,6 +12,17 @@ const PreviewImage = () => {
 
   const url = useMemo(() => content?.url, [content?.url])
 
+  const message = useMemo(() => {
+    switch (status) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load'
+      case 'loaded':
+        return 'No preview'
+    }
+  }, [status])
+
   useEffect(() => {
     ;(async () => {
       if (!url) {
@@ -27,17 +38,6 @@ const PreviewImage = () => {
       setStatus(success ? 'loaded' : 'error')
     })()
   }, [url])
-
-  const message = useMemo(() => {
-    switch (status) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load'
-      case 'loaded':
-        return 'No preview'
-    }
-  }, [status])
 
   return (
     <>

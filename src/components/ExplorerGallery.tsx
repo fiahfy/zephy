@@ -19,6 +19,8 @@ const ExplorerGallery = (props: Props) => {
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
+  const ref = useRef<HTMLDivElement>(null)
+
   const size = useMemo(() => {
     const maxCount = Math.floor(wrapperWidth / maxItemSize)
     let n = Math.max(1, maxCount)
@@ -31,8 +33,6 @@ const ExplorerGallery = (props: Props) => {
       n++
     }
   }, [wrapperWidth])
-
-  const ref = useRef<HTMLDivElement>(null)
 
   const {
     chunks,

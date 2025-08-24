@@ -28,6 +28,18 @@ const WatcherProvider = (props: Props) => {
     [registry],
   )
 
+  const watch = useCallback(
+    (key: string, directoryPaths: string[], callback: Callback) =>
+      setRegistry((registry) => ({
+        ...registry,
+        [key]: {
+          directoryPaths,
+          callback,
+        },
+      })),
+    [],
+  )
+
   useEffect(() => {
     window.electronAPI.watchDirectories(
       directoryPaths,
@@ -45,18 +57,6 @@ const WatcherProvider = (props: Props) => {
       },
     )
   }, [directoryPaths, registry])
-
-  const watch = useCallback(
-    (key: string, directoryPaths: string[], callback: Callback) =>
-      setRegistry((registry) => ({
-        ...registry,
-        [key]: {
-          directoryPaths,
-          callback,
-        },
-      })),
-    [],
-  )
 
   const value = { watch }
 

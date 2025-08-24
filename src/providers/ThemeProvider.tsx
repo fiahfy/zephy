@@ -25,16 +25,6 @@ const ThemeProvider = (props: Props) => {
         : 'light'
       : themeSetting
 
-  useEffect(() => {
-    if (mode === 'light') {
-      document.body.classList.remove('theme-dark')
-      document.body.classList.add('theme-light')
-    } else {
-      document.body.classList.remove('theme-light')
-      document.body.classList.add('theme-dark')
-    }
-  }, [mode])
-
   const theme = useMemo(() => {
     const palette = {
       mode,
@@ -69,6 +59,16 @@ const ThemeProvider = (props: Props) => {
         },
       },
     })
+  }, [mode])
+
+  useEffect(() => {
+    if (mode === 'light') {
+      document.body.classList.remove('theme-dark')
+      document.body.classList.add('theme-light')
+    } else {
+      document.body.classList.remove('theme-light')
+      document.body.classList.add('theme-dark')
+    }
   }, [mode])
 
   const value = { theme }

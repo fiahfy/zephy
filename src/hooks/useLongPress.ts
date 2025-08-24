@@ -7,12 +7,9 @@ import {
 } from 'react'
 
 const useLongPress = (callback: (e: MouseEvent) => void, timeout = 400) => {
-  const timer = useRef(0)
   const [pressing, setPressing] = useState(false)
 
-  useEffect(() => {
-    return () => window.clearTimeout(timer.current)
-  }, [])
+  const timer = useRef(0)
 
   const onMouseDown = useCallback(
     (e: MouseEvent) => {
@@ -40,6 +37,10 @@ const useLongPress = (callback: (e: MouseEvent) => void, timeout = 400) => {
     },
     [callback, pressing],
   )
+
+  useEffect(() => {
+    return () => window.clearTimeout(timer.current)
+  }, [])
 
   return { onMouseDown, onMouseUp, onMouseLeave }
 }

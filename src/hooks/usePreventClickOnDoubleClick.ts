@@ -7,10 +7,6 @@ const usePreventClickOnDoubleClick = <T>(
 ) => {
   const timer = useRef(0)
 
-  useEffect(() => {
-    return () => window.clearTimeout(timer.current)
-  }, [])
-
   const onClick = useCallback(
     (e: MouseEvent, ...args: T[]) => {
       window.clearTimeout(timer.current)
@@ -27,6 +23,10 @@ const usePreventClickOnDoubleClick = <T>(
     },
     [doubleClickCallback],
   )
+
+  useEffect(() => {
+    return () => window.clearTimeout(timer.current)
+  }, [])
 
   return { onClick, onDoubleClick }
 }

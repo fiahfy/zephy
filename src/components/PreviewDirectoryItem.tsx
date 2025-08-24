@@ -25,7 +25,9 @@ const PreviewDirectoryItem = (props: Props) => {
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(content)
+
   const { message, status, thumbnail } = useEntryThumbnail(content)
+
   const { draggable, ...dragHandlers } = useDraggable(content.path)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,

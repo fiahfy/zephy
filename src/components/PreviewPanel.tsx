@@ -19,18 +19,6 @@ const PreviewPanel = () => {
   const ref = useRef<HTMLElement>(null)
   const footerRef = useRef<HTMLElement>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => {
-    const el = ref.current
-    if (el) {
-      el.scrollTop = 0
-    }
-    const footerEl = footerRef.current
-    if (footerEl) {
-      footerEl.scrollTop = 0
-    }
-  }, [contents])
-
   const preview = useMemo(() => {
     if (!content) {
       return undefined
@@ -61,6 +49,18 @@ const PreviewPanel = () => {
         return <PreviewEmptyState message="No preview" />
     }
   }, [preview])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => {
+    const el = ref.current
+    if (el) {
+      el.scrollTop = 0
+    }
+    const footerEl = footerRef.current
+    if (footerEl) {
+      footerEl.scrollTop = 0
+    }
+  }, [contents])
 
   return (
     <Box

@@ -58,28 +58,18 @@ const Sidebar = (props: Props) => {
 
   const [resizing, setResizing] = useState(false)
 
+  const width = sidebarWidth
+  const hidden = sidebarHidden
+
   const position = useMemo(
     () => (variant === 'primary' ? 'left' : 'right'),
     [variant],
   )
 
-  const width = sidebarWidth
-  const hidden = sidebarHidden
-
   const oppositeWidth = useMemo(
     () => (oppositeSidebarHidden ? 0 : oppositeSidebarWidth),
     [oppositeSidebarHidden, oppositeSidebarWidth],
   )
-
-  useEffect(() => {
-    const handler = throttle(() => {
-      if (width + minContentWidth > window.innerWidth) {
-        dispatch(setSidebarWidth(variant, window.innerWidth - minContentWidth))
-      }
-    }, 100)
-    window.addEventListener('resize', handler)
-    return () => window.removeEventListener('resize', handler)
-  }, [dispatch, variant, width])
 
   const handleMouseMove = useMemo(
     () =>
@@ -117,6 +107,16 @@ const Sidebar = (props: Props) => {
     },
     [handleMouseMove, handleMouseUp],
   )
+
+  useEffect(() => {
+    const handler = throttle(() => {
+      if (width + minContentWidth > window.innerWidth) {
+        dispatch(setSidebarWidth(variant, window.innerWidth - minContentWidth))
+      }
+    }, 100)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [dispatch, variant, width])
 
   return (
     <Drawer
