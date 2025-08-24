@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDefaultLoop,
@@ -19,21 +18,19 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
+import { selectPreviewContent } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
-type Props = {
-  entry: Entry
-}
-
-const PreviewAudio = (props: Props) => {
-  const { entry } = props
-
+const PreviewAudio = () => {
+  const content = useAppSelector(selectPreviewContent)
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
 
   const ref = useRef<HTMLAudioElement>(null)
   const [paused, setPaused] = useState(true)
+
+  const url = useMemo(() => content?.url, [content?.url])
 
   useEffect(() => {
     const removeListener = window.electronAPI.onMessage((message) => {
@@ -61,7 +58,7 @@ const PreviewAudio = (props: Props) => {
   }, [defaultLoop, defaultVolume])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => setPaused(true), [entry.path])
+  useEffect(() => setPaused(true), [url])
 
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
 
@@ -110,51 +107,55 @@ const PreviewAudio = (props: Props) => {
 
   return (
     <>
-      <GlobalStyles
-        styles={{
-          'audio#custom-audio': {
-            '&::-webkit-media-controls-enclosure': {
-              borderRadius: 0,
-            },
-          },
-        }}
-      />
-      <Stack
-        onContextMenu={handleContextMenu}
-        sx={{
-          aspectRatio: '16 / 9',
-          backgroundColor: 'black',
-          minHeight: 128,
-        }}
-      >
-        <Stack
-          onClick={handleClick}
-          sx={{
-            alignItems: 'center',
-            cursor: 'pointer',
-            flexGrow: 1,
-            justifyContent: 'center',
-          }}
-        >
-          <Icon fontSize="large" sx={{ color: 'white' }} />
-        </Stack>
-        {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
-        <audio
-          controls
-          id="custom-audio"
-          onKeyDown={handleKeyDown}
-          onPause={() => setPaused(true)}
-          onPlay={() => setPaused(false)}
-          onVolumeChange={handleVolumeChange}
-          ref={ref}
-          src={entry.url}
-          style={{
-            height: 38,
-            outline: 'none',
-            width: '100%',
-          }}
-        />
-      </Stack>
+      {url && (
+        <>
+          <GlobalStyles
+            styles={{
+              'audio#custom-audio': {
+                '&::-webkit-media-controls-enclosure': {
+                  borderRadius: 0,
+                },
+              },
+            }}
+          />
+          <Stack
+            onContextMenu={handleContextMenu}
+            sx={{
+              aspectRatio: '16 / 9',
+              backgroundColor: 'black',
+              minHeight: 128,
+            }}
+          >
+            <Stack
+              onClick={handleClick}
+              sx={{
+                alignItems: 'center',
+                cursor: 'pointer',
+                flexGrow: 1,
+                justifyContent: 'center',
+              }}
+            >
+              <Icon fontSize="large" sx={{ color: 'white' }} />
+            </Stack>
+            {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
+            <audio
+              controls
+              id="custom-audio"
+              onKeyDown={handleKeyDown}
+              onPause={() => setPaused(true)}
+              onPlay={() => setPaused(false)}
+              onVolumeChange={handleVolumeChange}
+              ref={ref}
+              src={url}
+              style={{
+                height: 38,
+                outline: 'none',
+                width: '100%',
+              }}
+            />
+          </Stack>
+        </>
+      )}
     </>
   )
 }

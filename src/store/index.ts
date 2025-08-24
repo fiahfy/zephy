@@ -26,6 +26,7 @@ import explorerTreeReducer from '~/store/explorer-tree'
 import favoriteReducer from '~/store/favorite'
 import notificationReducer from '~/store/notification'
 import preferencesReducer from '~/store/preferences'
+import previewReducer from '~/store/preview'
 import queryReducer from '~/store/query'
 import ratingReducer from '~/store/rating'
 import settingsReducer from '~/store/settings'
@@ -38,6 +39,7 @@ const reducers = combineReducers({
   favorite: favoriteReducer,
   notification: notificationReducer,
   preferences: preferencesReducer,
+  preview: previewReducer,
   query: queryReducer,
   rating: ratingReducer,
   settings: settingsReducer,

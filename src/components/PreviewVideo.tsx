@@ -6,7 +6,6 @@ import {
   useReducer,
   useRef,
 } from 'react'
-import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDefaultLoop,
@@ -14,6 +13,7 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
+import { selectPreviewContent } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type State = {
@@ -40,13 +40,8 @@ const reducer = (_state: State, action: Action) => {
   }
 }
 
-type Props = {
-  entry: Entry
-}
-
-const PreviewVideo = (props: Props) => {
-  const { entry } = props
-
+const PreviewVideo = () => {
+  const content = useAppSelector(selectPreviewContent)
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const appDispatch = useAppDispatch()
@@ -56,6 +51,8 @@ const PreviewVideo = (props: Props) => {
     thumbnail: undefined,
   })
   const ref = useRef<HTMLVideoElement>(null)
+
+  const url = useMemo(() => content?.url, [content?.url])
 
   useEffect(() => {
     const removeListener = window.electronAPI.onMessage((message) => {
@@ -85,9 +82,12 @@ const PreviewVideo = (props: Props) => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
+      if (!content?.path) {
+        return
+      }
       dispatch({ type: 'loading' })
       const thumbnail = await window.electronAPI.createEntryThumbnailUrl(
-        entry.path,
+        content.path,
       )
       if (unmounted) {
         return
@@ -98,7 +98,7 @@ const PreviewVideo = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path])
+  }, [content?.path])
 
   const handleContextMenu = useMemo(
     () =>
@@ -131,23 +131,27 @@ const PreviewVideo = (props: Props) => {
   }, [appDispatch])
 
   return (
-    // biome-ignore lint/a11y/useMediaCaption: false positive
-    <video
-      controls
-      onContextMenu={handleContextMenu}
-      onKeyDown={handleKeyDown}
-      onVolumeChange={handleVolumeChange}
-      poster={thumbnail}
-      ref={ref}
-      src={entry.url}
-      style={{
-        backgroundColor: 'black',
-        display: 'block',
-        minHeight: 128,
-        outline: 'none',
-        width: '100%',
-      }}
-    />
+    <>
+      {url && (
+        // biome-ignore lint/a11y/useMediaCaption: false positive
+        <video
+          controls
+          onContextMenu={handleContextMenu}
+          onKeyDown={handleKeyDown}
+          onVolumeChange={handleVolumeChange}
+          poster={thumbnail}
+          ref={ref}
+          src={url}
+          style={{
+            backgroundColor: 'black',
+            display: 'block',
+            minHeight: 128,
+            outline: 'none',
+            width: '100%',
+          }}
+        />
+      )}
+    </>
   )
 }
 

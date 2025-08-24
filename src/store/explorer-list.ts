@@ -17,6 +17,7 @@ import {
 import { openEntry, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   changeUrl,
+  selectCurrentDirectoryPath,
   selectCurrentTabId,
   selectCurrentUrl,
   selectQueryByTabId,
@@ -554,6 +555,7 @@ export const load =
     if (!url) {
       return
     }
+
     const loading = selectLoadingByTabId(getState(), tabId)
     if (loading) {
       return
@@ -739,13 +741,11 @@ export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
 }
 
 export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
-  const url = selectCurrentUrl(getState())
-
-  const directoryPath = getPath(url)
-  if (!directoryPath) {
+  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
+  if (!currentDirectoryPath) {
     return
   }
-  window.electronAPI.pasteEntries(directoryPath)
+  window.electronAPI.pasteEntries(currentDirectoryPath)
 }
 
 export const startRenamingInCurrentTab =

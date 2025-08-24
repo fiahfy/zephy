@@ -712,6 +712,11 @@ export const selectCurrentUrl = createSelector(
   (currentHistory) => currentHistory.url,
 )
 
+export const selectCurrentDirectoryPath = createSelector(
+  selectCurrentUrl,
+  (currentUrl) => getPath(currentUrl),
+)
+
 export const selectCurrentQuery = createSelector(
   selectCurrentHistory,
   (currentHistory) => currentHistory.query,
@@ -885,9 +890,7 @@ export const back = (): AppThunk => async (dispatch) => dispatch(go(-1))
 export const forward = (): AppThunk => async (dispatch) => dispatch(go(1))
 
 export const upward = (): AppThunk => async (dispatch, getState) => {
-  const currentUrl = selectCurrentUrl(getState())
-
-  const currentDirectoryPath = getPath(currentUrl)
+  const currentDirectoryPath = selectCurrentDirectoryPath(getState())
   if (!currentDirectoryPath) {
     return
   }

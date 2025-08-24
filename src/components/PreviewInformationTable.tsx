@@ -7,58 +7,55 @@ import {
 } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
-import type { Entry, Metadata } from '~/interfaces'
+import type { Content, Metadata } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectPreviewContent, selectPreviewContents } from '~/store/preview'
 import {
   formatDateTime,
   formatDuration,
   formatFileSize,
 } from '~/utils/formatter'
 
-const getTotalFileSize = (entries: Entry[]) =>
-  entries
-    .filter((entry) => entry.type !== 'directory')
-    .reduce((acc, entry) => acc + entry.size, 0)
+const getTotalFileSize = (contents: Content[]) =>
+  contents
+    .filter((content) => content.type !== 'directory')
+    .reduce((acc, content) => acc + content.size, 0)
 
 const formatDateRange = (
-  entries: Entry[],
+  contents: Content[],
   dateProperty: 'dateCreated' | 'dateLastOpened' | 'dateModified',
 ) => {
-  const entry = entries[0]
-  if (!entry) {
+  const content = contents[0]
+  if (!content) {
     return
   }
-  if (entries.length > 1) {
-    const dates = entries.map((entry) => entry[dateProperty])
+  if (contents.length > 1) {
+    const dates = contents.map((content) => content[dateProperty])
     const minDate = Math.min(...dates)
     const maxDate = Math.max(...dates)
     return minDate === maxDate
       ? formatDateTime(minDate)
       : `${formatDateTime(minDate)} - ${formatDateTime(maxDate)}`
   }
-  return formatDateTime(entry[dateProperty])
+  return formatDateTime(content[dateProperty])
 }
 
-type Props = {
-  entries: Entry[]
-}
-
-const PreviewInformationTable = (props: Props) => {
-  const { entries } = props
+const PreviewInformationTable = () => {
+  const contents = useAppSelector(selectPreviewContents)
+  const content = useAppSelector(selectPreviewContent)
 
   const [metadata, setMetadata] = useState<Metadata>()
-
-  const entry = useMemo(() => entries[0], [entries])
 
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (entries.length > 1) {
+      if (contents.length > 1) {
         return
       }
-      if (!entry.path) {
+      if (!content?.path) {
         return
       }
-      const metadata = await window.electronAPI.getEntryMetadata(entry.path)
+      const metadata = await window.electronAPI.getEntryMetadata(content.path)
       if (unmounted) {
         return
       }
@@ -68,15 +65,17 @@ const PreviewInformationTable = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entries.length, entry.path])
+  }, [contents.length, content?.path])
 
   const caption = useMemo(
     () =>
-      entries.length > 1 ? pluralize('item', entries.length, true) : entry.name,
-    [entries, entry],
+      contents.length > 1
+        ? pluralize('item', contents.length, true)
+        : content?.name,
+    [contents.length, content?.name],
   )
 
-  const fileSize = useMemo(() => getTotalFileSize(entries), [entries])
+  const fileSize = useMemo(() => getTotalFileSize(contents), [contents])
 
   const rows = useMemo(
     () => [
@@ -90,15 +89,15 @@ const PreviewInformationTable = (props: Props) => {
         : []),
       {
         label: 'Date Created',
-        value: formatDateRange(entries, 'dateCreated'),
+        value: formatDateRange(contents, 'dateCreated'),
       },
       {
         label: 'Date Modified',
-        value: formatDateRange(entries, 'dateModified'),
+        value: formatDateRange(contents, 'dateModified'),
       },
       {
         label: 'Date Last Opened',
-        value: formatDateRange(entries, 'dateLastOpened'),
+        value: formatDateRange(contents, 'dateLastOpened'),
       },
       ...(metadata
         ? [
@@ -121,7 +120,7 @@ const PreviewInformationTable = (props: Props) => {
           ]
         : []),
     ],
-    [entries, fileSize, metadata],
+    [contents, fileSize, metadata],
   )
 
   return (

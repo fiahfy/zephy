@@ -1,30 +1,32 @@
 import { useEffect, useMemo, useState } from 'react'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
-import type { Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectPreviewContent } from '~/store/preview'
 
-type Props = {
-  entry: Entry
-}
-
-const PreviewImage = (props: Props) => {
-  const { entry } = props
+const PreviewImage = () => {
+  const content = useAppSelector(selectPreviewContent)
 
   const [status, setStatus] = useState<'error' | 'loaded' | 'loading'>(
     'loading',
   )
 
+  const url = useMemo(() => content?.url, [content?.url])
+
   useEffect(() => {
     ;(async () => {
+      if (!url) {
+        return
+      }
       setStatus('loading')
-      const success = await new Promise<boolean>((resolve, reject) => {
+      const success = await new Promise<boolean>((resolve) => {
         const img = new Image()
         img.onload = () => resolve(true)
-        img.onerror = () => reject(false)
-        img.src = entry.url
+        img.onerror = () => resolve(false)
+        img.src = url
       })
       setStatus(success ? 'loaded' : 'error')
     })()
-  }, [entry.url])
+  }, [url])
 
   const message = useMemo(() => {
     switch (status) {
@@ -43,7 +45,7 @@ const PreviewImage = (props: Props) => {
         <img
           alt=""
           draggable={false}
-          src={entry.url}
+          src={url}
           style={{
             flexShrink: 0,
             minHeight: 128,

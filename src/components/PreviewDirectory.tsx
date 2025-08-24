@@ -1,53 +1,27 @@
 import { Box, Stack } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import throttle from 'lodash.throttle'
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
-import type { Entry } from '~/interfaces'
-import { useAppSelector } from '~/store'
-import { selectShouldShowHiddenFiles } from '~/store/settings'
-import { isHiddenFile } from '~/utils/file'
+import type { Content, Entry } from '~/interfaces'
+import { useAppDispatch, useAppSelector } from '~/store'
+import {
+  load,
+  selectContents,
+  selectError,
+  selectLoading,
+  selectPreviewContent,
+} from '~/store/preview'
 
 const maxItemSize = 256
 
-type State = {
-  loading: boolean
-  entries: Entry[]
-}
-
-type Action =
-  | {
-      type: 'loaded'
-      payload: Entry[]
-    }
-  | { type: 'loading' }
-
-const reducer = (_state: State, action: Action) => {
-  switch (action.type) {
-    case 'loaded':
-      return {
-        loading: false,
-        entries: action.payload,
-      }
-    case 'loading':
-      return { loading: true, entries: [] }
-  }
-}
-
-type Props = {
-  entry: Entry
-}
-
-const PreviewDirectory = (props: Props) => {
-  const { entry } = props
-
-  const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
-
-  const [{ loading, entries }, dispatch] = useReducer(reducer, {
-    loading: false,
-    entries: [],
-  })
+const PreviewDirectory = () => {
+  const contents = useAppSelector(selectContents)
+  const error = useAppSelector(selectError)
+  const loading = useAppSelector(selectLoading)
+  const previewContent = useAppSelector(selectPreviewContent)
+  const dispatch = useAppDispatch()
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -62,18 +36,23 @@ const PreviewDirectory = (props: Props) => {
 
   const rows = useMemo(
     () =>
-      entries.reduce((acc, _, i) => {
+      contents.reduce((acc, _, i) => {
         if (i % columns === 0) {
-          acc.push(entries.slice(i, i + columns))
+          acc.push(contents.slice(i, i + columns))
         }
         return acc
       }, [] as Entry[][]),
-    [columns, entries],
+    [columns, contents],
   )
 
   const noDataText = useMemo(
-    () => (loading ? 'Loading...' : 'No items'),
-    [loading],
+    () =>
+      loading
+        ? 'Loading items...'
+        : error
+          ? 'The specified directory does not exist'
+          : 'No items',
+    [loading, error],
   )
 
   const virtualizer = useVirtualizer({
@@ -107,32 +86,10 @@ const PreviewDirectory = (props: Props) => {
     }
   }, [loading, virtualizer])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
-    let unmounted = false
-    ;(async () => {
-      dispatch({ type: 'loading' })
-      const entries = await (async () => {
-        try {
-          const entries = await window.electronAPI.getEntries(entry.path)
-          return entries
-            .filter(
-              (entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name),
-            )
-            .toSorted((a, b) => a.name.localeCompare(b.name))
-        } catch {
-          return []
-        }
-      })()
-      if (unmounted) {
-        return
-      }
-      dispatch({ type: 'loaded', payload: entries })
-    })()
-
-    return () => {
-      unmounted = true
-    }
-  }, [entry.path, shouldShowHiddenFiles])
+    dispatch(load())
+  }, [dispatch, previewContent?.url])
 
   return (
     <>
@@ -142,6 +99,7 @@ const PreviewDirectory = (props: Props) => {
           height: '100%',
           overflowX: 'hidden',
           overflowY: 'scroll',
+          display: contents.length === 0 ? 'none' : 'block',
         }}
       >
         {wrapperWidth > 0 && (
@@ -152,7 +110,7 @@ const PreviewDirectory = (props: Props) => {
             }}
           >
             {virtualizer.getVirtualItems().map((virtualRow) => {
-              const columns = rows[virtualRow.index] as Entry[]
+              const columns = rows[virtualRow.index] as Content[]
               return (
                 <Stack
                   direction="row"
@@ -163,12 +121,12 @@ const PreviewDirectory = (props: Props) => {
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  {columns.map((entry) => (
+                  {columns.map((content) => (
                     <Box
-                      key={entry.path}
+                      key={content.path}
                       sx={{ p: 0.0625, width: virtualRow.size }}
                     >
-                      <PreviewDirectoryItem entry={entry} />
+                      <PreviewDirectoryItem content={content} />
                     </Box>
                   ))}
                 </Stack>
@@ -177,7 +135,7 @@ const PreviewDirectory = (props: Props) => {
           </Box>
         )}
       </Box>
-      {entries.length === 0 && <PreviewEmptyState message={noDataText} />}
+      {contents.length === 0 && <PreviewEmptyState message={noDataText} />}
     </>
   )
 }

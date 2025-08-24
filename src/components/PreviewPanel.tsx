@@ -9,11 +9,12 @@ import PreviewParametersTable from '~/components/PreviewParametersTable'
 import PreviewText from '~/components/PreviewText'
 import PreviewVideo from '~/components/PreviewVideo'
 import { useAppSelector } from '~/store'
-import { selectCurrentSelectedContents } from '~/store/explorer-list'
+import { selectPreviewContent, selectPreviewContents } from '~/store/preview'
 import { detectFileType } from '~/utils/file'
 
 const PreviewPanel = () => {
-  const contents = useAppSelector(selectCurrentSelectedContents)
+  const contents = useAppSelector(selectPreviewContents)
+  const content = useAppSelector(selectPreviewContent)
 
   const ref = useRef<HTMLElement>(null)
   const footerRef = useRef<HTMLElement>(null)
@@ -29,11 +30,6 @@ const PreviewPanel = () => {
       footerEl.scrollTop = 0
     }
   }, [contents])
-
-  const content = useMemo(
-    () => contents.length === 1 && contents[0],
-    [contents],
-  )
 
   const preview = useMemo(() => {
     if (!content) {
@@ -52,15 +48,15 @@ const PreviewPanel = () => {
   const previewItem = useMemo(() => {
     switch (preview?.type) {
       case 'audio':
-        return <PreviewAudio entry={preview.content} />
+        return <PreviewAudio />
       case 'directory':
-        return <PreviewDirectory entry={preview.content} />
+        return <PreviewDirectory />
       case 'image':
-        return <PreviewImage entry={preview.content} />
+        return <PreviewImage />
       case 'text':
-        return <PreviewText entry={preview.content} />
+        return <PreviewText />
       case 'video':
-        return <PreviewVideo entry={preview.content} />
+        return <PreviewVideo />
       default:
         return <PreviewEmptyState message="No preview" />
     }
@@ -117,10 +113,8 @@ const PreviewPanel = () => {
               zIndex: 1,
             })}
           >
-            <PreviewInformationTable entries={contents} />
-            {preview?.type === 'image' && (
-              <PreviewParametersTable entry={preview.content} />
-            )}
+            <PreviewInformationTable />
+            {preview?.type === 'image' && <PreviewParametersTable />}
           </Box>
         </>
       ) : (

@@ -10,33 +10,33 @@ import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
-import type { Entry } from '~/interfaces'
+import type { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { openEntry } from '~/store/settings'
 import { changeUrl } from '~/store/window'
 
 type Props = {
-  entry: Entry
+  content: Content
 }
 
 const PreviewDirectoryItem = (props: Props) => {
-  const { entry } = props
+  const { content } = props
 
   const dispatch = useAppDispatch()
 
-  const { onContextMenu } = useEntryItem(entry)
-  const { message, status, thumbnail } = useEntryThumbnail(entry)
-  const { draggable, ...dragHandlers } = useDraggable(entry.path)
+  const { onContextMenu } = useEntryItem(content)
+  const { message, status, thumbnail } = useEntryThumbnail(content)
+  const { draggable, ...dragHandlers } = useDraggable(content.path)
   const { droppableStyle, ...dropHandlers } = useDroppable(
-    entry.type === 'directory' ? entry.path : undefined,
+    content.type === 'directory' ? content.path : undefined,
   )
 
   const handleDoubleClick = useCallback(
     async () =>
-      entry.type === 'directory'
-        ? dispatch(changeUrl(entry.url))
-        : dispatch(openEntry(entry.path)),
-    [dispatch, entry.path, entry.type, entry.url],
+      content.type === 'directory'
+        ? dispatch(changeUrl(content.url))
+        : dispatch(openEntry(content.path)),
+    [dispatch, content.path, content.type, content.url],
   )
 
   return (
@@ -89,7 +89,7 @@ const PreviewDirectoryItem = (props: Props) => {
       <ImageListItemBar
         actionIcon={
           <Stack>
-            <EntryIcon entry={entry} />
+            <EntryIcon entry={content} />
           </Stack>
         }
         actionPosition="left"
@@ -109,10 +109,10 @@ const PreviewDirectoryItem = (props: Props) => {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
-              title={entry.name}
+              title={content.name}
               variant="caption"
             >
-              {entry.name}
+              {content.name}
             </Typography>
           </Stack>
         }

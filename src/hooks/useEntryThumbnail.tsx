@@ -66,13 +66,13 @@ const useEntryThumbnail = (entry: Entry) => {
       const paths =
         entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
       const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
-      const success = await new Promise<boolean>((resolve, reject) => {
+      const success = await new Promise<boolean>((resolve) => {
         if (!thumbnail) {
           return resolve(true)
         }
         const img = new Image()
         img.onload = () => resolve(true)
-        img.onerror = () => reject(false)
+        img.onerror = () => resolve(false)
         img.src = thumbnail
       })
 

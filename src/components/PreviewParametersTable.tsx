@@ -8,7 +8,8 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import PreviewParametersTableCell from '~/components/PreviewParametersTableCell'
 import PreviewParametersTableHeaderCell from '~/components/PreviewParametersTableHeaderCell'
-import type { Entry } from '~/interfaces'
+import { useAppSelector } from '~/store'
+import { selectPreviewContent } from '~/store/preview'
 
 const parseParameters = (parameters: string) => {
   let prompt = ''
@@ -62,19 +63,20 @@ const parseParameters = (parameters: string) => {
   return { prompt, negativePrompt, params }
 }
 
-type Props = {
-  entry: Entry
-}
-
-const PreviewParametersTable = (props: Props) => {
-  const { entry } = props
+const PreviewParametersTable = () => {
+  const content = useAppSelector(selectPreviewContent)
 
   const [parameters, setParameters] = useState<string>()
 
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      const parameters = await window.electronAPI.getEntryParameters(entry.path)
+      if (!content?.path) {
+        return
+      }
+      const parameters = await window.electronAPI.getEntryParameters(
+        content.path,
+      )
       if (unmounted) {
         return
       }
@@ -84,7 +86,7 @@ const PreviewParametersTable = (props: Props) => {
     return () => {
       unmounted = true
     }
-  }, [entry.path])
+  }, [content?.path])
 
   const parsed = useMemo(
     () => (parameters ? parseParameters(parameters) : undefined),
