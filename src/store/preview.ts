@@ -149,7 +149,6 @@ export const {
   blur,
   select,
   toggleSelection,
-  addSelection,
   removeSelection,
   selectAll,
   unselectAll,
@@ -173,6 +172,49 @@ export const selectError = createSelector(
 export const selectLoading = createSelector(
   selectPreview,
   (preview) => preview.loading,
+)
+
+export const selectEditing = createSelector(
+  selectPreview,
+  (preview) => preview.editing,
+)
+
+export const selectFocused = createSelector(
+  selectPreview,
+  (preview) => preview.focused,
+)
+
+export const selectSelected = createSelector(
+  selectPreview,
+  (preview) => preview.selected,
+)
+
+const selectPath = (_state: AppState, path: string) => path
+
+const isEditing = (editing: string | undefined, path: string) =>
+  editing === path
+
+export const selectEditingByPath = createSelector(
+  selectEditing,
+  selectPath,
+  (editing, path) => isEditing(editing, path),
+)
+
+const isFocused = (focused: string | undefined, path: string) =>
+  focused === path
+
+export const selectFocusedByPath = createSelector(
+  selectFocused,
+  selectPath,
+  (focused, path) => isFocused(focused, path),
+)
+
+const isSelected = (selected: string[], path: string) => selected.includes(path)
+
+export const selectSelectedByPath = createSelector(
+  selectSelected,
+  selectPath,
+  (selected, path) => isSelected(selected, path),
 )
 
 export const selectContents = createSelector(
@@ -221,3 +263,26 @@ export const load = (): AppThunk => async (dispatch, getState) => {
     dispatch(loadFailed())
   }
 }
+
+export const addSelection =
+  (path: string, anchorPath?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { addSelection } = previewSlice.actions
+
+    const contents = selectContents(getState())
+    const paths = contents.map((content) => content.path)
+
+    let newPaths: string[]
+    if (anchorPath) {
+      const index = paths.indexOf(path)
+      const prevIndex = paths.indexOf(anchorPath)
+      newPaths =
+        prevIndex < index
+          ? paths.slice(prevIndex, index + 1)
+          : paths.slice(index, prevIndex + 1)
+    } else {
+      newPaths = [path]
+    }
+
+    dispatch(addSelection({ paths: newPaths }))
+  }

@@ -94,6 +94,7 @@ const PreviewDirectory = () => {
   return (
     <>
       <Box
+        className="preview-list"
         ref={ref}
         sx={{
           height: '100%',
@@ -101,6 +102,7 @@ const PreviewDirectory = () => {
           overflowY: 'scroll',
           display: chunks.length === 0 ? 'none' : 'block',
         }}
+        tabIndex={0}
       >
         {wrapperWidth > 0 && (
           <Box

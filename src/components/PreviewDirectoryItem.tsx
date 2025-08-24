@@ -4,14 +4,28 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { useCallback } from 'react'
+import { alpha } from '@mui/material/styles'
+import clsx from 'clsx'
+import type { MouseEvent } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
+import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import type { Content } from '~/interfaces'
-import { useAppDispatch } from '~/store'
+import { useAppDispatch, useAppSelector } from '~/store'
+import {
+  addSelection,
+  focus,
+  select,
+  selectEditingByPath,
+  selectFocusedByPath,
+  selectSelected,
+  selectSelectedByPath,
+  startEditing,
+  toggleSelection,
+} from '~/store/preview'
 import { openEntry } from '~/store/settings'
 import { changeUrl } from '~/store/window'
 
@@ -22,6 +36,16 @@ type Props = {
 const PreviewDirectoryItem = (props: Props) => {
   const { content } = props
 
+  const editing = useAppSelector((state) =>
+    selectEditingByPath(state, content.path),
+  )
+  const focused = useAppSelector((state) =>
+    selectFocusedByPath(state, content.path),
+  )
+  const selected = useAppSelector((state) =>
+    selectSelectedByPath(state, content.path),
+  )
+  const selectedPaths = useAppSelector(selectSelected)
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(content)
@@ -32,21 +56,50 @@ const PreviewDirectoryItem = (props: Props) => {
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,
   )
-
-  const handleDoubleClick = useCallback(
-    async () =>
+  const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
+    (e: MouseEvent) => {
+      // NOTE: Prevent container event
+      e.stopPropagation()
+      if (e.shiftKey) {
+        dispatch(
+          addSelection(content.path, selectedPaths[selectedPaths.length - 1]),
+        )
+      } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+        dispatch(toggleSelection({ path: content.path }))
+      } else {
+        dispatch(select({ path: content.path }))
+      }
+      dispatch(focus({ path: content.path }))
+    },
+    () => {
+      if (
+        !editing &&
+        selectedPaths.length === 1 &&
+        selectedPaths[0] === content.path
+      ) {
+        dispatch(startEditing({ path: content.path }))
+      }
+    },
+    async (e: MouseEvent) => {
+      // NOTE: Prevent container event
+      e.stopPropagation()
+      if (editing) {
+        return
+      }
       content.type === 'directory'
         ? dispatch(changeUrl(content.url))
-        : dispatch(openEntry(content.path)),
-    [dispatch, content.path, content.type, content.url],
+        : dispatch(openEntry(content.path))
+    },
   )
 
   return (
     <ImageListItem
+      className={clsx({ 'Mui-focused': focused, 'Mui-selected': selected })}
       component="div"
       draggable={draggable}
+      onClick={onClick}
       onContextMenu={onContextMenu}
-      onDoubleClick={handleDoubleClick}
+      onDoubleClick={onDoubleClick}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
@@ -62,9 +115,29 @@ const PreviewDirectoryItem = (props: Props) => {
             backgroundColor: theme.palette.action.hover,
           },
         },
+        '&.Mui-selected': {
+          '&::before': {
+            backgroundColor: alpha(
+              theme.palette.primary.main,
+              theme.palette.action.selectedOpacity,
+            ),
+          },
+          '&:hover': {
+            '&::before': {
+              backgroundColor: alpha(
+                theme.palette.primary.main,
+                theme.palette.action.selectedOpacity +
+                  theme.palette.action.hoverOpacity,
+              ),
+            },
+          },
+        },
+        '.preview-list:focus-within &.Mui-focused': {
+          outline: `${theme.palette.primary.main} solid 1px`,
+          outlineOffset: '-1px',
+        },
         ...droppableStyle,
       })}
-      tabIndex={0}
       {...dragHandlers}
       {...dropHandlers}
     >

@@ -428,7 +428,7 @@ export const selectLoadingByTabId = createSelector(
 
 const selectPath = (_state: AppState, _tabId: number, path: string) => path
 
-const selectEditing = (editing: string | undefined, path: string) =>
+const isEditing = (editing: string | undefined, path: string) =>
   editing === path
 
 export const selectEditingByTabId = createSelector(
@@ -439,10 +439,10 @@ export const selectEditingByTabId = createSelector(
 export const selectEditingByTabIdAndPath = createSelector(
   selectEditingByTabId,
   selectPath,
-  (editing, path) => selectEditing(editing, path),
+  (editing, path) => isEditing(editing, path),
 )
 
-const selectFocused = (focused: string | undefined, path: string) =>
+const isFocused = (focused: string | undefined, path: string) =>
   focused === path
 
 export const selectFocusedByTabId = createSelector(
@@ -453,11 +453,10 @@ export const selectFocusedByTabId = createSelector(
 export const selectFocusedByTabIdAndPath = createSelector(
   selectFocusedByTabId,
   selectPath,
-  (focused, path) => selectFocused(focused, path),
+  (focused, path) => isFocused(focused, path),
 )
 
-const selectSelected = (selected: string[], path: string) =>
-  selected.includes(path)
+const isSelected = (selected: string[], path: string) => selected.includes(path)
 
 export const selectSelectedByTabId = createSelector(
   selectExplorerByTabId,
@@ -467,7 +466,7 @@ export const selectSelectedByTabId = createSelector(
 export const selectSelectedByTabIdAndPath = createSelector(
   selectSelectedByTabId,
   selectPath,
-  (selected, path) => selectSelected(selected, path),
+  (selected, path) => isSelected(selected, path),
 )
 
 export const selectAnchorByTabId = createSelector(
@@ -519,9 +518,7 @@ export const selectSelectedContentsByTabId = createSelector(
   selectContentsByTabId,
   selectSelectedByTabId,
   (contents, selected) =>
-    contents.filter((content: Content) =>
-      selectSelected(selected, content.path),
-    ),
+    contents.filter((content: Content) => isSelected(selected, content.path)),
 )
 
 // Selectors for current tab
