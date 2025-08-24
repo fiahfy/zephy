@@ -1,4 +1,4 @@
-import { type MouseEvent, useMemo } from 'react'
+import { type MouseEvent, useCallback, useMemo } from 'react'
 import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -80,6 +80,15 @@ const useExplorerItem = (tabId: number, content: Content) => {
         ? dispatch(changeUrl(content.url))
         : dispatch(openEntry(content.path))
     },
+  )
+
+  const onMouseDown = useCallback(
+    (e: MouseEvent) => {
+      if (editing) {
+        e.preventDefault()
+      }
+    },
+    [editing],
   )
 
   const draggingPaths = useMemo(
@@ -170,6 +179,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
     onClick,
     onContextMenu,
     onDoubleClick,
+    onMouseDown,
     selected,
   }
 }

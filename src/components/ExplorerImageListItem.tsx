@@ -32,6 +32,7 @@ const ExplorerImageListItem = (props: Props) => {
     onClick,
     onContextMenu,
     onDoubleClick,
+    onMouseDown,
     selected,
   } = useExplorerItem(tabId, content)
 
@@ -50,6 +51,7 @@ const ExplorerImageListItem = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onMouseDown={onMouseDown}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',

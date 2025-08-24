@@ -13,8 +13,8 @@ const usePreventClickOnDoubleClick = <T>(
 
   const onClick = useCallback(
     (e: MouseEvent, ...args: T[]) => {
-      beforeClickCallback(e, ...args)
       window.clearTimeout(timer.current)
+      beforeClickCallback(e, ...args)
       timer.current = window.setTimeout(() => clickCallback(e, ...args), 300)
     },
     [beforeClickCallback, clickCallback],

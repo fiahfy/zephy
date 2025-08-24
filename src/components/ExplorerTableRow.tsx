@@ -21,6 +21,7 @@ const ExplorerTableRow = (props: Props) => {
     onClick,
     onContextMenu,
     onDoubleClick,
+    onMouseDown,
     selected,
   } = useExplorerItem(tabId, content)
 
@@ -38,6 +39,7 @@ const ExplorerTableRow = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onMouseDown={onMouseDown}
       selected={selected}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),

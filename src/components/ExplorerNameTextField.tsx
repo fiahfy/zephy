@@ -1,14 +1,14 @@
-import { Stack, Typography } from '@mui/material'
+import { Stack, TextField, Typography } from '@mui/material'
 import {
   type ChangeEvent,
   type KeyboardEvent,
+  type MouseEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
-import DenseOutlineTextField from '~/components/mui/DenseOutlineTextField'
 import type { Content } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { finishEditing, rename } from '~/store/explorer-list'
@@ -89,6 +89,11 @@ const ExplorerNameTextField = (props: Props) => {
     [dispatch, finish, tabId],
   )
 
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    // NOTE: Prevent parent mouse down event
+    e.stopPropagation()
+  }, [])
+
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
   return (
@@ -124,20 +129,34 @@ const ExplorerNameTextField = (props: Props) => {
             ml: -0.5,
           }}
         >
-          <DenseOutlineTextField
+          <TextField
             fullWidth
+            hiddenLabel
             inputRef={ref}
+            maxRows={2}
+            multiline={multiline}
             onBlur={handleBlur}
             onChange={handleChange}
             onContextMenu={handleContextMenu}
             onKeyDown={handleKeyDown}
+            onMouseDown={handleMouseDown}
+            size="small"
             spellCheck={false}
             sx={(theme) => ({
               '.MuiInputBase-root': {
                 backgroundColor: theme.palette.background.default,
+                p: 0,
+                '.MuiInputBase-input': {
+                  ...theme.typography.caption,
+                  wordBreak: 'break-all',
+                  height: 18,
+                  px: 0.5,
+                  py: 0,
+                },
               },
             })}
             value={name}
+            variant="outlined"
           />
         </Stack>
       )}
