@@ -21,7 +21,6 @@ import {
   select,
   selectEditingByPath,
   selectFocusedByPath,
-  selectSelected,
   selectSelectedByPath,
   startEditing,
   toggleSelection,
@@ -45,7 +44,6 @@ const PreviewDirectoryItem = (props: Props) => {
   const selected = useAppSelector((state) =>
     selectSelectedByPath(state, content.path),
   )
-  const selectedPaths = useAppSelector(selectSelected)
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(content)
@@ -70,11 +68,7 @@ const PreviewDirectoryItem = (props: Props) => {
       dispatch(focus({ path: content.path }))
     },
     () => {
-      if (
-        !editing &&
-        selectedPaths.length === 1 &&
-        selectedPaths[0] === content.path
-      ) {
+      if (selected) {
         dispatch(startEditing({ path: content.path }))
       }
     },

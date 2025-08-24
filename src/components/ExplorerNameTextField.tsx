@@ -32,15 +32,18 @@ const ExplorerNameTextField = (props: Props) => {
 
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 
-  const finish = useCallback(() => {
-    dispatch(finishEditing(tabId))
-    if (name !== content.name) {
-      dispatch(rename(tabId, content.path, name))
-    }
-  }, [content.name, content.path, dispatch, name, tabId])
+  const finish = useCallback(
+    (shouldSave: boolean) => {
+      dispatch(finishEditing(tabId))
+      if (shouldSave && name !== content.name) {
+        dispatch(rename(tabId, content.path, name))
+      }
+    },
+    [content.name, content.path, dispatch, name, tabId],
+  )
 
   const handleBlur = useCallback(
-    () => window.setTimeout(() => finish()),
+    () => window.setTimeout(() => finish(true)),
     [finish],
   )
 
@@ -54,16 +57,16 @@ const ExplorerNameTextField = (props: Props) => {
       e.stopPropagation()
       switch (e.key) {
         case 'Escape':
-          dispatch(finishEditing(tabId))
+          finish(false)
           break
         case 'Enter':
           if (!e.nativeEvent.isComposing) {
-            finish()
+            finish(true)
           }
           break
       }
     },
-    [dispatch, finish, tabId],
+    [finish],
   )
 
   const handleMouseDown = useCallback((e: MouseEvent) => {

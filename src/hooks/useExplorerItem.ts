@@ -56,11 +56,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       dispatch(focus(tabId, content.path))
     },
     () => {
-      if (
-        !editing &&
-        selectedPaths.length === 1 &&
-        selectedPaths[0] === content.path
-      ) {
+      if (selected) {
         dispatch(startEditing(tabId, content.path))
       }
     },
