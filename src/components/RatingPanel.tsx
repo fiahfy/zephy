@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Panel from '~/components/Panel'
+import RatingTable from '~/components/RatingTable'
 import { useAppSelector } from '~/store'
 import { selectScoreToPathsMap } from '~/store/rating'
-import RatingTable from './RatingTable'
 
 const RatingPanel = () => {
   const scoreToPathsMap = useAppSelector(selectScoreToPathsMap)
