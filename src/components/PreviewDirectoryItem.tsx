@@ -8,8 +8,10 @@ import {
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import type { MouseEvent } from 'react'
+import { type MouseEvent, useCallback, useMemo } from 'react'
 import EntryIcon from '~/components/EntryIcon'
+import EntryNameTextField from '~/components/EntryNameTextField'
+import Rating from '~/components/ExplorerRating'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
@@ -19,10 +21,13 @@ import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   addSelection,
+  finishEditing,
   focus,
+  rename,
   select,
   selectEditingByPath,
   selectFocusedByPath,
+  selectSelected,
   selectSelectedByPath,
   startEditing,
   toggleSelection,
@@ -34,7 +39,6 @@ type Props = {
   content: Content
 }
 
-// TODO: Impl editing, DnD, copy/paste
 const PreviewDirectoryItem = (props: Props) => {
   const { content } = props
 
@@ -47,16 +51,23 @@ const PreviewDirectoryItem = (props: Props) => {
   const selected = useAppSelector((state) =>
     selectSelectedByPath(state, content.path),
   )
+  const selectedPaths = useAppSelector((state) => selectSelected(state))
   const dispatch = useAppDispatch()
 
   const { onContextMenu } = useEntryItem(content)
 
   const { itemCount, message, status, thumbnail } = useEntryThumbnail(content)
 
-  const { draggable, ...dragHandlers } = useDraggable(content.path)
+  const draggingPaths = useMemo(
+    () => (editing ? [] : selected ? selectedPaths : [content.path]),
+    [content.path, editing, selected, selectedPaths],
+  )
+
+  const { draggable, ...dragHandlers } = useDraggable(draggingPaths)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,
   )
+
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
     (e: MouseEvent) => {
       // NOTE: Prevent container event
@@ -70,8 +81,13 @@ const PreviewDirectoryItem = (props: Props) => {
       }
       dispatch(focus({ path: content.path }))
     },
-    () => {
-      if (selected) {
+    (e) => {
+      if (!selected) {
+        return
+      }
+      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+        // noop
+      } else {
         dispatch(startEditing({ path: content.path }))
       }
     },
@@ -87,6 +103,16 @@ const PreviewDirectoryItem = (props: Props) => {
     },
   )
 
+  const handleFinish = useCallback(
+    (changedValue: string | undefined) => {
+      dispatch(finishEditing())
+      if (changedValue) {
+        dispatch(rename(content.path, changedValue))
+      }
+    },
+    [content.path, dispatch],
+  )
+
   return (
     <ImageListItem
       className={clsx({ 'Mui-focused': focused, 'Mui-selected': selected })}
@@ -97,6 +123,7 @@ const PreviewDirectoryItem = (props: Props) => {
       onDoubleClick={onDoubleClick}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
+        cursor: 'pointer',
         height: '100%!important',
         overflow: 'hidden',
         width: '100%',
@@ -166,7 +193,7 @@ const PreviewDirectoryItem = (props: Props) => {
             }}
           >
             <Box sx={{ my: 0.25 }}>
-              {/* <ExplorerRating path={content.path} /> */}
+              <Rating path={content.path} />
             </Box>
             {itemCount !== undefined && content.type === 'directory' && (
               <Typography noWrap sx={{ ml: 1 }} variant="caption">
@@ -195,12 +222,12 @@ const PreviewDirectoryItem = (props: Props) => {
               height: theme.spacing(5),
             })}
           >
-            {/* <ExplorerNameTextField
-              content={content}
+            <EntryNameTextField
+              entry={content}
               multiline
+              onFinish={handleFinish}
               readOnly={!editing}
-              tabId={tabId}
-            /> */}
+            />
           </Stack>
         }
       />

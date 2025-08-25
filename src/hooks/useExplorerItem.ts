@@ -60,8 +60,13 @@ const useExplorerItem = (tabId: number, content: Content) => {
       }
       dispatch(focus(tabId, content.path))
     },
-    () => {
-      if (selected) {
+    (e) => {
+      if (!selected) {
+        return
+      }
+      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+        // noop
+      } else {
         dispatch(startEditing(tabId, content.path))
       }
     },

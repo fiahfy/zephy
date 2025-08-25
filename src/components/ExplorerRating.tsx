@@ -1,4 +1,4 @@
-import { Rating } from '@mui/material'
+import { Rating as MuiRating } from '@mui/material'
 import { type SyntheticEvent, useCallback, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { rate, selectRating, selectScoreByPath } from '~/store/rating'
@@ -7,7 +7,7 @@ type Props = {
   path: string
 }
 
-const ExplorerRating = (props: Props) => {
+const Rating = (props: Props) => {
   const { path } = props
 
   const score = useAppSelector((state) =>
@@ -24,7 +24,7 @@ const ExplorerRating = (props: Props) => {
   // NOTE: Rating component rendering is slow, so avoid unnecessary rendering
   const rating = useMemo(
     () => (
-      <Rating
+      <MuiRating
         onChange={handleChangeScore}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
@@ -50,4 +50,4 @@ const ExplorerRating = (props: Props) => {
   return rating
 }
 
-export default ExplorerRating
+export default Rating

@@ -6,8 +6,14 @@ import {
 import type { Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { selectCurrentSelectedContents } from '~/store/explorer-list'
-import { removeFromFavorites } from '~/store/favorite'
-import { removeRating, selectRating, selectScoreByPath } from '~/store/rating'
+import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
+import { showError } from '~/store/notification'
+import {
+  changeRatingPath,
+  removeRating,
+  selectRating,
+  selectScoreByPath,
+} from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
 
@@ -466,6 +472,29 @@ export const focusTo =
       dispatch(select({ path: content.path }))
     }
     dispatch(focus({ path: content.path }))
+  }
+
+export const rename =
+  (path: string, newName: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { addEntries, focus, removeEntries, select } = previewSlice.actions
+
+    try {
+      const entry = await window.electronAPI.renameEntry(path, newName)
+      // NOTE: Get the selected paths after renaming
+      const selected = selectSelected(getState())
+      dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+      dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+      dispatch(removeEntries({ paths: [path] }))
+      dispatch(addEntries({ entries: [entry] }))
+      // NOTE: Do not focus if the renamed entry is not selected
+      if (selected.length === 1 && selected[0] === path) {
+        dispatch(select({ path: entry.path }))
+        dispatch(focus({ path: entry.path }))
+      }
+    } catch (e) {
+      dispatch(showError(e))
+    }
   }
 
 export const handle =

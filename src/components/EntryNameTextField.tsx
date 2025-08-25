@@ -9,24 +9,20 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { Content } from '~/interfaces'
-import { useAppDispatch } from '~/store'
-import { finishEditing, rename } from '~/store/explorer-list'
+import type { Entry } from '~/interfaces'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
-  content: Content
+  entry: Entry
   multiline?: boolean
+  onFinish: (changedValue: string | undefined) => void
   readOnly: boolean
-  tabId: number
 }
 
-const ExplorerNameTextField = (props: Props) => {
-  const { content, multiline = false, readOnly, tabId } = props
+const EntryNameTextField = (props: Props) => {
+  const { entry, multiline = false, onFinish, readOnly } = props
 
-  const dispatch = useAppDispatch()
-
-  const [name, setName] = useState(content.name)
+  const [name, setName] = useState(entry.name)
 
   const ref = useRef<HTMLInputElement>(null)
 
@@ -34,12 +30,13 @@ const ExplorerNameTextField = (props: Props) => {
 
   const finish = useCallback(
     (shouldSave: boolean) => {
-      dispatch(finishEditing(tabId))
-      if (shouldSave && name !== content.name) {
-        dispatch(rename(tabId, content.path, name))
+      if (shouldSave && name !== entry.name) {
+        onFinish(name)
+      } else {
+        onFinish(undefined)
       }
     },
-    [content.name, content.path, dispatch, name, tabId],
+    [entry.name, name, onFinish],
   )
 
   const handleBlur = useCallback(
@@ -76,9 +73,9 @@ const ExplorerNameTextField = (props: Props) => {
 
   useEffect(() => {
     if (!readOnly) {
-      setName(content.name)
+      setName(entry.name)
     }
-  }, [content.name, readOnly])
+  }, [entry.name, readOnly])
 
   useEffect(() => {
     if (readOnly) {
@@ -90,7 +87,7 @@ const ExplorerNameTextField = (props: Props) => {
     }
     const timer = window.setTimeout(() => {
       el.focus()
-      if (content.type === 'file') {
+      if (entry.type === 'file') {
         const index = el.value.lastIndexOf('.')
         el.setSelectionRange(0, index)
       } else {
@@ -98,7 +95,7 @@ const ExplorerNameTextField = (props: Props) => {
       }
     })
     return () => clearTimeout(timer)
-  }, [content.type, readOnly])
+  }, [entry.type, readOnly])
 
   return (
     <>
@@ -119,10 +116,10 @@ const ExplorerNameTextField = (props: Props) => {
                 }
               : undefined
           }
-          title={content.name}
+          title={entry.name}
           variant="caption"
         >
-          {content.name}
+          {entry.name}
         </Typography>
       ) : (
         <Stack
@@ -168,4 +165,4 @@ const ExplorerNameTextField = (props: Props) => {
   )
 }
 
-export default ExplorerNameTextField
+export default EntryNameTextField

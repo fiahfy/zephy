@@ -4,11 +4,14 @@ import {
   type TableCellProps,
   Typography,
 } from '@mui/material'
+import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
-import ExplorerNameTextField from '~/components/ExplorerNameTextField'
-import ExplorerRating from '~/components/ExplorerRating'
+import EntryNameTextField from '~/components/EntryNameTextField'
+import Rating from '~/components/ExplorerRating'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
+import { useAppDispatch } from '~/store'
+import { finishEditing, rename } from '~/store/explorer-list'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
 type Key = keyof Content
@@ -25,7 +28,19 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabId, width } = props
 
+  const dispatch = useAppDispatch()
+
   const { editing } = useExplorerItem(tabId, content)
+
+  const handleFinish = useCallback(
+    (changedValue: string | undefined) => {
+      dispatch(finishEditing(tabId))
+      if (changedValue) {
+        dispatch(rename(tabId, content.path, changedValue))
+      }
+    },
+    [content.path, dispatch, tabId],
+  )
 
   return (
     <TableCell
@@ -50,14 +65,14 @@ const ExplorerTableCell = (props: Props) => {
           sx={{ flexGrow: 1, maxWidth: '100%' }}
         >
           <EntryIcon entry={content} />
-          <ExplorerNameTextField
-            content={content}
+          <EntryNameTextField
+            entry={content}
+            onFinish={handleFinish}
             readOnly={!editing}
-            tabId={tabId}
           />
         </Stack>
       )}
-      {dataKey === 'score' && <ExplorerRating path={content.path} />}
+      {dataKey === 'score' && <Rating path={content.path} />}
       {dataKey === 'size' && content.type !== 'directory' && (
         <Typography noWrap variant="caption">
           {formatFileSize(content.size)}
