@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
-import { changeDirectoryPath } from '~/store/window'
+import { changeDirectoryPath, newTab } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
@@ -12,13 +12,17 @@ type Props = {
 }
 
 const FavoriteTableRow = (props: Props) => {
-  const { children, path, ...others } = props
+  const { children, path } = props
 
   const dispatch = useAppDispatch()
 
-  const buttonHandlers = useButtonBehavior(() =>
-    dispatch(changeDirectoryPath(path)),
-  )
+  const buttonHandlers = useButtonBehavior((e) => {
+    if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
+      dispatch(newTab(path))
+    } else {
+      dispatch(changeDirectoryPath(path))
+    }
+  })
 
   const { droppableStyle, ...dropHandlers } = useDroppable(path)
 
@@ -46,7 +50,6 @@ const FavoriteTableRow = (props: Props) => {
 
   return (
     <TableRow
-      {...others}
       hover
       onContextMenu={handleContextMenu}
       sx={(theme) => ({

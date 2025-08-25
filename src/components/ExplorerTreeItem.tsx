@@ -31,7 +31,7 @@ import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
 import { open } from '~/store/settings'
-import { changeUrl } from '~/store/window'
+import { changeDirectoryPath, newTab } from '~/store/window'
 
 const StyledTreeItemRoot = styled(TreeItemRoot)(() => ({
   position: 'relative',
@@ -126,10 +126,14 @@ const ExplorerTreeItemRoot = forwardRef(
       (e: MouseEvent) => {
         e.stopPropagation()
         if (entry.type === 'directory') {
-          dispatch(changeUrl(entry.url))
+          if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+            dispatch(newTab(entry.path))
+          } else {
+            dispatch(changeDirectoryPath(entry.path))
+          }
         }
       },
-      [dispatch, entry.type, entry.url],
+      [dispatch, entry.type, entry.path],
     )
 
     const handleDoubleClick = useCallback(

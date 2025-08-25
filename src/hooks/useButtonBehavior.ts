@@ -1,6 +1,6 @@
-import { type KeyboardEvent, useCallback } from 'react'
+import { type KeyboardEvent, type MouseEvent, useCallback } from 'react'
 
-const useButtonBehavior = (callback: () => void) => {
+const useButtonBehavior = (callback: (e?: MouseEvent) => void) => {
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === ' ') {

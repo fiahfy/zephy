@@ -16,7 +16,11 @@ import {
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { open } from '~/store/settings'
-import { changeUrl, selectDirectoryPathByTabId } from '~/store/window'
+import {
+  changeDirectoryPath,
+  newTab,
+  selectDirectoryPathByTabId,
+} from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const useExplorerItem = (tabId: number, content: Content) => {
@@ -67,9 +71,15 @@ const useExplorerItem = (tabId: number, content: Content) => {
       if (editing) {
         return
       }
-      content.type === 'directory'
-        ? dispatch(changeUrl(content.url))
-        : dispatch(open(content.path))
+      if (content.type === 'directory') {
+        if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+          dispatch(newTab(content.path, tabId))
+        } else {
+          dispatch(changeDirectoryPath(content.path))
+        }
+      } else {
+        dispatch(open(content.path))
+      }
     },
   )
 

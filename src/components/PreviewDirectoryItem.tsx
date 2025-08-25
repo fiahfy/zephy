@@ -26,7 +26,7 @@ import {
   toggleSelection,
 } from '~/store/preview'
 import { open } from '~/store/settings'
-import { changeUrl } from '~/store/window'
+import { changeDirectoryPath } from '~/store/window'
 
 type Props = {
   content: Content
@@ -80,7 +80,7 @@ const PreviewDirectoryItem = (props: Props) => {
         return
       }
       content.type === 'directory'
-        ? dispatch(changeUrl(content.url))
+        ? dispatch(changeDirectoryPath(content.path))
         : dispatch(open(content.path))
     },
   )

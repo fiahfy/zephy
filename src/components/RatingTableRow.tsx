@@ -12,11 +12,18 @@ type Props = {
 }
 
 const RatingTableRow = (props: Props) => {
-  const { children, score, ...others } = props
+  const { children, score } = props
 
   const dispatch = useAppDispatch()
 
-  const buttonHandlers = useButtonBehavior(() => dispatch(goToRatings(score)))
+  const buttonHandlers = useButtonBehavior((e) => {
+    if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
+      // TODO: Open in new tab
+      dispatch(goToRatings(score))
+    } else {
+      dispatch(goToRatings(score))
+    }
+  })
 
   const handleContextMenu = useMemo(() => {
     const path = buildZephyUrl({ pathname: 'ratings', params: { score } })
@@ -38,7 +45,6 @@ const RatingTableRow = (props: Props) => {
 
   return (
     <TableRow
-      {...others}
       hover
       onContextMenu={handleContextMenu}
       sx={(theme) => ({
