@@ -189,34 +189,6 @@ export const selectSelected = createSelector(
   (preview) => preview.selected,
 )
 
-const selectPath = (_state: AppState, path: string) => path
-
-const isEditing = (editing: string | undefined, path: string) =>
-  editing === path
-
-export const selectEditingByPath = createSelector(
-  selectEditing,
-  selectPath,
-  (editing, path) => isEditing(editing, path),
-)
-
-const isFocused = (focused: string | undefined, path: string) =>
-  focused === path
-
-export const selectFocusedByPath = createSelector(
-  selectFocused,
-  selectPath,
-  (focused, path) => isFocused(focused, path),
-)
-
-const isSelected = (selected: string[], path: string) => selected.includes(path)
-
-export const selectSelectedByPath = createSelector(
-  selectSelected,
-  selectPath,
-  (selected, path) => isSelected(selected, path),
-)
-
 export const selectContents = createSelector(
   selectEntries,
   selectRating,
@@ -236,6 +208,30 @@ export const selectPreviewContent = createSelector(
   (previewContents) =>
     previewContents.length === 1 ? previewContents[0] : undefined,
 )
+
+// Selectors by path
+
+const selectPath = (_state: AppState, path: string) => path
+
+export const selectEditingByPath = createSelector(
+  selectEditing,
+  selectPath,
+  (editing, path) => editing === path,
+)
+
+export const selectFocusedByPath = createSelector(
+  selectFocused,
+  selectPath,
+  (focused, path) => focused === path,
+)
+
+export const selectSelectedByPath = createSelector(
+  selectSelected,
+  selectPath,
+  (selected, path) => selected.includes(path),
+)
+
+// Operations
 
 export const load = (): AppThunk => async (dispatch, getState) => {
   const { load, loaded, loadFailed } = previewSlice.actions

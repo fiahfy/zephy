@@ -15,8 +15,12 @@ import {
   toggleFavorite,
 } from '~/store/favorite'
 import { open } from '~/store/settings'
-import { changeUrl, selectCurrentUrl } from '~/store/window'
-import { getIconType, getPath, isFileUrl } from '~/utils/url'
+import {
+  changeUrl,
+  selectCurrentDirectoryPath,
+  selectCurrentUrl,
+} from '~/store/window'
+import { getIconType, isFileUrl } from '~/utils/url'
 
 type Props = {
   onChange: (value: string) => void
@@ -26,9 +30,8 @@ type Props = {
 const AddressTextField = (props: Props) => {
   const { onChange, value } = props
 
+  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
   const url = useAppSelector(selectCurrentUrl)
-
-  const directoryPath = useMemo(() => getPath(url), [url])
 
   const favorite = useAppSelector((state) =>
     selectFavoriteByPath(selectFavorite(state), directoryPath),

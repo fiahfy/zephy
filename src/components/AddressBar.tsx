@@ -20,34 +20,36 @@ import {
 import {
   back,
   forward,
-  selectBackHistories,
-  selectCanBack,
-  selectCanForward,
+  selectCurrentBackHistories,
+  selectCurrentCanBack,
+  selectCurrentCanForward,
+  selectCurrentDirectoryPath,
+  selectCurrentForwardHistories,
   selectCurrentSortOption,
   selectCurrentUrl,
   selectCurrentViewMode,
-  selectForwardHistories,
   selectSidebarHiddenByVariant,
   upward,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { getPath, isFileUrl } from '~/utils/url'
+import { isFileUrl } from '~/utils/url'
 
 const AddressBar = () => {
-  const backHistories = useAppSelector(selectBackHistories)
-  const canBack = useAppSelector(selectCanBack)
-  const canForward = useAppSelector(selectCanForward)
-  const forwardHistories = useAppSelector(selectForwardHistories)
+  const backHistories = useAppSelector(selectCurrentBackHistories)
+  const canBack = useAppSelector(selectCurrentCanBack)
+  const canForward = useAppSelector(selectCurrentCanForward)
+  const directoryPath = useAppSelector(selectCurrentDirectoryPath)
+  const forwardHistories = useAppSelector(selectCurrentForwardHistories)
   const loading = useAppSelector(selectCurrentLoading)
+  const sortOption = useAppSelector(selectCurrentSortOption)
+  const url = useAppSelector(selectCurrentUrl)
+  const viewMode = useAppSelector(selectCurrentViewMode)
   const primarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'primary'),
   )
   const secondarySidebarHidden = useAppSelector((state) =>
     selectSidebarHiddenByVariant(state, 'secondary'),
   )
-  const sortOption = useAppSelector(selectCurrentSortOption)
-  const url = useAppSelector(selectCurrentUrl)
-  const viewMode = useAppSelector(selectCurrentViewMode)
   const dispatch = useAppDispatch()
 
   const { visible } = useTrafficLight()
@@ -84,7 +86,6 @@ const AddressBar = () => {
 
   const [urlInput, setUrlInput] = useState('')
 
-  const directoryPath = useMemo(() => getPath(url), [url])
   const fileUrl = useMemo(() => isFileUrl(url), [url])
 
   const handleClickMore = useMemo(

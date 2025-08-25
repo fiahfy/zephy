@@ -25,6 +25,7 @@ import {
   unselectAll,
 } from '~/store/explorer-list'
 import {
+  selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectScrollPositionByTabId,
   selectSortOptionByTabIdAndUrl,
@@ -33,7 +34,6 @@ import {
   setScrollPosition,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { getPath } from '~/utils/url'
 
 const useExplorerList = (
   tabId: number,
@@ -46,6 +46,9 @@ const useExplorerList = (
     selectContentsByTabId(state, tabId),
   )
   const editing = useAppSelector((state) => selectEditingByTabId(state, tabId))
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabId(state, tabId),
+  )
   const error = useAppSelector((state) => selectErrorByTabId(state, tabId))
   const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
@@ -97,8 +100,6 @@ const useExplorerList = (
             : 'No items',
     [error, loading, query],
   )
-
-  const directoryPath = useMemo(() => getPath(url), [url])
 
   const onContextMenu = useMemo(
     () =>

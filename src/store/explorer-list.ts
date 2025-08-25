@@ -19,6 +19,7 @@ import {
   changeUrl,
   selectCurrentDirectoryPath,
   selectCurrentTabId,
+  selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectSortOptionByTabIdAndUrl,
   selectTabs,
@@ -401,7 +402,7 @@ export default explorerListSlice.reducer
 
 export const selectExplorerList = (state: AppState) => state.explorerList
 
-// Selectors for tabs
+// Selectors by tabId
 
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
@@ -426,47 +427,19 @@ export const selectLoadingByTabId = createSelector(
   (explorer) => explorer.loading,
 )
 
-const selectPath = (_state: AppState, _tabId: number, path: string) => path
-
-const isEditing = (editing: string | undefined, path: string) =>
-  editing === path
-
 export const selectEditingByTabId = createSelector(
   selectExplorerByTabId,
   (explorer) => explorer.editing,
 )
-
-export const selectEditingByTabIdAndPath = createSelector(
-  selectEditingByTabId,
-  selectPath,
-  (editing, path) => isEditing(editing, path),
-)
-
-const isFocused = (focused: string | undefined, path: string) =>
-  focused === path
 
 export const selectFocusedByTabId = createSelector(
   selectExplorerByTabId,
   (explorer) => explorer.focused,
 )
 
-export const selectFocusedByTabIdAndPath = createSelector(
-  selectFocusedByTabId,
-  selectPath,
-  (focused, path) => isFocused(focused, path),
-)
-
-const isSelected = (selected: string[], path: string) => selected.includes(path)
-
 export const selectSelectedByTabId = createSelector(
   selectExplorerByTabId,
   (explorer) => explorer.selected,
-)
-
-export const selectSelectedByTabIdAndPath = createSelector(
-  selectSelectedByTabId,
-  selectPath,
-  (selected, path) => isSelected(selected, path),
 )
 
 export const selectAnchorByTabId = createSelector(
@@ -515,32 +488,70 @@ export const selectContentsByTabId = createSelector(
 )
 
 export const selectSelectedContentsByTabId = createSelector(
+  (state: AppState) => state,
+  selectTabId,
   selectContentsByTabId,
+  (state, tabId, contents) =>
+    contents.filter((content: Content) =>
+      selectSelectedByTabIdAndPath(state, tabId, content.path),
+    ),
+)
+
+// Selectors by tabId and path
+
+const selectPath = (_state: AppState, _tabId: number, path: string) => path
+
+export const selectEditingByTabIdAndPath = createSelector(
+  selectEditingByTabId,
+  selectPath,
+  (editing, path) => editing === path,
+)
+
+export const selectFocusedByTabIdAndPath = createSelector(
+  selectFocusedByTabId,
+  selectPath,
+  (focused, path) => focused === path,
+)
+
+export const selectSelectedByTabIdAndPath = createSelector(
   selectSelectedByTabId,
-  (contents, selected) =>
-    contents.filter((content: Content) => isSelected(selected, content.path)),
+  selectPath,
+  (selected, path) => selected.includes(path),
 )
 
 // Selectors for current tab
 
-export const selectCurrentExplorer = (state: AppState) =>
-  selectExplorerByTabId(state, selectCurrentTabId(state))
-
-export const selectCurrentLoading = createSelector(
-  selectCurrentExplorer,
-  (currentExplorer) => currentExplorer.loading,
+export const selectCurrentExplorer = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectExplorerByTabId(state, tabId),
 )
 
-export const selectCurrentSelected = (state: AppState) =>
-  selectSelectedByTabId(state, selectCurrentTabId(state))
+export const selectCurrentLoading = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectLoadingByTabId(state, tabId),
+)
 
-export const selectCurrentContents = (state: AppState) =>
-  selectContentsByTabId(state, selectCurrentTabId(state))
+export const selectCurrentSelected = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectSelectedByTabId(state, tabId),
+)
 
-export const selectCurrentSelectedContents = (state: AppState) =>
-  selectSelectedContentsByTabId(state, selectCurrentTabId(state))
+export const selectCurrentContents = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectContentsByTabId(state, tabId),
+)
 
-// Operations for tabs
+export const selectCurrentSelectedContents = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectSelectedContentsByTabId(state, tabId),
+)
+
+// Operations by tabId
 
 export const load =
   (tabId: number): AppThunk =>
@@ -859,9 +870,8 @@ export const handle =
 
     const tabs = selectTabs(getState())
     for (const { id: tabId } of tabs) {
-      const url = selectUrlByTabId(getState(), tabId)
-      const currentDirectoryPath = getPath(url)
-      if (directoryPath !== currentDirectoryPath) {
+      const directoryPathByTabId = selectDirectoryPathByTabId(getState(), tabId)
+      if (directoryPath !== directoryPathByTabId) {
         continue
       }
 

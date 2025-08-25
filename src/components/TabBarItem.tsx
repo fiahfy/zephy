@@ -6,9 +6,14 @@ import Icon from '~/components/Icon'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { selectLoadingByTabId } from '~/store/explorer-list'
-import { changeTab, closeTab, selectHistoryByTabId } from '~/store/window'
+import {
+  changeTab,
+  closeTab,
+  selectDirectoryPathByTabId,
+  selectHistoryByTabId,
+} from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { getIconType, getPath } from '~/utils/url'
+import { getIconType } from '~/utils/url'
 
 type Props = {
   tabId: number
@@ -17,11 +22,12 @@ type Props = {
 const TabBarItem = (props: Props) => {
   const { tabId, ...others } = props
 
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabId(state, tabId),
+  )
   const history = useAppSelector((state) => selectHistoryByTabId(state, tabId))
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const dispatch = useAppDispatch()
-
-  const directoryPath = useMemo(() => getPath(history.url), [history.url])
 
   const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 

@@ -16,13 +16,15 @@ import {
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import { open } from '~/store/settings'
-import { changeUrl, selectUrlByTabId } from '~/store/window'
+import { changeUrl, selectDirectoryPathByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { getPath } from '~/utils/url'
 
 const useExplorerItem = (tabId: number, content: Content) => {
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
+  )
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabId(state, tabId),
   )
   const editing = useAppSelector((state) =>
     selectEditingByTabIdAndPath(state, tabId, content.path),
@@ -39,7 +41,6 @@ const useExplorerItem = (tabId: number, content: Content) => {
   const selectedPaths = useAppSelector((state) =>
     selectSelectedByTabId(state, tabId),
   )
-  const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
@@ -76,8 +77,6 @@ const useExplorerItem = (tabId: number, content: Content) => {
     () => (editing ? [] : selected ? selectedPaths : [content.path]),
     [content.path, editing, selected, selectedPaths],
   )
-
-  const directoryPath = useMemo(() => getPath(url), [url])
 
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'

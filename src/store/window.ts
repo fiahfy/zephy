@@ -575,12 +575,36 @@ export const selectCurrentWindow = createSelector(
   (window, windowId) => window[windowId] ?? defaultWindowState,
 )
 
-// Selectors for sidebar
+export const selectCurrentTabId = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabId,
+)
 
 export const selectSidebar = createSelector(
   selectCurrentWindow,
   (currentWindow) => currentWindow.sidebar,
 )
+
+export const selectTabs = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabs,
+)
+
+export const selectDirectoryPaths = createSelector(
+  selectTabs,
+  (state: AppState) => state,
+  (tabs, state) =>
+    tabs
+      .map((tab) => selectDirectoryPathByTabId(state, tab.id))
+      .filter((url): url is string => typeof url === 'string'),
+)
+
+export const selectCanCloseTab = createSelector(
+  selectTabs,
+  (tabs) => tabs.length > 1,
+)
+
+// Selectors by variant
 
 const selectSidebarVariant = (
   _state: AppState,
@@ -599,12 +623,7 @@ export const selectSidebarWidthByVariant = createSelector(
   (sidebar, variant) => sidebar[variant].width,
 )
 
-// Selector for tabs
-
-export const selectTabs = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.tabs,
-)
+// Selector by tabId
 
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
@@ -620,19 +639,24 @@ export const selectTabByTabId = createSelector(
     },
 )
 
-export const selectCanCloseTab = createSelector(
-  selectTabs,
-  (tabs) => tabs.length > 1,
+export const selectCanBackByTabId = createSelector(
+  selectTabByTabId,
+  (tab) => tab.history.index > 0,
 )
 
-export const selectUrls = createSelector(selectTabs, (tabs) =>
-  tabs.reduce((acc, tab) => {
-    const url = tab.history.histories[tab.history.index]?.url
-    if (url) {
-      acc.push(url)
-    }
-    return acc
-  }, [] as string[]),
+export const selectCanForwardByTabId = createSelector(
+  selectTabByTabId,
+  (tab) => tab.history.index < tab.history.histories.length - 1,
+)
+
+export const selectBackHistoriesByTabId = createSelector(
+  selectTabByTabId,
+  (tab) => tab.history.histories.slice(0, tab.history.index).toReversed(),
+)
+
+export const selectForwardHistoriesByTabId = createSelector(
+  selectTabByTabId,
+  (tab) => tab.history.histories.slice(tab.history.index + 1),
 )
 
 export const selectHistoryByTabId = createSelector(selectTabByTabId, (tab) => {
@@ -652,15 +676,27 @@ export const selectUrlByTabId = createSelector(
   (history) => history.url,
 )
 
+export const selectDirectoryPathByTabId = createSelector(
+  selectHistoryByTabId,
+  (history) => getPath(history.url),
+)
+
 export const selectQueryByTabId = createSelector(
   selectHistoryByTabId,
   (history) => history.query,
+)
+
+export const selectTitleByTabId = createSelector(
+  selectHistoryByTabId,
+  (history) => history.title,
 )
 
 export const selectScrollPositionByTabId = createSelector(
   selectHistoryByTabId,
   (history) => history.scrollPosition,
 )
+
+// Selectors by tabId and url
 
 const selectUrl = (_state: AppState, _tabId: number, url: string) => url
 
@@ -678,68 +714,79 @@ export const selectViewModeByTabIdAndUrl = createSelector(
 
 // Selector for current tab
 
-export const selectCurrentTabId = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.tabId,
+export const selectCurrentTab = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectTabByTabId(state, tabId),
 )
 
-export const selectCurrentTab = (state: AppState) =>
-  selectTabByTabId(state, selectCurrentTabId(state))
-
-export const selectCanBack = createSelector(
-  selectCurrentTab,
-  (tab) => tab.history.index > 0,
+export const selectCurrentHistory = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectHistoryByTabId(state, tabId),
 )
 
-export const selectCanForward = createSelector(
-  selectCurrentTab,
-  (tab) => tab.history.index < tab.history.histories.length - 1,
+export const selectCurrentCanBack = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectCanBackByTabId(state, tabId),
 )
 
-export const selectBackHistories = createSelector(selectCurrentTab, (tab) =>
-  tab.history.histories.slice(0, tab.history.index).toReversed(),
+export const selectCurrentCanForward = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectCanForwardByTabId(state, tabId),
 )
 
-export const selectForwardHistories = createSelector(selectCurrentTab, (tab) =>
-  tab.history.histories.slice(tab.history.index + 1),
+export const selectCurrentBackHistories = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectBackHistoriesByTabId(state, tabId),
 )
 
-const selectCurrentHistory = (state: AppState) =>
-  selectHistoryByTabId(state, selectCurrentTabId(state))
+export const selectCurrentForwardHistories = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectForwardHistoriesByTabId(state, tabId),
+)
 
 export const selectCurrentUrl = createSelector(
-  selectCurrentHistory,
-  (currentHistory) => currentHistory.url,
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectUrlByTabId(state, tabId),
 )
 
 export const selectCurrentDirectoryPath = createSelector(
-  selectCurrentUrl,
-  (currentUrl) => getPath(currentUrl),
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectDirectoryPathByTabId(state, tabId),
 )
 
 export const selectCurrentQuery = createSelector(
-  selectCurrentHistory,
-  (currentHistory) => currentHistory.query,
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectQueryByTabId(state, tabId),
 )
 
 export const selectCurrentTitle = createSelector(
-  selectCurrentHistory,
-  (currentHistory) => currentHistory.title,
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectTitleByTabId(state, tabId),
 )
 
-export const selectCurrentSortOption = (state: AppState) =>
-  selectSortOptionByTabIdAndUrl(
-    state,
-    selectCurrentTabId(state),
-    selectCurrentUrl(state),
-  )
+export const selectCurrentSortOption = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  selectCurrentUrl,
+  (state, tabId, url) => selectSortOptionByTabIdAndUrl(state, tabId, url),
+)
 
-export const selectCurrentViewMode = (state: AppState) =>
-  selectViewModeByTabIdAndUrl(
-    state,
-    selectCurrentTabId(state),
-    selectCurrentUrl(state),
-  )
+export const selectCurrentViewMode = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  selectCurrentUrl,
+  (state, tabId, url) => selectViewModeByTabIdAndUrl(state, tabId, url),
+)
 
 // Operations for windows & tabs
 
@@ -973,9 +1020,9 @@ export const setCurrentViewMode =
 // Operations for application menu
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
-  const canBack = selectCanBack(getState())
+  const canBack = selectCurrentCanBack(getState())
   const canCloseTab = selectCanCloseTab(getState())
-  const canForward = selectCanForward(getState())
+  const canForward = selectCurrentCanForward(getState())
   const sidebar = selectSidebar(getState())
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())

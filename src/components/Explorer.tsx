@@ -6,8 +6,11 @@ import ExplorerTable from '~/components/ExplorerTable'
 import useDroppable from '~/hooks/useDroppable'
 import ExplorerProvider from '~/providers/ExplorerProvider'
 import { useAppSelector } from '~/store'
-import { selectUrlByTabId, selectViewModeByTabIdAndUrl } from '~/store/window'
-import { getPath } from '~/utils/url'
+import {
+  selectDirectoryPathByTabId,
+  selectUrlByTabId,
+  selectViewModeByTabIdAndUrl,
+} from '~/store/window'
 
 type Props = {
   tabId: number
@@ -16,12 +19,13 @@ type Props = {
 const Explorer = (props: Props) => {
   const { tabId } = props
 
+  const directoryPath = useAppSelector((state) =>
+    selectDirectoryPathByTabId(state, tabId),
+  )
   const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const viewMode = useAppSelector((state) =>
     selectViewModeByTabIdAndUrl(state, tabId, url),
   )
-
-  const directoryPath = useMemo(() => getPath(url), [url])
 
   const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
