@@ -69,8 +69,8 @@ const generateNewDirectoryName = async (directoryPath: string) => {
     }
     return acc
   }, [] as number[])
-  const missingNumber = findMissingNumber(numbers)
-  return missingNumber === 1 ? filename : `${filename} ${missingNumber}`
+  const newNumber = findMissingNumber(numbers)
+  return newNumber === 1 ? filename : `${filename} ${newNumber}`
 }
 
 const generateCopyFilename = async (path: string, directoryPath: string) => {
@@ -94,10 +94,10 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
     }
     return acc
   }, [] as number[])
-  const missingNumber = findMissingNumber(numbers)
-  return missingNumber === 1
+  const newNumber = Math.max(...[0, ...numbers]) + 1
+  return newNumber === 1
     ? `${name} copy${ext}`
-    : `${name} copy ${missingNumber}${ext}`
+    : `${name} copy ${newNumber}${ext}`
 }
 
 export const getEntry = async (path: string): Promise<Entry> => {
