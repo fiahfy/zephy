@@ -13,7 +13,10 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import { selectPreviewContent } from '~/store/preview'
+import {
+  selectPreviewContentPath,
+  selectPreviewContentUrl,
+} from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type State = {
@@ -41,7 +44,8 @@ const reducer = (_state: State, action: Action) => {
 }
 
 const PreviewVideo = () => {
-  const content = useAppSelector(selectPreviewContent)
+  const path = useAppSelector(selectPreviewContentPath)
+  const url = useAppSelector(selectPreviewContentUrl)
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const appDispatch = useAppDispatch()
@@ -52,8 +56,6 @@ const PreviewVideo = () => {
   })
 
   const ref = useRef<HTMLVideoElement>(null)
-
-  const url = useMemo(() => content?.url, [content?.url])
 
   const handleContextMenu = useMemo(
     () =>
@@ -112,13 +114,11 @@ const PreviewVideo = () => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (!content?.path) {
+      if (!path) {
         return
       }
       dispatch({ type: 'loading' })
-      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(
-        content.path,
-      )
+      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(path)
       if (unmounted) {
         return
       }
@@ -128,7 +128,7 @@ const PreviewVideo = () => {
     return () => {
       unmounted = true
     }
-  }, [content?.path])
+  }, [path])
 
   return (
     <>

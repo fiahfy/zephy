@@ -43,7 +43,8 @@ export type MessageOperations = {
 }
 
 export type WatcherOperations = {
-  watchDirectories: (
+  unwatch: () => void
+  watch: (
     directoryPaths: string[],
     callback: (
       eventType: 'create' | 'update' | 'delete',

@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from 'react'
 import PreviewParametersTableCell from '~/components/PreviewParametersTableCell'
 import PreviewParametersTableHeaderCell from '~/components/PreviewParametersTableHeaderCell'
 import { useAppSelector } from '~/store'
-import { selectPreviewContent } from '~/store/preview'
+import { selectPreviewContentPath } from '~/store/preview'
 
 const parseParameters = (parameters: string) => {
   let prompt = ''
@@ -64,7 +64,7 @@ const parseParameters = (parameters: string) => {
 }
 
 const PreviewParametersTable = () => {
-  const content = useAppSelector(selectPreviewContent)
+  const path = useAppSelector(selectPreviewContentPath)
 
   const [parameters, setParameters] = useState<string>()
 
@@ -76,12 +76,10 @@ const PreviewParametersTable = () => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (!content?.path) {
+      if (!path) {
         return
       }
-      const parameters = await window.electronAPI.getEntryParameters(
-        content.path,
-      )
+      const parameters = await window.electronAPI.getEntryParameters(path)
       if (unmounted) {
         return
       }
@@ -91,7 +89,7 @@ const PreviewParametersTable = () => {
     return () => {
       unmounted = true
     }
-  }, [content?.path])
+  }, [path])
 
   return (
     <>

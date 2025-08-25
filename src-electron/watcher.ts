@@ -29,9 +29,11 @@ const createWatcher = () => {
 
   const close = async (id: number) => {
     const watcher = watchers[id]
-    if (watcher) {
-      await watcher.close()
+    if (!watcher) {
+      return
     }
+    await watcher.close()
+    delete watchers[id]
   }
 
   const watch = async (
@@ -39,8 +41,6 @@ const createWatcher = () => {
     directoryPaths: string[],
     callback: Callback,
   ) => {
-    await close(id)
-
     watchers[id] = chokidar
       .watch(directoryPaths, {
         depth: 0,
@@ -72,20 +72,20 @@ const createWatcher = () => {
     }
   }
 
-  ipcMain.on(
-    'watchDirectories',
-    (event: IpcMainInvokeEvent, directoryPaths: string[]) =>
-      watch(
-        event.sender.id,
-        directoryPaths,
-        (eventType, directoryPath, filePath) =>
-          event.sender.send(
-            'onDirectoryChange',
-            eventType,
-            directoryPath,
-            filePath,
-          ),
-      ),
+  ipcMain.on('unwatch', (event: IpcMainInvokeEvent) => close(event.sender.id))
+
+  ipcMain.on('watch', (event: IpcMainInvokeEvent, directoryPaths: string[]) =>
+    watch(
+      event.sender.id,
+      directoryPaths,
+      (eventType, directoryPath, filePath) =>
+        event.sender.send(
+          'onDirectoryChange',
+          eventType,
+          directoryPath,
+          filePath,
+        ),
+    ),
   )
 
   return { handle, notify }

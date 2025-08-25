@@ -60,7 +60,11 @@ const messageOperations = {
 }
 
 const watcherOperations = {
-  watchDirectories: (
+  unwatch: () => {
+    ipcRenderer.removeAllListeners('onDirectoryChange')
+    ipcRenderer.send('unwatch')
+  },
+  watch: (
     directoryPaths: string[],
     callback: (
       eventType: 'create' | 'delete',
@@ -68,7 +72,6 @@ const watcherOperations = {
       filePath: string,
     ) => void,
   ) => {
-    ipcRenderer.removeAllListeners('onDirectoryChange')
     ipcRenderer.on(
       'onDirectoryChange',
       (
@@ -78,7 +81,7 @@ const watcherOperations = {
         filePath: string,
       ) => callback(eventType, directoryPath, filePath),
     )
-    ipcRenderer.send('watchDirectories', directoryPaths)
+    ipcRenderer.send('watch', directoryPaths)
   },
 }
 

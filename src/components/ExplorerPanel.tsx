@@ -36,7 +36,7 @@ const ExplorerPanel = () => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
   const dispatch = useAppDispatch()
 
-  const { watch } = useWatcher()
+  const { unwatch, watch } = useWatcher()
 
   const apiRef = useTreeViewApiRef()
 
@@ -107,16 +107,13 @@ const ExplorerPanel = () => {
     return () => clearTimeout(timer)
   }, [root, selectedItems])
 
-  useEffect(
-    () =>
-      watch(
-        'explorer-tree',
-        loadedDirectoryPath,
-        async (eventType, directoryPath, filePath) =>
-          dispatch(handle(eventType, directoryPath, filePath)),
-      ),
-    [dispatch, loadedDirectoryPath, watch],
-  )
+  useEffect(() => {
+    const key = 'explorer-tree'
+    watch(key, loadedDirectoryPath, (eventType, directoryPath, filePath) =>
+      dispatch(handle(eventType, directoryPath, filePath)),
+    )
+    return () => unwatch(key)
+  }, [dispatch, loadedDirectoryPath, unwatch, watch])
 
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">

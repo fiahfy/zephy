@@ -6,7 +6,8 @@ import {
 import type { Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { selectCurrentSelectedContents } from '~/store/explorer-list'
-import { selectRating, selectScoreByPath } from '~/store/rating'
+import { removeFromFavorites } from '~/store/favorite'
+import { removeRating, selectRating, selectScoreByPath } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { isHiddenFile } from '~/utils/file'
 
@@ -18,6 +19,7 @@ type State = {
   focused: string | undefined
   loading: boolean
   selected: string[]
+  timestamp: number
 }
 
 const initialState: State = {
@@ -28,27 +30,34 @@ const initialState: State = {
   focused: undefined,
   loading: false,
   selected: [],
+  timestamp: 0,
 }
 
 export const previewSlice = createSlice({
   name: 'preview',
   initialState,
   reducers: {
-    load(state) {
+    load(state, action: PayloadAction<{ timestamp: number }>) {
+      const { timestamp } = action.payload
       return {
         ...state,
         entries: [],
         loading: true,
         error: false,
+        timestamp,
       }
     },
     loaded(
       state,
       action: PayloadAction<{
         entries: Entry[]
+        timestamp: number
       }>,
     ) {
-      const { entries } = action.payload
+      const { entries, timestamp } = action.payload
+      if (state.timestamp !== timestamp) {
+        return state
+      }
       const paths = entries.map((entry) => entry.path)
       const focused =
         state.focused && paths.includes(state.focused)
@@ -64,7 +73,11 @@ export const previewSlice = createSlice({
         selected,
       }
     },
-    loadFailed(state) {
+    loadFailed(state, action: PayloadAction<{ timestamp: number }>) {
+      const { timestamp } = action.payload
+      if (state.timestamp !== timestamp) {
+        return state
+      }
       return {
         ...state,
         entries: [],
@@ -72,6 +85,45 @@ export const previewSlice = createSlice({
         focused: undefined,
         loading: false,
         selected: [],
+      }
+    },
+    addEntries(
+      state,
+      action: PayloadAction<{
+        entries: Entry[]
+      }>,
+    ) {
+      const { entries } = action.payload
+      const paths = entries.map((entry) => entry.path)
+      const newEntries = [
+        ...state.entries.filter((entry) => !paths.includes(entry.path)),
+        ...entries,
+      ]
+      return {
+        ...state,
+        entries: newEntries,
+      }
+    },
+    removeEntries(
+      state,
+      action: PayloadAction<{
+        paths: string[]
+      }>,
+    ) {
+      const { paths } = action.payload
+      const entries = state.entries.filter(
+        (entry) => !paths.includes(entry.path),
+      )
+      const focused =
+        state.focused && paths.includes(state.focused)
+          ? undefined
+          : state.focused
+      const selected = state.selected.filter((path) => !paths.includes(path))
+      return {
+        ...state,
+        entries,
+        focused,
+        selected,
       }
     },
     startEditing(
@@ -189,6 +241,11 @@ export const selectSelected = createSelector(
   (preview) => preview.selected,
 )
 
+export const selectAnchor = createSelector(
+  selectPreview,
+  (preview) => preview.anchor,
+)
+
 export const selectContents = createSelector(
   selectEntries,
   selectRating,
@@ -207,6 +264,16 @@ export const selectPreviewContent = createSelector(
   selectCurrentSelectedContents,
   (previewContents) =>
     previewContents.length === 1 ? previewContents[0] : undefined,
+)
+
+export const selectPreviewContentUrl = createSelector(
+  selectPreviewContent,
+  (previewContent) => (previewContent ? previewContent.url : undefined),
+)
+
+export const selectPreviewContentPath = createSelector(
+  selectPreviewContent,
+  (previewContent) => (previewContent ? previewContent.path : undefined),
 )
 
 // Selectors by path
@@ -246,22 +313,29 @@ export const load = (): AppThunk => async (dispatch, getState) => {
     return
   }
 
-  dispatch(load())
+  const timestamp = Date.now()
+
+  dispatch(load({ timestamp }))
   try {
     const entries = await window.electronAPI.getEntries(previewContent.path)
-    dispatch(loaded({ entries }))
+    dispatch(loaded({ entries, timestamp }))
   } catch {
-    dispatch(loadFailed())
+    dispatch(loadFailed({ timestamp }))
   }
 }
 
 export const addSelection =
-  (path: string): AppThunk =>
+  (path: string, useAnchor: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { addSelection } = previewSlice.actions
 
-    const selected = selectSelected(getState())
-    const anchor = selected[selected.length - 1]
+    let anchor: string | undefined
+    if (useAnchor) {
+      anchor = selectAnchor(getState())
+    } else {
+      const selected = selectSelected(getState())
+      anchor = selected[selected.length - 1]
+    }
 
     const contents = selectContents(getState())
     const paths = contents.map((content) => content.path)
@@ -279,4 +353,153 @@ export const addSelection =
     }
 
     dispatch(addSelection({ paths: newPaths }))
+  }
+
+export const focusFirst = (): AppThunk => async (dispatch, getState) => {
+  const contents = selectContents(getState())
+  const content = contents[0]
+  if (!content) {
+    return
+  }
+  dispatch(select({ path: content.path }))
+  dispatch(focus({ path: content.path }))
+}
+
+export const focusByHorizontal =
+  (offset: number, columns: number, multiSelect: boolean): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocused(getState())
+    const contents = selectContents(getState())
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst())
+    }
+
+    const rowIndex = Math.floor(index / columns)
+    const columnIndex = index % columns
+    const newColumnIndex = columnIndex + offset
+
+    if (newColumnIndex < 0 || newColumnIndex >= columns) {
+      return
+    }
+
+    const newIndex = columns * rowIndex + newColumnIndex
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll())
+      dispatch(addSelection(content.path, true))
+    } else {
+      dispatch(select({ path: content.path }))
+    }
+    dispatch(focus({ path: content.path }))
+  }
+
+export const focusByVertical =
+  (offset: number, columns: number, multiSelect: boolean): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocused(getState())
+    const contents = selectContents(getState())
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst())
+    }
+
+    const rowIndex = Math.floor(index / columns)
+    const columnIndex = index % columns
+    const newRowIndex = rowIndex + offset
+
+    const newIndex = columns * newRowIndex + columnIndex
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll())
+      dispatch(addSelection(content.path, true))
+    } else {
+      dispatch(select({ path: content.path }))
+    }
+    dispatch(focus({ path: content.path }))
+  }
+
+export const focusTo =
+  (
+    position: 'first' | 'last',
+    columns: number,
+    multiSelect: boolean,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocused(getState())
+    const contents = selectContents(getState())
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst())
+    }
+
+    const columnIndex = index % columns
+    const maxRowIndex = Math.floor(contents.length / columns)
+
+    let newIndex: number
+    if (position === 'first') {
+      newIndex = columnIndex
+    } else {
+      newIndex = maxRowIndex * columns + columnIndex
+      if (newIndex >= contents.length) {
+        newIndex -= columns
+      }
+    }
+
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll())
+      dispatch(addSelection(content.path, true))
+    } else {
+      dispatch(select({ path: content.path }))
+    }
+    dispatch(focus({ path: content.path }))
+  }
+
+export const handle =
+  (
+    eventType: 'create' | 'update' | 'delete',
+    directoryPath: string,
+    filePath: string,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const { addEntries, removeEntries, removeSelection, unfocus } =
+      previewSlice.actions
+
+    const previewContentPath = selectPreviewContentPath(getState())
+    if (directoryPath !== previewContentPath) {
+      return
+    }
+
+    switch (eventType) {
+      case 'create':
+      case 'update': {
+        try {
+          const entry = await window.electronAPI.getEntry(filePath)
+          dispatch(addEntries({ entries: [entry] }))
+        } catch {
+          // noop
+        }
+        break
+      }
+      case 'delete':
+        dispatch(removeFromFavorites(filePath))
+        dispatch(removeRating({ path: filePath }))
+        dispatch(removeEntries({ paths: [filePath] }))
+        dispatch(removeSelection({ paths: [filePath] }))
+        dispatch(unfocus({ paths: [filePath] }))
+        break
+    }
   }

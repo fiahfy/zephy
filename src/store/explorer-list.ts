@@ -36,6 +36,7 @@ type ExplorerState = {
   focused: string | undefined
   loading: boolean
   selected: string[]
+  timestamp: number
 }
 
 type State = {
@@ -52,6 +53,7 @@ const defaultExplorerState = {
   focused: undefined,
   loading: false,
   selected: [],
+  timestamp: 0,
 }
 
 const findExplorer = (state: State, tabId: number) =>
@@ -101,9 +103,10 @@ export const explorerListSlice = createSlice({
       state,
       action: PayloadAction<{
         tabId: number
+        timestamp: number
       }>,
     ) {
-      const { tabId } = action.payload
+      const { tabId, timestamp } = action.payload
       const explorer = findExplorer(state, tabId)
       return {
         ...state,
@@ -112,6 +115,7 @@ export const explorerListSlice = createSlice({
           entries: [],
           loading: true,
           error: false,
+          timestamp,
         },
       }
     },
@@ -120,10 +124,14 @@ export const explorerListSlice = createSlice({
       action: PayloadAction<{
         tabId: number
         entries: Entry[]
+        timestamp: number
       }>,
     ) {
-      const { tabId, entries } = action.payload
+      const { tabId, entries, timestamp } = action.payload
       const explorer = findExplorer(state, tabId)
+      if (explorer.timestamp !== timestamp) {
+        return state
+      }
       const paths = entries.map((entry) => entry.path)
       const focused =
         explorer.focused && paths.includes(explorer.focused)
@@ -146,10 +154,14 @@ export const explorerListSlice = createSlice({
       state,
       action: PayloadAction<{
         tabId: number
+        timestamp: number
       }>,
     ) {
-      const { tabId } = action.payload
+      const { tabId, timestamp } = action.payload
       const explorer = findExplorer(state, tabId)
+      if (explorer.timestamp !== timestamp) {
+        return state
+      }
       return {
         ...state,
         [tabId]: {
@@ -568,7 +580,9 @@ export const load =
       return
     }
 
-    dispatch(load({ tabId }))
+    const timestamp = Date.now()
+
+    dispatch(load({ tabId, timestamp }))
     try {
       const entries: Entry[] = await (async () => {
         const u = new URL(url)
@@ -597,9 +611,9 @@ export const load =
             throw new Error()
         }
       })()
-      dispatch(loaded({ tabId, entries }))
+      dispatch(loaded({ tabId, entries, timestamp }))
     } catch {
-      dispatch(loadFailed({ tabId }))
+      dispatch(loadFailed({ tabId, timestamp }))
     }
   }
 
@@ -688,6 +702,132 @@ export const unselectAll =
     const { unselectAll } = explorerListSlice.actions
 
     dispatch(unselectAll({ tabId }))
+  }
+
+export const focusFirst =
+  (tabId: number): AppThunk =>
+  async (dispatch, getState) => {
+    const contents = selectContentsByTabId(getState(), tabId)
+    const content = contents[0]
+    if (!content) {
+      return
+    }
+    dispatch(select(tabId, content.path))
+    dispatch(focus(tabId, content.path))
+  }
+
+export const focusByHorizontal =
+  (
+    tabId: number,
+    offset: number,
+    columns: number,
+    multiSelect: boolean,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocusedByTabId(getState(), tabId)
+    const contents = selectContentsByTabId(getState(), tabId)
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst(tabId))
+    }
+
+    const rowIndex = Math.floor(index / columns)
+    const columnIndex = index % columns
+    const newColumnIndex = columnIndex + offset
+
+    if (newColumnIndex < 0 || newColumnIndex >= columns) {
+      return
+    }
+
+    const newIndex = columns * rowIndex + newColumnIndex
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll(tabId))
+      dispatch(addSelection(tabId, content.path, true))
+    } else {
+      dispatch(select(tabId, content.path))
+    }
+    dispatch(focus(tabId, content.path))
+  }
+
+export const focusByVertical =
+  (
+    tabId: number,
+    offset: number,
+    columns: number,
+    multiSelect: boolean,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocusedByTabId(getState(), tabId)
+    const contents = selectContentsByTabId(getState(), tabId)
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst(tabId))
+    }
+
+    const rowIndex = Math.floor(index / columns)
+    const columnIndex = index % columns
+    const newRowIndex = rowIndex + offset
+
+    const newIndex = columns * newRowIndex + columnIndex
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll(tabId))
+      dispatch(addSelection(tabId, content.path, true))
+    } else {
+      dispatch(select(tabId, content.path))
+    }
+    dispatch(focus(tabId, content.path))
+  }
+
+export const focusTo =
+  (
+    tabId: number,
+    position: 'first' | 'last',
+    columns: number,
+    multiSelect: boolean,
+  ): AppThunk =>
+  async (dispatch, getState) => {
+    const focused = selectFocusedByTabId(getState(), tabId)
+    const contents = selectContentsByTabId(getState(), tabId)
+    const index = contents.findIndex((c) => c.path === focused)
+    if (index < 0) {
+      return dispatch(focusFirst(tabId))
+    }
+
+    const columnIndex = index % columns
+    const maxRowIndex = Math.floor(contents.length / columns)
+
+    let newIndex: number
+    if (position === 'first') {
+      newIndex = columnIndex
+    } else {
+      newIndex = maxRowIndex * columns + columnIndex
+      if (newIndex >= contents.length) {
+        newIndex -= columns
+      }
+    }
+
+    const content = contents[newIndex]
+    if (!content) {
+      return
+    }
+
+    if (multiSelect) {
+      dispatch(unselectAll(tabId))
+      dispatch(addSelection(tabId, content.path, true))
+    } else {
+      dispatch(select(tabId, content.path))
+    }
+    dispatch(focus(tabId, content.path))
   }
 
 export const rename =
@@ -832,9 +972,11 @@ export const openInCurrentTab =
 
     try {
       const entry = await window.electronAPI.getEntry(targetPath)
-      const action =
-        entry.type === 'directory' ? changeUrl(entry.url) : open(entry.path)
-      dispatch(action)
+      if (entry.type === 'directory') {
+        dispatch(changeUrl(entry.url))
+      } else {
+        dispatch(open(entry.path))
+      }
     } catch (e) {
       showError(e)
     }
@@ -887,9 +1029,9 @@ export const handle =
           break
         }
         case 'delete':
-          dispatch(removeEntries({ tabId, paths: [filePath] }))
           dispatch(removeFromFavorites(filePath))
           dispatch(removeRating({ path: filePath }))
+          dispatch(removeEntries({ tabId, paths: [filePath] }))
           dispatch(removeSelection({ tabId, paths: [filePath] }))
           dispatch(unfocus({ tabId, paths: [filePath] }))
           break

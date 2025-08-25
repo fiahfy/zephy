@@ -10,6 +10,7 @@ export type Callback = (
 
 export const WatcherContext = createContext<
   | {
+      unwatch: (key: string) => void
       watch: (key: string, directoryPaths: string[], callback: Callback) => void
     }
   | undefined

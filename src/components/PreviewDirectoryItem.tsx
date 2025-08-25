@@ -1,4 +1,5 @@
 import {
+  Box,
   ImageListItem,
   ImageListItemBar,
   Stack,
@@ -6,6 +7,7 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
+import pluralize from 'pluralize'
 import type { MouseEvent } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import useDraggable from '~/hooks/useDraggable'
@@ -49,7 +51,7 @@ const PreviewDirectoryItem = (props: Props) => {
 
   const { onContextMenu } = useEntryItem(content)
 
-  const { message, status, thumbnail } = useEntryThumbnail(content)
+  const { itemCount, message, status, thumbnail } = useEntryThumbnail(content)
 
   const { draggable, ...dragHandlers } = useDraggable(content.path)
   const { droppableStyle, ...dropHandlers } = useDroppable(
@@ -60,7 +62,7 @@ const PreviewDirectoryItem = (props: Props) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
-        dispatch(addSelection(content.path))
+        dispatch(addSelection(content.path, false))
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
         dispatch(toggleSelection({ path: content.path }))
       } else {
@@ -95,8 +97,9 @@ const PreviewDirectoryItem = (props: Props) => {
       onDoubleClick={onDoubleClick}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
-        cursor: 'pointer',
+        height: '100%!important',
         overflow: 'hidden',
+        width: '100%',
         '&::before': {
           content: '""',
           inset: 0,
@@ -135,19 +138,12 @@ const PreviewDirectoryItem = (props: Props) => {
       {...dropHandlers}
     >
       {status === 'loaded' && thumbnail ? (
-        <img
-          alt=""
-          src={thumbnail}
-          style={{
-            aspectRatio: '1 / 1',
-            objectPosition: 'center top',
-          }}
-        />
+        <img alt="" src={thumbnail} style={{ objectPosition: 'center top' }} />
       ) : (
         <Stack
           sx={{
             alignItems: 'center',
-            aspectRatio: '1 / 1',
+            height: '100%',
             justifyContent: 'center',
           }}
         >
@@ -156,32 +152,55 @@ const PreviewDirectoryItem = (props: Props) => {
       )}
       <ImageListItemBar
         actionIcon={
-          <Stack>
+          <Stack sx={{ mt: -2.75 }}>
             <EntryIcon entry={content} />
           </Stack>
         }
         actionPosition="left"
+        subtitle={
+          <Stack
+            direction="row"
+            sx={{
+              alignItems: 'end',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ my: 0.25 }}>
+              {/* <ExplorerRating path={content.path} /> */}
+            </Box>
+            {itemCount !== undefined && content.type === 'directory' && (
+              <Typography noWrap sx={{ ml: 1 }} variant="caption">
+                {pluralize('item', itemCount, true)}
+              </Typography>
+            )}
+          </Stack>
+        }
         sx={{
           gap: 0.5,
           px: 1,
           py: 0.5,
           '.MuiImageListItemBar-titleWrap': {
+            overflow: 'visible',
             p: 0,
+            '.MuiImageListItemBar-title': {
+              overflow: 'visible',
+            },
           },
         }}
         title={
-          <Stack>
-            <Typography
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-              title={content.name}
-              variant="caption"
-            >
-              {content.name}
-            </Typography>
+          <Stack
+            direction="row"
+            sx={(theme) => ({
+              alignItems: 'center',
+              height: theme.spacing(5),
+            })}
+          >
+            {/* <ExplorerNameTextField
+              content={content}
+              multiline
+              readOnly={!editing}
+              tabId={tabId}
+            /> */}
           </Stack>
         }
       />

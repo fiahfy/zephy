@@ -16,18 +16,15 @@ const TabPanels = () => {
   const tabs = useAppSelector(selectTabs)
   const dispatch = useAppDispatch()
 
-  const { watch } = useWatcher()
+  const { unwatch, watch } = useWatcher()
 
-  useEffect(
-    () =>
-      watch(
-        'explorer-list',
-        directoryPaths,
-        async (eventType, directoryPath, filePath) =>
-          dispatch(handle(eventType, directoryPath, filePath)),
-      ),
-    [directoryPaths, dispatch, watch],
-  )
+  useEffect(() => {
+    const key = 'explorer-list'
+    watch(key, directoryPaths, (eventType, directoryPath, filePath) =>
+      dispatch(handle(eventType, directoryPath, filePath)),
+    )
+    return () => unwatch(key)
+  }, [directoryPaths, dispatch, unwatch, watch])
 
   return (
     <Box

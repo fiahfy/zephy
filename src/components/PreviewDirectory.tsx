@@ -1,28 +1,49 @@
 import { Box, Stack } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import throttle from 'lodash.throttle'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  type KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
+import usePrevious from '~/hooks/usePrevious'
+import useWatcher from '~/hooks/useWatcher'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  blur,
+  focusByHorizontal,
+  focusByVertical,
+  focusTo,
+  handle,
   load,
   selectContents,
   selectError,
+  selectFocused,
   selectLoading,
-  selectPreviewContent,
+  selectPreviewContentPath,
+  setAnchor,
+  startEditing,
+  unselectAll,
 } from '~/store/preview'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 const maxItemSize = 256
 
-// TODO: Impl events, loading progress
 const PreviewDirectory = () => {
   const contents = useAppSelector(selectContents)
   const error = useAppSelector(selectError)
+  const focused = useAppSelector(selectFocused)
   const loading = useAppSelector(selectLoading)
-  const previewContent = useAppSelector(selectPreviewContent)
+  const previewContentPath = useAppSelector(selectPreviewContentPath)
   const dispatch = useAppDispatch()
+
+  const { unwatch, watch } = useWatcher()
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -52,6 +73,8 @@ const PreviewDirectory = () => {
     getScrollElement: () => ref.current,
   })
 
+  const previousFocused = usePrevious(focused)
+
   const noDataText = useMemo(
     () =>
       loading
@@ -62,10 +85,82 @@ const PreviewDirectory = () => {
     [loading, error],
   )
 
+  const onContextMenu = useMemo(() => {
+    if (!previewContentPath) {
+      return
+    }
+    return createContextMenuHandler([
+      {
+        type: 'newFolder',
+        data: { path: previewContentPath },
+      },
+      { type: 'separator' },
+      { type: 'cutEntries', data: { paths: [] } },
+      { type: 'copyEntries', data: { paths: [] } },
+      {
+        type: 'pasteEntries',
+        data: { path: previewContentPath },
+      },
+    ])
+  }, [previewContentPath])
+
+  const onClick = useCallback(() => {
+    dispatch(blur())
+    dispatch(unselectAll())
+  }, [dispatch])
+
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Enter':
+          if (!e.nativeEvent.isComposing && focused) {
+            dispatch(startEditing({ path: focused }))
+          }
+          return
+        case 'ArrowUp':
+          e.preventDefault()
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? dispatch(focusTo('first', columns, e.shiftKey))
+            : dispatch(focusByVertical(-1, columns, e.shiftKey))
+        case 'ArrowDown':
+          e.preventDefault()
+          return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
+            ? dispatch(focusTo('last', columns, e.shiftKey))
+            : dispatch(focusByVertical(1, columns, e.shiftKey))
+        case 'ArrowLeft':
+          e.preventDefault()
+          return dispatch(focusByHorizontal(-1, columns, e.shiftKey))
+        case 'ArrowRight':
+          return dispatch(focusByHorizontal(1, columns, e.shiftKey))
+        case 'Shift':
+          e.preventDefault()
+          if (focused) {
+            dispatch(setAnchor({ anchor: focused }))
+          }
+          return
+      }
+    },
+    [columns, dispatch, focused],
+  )
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => virtualizer.measure(), [virtualizer, size])
+
   useEffect(() => {
-    dispatch(load())
-  }, [dispatch, previewContent?.url])
+    if (focused && previousFocused !== focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        const rowIndex = Math.floor(index / columns)
+        virtualizer.scrollToIndex(rowIndex)
+      }
+    }
+  }, [columns, contents, focused, previousFocused, virtualizer])
+
+  useEffect(() => {
+    if (!loading) {
+      virtualizer.scrollToOffset(0)
+    }
+  }, [loading, virtualizer])
 
   useEffect(() => {
     const el = ref.current
@@ -83,22 +178,35 @@ const PreviewDirectory = () => {
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    if (!loading) {
-      virtualizer.scrollToOffset(0)
-    }
-  }, [loading, virtualizer])
-
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.measure(), [virtualizer, size])
+  useEffect(() => {
+    dispatch(load())
+  }, [dispatch, previewContentPath])
 
+  useEffect(() => {
+    if (!previewContentPath) {
+      return
+    }
+    const key = 'preview-list'
+    watch(
+      key,
+      [previewContentPath],
+      async (eventType, directoryPath, filePath) =>
+        dispatch(handle(eventType, directoryPath, filePath)),
+    )
+    return () => unwatch(key)
+  }, [dispatch, previewContentPath, unwatch, watch])
   return (
     <>
       <Box
         className="preview-list"
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
         ref={ref}
         sx={{
           height: '100%',
+          outline: 'none',
           overflowX: 'hidden',
           overflowY: 'scroll',
           display: chunks.length === 0 ? 'none' : 'block',

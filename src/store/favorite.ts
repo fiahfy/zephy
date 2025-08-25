@@ -118,8 +118,10 @@ export const toggleFavorite =
       selectFavorite(getState()),
       directoryPath,
     )
-    const action = favorite
-      ? removeFromFavorites(directoryPath)
-      : addToFavorites(directoryPath)
-    dispatch(action)
+
+    if (favorite) {
+      dispatch(removeFromFavorites(directoryPath))
+    } else {
+      dispatch(addToFavorites(directoryPath))
+    }
   }

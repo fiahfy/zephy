@@ -18,11 +18,11 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import { selectPreviewContent } from '~/store/preview'
+import { selectPreviewContentUrl } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const PreviewAudio = () => {
-  const content = useAppSelector(selectPreviewContent)
+  const url = useAppSelector(selectPreviewContentUrl)
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
@@ -31,7 +31,6 @@ const PreviewAudio = () => {
 
   const ref = useRef<HTMLAudioElement>(null)
 
-  const url = useMemo(() => content?.url, [content?.url])
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
 
   const handleContextMenu = useMemo(

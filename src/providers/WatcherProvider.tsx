@@ -40,8 +40,22 @@ const WatcherProvider = (props: Props) => {
     [],
   )
 
+  const unwatch = useCallback(
+    (key: string) =>
+      setRegistry((registry) => {
+        const { [key]: _, ...others } = registry
+        return others
+      }),
+    [],
+  )
+
   useEffect(() => {
-    window.electronAPI.watchDirectories(
+    window.electronAPI.unwatch()
+    if (directoryPaths.length === 0) {
+      return
+    }
+
+    window.electronAPI.watch(
       directoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: Remove logging
@@ -58,7 +72,7 @@ const WatcherProvider = (props: Props) => {
     )
   }, [directoryPaths, registry])
 
-  const value = { watch }
+  const value = { unwatch, watch }
 
   return (
     <WatcherContext.Provider value={value}>{children}</WatcherContext.Provider>

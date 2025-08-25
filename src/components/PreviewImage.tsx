@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
 import { useAppSelector } from '~/store'
-import { selectPreviewContent } from '~/store/preview'
+import { selectPreviewContentUrl } from '~/store/preview'
 
 const PreviewImage = () => {
-  const content = useAppSelector(selectPreviewContent)
+  const url = useAppSelector(selectPreviewContentUrl)
 
   const [status, setStatus] = useState<'error' | 'loaded' | 'loading'>(
     'loading',
   )
-
-  const url = useMemo(() => content?.url, [content?.url])
 
   const message = useMemo(() => {
     switch (status) {

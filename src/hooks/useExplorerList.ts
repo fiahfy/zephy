@@ -11,10 +11,10 @@ import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  addSelection,
   blur,
-  focus,
-  select,
+  focusByHorizontal,
+  focusByVertical,
+  focusTo,
   selectContentsByTabId,
   selectEditingByTabId,
   selectErrorByTabId,
@@ -133,103 +133,6 @@ const useExplorerList = (
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const focusFirst = () => {
-        const content = contents[0]
-        if (!content) {
-          return
-        }
-        dispatch(select(tabId, content.path))
-        dispatch(focus(tabId, content.path))
-      }
-
-      // TODO: Move to store
-      const focusByHorizontal = (offset: number, multiSelect: boolean) => {
-        const index = contents.findIndex((c) => c.path === focused)
-        if (index < 0) {
-          return focusFirst()
-        }
-
-        const rowIndex = Math.floor(index / columns)
-        const columnIndex = index % columns
-        const newColumnIndex = columnIndex + offset
-
-        if (newColumnIndex < 0 || newColumnIndex >= columns) {
-          return
-        }
-
-        const newIndex = columns * rowIndex + newColumnIndex
-        const content = contents[newIndex]
-        if (!content) {
-          return
-        }
-
-        if (multiSelect) {
-          dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, true))
-        } else {
-          dispatch(select(tabId, content.path))
-        }
-        dispatch(focus(tabId, content.path))
-      }
-
-      const focusByVertical = (offset: number, multiSelect: boolean) => {
-        const index = contents.findIndex((c) => c.path === focused)
-        if (index < 0) {
-          return focusFirst()
-        }
-
-        const rowIndex = Math.floor(index / columns)
-        const columnIndex = index % columns
-        const newRowIndex = rowIndex + offset
-
-        const newIndex = columns * newRowIndex + columnIndex
-        const content = contents[newIndex]
-        if (!content) {
-          return
-        }
-
-        if (multiSelect) {
-          dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, true))
-        } else {
-          dispatch(select(tabId, content.path))
-        }
-        dispatch(focus(tabId, content.path))
-      }
-
-      const focusTo = (position: 'first' | 'last', multiSelect: boolean) => {
-        const index = contents.findIndex((c) => c.path === focused)
-        if (index < 0) {
-          return focusFirst()
-        }
-
-        const columnIndex = index % columns
-        const maxRowIndex = Math.floor(contents.length / columns)
-
-        let newIndex: number
-        if (position === 'first') {
-          newIndex = columnIndex
-        } else {
-          newIndex = maxRowIndex * columns + columnIndex
-          if (newIndex >= contents.length) {
-            newIndex -= columns
-          }
-        }
-
-        const content = contents[newIndex]
-        if (!content) {
-          return
-        }
-
-        if (multiSelect) {
-          dispatch(unselectAll(tabId))
-          dispatch(addSelection(tabId, content.path, true))
-        } else {
-          dispatch(select(tabId, content.path))
-        }
-        dispatch(focus(tabId, content.path))
-      }
-
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
@@ -239,25 +142,25 @@ const useExplorerList = (
         case 'ArrowUp':
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('first', e.shiftKey)
-            : focusByVertical(-1, e.shiftKey)
+            ? dispatch(focusTo(tabId, 'first', columns, e.shiftKey))
+            : dispatch(focusByVertical(tabId, -1, columns, e.shiftKey))
         case 'ArrowDown':
           e.preventDefault()
           return (e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)
-            ? focusTo('last', e.shiftKey)
-            : focusByVertical(1, e.shiftKey)
+            ? dispatch(focusTo(tabId, 'last', columns, e.shiftKey))
+            : dispatch(focusByVertical(tabId, 1, columns, e.shiftKey))
         case 'ArrowLeft':
           e.preventDefault()
           if (horizontal) {
-            return focusByVertical(-1, e.shiftKey)
+            return dispatch(focusByVertical(tabId, -1, columns, e.shiftKey))
           }
-          return focusByHorizontal(-1, e.shiftKey)
+          return dispatch(focusByHorizontal(tabId, -1, columns, e.shiftKey))
         case 'ArrowRight':
           e.preventDefault()
           if (horizontal) {
-            return focusByVertical(1, e.shiftKey)
+            return dispatch(focusByVertical(tabId, 1, columns, e.shiftKey))
           }
-          return focusByHorizontal(1, e.shiftKey)
+          return dispatch(focusByHorizontal(tabId, 1, columns, e.shiftKey))
         case 'Shift':
           e.preventDefault()
           if (focused) {
@@ -266,8 +169,34 @@ const useExplorerList = (
           return
       }
     },
-    [columns, contents, dispatch, focused, horizontal, tabId],
+    [columns, dispatch, focused, horizontal, tabId],
   )
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
+
+  useEffect(() => {
+    if (focused && previousFocused !== focused) {
+      const index = contents.findIndex((content) => content.path === focused)
+      if (index >= 0) {
+        const rowIndex = Math.floor(index / columns)
+        virtualizer.scrollToIndex(rowIndex)
+      }
+    }
+  }, [columns, contents, focused, previousFocused, virtualizer])
+
+  useEffect(() => {
+    const el = ref?.current
+    if (!el) {
+      return
+    }
+    if (focused && previousEditing && !editing) {
+      el.focus()
+    }
+  }, [editing, focused, previousEditing, ref])
 
   useEffect(() => {
     const el = ref.current
@@ -302,32 +231,6 @@ const useExplorerList = (
     // NOTE: Do not clear timer
     // return () => clearTimeout(timer)
   }, [loading, previousLoading, scrollPosition, virtualizer])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.measure(), [virtualizer, estimateSize])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => virtualizer.scrollToOffset(0), [virtualizer, sortOption])
-
-  useEffect(() => {
-    if (focused && previousFocused !== focused) {
-      const index = contents.findIndex((content) => content.path === focused)
-      if (index >= 0) {
-        const rowIndex = Math.floor(index / columns)
-        virtualizer.scrollToIndex(rowIndex)
-      }
-    }
-  }, [columns, contents, focused, previousFocused, virtualizer])
-
-  useEffect(() => {
-    const el = ref?.current
-    if (!el) {
-      return
-    }
-    if (focused && previousEditing && !editing) {
-      el.focus()
-    }
-  }, [editing, focused, previousEditing, ref])
 
   return {
     chunks,
