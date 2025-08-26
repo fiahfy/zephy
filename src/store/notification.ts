@@ -24,7 +24,7 @@ export const notificationSlice = createSlice({
   name: 'notification',
   initialState,
   reducers: {
-    showNotification(state, action: PayloadAction<State['notification']>) {
+    setNotification(state, action: PayloadAction<State['notification']>) {
       const notification = action.payload
       return { ...state, notification }
     },
@@ -41,11 +41,11 @@ export const selectNotification = createSelector(
 export const showError =
   (error: Error | unknown): AppThunk =>
   async (dispatch) => {
-    const { showNotification } = notificationSlice.actions
+    const { setNotification } = notificationSlice.actions
 
     if (error instanceof Error) {
       dispatch(
-        showNotification({ message: getErrorMessage(error), type: 'error' }),
+        setNotification({ message: getErrorMessage(error), type: 'error' }),
       )
     }
   }

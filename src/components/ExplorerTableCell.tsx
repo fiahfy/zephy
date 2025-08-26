@@ -34,7 +34,7 @@ const ExplorerTableCell = (props: Props) => {
 
   const handleFinish = useCallback(
     (changedValue: string | undefined) => {
-      dispatch(finishEditing(tabId))
+      dispatch(finishEditing({ tabId }))
       if (changedValue) {
         dispatch(rename(tabId, content.path, changedValue))
       }

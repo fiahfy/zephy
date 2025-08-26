@@ -127,8 +127,8 @@ const useExplorerList = (
   )
 
   const onClick = useCallback(() => {
-    dispatch(blur(tabId))
-    dispatch(unselectAll(tabId))
+    dispatch(blur({ tabId }))
+    dispatch(unselectAll({ tabId }))
   }, [dispatch, tabId])
 
   const onKeyDown = useCallback(
@@ -136,7 +136,7 @@ const useExplorerList = (
       switch (e.key) {
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
-            dispatch(startEditing(tabId, focused))
+            dispatch(startEditing({ tabId, path: focused }))
           }
           return
         case 'ArrowUp':

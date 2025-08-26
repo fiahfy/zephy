@@ -200,16 +200,16 @@ export const previewSlice = createSlice({
 })
 
 export const {
-  startEditing,
+  blur,
   finishEditing,
   focus,
-  unfocus,
-  blur,
-  select,
-  toggleSelection,
   removeSelection,
-  unselectAll,
+  select,
   setAnchor,
+  startEditing,
+  toggleSelection,
+  unfocus,
+  unselectAll,
 } = previewSlice.actions
 
 export default previewSlice.reducer
@@ -361,6 +361,8 @@ export const addSelection =
   }
 
 export const focusFirst = (): AppThunk => async (dispatch, getState) => {
+  const { focus, select } = previewSlice.actions
+
   const contents = selectContents(getState())
   const content = contents[0]
   if (!content) {
@@ -374,6 +376,8 @@ export const focusFirst = (): AppThunk => async (dispatch, getState) => {
 export const focusByHorizontal =
   (offset: number, columns: number, multiSelect: boolean): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = previewSlice.actions
+
     const focused = selectFocused(getState())
     const contents = selectContents(getState())
     const index = contents.findIndex((c) => c.path === focused)
@@ -407,6 +411,8 @@ export const focusByHorizontal =
 export const focusByVertical =
   (offset: number, columns: number, multiSelect: boolean): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = previewSlice.actions
+
     const focused = selectFocused(getState())
     const contents = selectContents(getState())
     const index = contents.findIndex((c) => c.path === focused)
@@ -440,6 +446,8 @@ export const focusTo =
     multiSelect: boolean,
   ): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = previewSlice.actions
+
     const focused = selectFocused(getState())
     const contents = selectContents(getState())
     const index = contents.findIndex((c) => c.path === focused)
@@ -481,7 +489,6 @@ export const rename =
 
     try {
       const entry = await window.electronAPI.renameEntry(path, newName)
-      // TODO: fix
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ paths: [path] }))
@@ -612,8 +619,7 @@ export const handle =
         break
       }
       case 'delete':
-        // TODO: fix
-        dispatch(removeFromFavorites(filePath))
+        dispatch(removeFromFavorites({ path: filePath }))
         dispatch(removeRating({ path: filePath }))
         dispatch(removeEntries({ paths: [filePath] }))
         dispatch(removeSelection({ paths: [filePath] }))

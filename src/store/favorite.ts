@@ -55,7 +55,8 @@ export const favoriteSlice = createSlice({
   },
 })
 
-export const { replaceState, changeFavoritePath } = favoriteSlice.actions
+export const { replaceState, removeFromFavorites, changeFavoritePath } =
+  favoriteSlice.actions
 
 export default favoriteSlice.reducer
 
@@ -99,17 +100,11 @@ export const addToFavorites =
     }
   }
 
-export const removeFromFavorites =
-  (directoryPath: string): AppThunk =>
-  async (dispatch) => {
-    const { removeFromFavorites } = favoriteSlice.actions
-
-    dispatch(removeFromFavorites({ path: directoryPath }))
-  }
-
 export const toggleFavorite =
   (directoryPath?: string): AppThunk =>
   async (dispatch, getState) => {
+    const { removeFromFavorites } = favoriteSlice.actions
+
     if (!directoryPath) {
       return
     }
@@ -120,7 +115,7 @@ export const toggleFavorite =
     )
 
     if (favorite) {
-      dispatch(removeFromFavorites(directoryPath))
+      dispatch(removeFromFavorites({ path: directoryPath }))
     } else {
       dispatch(addToFavorites(directoryPath))
     }

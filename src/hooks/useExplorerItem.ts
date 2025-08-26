@@ -54,11 +54,11 @@ const useExplorerItem = (tabId: number, content: Content) => {
       if (e.shiftKey) {
         dispatch(addSelection(tabId, content.path, false))
       } else if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        dispatch(toggleSelection(tabId, content.path))
+        dispatch(toggleSelection({ tabId, path: content.path }))
       } else {
-        dispatch(select(tabId, content.path))
+        dispatch(select({ tabId, path: content.path }))
       }
-      dispatch(focus(tabId, content.path))
+      dispatch(focus({ tabId, path: content.path }))
     },
     (e) => {
       if (!selected) {
@@ -67,7 +67,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
         // noop
       } else {
-        dispatch(startEditing(tabId, content.path))
+        dispatch(startEditing({ tabId, path: content.path }))
       }
     },
     async (e: MouseEvent) => {

@@ -402,12 +402,19 @@ export const explorerListSlice = createSlice({
 
 export const {
   addTab,
+  blur,
   copyTab,
-  removeTab,
+  finishEditing,
+  focus,
   removeOtherTabs,
   removeSelection,
+  removeTab,
+  select,
   setAnchor,
+  startEditing,
+  toggleSelection,
   unfocus,
+  unselectAll,
 } = explorerListSlice.actions
 
 export default explorerListSlice.reducer
@@ -617,54 +624,6 @@ export const load =
     }
   }
 
-export const startEditing =
-  (tabId: number, path: string): AppThunk =>
-  async (dispatch) => {
-    const { startEditing } = explorerListSlice.actions
-
-    dispatch(startEditing({ tabId, path }))
-  }
-
-export const finishEditing =
-  (tabId: number): AppThunk =>
-  async (dispatch) => {
-    const { finishEditing } = explorerListSlice.actions
-
-    dispatch(finishEditing({ tabId }))
-  }
-
-export const focus =
-  (tabId: number, path: string): AppThunk =>
-  async (dispatch) => {
-    const { focus } = explorerListSlice.actions
-
-    dispatch(focus({ tabId, path }))
-  }
-
-export const blur =
-  (tabId: number): AppThunk =>
-  async (dispatch) => {
-    const { blur } = explorerListSlice.actions
-
-    dispatch(blur({ tabId }))
-  }
-
-export const select =
-  (tabId: number, path: string): AppThunk =>
-  async (dispatch) => {
-    const { select } = explorerListSlice.actions
-
-    dispatch(select({ tabId, path }))
-  }
-
-export const toggleSelection =
-  (tabId: number, path: string): AppThunk =>
-  async (dispatch) => {
-    const { toggleSelection } = explorerListSlice.actions
-
-    dispatch(toggleSelection({ tabId, path }))
-  }
-
 export const addSelection =
   (tabId: number, path: string, useAnchor: boolean): AppThunk =>
   async (dispatch, getState) => {
@@ -696,25 +655,19 @@ export const addSelection =
     dispatch(addSelection({ tabId, paths: newPaths }))
   }
 
-export const unselectAll =
-  (tabId: number): AppThunk =>
-  async (dispatch) => {
-    const { unselectAll } = explorerListSlice.actions
-
-    dispatch(unselectAll({ tabId }))
-  }
-
 export const focusFirst =
   (tabId: number): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select } = explorerListSlice.actions
+
     const contents = selectContentsByTabId(getState(), tabId)
     const content = contents[0]
     if (!content) {
       return
     }
 
-    dispatch(select(tabId, content.path))
-    dispatch(focus(tabId, content.path))
+    dispatch(select({ tabId, path: content.path }))
+    dispatch(focus({ tabId, path: content.path }))
   }
 
 export const focusByHorizontal =
@@ -725,6 +678,8 @@ export const focusByHorizontal =
     multiSelect: boolean,
   ): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = explorerListSlice.actions
+
     const focused = selectFocusedByTabId(getState(), tabId)
     const contents = selectContentsByTabId(getState(), tabId)
     const index = contents.findIndex((c) => c.path === focused)
@@ -747,12 +702,12 @@ export const focusByHorizontal =
     }
 
     if (multiSelect) {
-      dispatch(unselectAll(tabId))
+      dispatch(unselectAll({ tabId }))
       dispatch(addSelection(tabId, content.path, true))
     } else {
-      dispatch(select(tabId, content.path))
+      dispatch(select({ tabId, path: content.path }))
     }
-    dispatch(focus(tabId, content.path))
+    dispatch(focus({ tabId, path: content.path }))
   }
 
 export const focusByVertical =
@@ -763,6 +718,8 @@ export const focusByVertical =
     multiSelect: boolean,
   ): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = explorerListSlice.actions
+
     const focused = selectFocusedByTabId(getState(), tabId)
     const contents = selectContentsByTabId(getState(), tabId)
     const index = contents.findIndex((c) => c.path === focused)
@@ -781,12 +738,12 @@ export const focusByVertical =
     }
 
     if (multiSelect) {
-      dispatch(unselectAll(tabId))
+      dispatch(unselectAll({ tabId }))
       dispatch(addSelection(tabId, content.path, true))
     } else {
-      dispatch(select(tabId, content.path))
+      dispatch(select({ tabId, path: content.path }))
     }
-    dispatch(focus(tabId, content.path))
+    dispatch(focus({ tabId, path: content.path }))
   }
 
 export const focusTo =
@@ -797,6 +754,8 @@ export const focusTo =
     multiSelect: boolean,
   ): AppThunk =>
   async (dispatch, getState) => {
+    const { focus, select, unselectAll } = explorerListSlice.actions
+
     const focused = selectFocusedByTabId(getState(), tabId)
     const contents = selectContentsByTabId(getState(), tabId)
     const index = contents.findIndex((c) => c.path === focused)
@@ -823,12 +782,12 @@ export const focusTo =
     }
 
     if (multiSelect) {
-      dispatch(unselectAll(tabId))
+      dispatch(unselectAll({ tabId }))
       dispatch(addSelection(tabId, content.path, true))
     } else {
-      dispatch(select(tabId, content.path))
+      dispatch(select({ tabId, path: content.path }))
     }
-    dispatch(focus(tabId, content.path))
+    dispatch(focus({ tabId, path: content.path }))
   }
 
 export const rename =
@@ -839,7 +798,6 @@ export const rename =
 
     try {
       const entry = await window.electronAPI.renameEntry(path, newName)
-      // TODO: fix
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ tabId, paths: [path] }))
@@ -1030,8 +988,7 @@ export const handle =
           break
         }
         case 'delete':
-          // TODO: fix
-          dispatch(removeFromFavorites(filePath))
+          dispatch(removeFromFavorites({ path: filePath }))
           dispatch(removeRating({ path: filePath }))
           dispatch(removeEntries({ tabId, paths: [filePath] }))
           dispatch(removeSelection({ tabId, paths: [filePath] }))
