@@ -712,6 +712,7 @@ export const focusFirst =
     if (!content) {
       return
     }
+
     dispatch(select(tabId, content.path))
     dispatch(focus(tabId, content.path))
   }
@@ -832,23 +833,19 @@ export const focusTo =
 
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const { addEntries, focus, removeEntries, select } =
       explorerListSlice.actions
 
     try {
       const entry = await window.electronAPI.renameEntry(path, newName)
-      // NOTE: Get the selected paths after renaming
-      const selected = selectSelectedByTabId(getState(), tabId)
+      // TODO: fix
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ tabId, paths: [path] }))
       dispatch(addEntries({ tabId, entries: [entry] }))
-      // NOTE: Do not focus if the renamed entry is not selected
-      if (selected.length === 1 && selected[0] === path) {
-        dispatch(select({ tabId, path: entry.path }))
-        dispatch(focus({ tabId, path: entry.path }))
-      }
+      dispatch(select({ tabId, path: entry.path }))
+      dispatch(focus({ tabId, path: entry.path }))
     } catch (e) {
       dispatch(showError(e))
     }
@@ -891,7 +888,6 @@ export const newFolderInCurrentTab =
 
 export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
-
   window.electronAPI.copyEntries(selected)
 }
 
@@ -900,6 +896,7 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
   if (!currentDirectoryPath) {
     return
   }
+
   window.electronAPI.pasteEntries(currentDirectoryPath)
 }
 
@@ -910,6 +907,7 @@ export const startRenamingInCurrentTab =
 
     const tabId = selectCurrentTabId(getState())
     const selected = selectCurrentSelected(getState())
+
     const targetPath = path ?? selected[0]
     if (!targetPath) {
       return
@@ -927,13 +925,14 @@ export const moveToTrashInCurrentTab =
 
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
-    const contents = selectContentsByTabId(getState(), tabId)
+
     const targetPaths = paths ?? selected
     if (targetPaths.length === 0) {
       return
     }
 
     if (targetPaths.some((targetPath) => selected.includes(targetPath))) {
+      const contents = selectContentsByTabId(getState(), tabId)
       const path = (() => {
         const lastIndex = Math.max(
           ...contents.flatMap((content, i) =>
@@ -965,6 +964,7 @@ export const openInCurrentTab =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
     const selected = selectCurrentSelected(getState())
+
     const targetPath = path ?? selected[0]
     if (!targetPath) {
       return
@@ -1011,6 +1011,7 @@ export const handle =
       explorerListSlice.actions
 
     const tabs = selectTabs(getState())
+
     for (const { id: tabId } of tabs) {
       const directoryPathByTabId = selectDirectoryPathByTabId(getState(), tabId)
       if (directoryPath !== directoryPathByTabId) {
@@ -1029,6 +1030,7 @@ export const handle =
           break
         }
         case 'delete':
+          // TODO: fix
           dispatch(removeFromFavorites(filePath))
           dispatch(removeRating({ path: filePath }))
           dispatch(removeEntries({ tabId, paths: [filePath] }))

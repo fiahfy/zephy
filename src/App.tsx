@@ -31,6 +31,14 @@ import {
   toggleSizeColumnVisible,
 } from '~/store/preferences'
 import {
+  copy,
+  moveToTrash,
+  newFolder,
+  paste,
+  selectAll,
+  startRenaming,
+} from '~/store/preview'
+import {
   back,
   closeOtherTabs,
   closeTab,
@@ -51,9 +59,18 @@ import {
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
-const isFocused = () => {
-  const elements = document.querySelectorAll('.explorer-list')
-  return Array.from(elements).some((el) => el === document.activeElement)
+const focusedElement = () => {
+  const el = document.activeElement
+  if (!el) {
+    return undefined
+  }
+  if (el.classList.contains('explorer-list')) {
+    return 'explorer-list'
+  } else if (el.classList.contains('preview')) {
+    return 'preview'
+  } else {
+    return undefined
+  }
 }
 
 const App = () => {
@@ -85,16 +102,25 @@ const App = () => {
         case 'closeTab':
           return dispatch(closeTab(data?.tabId))
         case 'copy':
-          if (isFocused()) {
-            return dispatch(copyInCurrentTab())
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(copyInCurrentTab())
+            case 'preview':
+              return dispatch(copy())
+            default:
+              return window.electronAPI.copy()
           }
-          return window.electronAPI.copy()
         case 'cut':
-          if (isFocused()) {
-            // TODO: Implement cut entries
-            return
+          switch (focusedElement()) {
+            case 'explorer-list':
+              // TODO: Implement cut entries
+              return
+            case 'preview':
+              // TODO: Implement cut entries
+              return
+            default:
+              return window.electronAPI.cut()
           }
-          return window.electronAPI.cut()
         case 'duplicateTab':
           return dispatch(duplicateTab(data.tabId))
         case 'forward':
@@ -104,9 +130,23 @@ const App = () => {
         case 'goToSettings':
           return dispatch(goToSettings())
         case 'moveToTrash':
-          return dispatch(moveToTrashInCurrentTab(data?.paths))
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(moveToTrashInCurrentTab(data?.paths))
+            case 'preview':
+              return dispatch(moveToTrash(data?.paths))
+            default:
+              return
+          }
         case 'newFolder':
-          return dispatch(newFolderInCurrentTab(data.path))
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(newFolderInCurrentTab(data.path))
+            case 'preview':
+              return dispatch(newFolder(data.path))
+            default:
+              return window.electronAPI.paste()
+          }
         case 'newTab':
           return dispatch(newTab(data.path, data.tabId))
         case 'open':
@@ -116,19 +156,34 @@ const App = () => {
         case 'refresh':
           return dispatch(refreshInCurrentTab())
         case 'rename':
-          return dispatch(startRenamingInCurrentTab(data?.path))
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(startRenamingInCurrentTab(data?.path))
+            case 'preview':
+              return dispatch(startRenaming(data?.path))
+            default:
+              return
+          }
         case 'revealInExplorer':
           return dispatch(load(data.path))
         case 'paste':
-          if (isFocused()) {
-            return dispatch(pasteInCurrentTab())
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(pasteInCurrentTab())
+            case 'preview':
+              return dispatch(paste())
+            default:
+              return window.electronAPI.paste()
           }
-          return window.electronAPI.paste()
         case 'selectAll':
-          if (isFocused()) {
-            return dispatch(selectAllInCurrentTab())
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(selectAllInCurrentTab())
+            case 'preview':
+              return dispatch(selectAll())
+            default:
+              return window.electronAPI.selectAll()
           }
-          return window.electronAPI.selectAll()
         case 'sort':
           return dispatch(sort(data.orderBy))
         case 'toggleDateCreatedColumn':

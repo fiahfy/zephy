@@ -4,7 +4,6 @@ import ExplorerGallery from '~/components/ExplorerGallery'
 import ExplorerImageList from '~/components/ExplorerImageList'
 import ExplorerTable from '~/components/ExplorerTable'
 import useDroppable from '~/hooks/useDroppable'
-import ExplorerProvider from '~/providers/ExplorerProvider'
 import { useAppSelector } from '~/store'
 import {
   selectDirectoryPathByTabId,
@@ -41,13 +40,11 @@ const Explorer = (props: Props) => {
   }, [viewMode])
 
   return (
-    <ExplorerProvider>
-      <Box sx={{ height: '100%', ...droppableStyle }} {...dropHandlers}>
-        {createElement(Component, {
-          tabId,
-        })}
-      </Box>
-    </ExplorerProvider>
+    <Box sx={{ height: '100%', ...droppableStyle }} {...dropHandlers}>
+      {createElement(Component, {
+        tabId,
+      })}
+    </Box>
   )
 }
 

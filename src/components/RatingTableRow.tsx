@@ -18,7 +18,7 @@ const RatingTableRow = (props: Props) => {
 
   const buttonHandlers = useButtonBehavior((e) => {
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
-      // TODO: Open in new tab
+      // TODO: fix
       dispatch(goToRatings(score))
     } else {
       dispatch(goToRatings(score))

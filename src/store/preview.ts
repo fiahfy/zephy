@@ -208,7 +208,6 @@ export const {
   select,
   toggleSelection,
   removeSelection,
-  selectAll,
   unselectAll,
   setAnchor,
 } = previewSlice.actions
@@ -367,6 +366,7 @@ export const focusFirst = (): AppThunk => async (dispatch, getState) => {
   if (!content) {
     return
   }
+
   dispatch(select({ path: content.path }))
   dispatch(focus({ path: content.path }))
 }
@@ -476,25 +476,113 @@ export const focusTo =
 
 export const rename =
   (path: string, newName: string): AppThunk =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const { addEntries, focus, removeEntries, select } = previewSlice.actions
 
     try {
       const entry = await window.electronAPI.renameEntry(path, newName)
-      // NOTE: Get the selected paths after renaming
-      const selected = selectSelected(getState())
+      // TODO: fix
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ paths: [path] }))
       dispatch(addEntries({ entries: [entry] }))
-      // NOTE: Do not focus if the renamed entry is not selected
-      if (selected.length === 1 && selected[0] === path) {
-        dispatch(select({ path: entry.path }))
-        dispatch(focus({ path: entry.path }))
-      }
+      dispatch(select({ path: entry.path }))
+      dispatch(focus({ path: entry.path }))
     } catch (e) {
       dispatch(showError(e))
     }
+  }
+
+export const selectAll = (): AppThunk => async (dispatch, getState) => {
+  const { selectAll } = previewSlice.actions
+
+  const contents = selectContents(getState())
+  const paths = contents.map((content) => content.path)
+  dispatch(selectAll({ paths }))
+}
+
+export const newFolder =
+  (directoryPath: string): AppThunk =>
+  async (dispatch) => {
+    const { addEntries, focus, select, startEditing } = previewSlice.actions
+
+    const entry = await window.electronAPI.createDirectory(directoryPath)
+    dispatch(addEntries({ entries: [entry] }))
+    dispatch(select({ path: entry.path }))
+    dispatch(focus({ path: entry.path }))
+    dispatch(startEditing({ path: entry.path }))
+  }
+
+export const copy = (): AppThunk => async (_, getState) => {
+  const selected = selectSelected(getState())
+  window.electronAPI.copyEntries(selected)
+}
+
+export const paste = (): AppThunk => async (_, getState) => {
+  const currentContentPath = selectPreviewContentPath(getState())
+  if (!currentContentPath) {
+    return
+  }
+
+  window.electronAPI.pasteEntries(currentContentPath)
+}
+
+export const startRenaming =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { focus, select, startEditing } = previewSlice.actions
+
+    const selected = selectSelected(getState())
+
+    const targetPath = path ?? selected[0]
+    if (!targetPath) {
+      return
+    }
+
+    dispatch(select({ path: targetPath }))
+    dispatch(focus({ path: targetPath }))
+    dispatch(startEditing({ path: targetPath }))
+  }
+
+export const moveToTrash =
+  (paths?: string[]): AppThunk =>
+  async (dispatch, getState) => {
+    const { blur, focus, select, unselectAll } = previewSlice.actions
+
+    const selected = selectSelected(getState())
+
+    const targetPaths = paths ?? selected
+    if (targetPaths.length === 0) {
+      return
+    }
+
+    if (targetPaths.some((targetPath) => selected.includes(targetPath))) {
+      const contents = selectContents(getState())
+      const path = (() => {
+        const lastIndex = Math.max(
+          ...contents.flatMap((content, i) =>
+            targetPaths.includes(content.path) ? [i] : [],
+          ),
+        )
+        if (lastIndex !== contents.length - 1) {
+          return contents[lastIndex + 1]?.path
+        }
+        const filtered = contents.filter(
+          (content) => !targetPaths.includes(content.path),
+        )
+        return filtered[filtered.length - 1]?.path
+      })()
+
+      if (path) {
+        dispatch(select({ path }))
+        dispatch(focus({ path }))
+      } else {
+        dispatch(unselectAll())
+        dispatch(blur())
+      }
+    }
+
+    window.electronAPI.moveEntriesToTrash(targetPaths)
   }
 
 export const handle =
@@ -524,6 +612,7 @@ export const handle =
         break
       }
       case 'delete':
+        // TODO: fix
         dispatch(removeFromFavorites(filePath))
         dispatch(removeRating({ path: filePath }))
         dispatch(removeEntries({ paths: [filePath] }))

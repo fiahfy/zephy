@@ -14,11 +14,11 @@ import EntryNameTextField from '~/components/EntryNameTextField'
 import Rating from '~/components/ExplorerRating'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
-import useEntryItem from '~/hooks/useEntryItem'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
 import usePreventClickOnDoubleClick from '~/hooks/usePreventClickOnDoubleClick'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
+import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
 import {
   addSelection,
   finishEditing,
@@ -27,13 +27,15 @@ import {
   select,
   selectEditingByPath,
   selectFocusedByPath,
+  selectPreviewContentPath,
   selectSelected,
   selectSelectedByPath,
   startEditing,
   toggleSelection,
 } from '~/store/preview'
 import { open } from '~/store/settings'
-import { changeDirectoryPath } from '~/store/window'
+import { changeDirectoryPath, newTab } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
   content: Content
@@ -42,8 +44,14 @@ type Props = {
 const PreviewDirectoryItem = (props: Props) => {
   const { content } = props
 
+  const directoryPath = useAppSelector((state) =>
+    selectPreviewContentPath(state),
+  )
   const editing = useAppSelector((state) =>
     selectEditingByPath(state, content.path),
+  )
+  const favorite = useAppSelector((state) =>
+    selectFavoriteByPath(selectFavorite(state), content.path),
   )
   const focused = useAppSelector((state) =>
     selectFocusedByPath(state, content.path),
@@ -53,8 +61,6 @@ const PreviewDirectoryItem = (props: Props) => {
   )
   const selectedPaths = useAppSelector((state) => selectSelected(state))
   const dispatch = useAppDispatch()
-
-  const { onContextMenu } = useEntryItem(content)
 
   const { itemCount, message, status, thumbnail } = useEntryThumbnail(content)
 
@@ -97,10 +103,91 @@ const PreviewDirectoryItem = (props: Props) => {
       if (editing) {
         return
       }
-      content.type === 'directory'
-        ? dispatch(changeDirectoryPath(content.path))
-        : dispatch(open(content.path))
+      if (content.type === 'directory') {
+        if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+          dispatch(newTab(content.path))
+        } else {
+          dispatch(changeDirectoryPath(content.path))
+        }
+      } else {
+        dispatch(open(content.path))
+      }
     },
+  )
+
+  const onContextMenu = useMemo(() => {
+    const directory = content.type === 'directory'
+    const path = content.path
+    const paths = selectedPaths.includes(path) ? selectedPaths : [path]
+    return createContextMenuHandler([
+      ...(paths.length === 1
+        ? [
+            {
+              type: 'open',
+              data: { path },
+            },
+            ...(directory
+              ? [
+                  {
+                    type: 'openInNewWindow',
+                    data: { path },
+                  },
+                  {
+                    type: 'openInNewTab',
+                    data: { path },
+                  },
+                ]
+              : []),
+            {
+              type: 'revealInExplorer',
+              data: { path },
+            },
+            {
+              type: 'revealInFinder',
+              data: { path },
+            },
+            { type: 'separator' },
+            {
+              type: 'copyPath',
+              data: { path },
+            },
+            { type: 'separator' },
+            ...(directory
+              ? [
+                  {
+                    type: 'toggleFavorite',
+                    data: { path, favorite },
+                  },
+                ]
+              : []),
+            { type: 'separator' },
+            {
+              type: 'rename',
+              data: { path },
+            },
+          ]
+        : []),
+      {
+        type: 'moveToTrash',
+        data: { paths },
+      },
+      { type: 'separator' },
+      { type: 'cutEntries', data: { paths } },
+      { type: 'copyEntries', data: { paths } },
+      {
+        type: 'pasteEntries',
+        data: { path: directoryPath },
+      },
+    ])
+  }, [content.path, content.type, directoryPath, favorite, selectedPaths])
+
+  const onMouseDown = useCallback(
+    (e: MouseEvent) => {
+      if (editing) {
+        e.preventDefault()
+      }
+    },
+    [editing],
   )
 
   const handleFinish = useCallback(
@@ -121,6 +208,7 @@ const PreviewDirectoryItem = (props: Props) => {
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onMouseDown={onMouseDown}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',
@@ -155,7 +243,7 @@ const PreviewDirectoryItem = (props: Props) => {
             },
           },
         },
-        '.preview-list:focus-within &.Mui-focused': {
+        '.preview:focus-within &.Mui-focused': {
           outline: `${theme.palette.primary.main} solid 1px`,
           outlineOffset: '-1px',
         },

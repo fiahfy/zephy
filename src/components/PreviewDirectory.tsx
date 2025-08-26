@@ -11,6 +11,7 @@ import {
 } from 'react'
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
+import useDroppable from '~/hooks/useDroppable'
 import usePrevious from '~/hooks/usePrevious'
 import useWatcher from '~/hooks/useWatcher'
 import type { Content } from '~/interfaces'
@@ -44,6 +45,8 @@ const PreviewDirectory = () => {
   const dispatch = useAppDispatch()
 
   const { unwatch, watch } = useWatcher()
+
+  const { droppableStyle, ...dropHandlers } = useDroppable(previewContentPath)
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -187,7 +190,7 @@ const PreviewDirectory = () => {
     if (!previewContentPath) {
       return
     }
-    const key = 'preview-list'
+    const key = 'preview'
     watch(
       key,
       [previewContentPath],
@@ -196,10 +199,17 @@ const PreviewDirectory = () => {
     )
     return () => unwatch(key)
   }, [dispatch, previewContentPath, unwatch, watch])
+
   return (
-    <>
+    <Box
+      sx={{
+        height: '100%',
+        ...droppableStyle,
+      }}
+      {...dropHandlers}
+    >
       <Box
-        className="preview-list"
+        className="preview"
         onClick={onClick}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
@@ -247,7 +257,7 @@ const PreviewDirectory = () => {
         )}
       </Box>
       {chunks.length === 0 && <PreviewEmptyState message={noDataText} />}
-    </>
+    </Box>
   )
 }
 
