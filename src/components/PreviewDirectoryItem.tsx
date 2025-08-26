@@ -33,8 +33,8 @@ import {
   startEditing,
   toggleSelection,
 } from '~/store/preview'
-import { open } from '~/store/settings'
-import { changeDirectoryPath, newTab } from '~/store/window'
+import { openUrl } from '~/store/settings'
+import { changeUrl, newTab } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
@@ -105,12 +105,12 @@ const PreviewDirectoryItem = (props: Props) => {
       }
       if (content.type === 'directory') {
         if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-          dispatch(newTab(content.path))
+          dispatch(newTab(content.url))
         } else {
-          dispatch(changeDirectoryPath(content.path))
+          dispatch(changeUrl(content.url))
         }
       } else {
-        dispatch(open(content.path))
+        dispatch(openUrl(content.url))
       }
     },
   )

@@ -46,7 +46,7 @@ import {
   forward,
   go,
   goToSettings,
-  newTab,
+  newTabWithDirectoryPath,
   selectCurrentSortOption,
   selectCurrentTabId,
   selectCurrentTitle,
@@ -148,7 +148,7 @@ const App = () => {
               return window.electronAPI.paste()
           }
         case 'newTab':
-          return dispatch(newTab(data.path, data.tabId))
+          return dispatch(newTabWithDirectoryPath(data.path, data.tabId))
         case 'open':
           return dispatch(openInCurrentTab(data?.path))
         case 'removeFromFavorites':

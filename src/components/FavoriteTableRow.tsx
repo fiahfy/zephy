@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
-import { changeDirectoryPath, newTab } from '~/store/window'
+import { changeDirectoryPath, newTabWithDirectoryPath } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
@@ -18,7 +18,7 @@ const FavoriteTableRow = (props: Props) => {
 
   const buttonHandlers = useButtonBehavior((e) => {
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
-      dispatch(newTab(path))
+      dispatch(newTabWithDirectoryPath(path))
     } else {
       dispatch(changeDirectoryPath(path))
     }

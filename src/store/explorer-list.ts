@@ -14,7 +14,7 @@ import {
   selectScoreByPath,
   selectScoreToPathsMap,
 } from '~/store/rating'
-import { open, selectShouldShowHiddenFiles } from '~/store/settings'
+import { openUrl, selectShouldShowHiddenFiles } from '~/store/settings'
 import {
   changeUrl,
   selectCurrentDirectoryPath,
@@ -933,7 +933,7 @@ export const openInCurrentTab =
       if (entry.type === 'directory') {
         dispatch(changeUrl(entry.url))
       } else {
-        dispatch(open(entry.path))
+        dispatch(openUrl(entry.url))
       }
     } catch (e) {
       showError(e)

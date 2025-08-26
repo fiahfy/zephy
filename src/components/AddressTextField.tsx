@@ -14,7 +14,7 @@ import {
   selectFavoriteByPath,
   toggleFavorite,
 } from '~/store/favorite'
-import { open } from '~/store/settings'
+import { openUrl } from '~/store/settings'
 import {
   changeUrl,
   selectCurrentDirectoryPath,
@@ -68,8 +68,8 @@ const AddressTextField = (props: Props) => {
   )
 
   const handleClickFolder = useCallback(
-    async () => dispatch(open(directoryPath)),
-    [directoryPath, dispatch],
+    async () => dispatch(openUrl(url)),
+    [url, dispatch],
   )
 
   return (

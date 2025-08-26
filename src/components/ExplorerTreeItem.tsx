@@ -30,8 +30,8 @@ import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { open } from '~/store/settings'
-import { changeDirectoryPath, newTab } from '~/store/window'
+import { openUrl } from '~/store/settings'
+import { changeUrl, newTab } from '~/store/window'
 
 const StyledTreeItemRoot = styled(TreeItemRoot)(() => ({
   position: 'relative',
@@ -127,23 +127,23 @@ const ExplorerTreeItemRoot = forwardRef(
         e.stopPropagation()
         if (entry.type === 'directory') {
           if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-            dispatch(newTab(entry.path))
+            dispatch(newTab(entry.url))
           } else {
-            dispatch(changeDirectoryPath(entry.path))
+            dispatch(changeUrl(entry.url))
           }
         }
       },
-      [dispatch, entry.type, entry.path],
+      [dispatch, entry.type, entry.url],
     )
 
     const handleDoubleClick = useCallback(
       (e: MouseEvent) => {
         e.stopPropagation()
         if (entry.type !== 'directory') {
-          dispatch(open(entry.path))
+          dispatch(openUrl(entry.url))
         }
       },
-      [dispatch, entry.path, entry.type],
+      [dispatch, entry.url, entry.type],
     )
 
     const handleClickIconContainer = useCallback(

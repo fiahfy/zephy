@@ -15,12 +15,8 @@ import {
   toggleSelection,
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
-import { open } from '~/store/settings'
-import {
-  changeDirectoryPath,
-  newTab,
-  selectDirectoryPathByTabId,
-} from '~/store/window'
+import { openUrl } from '~/store/settings'
+import { changeUrl, newTab, selectDirectoryPathByTabId } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const useExplorerItem = (tabId: number, content: Content) => {
@@ -78,12 +74,12 @@ const useExplorerItem = (tabId: number, content: Content) => {
       }
       if (content.type === 'directory') {
         if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-          dispatch(newTab(content.path, tabId))
+          dispatch(newTab(content.url, tabId))
         } else {
-          dispatch(changeDirectoryPath(content.path))
+          dispatch(changeUrl(content.url))
         }
       } else {
-        dispatch(open(content.path))
+        dispatch(openUrl(content.url))
       }
     },
   )

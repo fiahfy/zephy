@@ -2,7 +2,7 @@ import { TableRow } from '@mui/material'
 import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import { useAppDispatch } from '~/store'
-import { goToRatings } from '~/store/window'
+import { goToRatings, openRatings } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { buildZephyUrl } from '~/utils/url'
 
@@ -18,8 +18,7 @@ const RatingTableRow = (props: Props) => {
 
   const buttonHandlers = useButtonBehavior((e) => {
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
-      // TODO: fix
-      dispatch(goToRatings(score))
+      dispatch(openRatings(score))
     } else {
       dispatch(goToRatings(score))
     }

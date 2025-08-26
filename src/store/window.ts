@@ -791,28 +791,44 @@ export const selectCurrentViewMode = createSelector(
 // Operations for windows & tabs
 
 export const newWindow =
+  (url: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { newWindow } = windowSlice.actions
+
+    const id = selectWindowId(getState())
+    dispatch(newWindow({ id }))
+    dispatch(newTab(url))
+  }
+
+export const newWindowWithDirectoryPath =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { newWindow } = windowSlice.actions
 
     const id = selectWindowId(getState())
     dispatch(newWindow({ id }))
-    dispatch(newTab(directoryPath))
+    dispatch(newTabWithDirectoryPath(directoryPath))
   }
 
 export const newTab =
-  (directoryPath: string, srcTabId?: number): AppThunk =>
+  (url: string, srcTabId?: number): AppThunk =>
   async (dispatch, getState) => {
     const { newTab } = windowSlice.actions
 
-    try {
-      const entry = await window.electronAPI.getEntry(directoryPath)
+    const id = selectWindowId(getState())
+    dispatch(newTab({ id, srcTabId }))
+    const tabId = selectCurrentTabId(getState())
+    dispatch(addTab({ tabId }))
+    dispatch(changeUrl(url))
+  }
 
-      const id = selectWindowId(getState())
-      dispatch(newTab({ id, srcTabId }))
-      const tabId = selectCurrentTabId(getState())
-      dispatch(addTab({ tabId }))
-      dispatch(changeUrl(entry.url))
+export const newTabWithDirectoryPath =
+  (directoryPath: string, srcTabId?: number): AppThunk =>
+  async (dispatch) => {
+    try {
+      // TODO: convert directoryPath to url
+      const entry = await window.electronAPI.getEntry(directoryPath)
+      dispatch(newTab(entry.url, srcTabId))
     } catch (e) {
       showError(e)
     }
@@ -914,6 +930,7 @@ export const changeDirectoryPath =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
     try {
+      // TODO: convert directoryPath to url
       const entry = await window.electronAPI.getEntry(directoryPath)
       dispatch(changeUrl(entry.url))
     } catch (e) {
@@ -959,6 +976,11 @@ export const goToRatings =
     dispatch(
       changeUrl(buildZephyUrl({ pathname: 'ratings', params: { score } })),
     )
+
+export const openRatings =
+  (score: number): AppThunk =>
+  async (dispatch) =>
+    dispatch(newTab(buildZephyUrl({ pathname: 'ratings', params: { score } })))
 
 export const goToSettings = (): AppThunk => async (dispatch) =>
   dispatch(changeUrl(buildZephyUrl({ pathname: 'settings' })))
