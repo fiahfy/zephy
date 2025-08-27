@@ -5,8 +5,7 @@
 // import User from 'path/to/interfaces';
 
 export type ApplicationMenuOperations = {
-  // biome-ignore lint/suspicious/noExplicitAny: false positive
-  update: (params: any) => void
+  update: (params: ApplicationMenuParams) => void
 }
 
 export type ElectronOperations = {
@@ -86,3 +85,19 @@ export type FileEventHandler = (
   directoryPath: string,
   filePath: string,
 ) => void
+
+export type ApplicationMenuParams = Partial<{
+  canBack: boolean
+  canCloseTab: boolean
+  canForward: boolean
+  inspectorHidden: boolean
+  navigatorHidden: boolean
+  orderBy:
+    | 'dateCreated'
+    | 'dateLastOpened'
+    | 'dateModified'
+    | 'name'
+    | 'score'
+    | 'size'
+  viewMode: 'gallery' | 'list' | 'thumbnail'
+}>

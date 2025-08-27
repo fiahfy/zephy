@@ -3,7 +3,6 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Content } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import {
   addTab,
@@ -47,7 +46,13 @@ type SidebarState = {
 
 type SortOption = {
   order: 'asc' | 'desc'
-  orderBy: keyof Content
+  orderBy:
+    | 'dateCreated'
+    | 'dateLastOpened'
+    | 'dateModified'
+    | 'name'
+    | 'score'
+    | 'size'
 }
 
 type SortingState = {

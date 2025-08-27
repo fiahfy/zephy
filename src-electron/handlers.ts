@@ -22,7 +22,6 @@ import {
   moveEntries,
   renameEntry,
 } from './utils/file'
-import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 

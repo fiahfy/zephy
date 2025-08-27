@@ -1,6 +1,5 @@
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
 import { type MouseEvent, useCallback } from 'react'
-import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectSortOptionByTabIdAndUrl,
@@ -8,10 +7,14 @@ import {
   sort,
 } from '~/store/window'
 
-type Key = keyof Content
-
 type Props = {
-  dataKey: Key
+  dataKey:
+    | 'dateCreated'
+    | 'dateLastOpened'
+    | 'dateModified'
+    | 'name'
+    | 'score'
+    | 'size'
   height: number
   label: string
   tabId: number

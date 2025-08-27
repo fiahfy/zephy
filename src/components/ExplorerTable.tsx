@@ -20,11 +20,15 @@ import { createContextMenuHandler } from '~/utils/context-menu'
 const headerHeight = 32
 const rowHeight = 20
 
-type Key = keyof Content
-
 type ColumnType = {
   align: 'left' | 'right'
-  key: Key
+  key:
+    | 'dateCreated'
+    | 'dateLastOpened'
+    | 'dateModified'
+    | 'name'
+    | 'score'
+    | 'size'
   label: string
   width?: number
 }
