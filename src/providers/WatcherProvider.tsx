@@ -5,7 +5,8 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { type Callback, WatcherContext } from '~/contexts/WatcherContext'
+import { WatcherContext } from '~/contexts/WatcherContext'
+import type { FileEventHandler } from '~/interfaces'
 
 type Props = { children: ReactNode }
 
@@ -15,7 +16,7 @@ const WatcherProvider = (props: Props) => {
   const [registry, setRegistry] = useState<{
     [key: string]: {
       directoryPaths: string[]
-      callback: Callback
+      handler: FileEventHandler
     }
   }>({})
 
@@ -28,13 +29,20 @@ const WatcherProvider = (props: Props) => {
     [registry],
   )
 
+  const handlers = useMemo(
+    () => [
+      ...new Set(Object.values(registry).flatMap(({ handler }) => handler)),
+    ],
+    [registry],
+  )
+
   const watch = useCallback(
-    (key: string, directoryPaths: string[], callback: Callback) =>
+    (key: string, directoryPaths: string[], handler: FileEventHandler) =>
       setRegistry((registry) => ({
         ...registry,
         [key]: {
           directoryPaths,
-          callback,
+          handler,
         },
       })),
     [],
@@ -50,27 +58,26 @@ const WatcherProvider = (props: Props) => {
   )
 
   useEffect(() => {
-    window.watcherAPI.unwatch()
-    if (directoryPaths.length === 0) {
-      return
-    }
-
-    window.watcherAPI.watch(
-      directoryPaths,
+    const removeListener = window.watcherAPI.onFileChange(
       (eventType, directoryPath, filePath) => {
         // TODO: Remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
-          directoryPaths,
           eventType,
           directoryPath,
           filePath,
         })
-        for (const { callback } of Object.values(registry)) {
-          callback(eventType, directoryPath, filePath)
+        for (const handler of handlers) {
+          handler(eventType, directoryPath, filePath)
         }
       },
     )
-  }, [directoryPaths, registry])
+    return () => removeListener()
+  }, [handlers])
+
+  useEffect(() => {
+    const unwatch = window.watcherAPI.watch(directoryPaths)
+    return () => unwatch()
+  }, [directoryPaths])
 
   const value = { unwatch, watch }
 

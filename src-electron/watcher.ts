@@ -1,11 +1,11 @@
 import { dirname } from 'node:path'
 import chokidar, { type FSWatcher } from 'chokidar'
-import { BrowserWindow, type IpcMainInvokeEvent, ipcMain } from 'electron'
+import { type BrowserWindow, type IpcMainEvent, ipcMain } from 'electron'
 
-type EventType = 'create' | 'update' | 'delete'
+export type FileEventType = 'create' | 'update' | 'delete'
 
-type Callback = (
-  eventType: EventType,
+export type FileEventHandler = (
+  eventType: FileEventType,
   directoryPath: string,
   filePath: string,
 ) => void
@@ -14,15 +14,15 @@ const createWatcher = () => {
   const watchers: { [key: string]: FSWatcher } = {}
 
   const createHandler = (
-    eventType: EventType,
+    eventType: FileEventType,
     directoryPaths: string[],
-    callback: Callback,
+    handler: FileEventHandler,
   ) => {
     return (path: string) => {
       const directoryPath = dirname(path)
       // NOTE: depth: 0 としているが folder をコピー/移動した時に folder 内の file が検出されてしまうため取り除く
       if (directoryPaths.includes(directoryPath)) {
-        callback(eventType, directoryPath, path)
+        handler(eventType, directoryPath, path)
       }
     }
   }
@@ -39,56 +39,35 @@ const createWatcher = () => {
   const watch = async (
     id: number,
     directoryPaths: string[],
-    callback: Callback,
+    handler: FileEventHandler,
   ) => {
     watchers[id] = chokidar
       .watch(directoryPaths, {
         depth: 0,
         ignoreInitial: true,
       })
-      .on('add', createHandler('create', directoryPaths, callback))
-      .on('addDir', createHandler('create', directoryPaths, callback))
-      .on('unlink', createHandler('delete', directoryPaths, callback))
-      .on('unlinkDir', createHandler('delete', directoryPaths, callback))
-      .on('change', createHandler('update', directoryPaths, callback))
+      .on('add', createHandler('create', directoryPaths, handler))
+      .on('addDir', createHandler('create', directoryPaths, handler))
+      .on('unlink', createHandler('delete', directoryPaths, handler))
+      .on('unlinkDir', createHandler('delete', directoryPaths, handler))
+      .on('change', createHandler('update', directoryPaths, handler))
   }
 
   const handle = (browserWindow: BrowserWindow) =>
     browserWindow.on('close', () => close(browserWindow.webContents.id))
 
-  const notify = (
-    eventType: EventType,
-    directoryPath: string,
-    filePath: string,
-  ) => {
-    const windows = BrowserWindow.getAllWindows()
-    for (const window of windows) {
-      window.webContents.send(
-        'onDirectoryChange',
-        eventType,
-        directoryPath,
-        filePath,
-      )
-    }
-  }
+  ipcMain.on('unwatch', (event: IpcMainEvent) => close(event.sender.id))
 
-  ipcMain.on('unwatch', (event: IpcMainInvokeEvent) => close(event.sender.id))
-
-  ipcMain.on('watch', (event: IpcMainInvokeEvent, directoryPaths: string[]) =>
+  ipcMain.on('watch', (event: IpcMainEvent, directoryPaths: string[]) =>
     watch(
       event.sender.id,
       directoryPaths,
       (eventType, directoryPath, filePath) =>
-        event.sender.send(
-          'onDirectoryChange',
-          eventType,
-          directoryPath,
-          filePath,
-        ),
+        event.sender.send('onFileChange', eventType, directoryPath, filePath),
     ),
   )
 
-  return { handle, notify }
+  return { handle }
 }
 
 export default createWatcher

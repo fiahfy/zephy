@@ -7,6 +7,7 @@ import {
   webUtils,
 } from 'electron'
 import type { ApplicationMenuParams } from './application-menu'
+import type { FileEventHandler, FileEventType } from './watcher'
 
 const applicationMenuOperations = {
   update: (params: ApplicationMenuParams) => ipcRenderer.send('update', params),
@@ -55,39 +56,29 @@ const entryOperations = {
 
 const messageOperations = {
   // biome-ignore lint/suspicious/noExplicitAny: false positive
-  onMessage: (callback: (message: any) => void) => {
+  onMessage: (handler: (message: any) => void) => {
     // biome-ignore lint/suspicious/noExplicitAny: false positive
     const listener = (_event: IpcRendererEvent, message: any) =>
-      callback(message)
+      handler(message)
     ipcRenderer.on('onMessage', listener)
     return () => ipcRenderer.off('onMessage', listener)
   },
 }
 
 const watcherOperations = {
-  // TODO: refactor
-  unwatch: () => {
-    ipcRenderer.removeAllListeners('onDirectoryChange')
-    ipcRenderer.send('unwatch')
-  },
-  watch: (
-    directoryPaths: string[],
-    callback: (
-      eventType: 'create' | 'delete',
+  onFileChange: (handler: FileEventHandler) => {
+    const listener = (
+      _event: IpcRendererEvent,
+      eventType: FileEventType,
       directoryPath: string,
       filePath: string,
-    ) => void,
-  ) => {
-    ipcRenderer.on(
-      'onDirectoryChange',
-      (
-        _event: IpcRendererEvent,
-        eventType: 'create' | 'delete',
-        directoryPath: string,
-        filePath: string,
-      ) => callback(eventType, directoryPath, filePath),
-    )
+    ) => handler(eventType, directoryPath, filePath)
+    ipcRenderer.on('onFileChange', listener)
+    return () => ipcRenderer.off('onFileChange', listener)
+  },
+  watch: (directoryPaths: string[]) => {
     ipcRenderer.send('watch', directoryPaths)
+    return () => ipcRenderer.send('unwatch')
   },
 }
 

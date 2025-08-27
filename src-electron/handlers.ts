@@ -72,7 +72,7 @@ const registerElectronHandlers = () => {
   )
 }
 
-const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
+const registerEntryHandlers = () => {
   ipcMain.on('copyEntries', (_event: IpcMainEvent, paths: string[]) =>
     writePaths(paths),
   )
@@ -125,8 +125,6 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     Promise.all(
       paths.map(async (path) => {
         await shell.trashItem(path)
-        // NOTE: Notify event manually because chokidar doesn't detect trashItem event
-        watcher.notify('delete', dirname(path), path)
       }),
     ),
   )
@@ -144,9 +142,9 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   )
 }
 
-const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
+const registerHandlers = () => {
   registerElectronHandlers()
-  registerEntryHandlers(watcher)
+  registerEntryHandlers()
 }
 
 export default registerHandlers

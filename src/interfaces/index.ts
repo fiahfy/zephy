@@ -44,19 +44,12 @@ export type EntryOperations = {
 
 export type MessageOperations = {
   // biome-ignore lint/suspicious/noExplicitAny: false positive
-  onMessage: (callback: (message: any) => void) => () => void
+  onMessage: (handler: (message: any) => void) => () => void
 }
 
 export type WatcherOperations = {
-  unwatch: () => void
-  watch: (
-    directoryPaths: string[],
-    callback: (
-      eventType: 'create' | 'update' | 'delete',
-      directoryPath: string,
-      filePath: string,
-    ) => void,
-  ) => void
+  onFileChange: (handler: FileEventHandler) => () => void
+  watch: (directoryPaths: string[]) => () => void
 }
 
 type File = {
@@ -85,3 +78,11 @@ export type Metadata = {
   height?: number
   width?: number
 }
+
+export type FileEventType = 'create' | 'update' | 'delete'
+
+export type FileEventHandler = (
+  eventType: FileEventType,
+  directoryPath: string,
+  filePath: string,
+) => void

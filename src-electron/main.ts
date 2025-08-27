@@ -84,7 +84,7 @@ app.on('before-quit', () => {
 app.whenReady().then(() => {
   registerApplicationMenu(createWindow)
   registerContextMenu(createWindow)
-  registerHandlers(watcher)
+  registerHandlers()
 
   const browserWindows = windowManager.restore()
   if (browserWindows.length === 0) {
