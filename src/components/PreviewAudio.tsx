@@ -7,6 +7,7 @@ import {
   type KeyboardEvent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -30,6 +31,8 @@ const PreviewAudio = () => {
   const [paused, setPaused] = useState(true)
 
   const ref = useRef<HTMLAudioElement>(null)
+
+  const id = useId()
 
   const Icon = useMemo(() => (paused ? PlayArrowIcon : PauseIcon), [paused])
 
@@ -138,7 +141,7 @@ const PreviewAudio = () => {
             {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
             <audio
               controls
-              id="custom-audio"
+              id={id}
               onKeyDown={handleKeyDown}
               onPause={() => setPaused(true)}
               onPlay={() => setPaused(false)}

@@ -1,7 +1,7 @@
 import {
   app,
   BrowserWindow,
-  type IpcMainInvokeEvent,
+  type IpcMainEvent,
   ipcMain,
   Menu,
   type MenuItemConstructorOptions,
@@ -308,7 +308,7 @@ const registerApplicationMenu = (
 
   ipcMain.on(
     'update',
-    (_event: IpcMainInvokeEvent, params: ApplicationMenuParams) => {
+    (_event: IpcMainEvent, params: ApplicationMenuParams) => {
       state = { ...state, ...params }
       update()
     },

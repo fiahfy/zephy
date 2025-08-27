@@ -1,10 +1,10 @@
 import { type ActionCreators, register } from '@fiahfy/electron-context-menu'
-import { app, clipboard, type IpcMainInvokeEvent, shell } from 'electron'
+import { app, clipboard, type IpcMainEvent, shell } from 'electron'
 import { canReadPaths, readPaths, writePaths } from './utils/clipboard'
 import { copyEntries } from './utils/file'
 
 // biome-ignore lint/suspicious/noExplicitAny: false positive
-const send = (event: IpcMainInvokeEvent, message: any) =>
+const send = (event: IpcMainEvent, message: any) =>
   event.sender.send('onMessage', message)
 
 const registerContextMenu = (

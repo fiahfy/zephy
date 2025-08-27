@@ -13,7 +13,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { type ChangeEvent, useCallback } from 'react'
+import { type ChangeEvent, useCallback, useId } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldOpenWithPhoty,
@@ -38,6 +38,8 @@ const Settings = () => {
   const shouldOpenWithVisty = useAppSelector(selectShouldOpenWithVisty)
   const theme = useAppSelector(selectTheme)
   const dispatch = useAppDispatch()
+
+  const id = useId()
 
   const handleChangeTheme = useCallback(
     (e: SelectChangeEvent) => {
@@ -80,10 +82,10 @@ const Settings = () => {
           </Typography>
           <FormGroup>
             <FormControl sx={{ mt: 1, width: 128 }}>
-              <InputLabel id="theme">Theme</InputLabel>
+              <InputLabel id={id}>Theme</InputLabel>
               <Select
                 label="Theme"
-                labelId="theme"
+                labelId={id}
                 onChange={handleChangeTheme}
                 size="small"
                 value={theme}
