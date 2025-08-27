@@ -181,7 +181,7 @@ export const load =
       }
       dispatch(load())
       try {
-        const root = await window.electronAPI.getRootEntry(directoryPath)
+        const root = await window.entryAPI.getRootEntry(directoryPath)
         const expandedItems = getDirectoryPaths(root, false)
         dispatch(setExpandedItems({ expandedItems }))
         dispatch(setSelectedItems({ selectedItems: directoryPath }))
@@ -223,7 +223,7 @@ export const expandItems =
     }
 
     try {
-      const children = await window.electronAPI.getEntries(entry.path)
+      const children = await window.entryAPI.getEntries(entry.path)
 
       const mapper = (e: Entry): Entry => {
         if (e.type !== 'directory') {
@@ -265,7 +265,7 @@ export const handle =
       const entry =
         eventType === 'delete'
           ? undefined
-          : await window.electronAPI.getEntry(filePath)
+          : await window.entryAPI.getEntry(filePath)
 
       const mapper = (e: Entry): Entry => {
         if (e.type === 'directory') {

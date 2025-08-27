@@ -307,7 +307,7 @@ const registerApplicationMenu = (
   update()
 
   ipcMain.on(
-    'updateApplicationMenu',
+    'update',
     (_event: IpcMainInvokeEvent, params: ApplicationMenuParams) => {
       state = { ...state, ...params }
       update()

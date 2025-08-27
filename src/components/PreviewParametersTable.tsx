@@ -79,7 +79,7 @@ const PreviewParametersTable = () => {
       if (!path) {
         return
       }
-      const parameters = await window.electronAPI.getEntryParameters(path)
+      const parameters = await window.entryAPI.getEntryParameters(path)
       if (unmounted) {
         return
       }

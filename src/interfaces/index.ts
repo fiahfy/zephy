@@ -3,18 +3,23 @@
 // example, to import the interface below do:
 //
 // import User from 'path/to/interfaces';
-import type { Operations as ContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
-import type { Operations as WindowOperations } from '@fiahfy/electron-window/preload'
 
 export type ApplicationMenuOperations = {
-  updateApplicationMenu: (params: ApplicationMenuParams) => void
+  // biome-ignore lint/suspicious/noExplicitAny: false positive
+  update: (params: any) => void
 }
 
-export type EditOperations = {
+export type ElectronOperations = {
   copy: () => void
   cut: () => void
+  fileURLToPath: (url: string) => string | undefined
+  getPathForFile: (file: globalThis.File) => string
+  openExternal: (url: string) => void
+  openTab: () => void
   paste: () => void
+  pathToFileURL: (path: string) => string
   selectAll: () => void
+  startDrag: (paths: string[]) => void
 }
 
 export type EntryOperations = {
@@ -54,29 +59,15 @@ export type WatcherOperations = {
   ) => void
 }
 
-export type IElectronAPI = {
-  getFilePaths: (files: globalThis.File[]) => string[]
-  openTab: () => void
-  openUrl: (url: string) => void
-  startDrag: (paths: string[]) => void
-} & ApplicationMenuOperations &
-  EditOperations &
-  EntryOperations &
-  MessageOperations &
-  WatcherOperations &
-  ContextMenuOperations &
-  WindowOperations<{ directoryPath: string }>
-
-// biome-ignore lint/suspicious/noExplicitAny: false positive
-export type ApplicationMenuParams = any
-
 type File = {
   type: 'file'
 }
+
 type Directory = {
   children?: Entry[]
   type: 'directory'
 }
+
 export type Entry = (File | Directory) & {
   dateCreated: number
   dateLastOpened: number
@@ -86,6 +77,7 @@ export type Entry = (File | Directory) & {
   size: number
   url: string
 }
+
 export type Content = Entry & { score: number }
 
 export type Metadata = {

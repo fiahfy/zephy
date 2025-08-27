@@ -1,7 +1,9 @@
 import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   app,
   BrowserWindow,
+  type IpcMainEvent,
   type IpcMainInvokeEvent,
   ipcMain,
   nativeImage,
@@ -29,23 +31,49 @@ const dataUrl =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII='
 const icon = nativeImage.createFromDataURL(dataUrl)
 
-const registerEditHandlers = () => {
-  ipcMain.on('copy', (event: IpcMainInvokeEvent) =>
+const registerElectronHandlers = () => {
+  ipcMain.on('copy', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.copy(),
   )
-  ipcMain.on('cut', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('cut', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.cut(),
   )
-  ipcMain.on('paste', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('fileURLToPath', (event: IpcMainEvent, url: string) => {
+    try {
+      event.returnValue = fileURLToPath(url)
+    } catch {
+      event.returnValue = undefined
+    }
+  })
+  ipcMain.on('openExternal', (_event: IpcMainEvent, url: string) =>
+    shell.openExternal(url),
+  )
+  ipcMain.on('openTab', (event: IpcMainEvent) =>
+    event.sender.send('onMessage', {
+      type: 'newTab',
+      data: { path: app.getPath('home') },
+    }),
+  )
+  ipcMain.on('paste', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.paste(),
   )
-  ipcMain.on('selectAll', (event: IpcMainInvokeEvent) =>
+  ipcMain.on('pathToFileURL', (event: IpcMainEvent, path: string) => {
+    event.returnValue = pathToFileURL(path).href
+  })
+  ipcMain.on('selectAll', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.selectAll(),
+  )
+  ipcMain.on('startDrag', (event: IpcMainEvent, paths: string[]) =>
+    event.sender.startDrag({
+      file: '',
+      files: paths,
+      icon,
+    }),
   )
 }
 
 const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.on('copyEntries', (_event: IpcMainInvokeEvent, paths: string[]) =>
+  ipcMain.on('copyEntries', (_event: IpcMainEvent, paths: string[]) =>
     writePaths(paths),
   )
   ipcMain.handle(
@@ -93,21 +121,19 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
   )
-  ipcMain.on(
-    'moveEntriesToTrash',
-    (_event: IpcMainInvokeEvent, paths: string[]) =>
-      Promise.all(
-        paths.map(async (path) => {
-          await shell.trashItem(path)
-          // NOTE: Notify event manually because chokidar doesn't detect trashItem event
-          watcher.notify('delete', dirname(path), path)
-        }),
-      ),
+  ipcMain.on('moveEntriesToTrash', (_event: IpcMainEvent, paths: string[]) =>
+    Promise.all(
+      paths.map(async (path) => {
+        await shell.trashItem(path)
+        // NOTE: Notify event manually because chokidar doesn't detect trashItem event
+        watcher.notify('delete', dirname(path), path)
+      }),
+    ),
   )
-  ipcMain.on('openEntry', (_event: IpcMainInvokeEvent, path: string) =>
+  ipcMain.on('openEntry', (_event: IpcMainEvent, path: string) =>
     shell.openPath(path),
   )
-  ipcMain.on('pasteEntries', (_event: IpcMainInvokeEvent, directoryPath) => {
+  ipcMain.on('pasteEntries', (_event: IpcMainEvent, directoryPath) => {
     const paths = readPaths()
     return copyEntries(paths, directoryPath)
   })
@@ -119,23 +145,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
 }
 
 const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
-  ipcMain.on('openTab', (event: IpcMainInvokeEvent) =>
-    event.sender.send('onMessage', {
-      type: 'newTab',
-      data: { path: app.getPath('home') },
-    }),
-  )
-  ipcMain.on('openUrl', (_event: IpcMainInvokeEvent, url: string) =>
-    shell.openExternal(url),
-  )
-  ipcMain.on('startDrag', (event: IpcMainInvokeEvent, paths: string[]) =>
-    event.sender.startDrag({
-      file: '',
-      files: paths,
-      icon,
-    }),
-  )
-  registerEditHandlers()
+  registerElectronHandlers()
   registerEntryHandlers(watcher)
 }
 

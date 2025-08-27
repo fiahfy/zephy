@@ -9,7 +9,7 @@ export const createContextMenuHandler = (options: ContextMenuOption[] = []) => {
     e.preventDefault()
     e.stopPropagation()
 
-    window.electronAPI.showContextMenu(
+    window.contextMenuAPI.showContextMenu(
       buildContextMenuParams(e.nativeEvent, options),
     )
   }

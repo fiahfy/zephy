@@ -73,7 +73,7 @@ const SearchAutocomplete = () => {
   useEffect(() => setQueryInput(query), [query])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
+    const removeListener = window.messageAPI.onMessage((message) => {
       const { type } = message
       switch (type) {
         case 'find':

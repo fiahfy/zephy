@@ -41,33 +41,17 @@ export const isFileUrl = (url: string) => {
   }
 }
 
-export const getPath = (url: string) => {
-  try {
-    const u = new URL(url)
-    switch (u.protocol) {
-      case 'file:':
-        return decodeURIComponent(u.pathname)
-      case 'zephy:':
-        throw new Error()
-      default:
-        throw new Error()
-    }
-  } catch {
-    return undefined
-  }
-}
-
 export const getTitle = async (url: string) => {
   try {
     const u = new URL(url)
     switch (u.protocol) {
       case 'file:': {
         try {
-          const directoryPath = getPath(url)
+          const directoryPath = window.electronAPI.fileURLToPath(url)
           if (!directoryPath) {
             throw new Error()
           }
-          const entry = await window.electronAPI.getEntry(directoryPath)
+          const entry = await window.entryAPI.getEntry(directoryPath)
           return entry.name
         } catch {
           return '<Error>'

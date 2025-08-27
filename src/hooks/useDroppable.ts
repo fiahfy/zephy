@@ -85,7 +85,7 @@ const useDroppable = (directoryPath?: string) => {
       e.stopPropagation()
       setEnterCount(0)
       const files = Array.from(e.dataTransfer.files)
-      const paths = window.electronAPI.getFilePaths(files)
+      const paths = files.map((file) => window.electronAPI.getPathForFile(file))
       dispatch(move(paths, directoryPath))
     },
     [dispatch, directoryPath],

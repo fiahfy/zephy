@@ -9,15 +9,20 @@ import {
 import type { ApplicationMenuParams } from './application-menu'
 
 const applicationMenuOperations = {
-  updateApplicationMenu: (params: ApplicationMenuParams) =>
-    ipcRenderer.send('updateApplicationMenu', params),
+  update: (params: ApplicationMenuParams) => ipcRenderer.send('update', params),
 }
 
-const editOperations = {
+const electronOperations = {
   copy: () => ipcRenderer.send('copy'),
   cut: () => ipcRenderer.send('cut'),
+  fileURLToPath: (url: string) => ipcRenderer.sendSync('fileURLToPath', url),
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
+  openExternal: (url: string) => ipcRenderer.send('openExternal', url),
+  openTab: () => ipcRenderer.send('openTab'),
   paste: () => ipcRenderer.send('paste'),
+  pathToFileURL: (path: string) => ipcRenderer.sendSync('pathToFileURL', path),
   selectAll: () => ipcRenderer.send('selectAll'),
+  startDrag: (paths: string[]) => ipcRenderer.send('startDrag', paths),
 }
 
 const entryOperations = {
@@ -60,6 +65,7 @@ const messageOperations = {
 }
 
 const watcherOperations = {
+  // TODO: refactor
   unwatch: () => {
     ipcRenderer.removeAllListeners('onDirectoryChange')
     ipcRenderer.send('unwatch')
@@ -85,17 +91,10 @@ const watcherOperations = {
   },
 }
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  getFilePaths: (files: File[]) =>
-    files.map((file) => webUtils.getPathForFile(file)),
-  openTab: () => ipcRenderer.send('openTab'),
-  openUrl: (url: string) => ipcRenderer.send('openUrl', url),
-  startDrag: (paths: string[]) => ipcRenderer.send('startDrag', paths),
-  ...applicationMenuOperations,
-  ...editOperations,
-  ...entryOperations,
-  ...messageOperations,
-  ...watcherOperations,
-  ...exposeContextMenuOperations(),
-  ...exposeWindowOperations(),
-})
+contextBridge.exposeInMainWorld('applicationMenuAPI', applicationMenuOperations)
+contextBridge.exposeInMainWorld('contextMenuAPI', exposeContextMenuOperations())
+contextBridge.exposeInMainWorld('electronAPI', electronOperations)
+contextBridge.exposeInMainWorld('entryAPI', entryOperations)
+contextBridge.exposeInMainWorld('messageAPI', messageOperations)
+contextBridge.exposeInMainWorld('watcherAPI', watcherOperations)
+contextBridge.exposeInMainWorld('windowAPI', exposeWindowOperations())

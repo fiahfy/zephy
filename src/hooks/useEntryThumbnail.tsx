@@ -57,7 +57,7 @@ const useEntryThumbnail = (entry: Entry) => {
   const getPaths = useCallback(
     async (path: string) => {
       try {
-        const entries = await window.electronAPI.getEntries(path)
+        const entries = await window.entryAPI.getEntries(path)
         return entries
           .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
           .toSorted((a, b) => a.name.localeCompare(b.name))
@@ -76,7 +76,7 @@ const useEntryThumbnail = (entry: Entry) => {
 
       const paths =
         entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
-      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(paths)
+      const thumbnail = await window.entryAPI.createEntryThumbnailUrl(paths)
       const success = await new Promise<boolean>((resolve) => {
         if (!thumbnail) {
           return resolve(true)

@@ -86,7 +86,7 @@ const App = () => {
   useTitle(title)
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
+    const removeListener = window.messageAPI.onMessage((message) => {
       const { type, data } = message
       switch (type) {
         case 'addToFavorites':
@@ -202,7 +202,7 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onFocusChange((focused) => {
+    const removeListener = window.windowAPI.onFocusChange((focused) => {
       if (focused) {
         dispatch(updateApplicationMenu())
       }
@@ -213,7 +213,7 @@ const App = () => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     ;(async () => {
-      const focused = await window.electronAPI.isFocused()
+      const focused = await window.windowAPI.isFocused()
       if (focused) {
         dispatch(updateApplicationMenu())
       }

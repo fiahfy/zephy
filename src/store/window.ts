@@ -19,7 +19,7 @@ import {
 import { showError } from '~/store/notification'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/window-id'
-import { buildZephyUrl, getPath, getTitle } from '~/utils/url'
+import { buildZephyUrl, getTitle } from '~/utils/url'
 
 type History = {
   query: string
@@ -678,7 +678,7 @@ export const selectUrlByTabId = createSelector(
 
 export const selectDirectoryPathByTabId = createSelector(
   selectHistoryByTabId,
-  (history) => getPath(history.url),
+  (history) => window.electronAPI.fileURLToPath(history.url),
 )
 
 export const selectQueryByTabId = createSelector(
@@ -826,9 +826,8 @@ export const newTabWithDirectoryPath =
   (directoryPath: string, srcTabId?: number): AppThunk =>
   async (dispatch) => {
     try {
-      // TODO: convert directoryPath to url
-      const entry = await window.electronAPI.getEntry(directoryPath)
-      dispatch(newTab(entry.url, srcTabId))
+      const url = window.electronAPI.pathToFileURL(directoryPath)
+      dispatch(newTab(url, srcTabId))
     } catch (e) {
       showError(e)
     }
@@ -930,9 +929,8 @@ export const changeDirectoryPath =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
     try {
-      // TODO: convert directoryPath to url
-      const entry = await window.electronAPI.getEntry(directoryPath)
-      dispatch(changeUrl(entry.url))
+      const url = window.electronAPI.pathToFileURL(directoryPath)
+      dispatch(changeUrl(url))
     } catch (e) {
       dispatch(showError(e))
     }
@@ -963,7 +961,7 @@ export const upward = (): AppThunk => async (dispatch, getState) => {
   }
 
   try {
-    const parent = await window.electronAPI.getParentEntry(currentDirectoryPath)
+    const parent = await window.entryAPI.getParentEntry(currentDirectoryPath)
     dispatch(changeUrl(parent.url))
   } catch (e) {
     showError(e)
@@ -1049,7 +1047,7 @@ export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const sortOption = selectCurrentSortOption(getState())
   const viewMode = selectCurrentViewMode(getState())
 
-  window.electronAPI.updateApplicationMenu({
+  window.applicationMenuAPI.update({
     canBack,
     canCloseTab,
     canForward,

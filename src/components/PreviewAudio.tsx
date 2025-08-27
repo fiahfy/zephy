@@ -77,7 +77,7 @@ const PreviewAudio = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
+    const removeListener = window.messageAPI.onMessage((message) => {
       const { type, data } = message
       if (type !== 'changeLoop') {
         return

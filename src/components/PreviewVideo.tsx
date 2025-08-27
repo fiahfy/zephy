@@ -88,7 +88,7 @@ const PreviewVideo = () => {
   }, [appDispatch])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
+    const removeListener = window.messageAPI.onMessage((message) => {
       const { type, data } = message
       if (type !== 'changeLoop') {
         return
@@ -118,7 +118,7 @@ const PreviewVideo = () => {
         return
       }
       dispatch({ type: 'loading' })
-      const thumbnail = await window.electronAPI.createEntryThumbnailUrl(path)
+      const thumbnail = await window.entryAPI.createEntryThumbnailUrl(path)
       if (unmounted) {
         return
       }

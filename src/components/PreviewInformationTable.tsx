@@ -112,7 +112,7 @@ const PreviewInformationTable = () => {
       if (!content?.path) {
         return
       }
-      const metadata = await window.electronAPI.getEntryMetadata(content.path)
+      const metadata = await window.entryAPI.getEntryMetadata(content.path)
       if (unmounted) {
         return
       }

@@ -322,7 +322,7 @@ export const load = (): AppThunk => async (dispatch, getState) => {
 
   dispatch(load({ timestamp }))
   try {
-    const entries = await window.electronAPI.getEntries(previewContent.path)
+    const entries = await window.entryAPI.getEntries(previewContent.path)
     dispatch(loaded({ entries, timestamp }))
   } catch {
     dispatch(loadFailed({ timestamp }))
@@ -488,7 +488,7 @@ export const rename =
     const { addEntries, focus, removeEntries, select } = previewSlice.actions
 
     try {
-      const entry = await window.electronAPI.renameEntry(path, newName)
+      const entry = await window.entryAPI.renameEntry(path, newName)
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ paths: [path] }))
@@ -513,7 +513,7 @@ export const newFolder =
   async (dispatch) => {
     const { addEntries, focus, select, startEditing } = previewSlice.actions
 
-    const entry = await window.electronAPI.createDirectory(directoryPath)
+    const entry = await window.entryAPI.createDirectory(directoryPath)
     dispatch(addEntries({ entries: [entry] }))
     dispatch(select({ path: entry.path }))
     dispatch(focus({ path: entry.path }))
@@ -522,7 +522,7 @@ export const newFolder =
 
 export const copy = (): AppThunk => async (_, getState) => {
   const selected = selectSelected(getState())
-  window.electronAPI.copyEntries(selected)
+  window.entryAPI.copyEntries(selected)
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
@@ -531,7 +531,7 @@ export const paste = (): AppThunk => async (_, getState) => {
     return
   }
 
-  window.electronAPI.pasteEntries(currentContentPath)
+  window.entryAPI.pasteEntries(currentContentPath)
 }
 
 export const startRenaming =
@@ -589,7 +589,7 @@ export const moveToTrash =
       }
     }
 
-    window.electronAPI.moveEntriesToTrash(targetPaths)
+    window.entryAPI.moveEntriesToTrash(targetPaths)
   }
 
 export const handle =
@@ -611,7 +611,7 @@ export const handle =
       case 'create':
       case 'update': {
         try {
-          const entry = await window.electronAPI.getEntry(filePath)
+          const entry = await window.entryAPI.getEntry(filePath)
           dispatch(addEntries({ entries: [entry] }))
         } catch {
           // noop

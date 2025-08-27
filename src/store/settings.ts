@@ -5,7 +5,6 @@ import {
 } from '@reduxjs/toolkit'
 import type { AppState, AppThunk } from '~/store'
 import { detectFileType } from '~/utils/file'
-import { getPath } from '~/utils/url'
 
 type State = {
   shouldOpenWithPhoty: boolean
@@ -91,7 +90,7 @@ export const selectTheme = createSelector(
 export const openUrl =
   (url: string): AppThunk =>
   async (_, getState) => {
-    const path = getPath(url)
+    const path = window.electronAPI.fileURLToPath(url)
     if (!path) {
       return
     }
@@ -102,17 +101,17 @@ export const openUrl =
       case 'image': {
         const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
         return shouldOpenWithPhoty
-          ? window.electronAPI.openUrl(`photy://open?path=${encoded}`)
-          : window.electronAPI.openEntry(path)
+          ? window.electronAPI.openExternal(`photy://open?path=${encoded}`)
+          : window.entryAPI.openEntry(path)
       }
       case 'video':
       case 'audio': {
         const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
         return shouldOpenWithVisty
-          ? window.electronAPI.openUrl(`visty://open?path=${encoded}`)
-          : window.electronAPI.openEntry(path)
+          ? window.electronAPI.openExternal(`visty://open?path=${encoded}`)
+          : window.entryAPI.openEntry(path)
       }
       default:
-        return window.electronAPI.openEntry(path)
+        return window.entryAPI.openEntry(path)
     }
   }

@@ -26,7 +26,7 @@ import {
   selectUrlByTabId,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { getPath, parseZephyUrl } from '~/utils/url'
+import { parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -595,11 +595,11 @@ export const load =
         const u = new URL(url)
         switch (u.protocol) {
           case 'file:': {
-            const directoryPath = getPath(url)
+            const directoryPath = window.electronAPI.fileURLToPath(url)
             if (!directoryPath) {
               throw new Error()
             }
-            return await window.electronAPI.getEntries(directoryPath)
+            return await window.entryAPI.getEntries(directoryPath)
           }
           case 'zephy:': {
             const parsed = parseZephyUrl(url)
@@ -609,7 +609,7 @@ export const load =
             if (parsed.pathname === 'ratings') {
               const scoreToPathsMap = selectScoreToPathsMap(getState())
               const paths = scoreToPathsMap[parsed.params.score] ?? []
-              return await window.electronAPI.getEntriesForPaths(paths)
+              return await window.entryAPI.getEntriesForPaths(paths)
             } else {
               return []
             }
@@ -797,7 +797,7 @@ export const rename =
       explorerListSlice.actions
 
     try {
-      const entry = await window.electronAPI.renameEntry(path, newName)
+      const entry = await window.entryAPI.renameEntry(path, newName)
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(removeEntries({ tabId, paths: [path] }))
@@ -837,7 +837,7 @@ export const newFolderInCurrentTab =
 
     const tabId = selectCurrentTabId(getState())
 
-    const entry = await window.electronAPI.createDirectory(directoryPath)
+    const entry = await window.entryAPI.createDirectory(directoryPath)
     dispatch(addEntries({ tabId, entries: [entry] }))
     dispatch(select({ tabId, path: entry.path }))
     dispatch(focus({ tabId, path: entry.path }))
@@ -846,7 +846,7 @@ export const newFolderInCurrentTab =
 
 export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
-  window.electronAPI.copyEntries(selected)
+  window.entryAPI.copyEntries(selected)
 }
 
 export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
@@ -855,7 +855,7 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
     return
   }
 
-  window.electronAPI.pasteEntries(currentDirectoryPath)
+  window.entryAPI.pasteEntries(currentDirectoryPath)
 }
 
 export const startRenamingInCurrentTab =
@@ -915,7 +915,7 @@ export const moveToTrashInCurrentTab =
       }
     }
 
-    window.electronAPI.moveEntriesToTrash(targetPaths)
+    window.entryAPI.moveEntriesToTrash(targetPaths)
   }
 
 export const openInCurrentTab =
@@ -929,7 +929,7 @@ export const openInCurrentTab =
     }
 
     try {
-      const entry = await window.electronAPI.getEntry(targetPath)
+      const entry = await window.entryAPI.getEntry(targetPath)
       if (entry.type === 'directory') {
         dispatch(changeUrl(entry.url))
       } else {
@@ -946,7 +946,7 @@ export const move =
   (paths: string[], directoryPath: string): AppThunk =>
   async (dispatch) => {
     try {
-      const entries = await window.electronAPI.moveEntries(paths, directoryPath)
+      const entries = await window.entryAPI.moveEntries(paths, directoryPath)
       for (let i = 0; i < paths.length; i++) {
         const path = paths[i]
         const entry = entries[i]
@@ -980,7 +980,7 @@ export const handle =
         case 'create':
         case 'update': {
           try {
-            const entry = await window.electronAPI.getEntry(filePath)
+            const entry = await window.entryAPI.getEntry(filePath)
             dispatch(addEntries({ tabId, entries: [entry] }))
           } catch {
             // noop

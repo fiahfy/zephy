@@ -93,7 +93,7 @@ export const addToFavorites =
     const { addToFavorites } = favoriteSlice.actions
 
     try {
-      const entry = await window.electronAPI.getEntry(directoryPath)
+      const entry = await window.entryAPI.getEntry(directoryPath)
       dispatch(addToFavorites({ ...entry }))
     } catch (e) {
       showError(e)

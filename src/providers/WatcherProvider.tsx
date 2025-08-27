@@ -50,12 +50,12 @@ const WatcherProvider = (props: Props) => {
   )
 
   useEffect(() => {
-    window.electronAPI.unwatch()
+    window.watcherAPI.unwatch()
     if (directoryPaths.length === 0) {
       return
     }
 
-    window.electronAPI.watch(
+    window.watcherAPI.watch(
       directoryPaths,
       (eventType, directoryPath, filePath) => {
         // TODO: Remove logging

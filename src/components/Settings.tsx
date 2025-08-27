@@ -117,7 +117,7 @@ const Settings = () => {
                     component="button"
                     onClick={(e) => {
                       e.preventDefault()
-                      window.electronAPI.openUrl(
+                      window.electronAPI.openExternal(
                         'https://github.com/fiahfy/photy',
                       )
                     }}
@@ -143,7 +143,7 @@ const Settings = () => {
                     component="button"
                     onClick={(e) => {
                       e.preventDefault()
-                      window.electronAPI.openUrl(
+                      window.electronAPI.openExternal(
                         'https://github.com/fiahfy/visty',
                       )
                     }}
