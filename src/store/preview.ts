@@ -612,8 +612,8 @@ export const handleFileChange =
     const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
       previewSlice.actions
 
-    const currentDirectoryPath = selectDirectoryPath(getState())
-    if (directoryPath !== currentDirectoryPath) {
+    const targetDirectoryPath = selectDirectoryPath(getState())
+    if (directoryPath !== targetDirectoryPath) {
       return
     }
 

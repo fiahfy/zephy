@@ -157,13 +157,13 @@ export const load =
       explorerTreeSlice.actions
 
     const root = selectRoot(getState())
-    const directories = root ? getDirectoryPaths(root, true) : []
+    const directoryPaths = root ? getDirectoryPaths(root, true) : []
 
     if (
       !force &&
       root &&
       directoryPath &&
-      directories.includes(directoryPath)
+      directoryPaths.includes(directoryPath)
     ) {
       const expandedItems = selectExpandedItems(getState())
       const newExpandedItems = [
@@ -260,6 +260,11 @@ export const handleFileChange =
   ): AppThunk =>
   async (dispatch, getState) => {
     const { setRoot } = explorerTreeSlice.actions
+
+    const loadedDirectoryPaths = selectLoadedDirectoryPaths(getState())
+    if (!loadedDirectoryPaths.includes(directoryPath)) {
+      return
+    }
 
     try {
       const entry =

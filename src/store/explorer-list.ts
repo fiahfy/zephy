@@ -985,8 +985,8 @@ export const handleFileChange =
     const tabs = selectTabs(getState())
 
     for (const { id: tabId } of tabs) {
-      const directoryPathByTabId = selectDirectoryPathByTabId(getState(), tabId)
-      if (directoryPath !== directoryPathByTabId) {
+      const targetDirectoryPath = selectDirectoryPathByTabId(getState(), tabId)
+      if (directoryPath !== targetDirectoryPath) {
         continue
       }
 
