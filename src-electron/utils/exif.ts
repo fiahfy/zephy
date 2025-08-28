@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises'
 import { load } from 'exifreader'
+import { readFile } from 'fs-extra'
 
 export const getEntryParameters = async (
   path: string,

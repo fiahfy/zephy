@@ -7,7 +7,7 @@ export type FileEventType = 'create' | 'update' | 'delete'
 export type FileEventHandler = (
   eventType: FileEventType,
   directoryPath: string,
-  filePath: string,
+  path: string,
 ) => void
 
 const createWatcher = () => {
@@ -59,11 +59,8 @@ const createWatcher = () => {
   ipcMain.on('unwatch', (event: IpcMainEvent) => close(event.sender.id))
 
   ipcMain.on('watch', (event: IpcMainEvent, directoryPaths: string[]) =>
-    watch(
-      event.sender.id,
-      directoryPaths,
-      (eventType, directoryPath, filePath) =>
-        event.sender.send('onFileChange', eventType, directoryPath, filePath),
+    watch(event.sender.id, directoryPaths, (eventType, directoryPath, path) =>
+      event.sender.send('onFileChange', eventType, directoryPath, path),
     ),
   )
 

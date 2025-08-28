@@ -1,8 +1,16 @@
-import type { Dirent, Stats } from 'node:fs'
-import { mkdir, opendir, rename, stat } from 'node:fs/promises'
 import { basename, dirname, join, parse, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { copy, move, pathExists } from 'fs-extra'
+import {
+  copy,
+  type Dirent,
+  mkdir,
+  move,
+  opendir,
+  pathExists,
+  rename,
+  type Stats,
+  stat,
+} from 'fs-extra'
 
 type File = {
   type: 'file'
@@ -230,7 +238,8 @@ export const renameEntry = async (
 ): Promise<Entry> => {
   const newPath = join(dirname(path), newName)
   const exists = await pathExists(newPath)
-  if (exists) {
+  const same = path.toLowerCase() === newPath.toLowerCase()
+  if (exists && !same) {
     throw new Error('A file or directory with that name already exists.')
   }
   await rename(path, newPath)

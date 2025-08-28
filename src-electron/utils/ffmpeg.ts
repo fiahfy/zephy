@@ -1,11 +1,10 @@
 import { createHash } from 'node:crypto'
-import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import ffmpegStatic from 'ffmpeg-static-electron'
 import ffprobeStatic from 'ffprobe-static-electron'
 import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg'
-import { pathExists } from 'fs-extra'
+import { pathExists, stat } from 'fs-extra'
 import mime from 'mime'
 
 // @see https://stackoverflow.com/q/63106834

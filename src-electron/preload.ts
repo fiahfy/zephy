@@ -71,8 +71,8 @@ const watcherOperations = {
       _event: IpcRendererEvent,
       eventType: FileEventType,
       directoryPath: string,
-      filePath: string,
-    ) => handler(eventType, directoryPath, filePath)
+      path: string,
+    ) => handler(eventType, directoryPath, path)
     ipcRenderer.on('onFileChange', listener)
     return () => ipcRenderer.off('onFileChange', listener)
   },
