@@ -1,6 +1,6 @@
 import { dirname } from 'node:path'
 import chokidar, { type FSWatcher } from 'chokidar'
-import { type BrowserWindow, type IpcMainEvent, ipcMain } from 'electron'
+import { BrowserWindow, type IpcMainEvent, ipcMain } from 'electron'
 
 export type FileEventType = 'create' | 'update' | 'delete'
 
@@ -56,6 +56,17 @@ const createWatcher = () => {
   const handle = (browserWindow: BrowserWindow) =>
     browserWindow.on('close', () => close(browserWindow.webContents.id))
 
+  const notify = (
+    eventType: FileEventType,
+    directoryPath: string,
+    path: string,
+  ) => {
+    const windows = BrowserWindow.getAllWindows()
+    for (const window of windows) {
+      window.webContents.send('onFileChange', eventType, directoryPath, path)
+    }
+  }
+
   ipcMain.on('unwatch', (event: IpcMainEvent) => close(event.sender.id))
 
   ipcMain.on('watch', (event: IpcMainEvent, directoryPaths: string[]) =>
@@ -64,7 +75,7 @@ const createWatcher = () => {
     ),
   )
 
-  return { handle }
+  return { handle, notify }
 }
 
 export default createWatcher

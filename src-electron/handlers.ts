@@ -22,6 +22,7 @@ import {
   moveEntries,
   renameEntry,
 } from './utils/file'
+import type createWatcher from './watcher'
 
 const thumbnailDir = join(app.getPath('userData'), 'thumbnails')
 
@@ -71,7 +72,7 @@ const registerElectronHandlers = () => {
   )
 }
 
-const registerEntryHandlers = () => {
+const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   ipcMain.on('copyEntries', (_event: IpcMainEvent, paths: string[]) =>
     writePaths(paths),
   )
@@ -124,6 +125,8 @@ const registerEntryHandlers = () => {
     Promise.all(
       paths.map(async (path) => {
         await shell.trashItem(path)
+        // NOTE: Notify event manually due to intermittent failures
+        watcher.notify('delete', dirname(path), path)
       }),
     ),
   )
@@ -136,14 +139,19 @@ const registerEntryHandlers = () => {
   })
   ipcMain.handle(
     'renameEntry',
-    (_event: IpcMainInvokeEvent, path: string, newName: string) =>
-      renameEntry(path, newName),
+    async (_event: IpcMainInvokeEvent, path: string, newName: string) => {
+      const entry = await renameEntry(path, newName)
+      // NOTE: No delete events are emitted when only changing letter case (uppercase/lowercase)
+      //       Send delete events asynchronously to prevent temporary disappearance of entries
+      setTimeout(() => watcher.notify('delete', dirname(path), path))
+      return entry
+    },
   )
 }
 
-const registerHandlers = () => {
+const registerHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   registerElectronHandlers()
-  registerEntryHandlers()
+  registerEntryHandlers(watcher)
 }
 
 export default registerHandlers

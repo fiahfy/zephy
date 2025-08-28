@@ -109,8 +109,8 @@ const ExplorerPanel = () => {
 
   useEffect(() => {
     const key = 'explorer-tree'
-    watch(key, loadedDirectoryPath, (eventType, directoryPath, filePath) =>
-      dispatch(handle(eventType, directoryPath, filePath)),
+    watch(key, loadedDirectoryPath, (eventType, directoryPath, path) =>
+      dispatch(handle(eventType, directoryPath, path)),
     )
     return () => unwatch(key)
   }, [dispatch, loadedDirectoryPath, unwatch, watch])

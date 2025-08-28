@@ -59,15 +59,15 @@ const WatcherProvider = (props: Props) => {
 
   useEffect(() => {
     const removeListener = window.watcherAPI.onFileChange(
-      (eventType, directoryPath, filePath) => {
+      (eventType, directoryPath, path) => {
         // TODO: Remove logging
         console.log(`[${new Date().toLocaleString()}]`, {
           eventType,
           directoryPath,
-          filePath,
+          path,
         })
         for (const handler of handlers) {
-          handler(eventType, directoryPath, filePath)
+          handler(eventType, directoryPath, path)
         }
       },
     )

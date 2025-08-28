@@ -83,7 +83,7 @@ export type FileEventType = 'create' | 'update' | 'delete'
 export type FileEventHandler = (
   eventType: FileEventType,
   directoryPath: string,
-  filePath: string,
+  path: string,
 ) => void
 
 export type ApplicationMenuParams = Partial<{

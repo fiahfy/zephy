@@ -191,11 +191,8 @@ const PreviewDirectory = () => {
       return
     }
     const key = 'preview'
-    watch(
-      key,
-      [previewContentPath],
-      async (eventType, directoryPath, filePath) =>
-        dispatch(handle(eventType, directoryPath, filePath)),
+    watch(key, [previewContentPath], async (eventType, directoryPath, path) =>
+      dispatch(handle(eventType, directoryPath, path)),
     )
     return () => unwatch(key)
   }, [dispatch, previewContentPath, unwatch, watch])

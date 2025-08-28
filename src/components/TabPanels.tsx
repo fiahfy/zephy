@@ -20,8 +20,8 @@ const TabPanels = () => {
 
   useEffect(() => {
     const key = 'explorer-list'
-    watch(key, directoryPaths, (eventType, directoryPath, filePath) =>
-      dispatch(handle(eventType, directoryPath, filePath)),
+    watch(key, directoryPaths, (eventType, directoryPath, path) =>
+      dispatch(handle(eventType, directoryPath, path)),
     )
     return () => unwatch(key)
   }, [directoryPaths, dispatch, unwatch, watch])
