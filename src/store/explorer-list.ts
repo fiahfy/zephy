@@ -174,45 +174,42 @@ export const explorerListSlice = createSlice({
         },
       }
     },
-    addEntries(
+    addEntry(
       state,
       action: PayloadAction<{
         tabId: number
-        entries: Entry[]
+        entry: Entry
       }>,
     ) {
-      const { tabId, entries } = action.payload
+      const { tabId, entry } = action.payload
       const explorer = findExplorer(state, tabId)
-      const paths = entries.map((entry) => entry.path)
-      const newEntries = [
-        ...explorer.entries.filter((entry) => !paths.includes(entry.path)),
-        ...entries,
+      const entries = [
+        ...explorer.entries.filter((e) => e.path !== entry.path),
+        entry,
       ]
       return {
         ...state,
         [tabId]: {
           ...explorer,
-          entries: newEntries,
+          entries,
         },
       }
     },
-    removeEntries(
+    removeEntry(
       state,
       action: PayloadAction<{
         tabId: number
-        paths: string[]
+        path: string
       }>,
     ) {
-      const { tabId, paths } = action.payload
+      const { tabId, path } = action.payload
       const explorer = findExplorer(state, tabId)
-      const entries = explorer.entries.filter(
-        (entry) => !paths.includes(entry.path),
-      )
+      const entries = explorer.entries.filter((entry) => entry.path !== path)
       const focused =
-        explorer.focused && paths.includes(explorer.focused)
-          ? undefined
-          : explorer.focused
-      const selected = explorer.selected.filter((path) => !paths.includes(path))
+        explorer.focused && explorer.focused !== path
+          ? explorer.focused
+          : undefined
+      const selected = explorer.selected.filter((p) => p !== path)
       return {
         ...state,
         [tabId]: {
@@ -220,6 +217,33 @@ export const explorerListSlice = createSlice({
           entries,
           focused,
           selected,
+        },
+      }
+    },
+    updateEntry(
+      state,
+      action: PayloadAction<{
+        tabId: number
+        path: string
+        entry: Entry
+      }>,
+    ) {
+      const { tabId, path, entry } = action.payload
+      const explorer = findExplorer(state, tabId)
+      if (!explorer.entries.find((e) => e.path === path)) {
+        return state
+      }
+      const entries = [
+        ...explorer.entries.filter(
+          (e) => e.path !== path && e.path !== entry.path,
+        ),
+        entry,
+      ]
+      return {
+        ...state,
+        [tabId]: {
+          ...explorer,
+          entries,
         },
       }
     },
@@ -793,15 +817,13 @@ export const focusTo =
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
   async (dispatch) => {
-    const { addEntries, focus, removeEntries, select } =
-      explorerListSlice.actions
+    const { focus, select, updateEntry } = explorerListSlice.actions
 
     try {
       const entry = await window.entryAPI.renameEntry(path, newName)
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-      dispatch(removeEntries({ tabId, paths: [path] }))
-      dispatch(addEntries({ tabId, entries: [entry] }))
+      dispatch(updateEntry({ tabId, path, entry }))
       dispatch(select({ tabId, path: entry.path }))
       dispatch(focus({ tabId, path: entry.path }))
     } catch (e) {
@@ -832,13 +854,12 @@ export const selectAllInCurrentTab =
 export const newFolderInCurrentTab =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, focus, select, startEditing } =
-      explorerListSlice.actions
+    const { addEntry, focus, select, startEditing } = explorerListSlice.actions
 
     const tabId = selectCurrentTabId(getState())
 
     const entry = await window.entryAPI.createDirectory(directoryPath)
-    dispatch(addEntries({ tabId, entries: [entry] }))
+    dispatch(addEntry({ tabId, entry }))
     dispatch(select({ tabId, path: entry.path }))
     dispatch(focus({ tabId, path: entry.path }))
     dispatch(startEditing({ tabId, path: entry.path }))
@@ -962,10 +983,10 @@ export const handle =
   (
     eventType: 'create' | 'update' | 'delete',
     directoryPath: string,
-    filePath: string,
+    path: string,
   ): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, removeEntries, removeSelection, unfocus } =
+    const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
       explorerListSlice.actions
 
     const tabs = selectTabs(getState())
@@ -977,22 +998,30 @@ export const handle =
       }
 
       switch (eventType) {
-        case 'create':
+        case 'create': {
+          try {
+            const entry = await window.entryAPI.getEntry(path)
+            dispatch(addEntry({ tabId, entry }))
+          } catch {
+            // noop
+          }
+          break
+        }
         case 'update': {
           try {
-            const entry = await window.entryAPI.getEntry(filePath)
-            dispatch(addEntries({ tabId, entries: [entry] }))
+            const entry = await window.entryAPI.getEntry(path)
+            dispatch(updateEntry({ tabId, path, entry }))
           } catch {
             // noop
           }
           break
         }
         case 'delete':
-          dispatch(removeFromFavorites({ path: filePath }))
-          dispatch(removeRating({ path: filePath }))
-          dispatch(removeEntries({ tabId, paths: [filePath] }))
-          dispatch(removeSelection({ tabId, paths: [filePath] }))
-          dispatch(unfocus({ tabId, paths: [filePath] }))
+          dispatch(removeFromFavorites({ path }))
+          dispatch(removeRating({ path }))
+          dispatch(removeEntry({ tabId, path }))
+          dispatch(removeSelection({ tabId, paths: [path] }))
+          dispatch(unfocus({ tabId, paths: [path] }))
           break
       }
     }

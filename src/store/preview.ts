@@ -93,43 +93,60 @@ export const previewSlice = createSlice({
         selected: [],
       }
     },
-    addEntries(
+    addEntry(
       state,
       action: PayloadAction<{
-        entries: Entry[]
+        entry: Entry
       }>,
     ) {
-      const { entries } = action.payload
-      const paths = entries.map((entry) => entry.path)
-      const newEntries = [
-        ...state.entries.filter((entry) => !paths.includes(entry.path)),
-        ...entries,
+      const { entry } = action.payload
+      const entries = [
+        ...state.entries.filter((e) => e.path !== entry.path),
+        entry,
       ]
       return {
         ...state,
-        entries: newEntries,
+        entries,
       }
     },
-    removeEntries(
+    removeEntry(
       state,
       action: PayloadAction<{
-        paths: string[]
+        path: string
       }>,
     ) {
-      const { paths } = action.payload
-      const entries = state.entries.filter(
-        (entry) => !paths.includes(entry.path),
-      )
+      const { path } = action.payload
+      const entries = state.entries.filter((entry) => entry.path !== path)
       const focused =
-        state.focused && paths.includes(state.focused)
-          ? undefined
-          : state.focused
-      const selected = state.selected.filter((path) => !paths.includes(path))
+        state.focused && state.focused === path ? undefined : state.focused
+      const selected = state.selected.filter((p) => p !== path)
       return {
         ...state,
         entries,
         focused,
         selected,
+      }
+    },
+    updateEntry(
+      state,
+      action: PayloadAction<{
+        path: string
+        entry: Entry
+      }>,
+    ) {
+      const { path, entry } = action.payload
+      if (!state.entries.find((e) => e.path === path)) {
+        return state
+      }
+      const entries = [
+        ...state.entries.filter(
+          (e) => e.path !== path && e.path !== entry.path,
+        ),
+        entry,
+      ]
+      return {
+        ...state,
+        entries,
       }
     },
     startEditing(
@@ -485,14 +502,13 @@ export const focusTo =
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch) => {
-    const { addEntries, focus, removeEntries, select } = previewSlice.actions
+    const { focus, select, updateEntry } = previewSlice.actions
 
     try {
       const entry = await window.entryAPI.renameEntry(path, newName)
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-      dispatch(removeEntries({ paths: [path] }))
-      dispatch(addEntries({ entries: [entry] }))
+      dispatch(updateEntry({ path, entry }))
       dispatch(select({ path: entry.path }))
       dispatch(focus({ path: entry.path }))
     } catch (e) {
@@ -511,10 +527,10 @@ export const selectAll = (): AppThunk => async (dispatch, getState) => {
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
-    const { addEntries, focus, select, startEditing } = previewSlice.actions
+    const { addEntry, focus, select, startEditing } = previewSlice.actions
 
     const entry = await window.entryAPI.createDirectory(directoryPath)
-    dispatch(addEntries({ entries: [entry] }))
+    dispatch(addEntry({ entry }))
     dispatch(select({ path: entry.path }))
     dispatch(focus({ path: entry.path }))
     dispatch(startEditing({ path: entry.path }))
@@ -596,10 +612,10 @@ export const handle =
   (
     eventType: 'create' | 'update' | 'delete',
     directoryPath: string,
-    filePath: string,
+    path: string,
   ): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntries, removeEntries, removeSelection, unfocus } =
+    const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
       previewSlice.actions
 
     const previewContentPath = selectPreviewContentPath(getState())
@@ -608,22 +624,30 @@ export const handle =
     }
 
     switch (eventType) {
-      case 'create':
+      case 'create': {
+        try {
+          const entry = await window.entryAPI.getEntry(path)
+          dispatch(addEntry({ entry }))
+        } catch {
+          // noop
+        }
+        break
+      }
       case 'update': {
         try {
-          const entry = await window.entryAPI.getEntry(filePath)
-          dispatch(addEntries({ entries: [entry] }))
+          const entry = await window.entryAPI.getEntry(path)
+          dispatch(updateEntry({ path, entry }))
         } catch {
           // noop
         }
         break
       }
       case 'delete':
-        dispatch(removeFromFavorites({ path: filePath }))
-        dispatch(removeRating({ path: filePath }))
-        dispatch(removeEntries({ paths: [filePath] }))
-        dispatch(removeSelection({ paths: [filePath] }))
-        dispatch(unfocus({ paths: [filePath] }))
+        dispatch(removeFromFavorites({ path }))
+        dispatch(removeRating({ path }))
+        dispatch(removeEntry({ path }))
+        dispatch(removeSelection({ paths: [path] }))
+        dispatch(unfocus({ paths: [path] }))
         break
     }
   }

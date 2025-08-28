@@ -256,7 +256,7 @@ export const handle =
   (
     eventType: 'create' | 'update' | 'delete',
     directoryPath: string,
-    filePath: string,
+    path: string,
   ): AppThunk =>
   async (dispatch, getState) => {
     const { setRoot } = explorerTreeSlice.actions
@@ -265,15 +265,33 @@ export const handle =
       const entry =
         eventType === 'delete'
           ? undefined
-          : await window.entryAPI.getEntry(filePath)
+          : await window.entryAPI.getEntry(path)
 
       const mapper = (e: Entry): Entry => {
         if (e.type === 'directory') {
           if (e.path === directoryPath && e.children) {
-            // NOTE: イベントが複数回発火するため、まず該当 entry を削除し、create/update の場合のみ追加する
-            let children = e.children.filter((entry) => entry.path !== filePath)
-            if (entry) {
-              children = [...children, entry]
+            let children = e.children
+            switch (eventType) {
+              case 'create': {
+                children = children.filter((entry) => entry.path !== path)
+                if (entry) {
+                  children = [...children, entry]
+                }
+                break
+              }
+              case 'update': {
+                if (children.find((entry) => entry.path !== path)) {
+                  break
+                }
+                children = children.filter((entry) => entry.path !== path)
+                if (entry) {
+                  children = [...children, entry]
+                }
+                break
+              }
+              case 'delete':
+                children = children.filter((entry) => entry.path !== path)
+                break
             }
             return {
               ...e,
