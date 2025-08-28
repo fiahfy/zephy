@@ -4,7 +4,7 @@ import type { SystemStyleObject } from '@mui/system'
 import { type DragEvent, useCallback, useMemo, useState } from 'react'
 import useTheme from '~/hooks/useTheme'
 import { useAppDispatch } from '~/store'
-import { move } from '~/store/explorer-list'
+import { move } from '~/store/window'
 
 const isDroppable = (path?: string): path is string => path !== undefined
 

@@ -19,7 +19,7 @@ import {
   getEntriesForPaths,
   getEntry,
   getRootEntry,
-  moveEntries,
+  moveEntry,
   renameEntry,
 } from './utils/file'
 import type createWatcher from './watcher'
@@ -117,9 +117,16 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     getRootEntry(path ?? app.getPath('home')),
   )
   ipcMain.handle(
-    'moveEntries',
-    (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
-      moveEntries(paths, directoryPath),
+    'moveEntry',
+    async (_event: IpcMainInvokeEvent, path: string, directoryPath: string) => {
+      const entry = await moveEntry(path, directoryPath)
+      // NOTE: Notify event manually due to intermittent failures
+      setTimeout(() => {
+        watcher.notify('delete', dirname(path), path)
+        watcher.notify('create', dirname(entry.path), entry.path)
+      })
+      return entry
+    },
   )
   ipcMain.handle(
     'moveEntryToTrash',

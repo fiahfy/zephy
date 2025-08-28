@@ -43,8 +43,8 @@ const entryOperations = {
     ipcRenderer.invoke('getEntryParameters', path),
   getParentEntry: (path: string) => ipcRenderer.invoke('getParentEntry', path),
   getRootEntry: (path?: string) => ipcRenderer.invoke('getRootEntry', path),
-  moveEntries: (paths: string[], directoryPath: string) =>
-    ipcRenderer.invoke('moveEntries', paths, directoryPath),
+  moveEntry: (path: string, directoryPath: string) =>
+    ipcRenderer.invoke('moveEntry', path, directoryPath),
   moveEntryToTrash: (path: string) =>
     ipcRenderer.invoke('moveEntryToTrash', path),
   openEntry: (path: string) => ipcRenderer.send('openEntry', path),

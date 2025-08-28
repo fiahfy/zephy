@@ -524,6 +524,23 @@ export const selectAll = (): AppThunk => async (dispatch, getState) => {
   dispatch(selectAll({ paths }))
 }
 
+export const startRenaming =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { focus, select, startEditing } = previewSlice.actions
+
+    const focused = selectFocused(getState())
+
+    const targetPath = path ?? focused
+    if (!targetPath) {
+      return
+    }
+
+    dispatch(select({ path: targetPath }))
+    dispatch(focus({ path: targetPath }))
+    dispatch(startEditing({ path: targetPath }))
+  }
+
 export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
@@ -549,23 +566,6 @@ export const paste = (): AppThunk => async (_, getState) => {
 
   window.entryAPI.pasteEntries(currentContentPath)
 }
-
-export const startRenaming =
-  (path?: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { focus, select, startEditing } = previewSlice.actions
-
-    const selected = selectSelected(getState())
-
-    const targetPath = path ?? selected[0]
-    if (!targetPath) {
-      return
-    }
-
-    dispatch(select({ path: targetPath }))
-    dispatch(focus({ path: targetPath }))
-    dispatch(startEditing({ path: targetPath }))
-  }
 
 export const moveToTrash =
   (paths?: string[]): AppThunk =>

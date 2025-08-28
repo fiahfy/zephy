@@ -210,26 +210,22 @@ export const copyEntries = async (paths: string[], directoryPath: string) =>
     Promise.resolve([]) as Promise<Entry[]>,
   )
 
-export const moveEntries = async (
-  paths: string[],
+export const moveEntry = async (
+  path: string,
   directoryPath: string,
-): Promise<Entry[]> => {
-  return await Promise.all(
-    paths.map(async (path) => {
-      let newPath = join(directoryPath, basename(path))
-      // NOTE: Skip if moving to the same path or into itself
-      if (newPath === path || paths.includes(directoryPath)) {
-        newPath = path
-      } else {
-        const exists = await pathExists(newPath)
-        if (exists) {
-          throw new Error('A file or directory with that name already exists.')
-        }
-        await move(path, newPath)
-      }
-      return await getEntry(newPath)
-    }),
-  )
+): Promise<Entry> => {
+  let newPath = join(directoryPath, basename(path))
+  // NOTE: Skip if moving to the same path or into itself
+  if (path === newPath || path === directoryPath) {
+    newPath = path
+  } else {
+    const exists = await pathExists(newPath)
+    if (exists) {
+      throw new Error('A file or directory with that name already exists.')
+    }
+    await move(path, newPath)
+  }
+  return await getEntry(newPath)
 }
 
 export const renameEntry = async (

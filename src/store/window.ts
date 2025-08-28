@@ -19,6 +19,8 @@ import { showError } from '~/store/notification'
 import { addQuery } from '~/store/query'
 import { selectWindowId } from '~/store/window-id'
 import { buildZephyUrl, getTitle } from '~/utils/url'
+import { changeFavoritePath } from './favorite'
+import { changeRatingPath } from './rating'
 
 type History = {
   query: string
@@ -1042,7 +1044,21 @@ export const setCurrentViewMode =
     dispatch(setViewMode({ id, url: currentUrl, viewMode }))
   }
 
-// Operations for application menu
+// Operations for anywhere
+
+export const move =
+  (paths: string[], directoryPath: string): AppThunk =>
+  async (dispatch) => {
+    for (const path of paths) {
+      try {
+        const entry = await window.entryAPI.moveEntry(path, directoryPath)
+        dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
+        dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
+      } catch (e) {
+        dispatch(showError(e))
+      }
+    }
+  }
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {
   const canBack = selectCurrentCanBack(getState())

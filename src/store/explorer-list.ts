@@ -576,6 +576,12 @@ export const selectCurrentLoading = createSelector(
   (state, tabId) => selectLoadingByTabId(state, tabId),
 )
 
+export const selectCurrentFocused = createSelector(
+  (state: AppState) => state,
+  selectCurrentTabId,
+  (state, tabId) => selectFocusedByTabId(state, tabId),
+)
+
 export const selectCurrentSelected = createSelector(
   (state: AppState) => state,
   selectCurrentTabId,
@@ -833,6 +839,28 @@ export const rename =
 
 // Operations for current tab
 
+export const openInCurrentTab =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const selected = selectCurrentSelected(getState())
+
+    const targetPath = path ?? selected[0]
+    if (!targetPath) {
+      return
+    }
+
+    try {
+      const entry = await window.entryAPI.getEntry(targetPath)
+      if (entry.type === 'directory') {
+        dispatch(changeUrl(entry.url))
+      } else {
+        dispatch(openUrl(entry.url))
+      }
+    } catch (e) {
+      showError(e)
+    }
+  }
+
 export const refreshInCurrentTab =
   (): AppThunk => async (dispatch, getState) => {
     const tabId = selectCurrentTabId(getState())
@@ -849,6 +877,24 @@ export const selectAllInCurrentTab =
 
     const paths = contents.map((content) => content.path)
     dispatch(selectAll({ tabId, paths }))
+  }
+
+export const startRenamingInCurrentTab =
+  (path?: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { focus, select, startEditing } = explorerListSlice.actions
+
+    const tabId = selectCurrentTabId(getState())
+    const focused = selectCurrentFocused(getState())
+
+    const targetPath = path ?? focused
+    if (!targetPath) {
+      return
+    }
+
+    dispatch(select({ tabId, path: targetPath }))
+    dispatch(focus({ tabId, path: targetPath }))
+    dispatch(startEditing({ tabId, path: targetPath }))
   }
 
 export const newFolderInCurrentTab =
@@ -878,24 +924,6 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
 
   window.entryAPI.pasteEntries(currentDirectoryPath)
 }
-
-export const startRenamingInCurrentTab =
-  (path?: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { focus, select, startEditing } = explorerListSlice.actions
-
-    const tabId = selectCurrentTabId(getState())
-    const selected = selectCurrentSelected(getState())
-
-    const targetPath = path ?? selected[0]
-    if (!targetPath) {
-      return
-    }
-
-    dispatch(select({ tabId, path: targetPath }))
-    dispatch(focus({ tabId, path: targetPath }))
-    dispatch(startEditing({ tabId, path: targetPath }))
-  }
 
 export const moveToTrashInCurrentTab =
   (paths?: string[]): AppThunk =>
@@ -947,45 +975,7 @@ export const moveToTrashInCurrentTab =
     }
   }
 
-export const openInCurrentTab =
-  (path?: string): AppThunk =>
-  async (dispatch, getState) => {
-    const selected = selectCurrentSelected(getState())
-
-    const targetPath = path ?? selected[0]
-    if (!targetPath) {
-      return
-    }
-
-    try {
-      const entry = await window.entryAPI.getEntry(targetPath)
-      if (entry.type === 'directory') {
-        dispatch(changeUrl(entry.url))
-      } else {
-        dispatch(openUrl(entry.url))
-      }
-    } catch (e) {
-      showError(e)
-    }
-  }
-
 // Operations for anywhere
-
-export const move =
-  (paths: string[], directoryPath: string): AppThunk =>
-  async (dispatch) => {
-    try {
-      const entries = await window.entryAPI.moveEntries(paths, directoryPath)
-      for (let i = 0; i < paths.length; i++) {
-        const path = paths[i]
-        const entry = entries[i]
-        dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
-        dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-      }
-    } catch (e) {
-      dispatch(showError(e))
-    }
-  }
 
 export const handle =
   (
