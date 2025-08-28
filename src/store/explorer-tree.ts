@@ -252,7 +252,7 @@ export const expandItems =
     }
   }
 
-export const handle =
+export const handleFileChange =
   (
     eventType: 'create' | 'update' | 'delete',
     directoryPath: string,

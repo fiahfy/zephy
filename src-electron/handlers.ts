@@ -58,7 +58,11 @@ const registerElectronHandlers = () => {
     BrowserWindow.fromWebContents(event.sender)?.webContents.paste(),
   )
   ipcMain.on('pathToFileURL', (event: IpcMainEvent, path: string) => {
-    event.returnValue = pathToFileURL(path).href
+    try {
+      event.returnValue = pathToFileURL(path).href
+    } catch {
+      event.returnValue = undefined
+    }
   })
   ipcMain.on('selectAll', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.selectAll(),

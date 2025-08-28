@@ -8,8 +8,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import PreviewParametersTableCell from '~/components/PreviewParametersTableCell'
 import PreviewParametersTableHeaderCell from '~/components/PreviewParametersTableHeaderCell'
-import { useAppSelector } from '~/store'
-import { selectPreviewContentPath } from '~/store/preview'
+import type { Entry } from '~/interfaces'
 
 const parseParameters = (parameters: string) => {
   let prompt = ''
@@ -63,8 +62,12 @@ const parseParameters = (parameters: string) => {
   return { prompt, negativePrompt, params }
 }
 
-const PreviewParametersTable = () => {
-  const path = useAppSelector(selectPreviewContentPath)
+type Props = {
+  entry: Entry
+}
+
+const PreviewParametersTable = (props: Props) => {
+  const { entry } = props
 
   const [parameters, setParameters] = useState<string>()
 
@@ -76,10 +79,7 @@ const PreviewParametersTable = () => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (!path) {
-        return
-      }
-      const parameters = await window.entryAPI.getEntryParameters(path)
+      const parameters = await window.entryAPI.getEntryParameters(entry.path)
       if (unmounted) {
         return
       }
@@ -89,7 +89,7 @@ const PreviewParametersTable = () => {
     return () => {
       unmounted = true
     }
-  }, [path])
+  }, [entry.path])
 
   return (
     <>

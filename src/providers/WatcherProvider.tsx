@@ -6,17 +6,19 @@ import {
   useState,
 } from 'react'
 import { WatcherContext } from '~/contexts/WatcherContext'
-import type { FileEventHandler } from '~/interfaces'
+import { useAppDispatch } from '~/store'
+import { handleFileChange } from '~/store/window'
 
 type Props = { children: ReactNode }
 
 const WatcherProvider = (props: Props) => {
   const { children } = props
 
+  const dispatch = useAppDispatch()
+
   const [registry, setRegistry] = useState<{
     [key: string]: {
       directoryPaths: string[]
-      handler: FileEventHandler
     }
   }>({})
 
@@ -29,20 +31,12 @@ const WatcherProvider = (props: Props) => {
     [registry],
   )
 
-  const handlers = useMemo(
-    () => [
-      ...new Set(Object.values(registry).flatMap(({ handler }) => handler)),
-    ],
-    [registry],
-  )
-
   const watch = useCallback(
-    (key: string, directoryPaths: string[], handler: FileEventHandler) =>
+    (key: string, directoryPaths: string[]) =>
       setRegistry((registry) => ({
         ...registry,
         [key]: {
           directoryPaths,
-          handler,
         },
       })),
     [],
@@ -66,13 +60,11 @@ const WatcherProvider = (props: Props) => {
           directoryPath,
           path,
         })
-        for (const handler of handlers) {
-          handler(eventType, directoryPath, path)
-        }
+        dispatch(handleFileChange(eventType, directoryPath, path))
       },
     )
     return () => removeListener()
-  }, [handlers])
+  }, [dispatch])
 
   useEffect(() => {
     const unwatch = window.watcherAPI.watch(directoryPaths)

@@ -3,13 +3,12 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Content, Entry } from '~/interfaces'
+import type { Content, Entry, FileEventType } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
-import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
+import { changeFavoritePath } from '~/store/favorite'
 import { showError } from '~/store/notification'
 import {
   changeRatingPath,
-  removeRating,
   selectRating,
   selectScoreByPath,
   selectScoreToPathsMap,
@@ -977,12 +976,8 @@ export const moveToTrashInCurrentTab =
 
 // Operations for anywhere
 
-export const handle =
-  (
-    eventType: 'create' | 'update' | 'delete',
-    directoryPath: string,
-    path: string,
-  ): AppThunk =>
+export const handleFileChange =
+  (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
       explorerListSlice.actions
@@ -1015,8 +1010,6 @@ export const handle =
           break
         }
         case 'delete':
-          dispatch(removeFromFavorites({ path }))
-          dispatch(removeRating({ path }))
           dispatch(removeEntry({ tabId, path }))
           dispatch(removeSelection({ tabId, paths: [path] }))
           dispatch(unfocus({ tabId, paths: [path] }))

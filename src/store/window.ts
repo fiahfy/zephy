@@ -3,10 +3,12 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
+import type { FileEventType } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import {
   addTab,
   copyTab,
+  handleFileChange as handleFileChangeForExplorerList,
   removeOtherTabs,
   removeSelection,
   removeTab,
@@ -15,12 +17,14 @@ import {
   selectCurrentSelected,
   unfocus,
 } from '~/store/explorer-list'
+import { handleFileChange as handleFileChangeForExplorerTree } from '~/store/explorer-tree'
+import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
 import { showError } from '~/store/notification'
+import { handleFileChange as handleFileChangeForPreview } from '~/store/preview'
 import { addQuery } from '~/store/query'
+import { changeRatingPath, removeRating } from '~/store/rating'
 import { selectWindowId } from '~/store/window-id'
 import { buildZephyUrl, getTitle } from '~/utils/url'
-import { changeFavoritePath } from './favorite'
-import { changeRatingPath } from './rating'
 
 type History = {
   query: string
@@ -832,12 +836,12 @@ export const newTab =
 export const newTabWithDirectoryPath =
   (directoryPath: string, srcTabId?: number): AppThunk =>
   async (dispatch) => {
-    try {
-      const url = window.electronAPI.pathToFileURL(directoryPath)
-      dispatch(newTab(url, srcTabId))
-    } catch (e) {
-      showError(e)
+    const url = window.electronAPI.pathToFileURL(directoryPath)
+    if (!url) {
+      return
     }
+
+    dispatch(newTab(url, srcTabId))
   }
 
 export const duplicateTab =
@@ -935,12 +939,12 @@ export const changeUrl =
 export const changeDirectoryPath =
   (directoryPath: string): AppThunk =>
   async (dispatch) => {
-    try {
-      const url = window.electronAPI.pathToFileURL(directoryPath)
-      dispatch(changeUrl(url))
-    } catch (e) {
-      dispatch(showError(e))
+    const url = window.electronAPI.pathToFileURL(directoryPath)
+    if (!url) {
+      return
     }
+
+    dispatch(changeUrl(url))
   }
 
 export const go =
@@ -1058,6 +1062,24 @@ export const move =
         dispatch(showError(e))
       }
     }
+  }
+
+export const handleFileChange =
+  (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
+  async (dispatch) => {
+    switch (eventType) {
+      case 'create':
+      case 'update':
+        break
+      case 'delete':
+        dispatch(removeFromFavorites({ path }))
+        dispatch(removeRating({ path }))
+        break
+    }
+
+    dispatch(handleFileChangeForExplorerList(eventType, directoryPath, path))
+    dispatch(handleFileChangeForExplorerTree(eventType, directoryPath, path))
+    dispatch(handleFileChangeForPreview(eventType, directoryPath, path))
   }
 
 export const updateApplicationMenu = (): AppThunk => async (_, getState) => {

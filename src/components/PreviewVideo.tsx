@@ -6,6 +6,7 @@ import {
   useReducer,
   useRef,
 } from 'react'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDefaultLoop,
@@ -13,10 +14,6 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import {
-  selectPreviewContentPath,
-  selectPreviewContentUrl,
-} from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type State = {
@@ -43,9 +40,13 @@ const reducer = (_state: State, action: Action) => {
   }
 }
 
-const PreviewVideo = () => {
-  const path = useAppSelector(selectPreviewContentPath)
-  const url = useAppSelector(selectPreviewContentUrl)
+type Props = {
+  entry: Entry
+}
+
+const PreviewVideo = (props: Props) => {
+  const { entry } = props
+
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const appDispatch = useAppDispatch()
@@ -114,11 +115,10 @@ const PreviewVideo = () => {
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (!path) {
-        return
-      }
       dispatch({ type: 'loading' })
-      const thumbnail = await window.entryAPI.createEntryThumbnailUrl(path)
+      const thumbnail = await window.entryAPI.createEntryThumbnailUrl(
+        entry.path,
+      )
       if (unmounted) {
         return
       }
@@ -128,30 +128,26 @@ const PreviewVideo = () => {
     return () => {
       unmounted = true
     }
-  }, [path])
+  }, [entry.path])
 
   return (
-    <>
-      {url && (
-        // biome-ignore lint/a11y/useMediaCaption: false positive
-        <video
-          controls
-          onContextMenu={handleContextMenu}
-          onKeyDown={handleKeyDown}
-          onVolumeChange={handleVolumeChange}
-          poster={thumbnail}
-          ref={ref}
-          src={url}
-          style={{
-            backgroundColor: 'black',
-            display: 'block',
-            minHeight: 128,
-            outline: 'none',
-            width: '100%',
-          }}
-        />
-      )}
-    </>
+    // biome-ignore lint/a11y/useMediaCaption: false positive
+    <video
+      controls
+      onContextMenu={handleContextMenu}
+      onKeyDown={handleKeyDown}
+      onVolumeChange={handleVolumeChange}
+      poster={thumbnail}
+      ref={ref}
+      src={entry.url}
+      style={{
+        backgroundColor: 'black',
+        display: 'block',
+        minHeight: 128,
+        outline: 'none',
+        width: '100%',
+      }}
+    />
   )
 }
 

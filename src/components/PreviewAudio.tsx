@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDefaultLoop,
@@ -19,11 +20,15 @@ import {
   setDefaultLoop,
   setDefaultVolume,
 } from '~/store/preferences'
-import { selectPreviewContentUrl } from '~/store/preview'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
-const PreviewAudio = () => {
-  const url = useAppSelector(selectPreviewContentUrl)
+type Props = {
+  entry: Entry
+}
+
+const PreviewAudio = (props: Props) => {
+  const { entry } = props
+
   const defaultLoop = useAppSelector(selectDefaultLoop)
   const defaultVolume = useAppSelector(selectDefaultVolume)
   const dispatch = useAppDispatch()
@@ -104,59 +109,55 @@ const PreviewAudio = () => {
   }, [defaultLoop, defaultVolume])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => setPaused(true), [url])
+  useEffect(() => setPaused(true), [entry.url])
 
   return (
     <>
-      {url && (
-        <>
-          <GlobalStyles
-            styles={{
-              'audio#custom-audio': {
-                '&::-webkit-media-controls-enclosure': {
-                  borderRadius: 0,
-                },
-              },
-            }}
-          />
-          <Stack
-            onContextMenu={handleContextMenu}
-            sx={{
-              aspectRatio: '16 / 9',
-              backgroundColor: 'black',
-              minHeight: 128,
-            }}
-          >
-            <Stack
-              onClick={handleClick}
-              sx={{
-                alignItems: 'center',
-                cursor: 'pointer',
-                flexGrow: 1,
-                justifyContent: 'center',
-              }}
-            >
-              <Icon fontSize="large" sx={{ color: 'white' }} />
-            </Stack>
-            {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
-            <audio
-              controls
-              id={id}
-              onKeyDown={handleKeyDown}
-              onPause={() => setPaused(true)}
-              onPlay={() => setPaused(false)}
-              onVolumeChange={handleVolumeChange}
-              ref={ref}
-              src={url}
-              style={{
-                height: 38,
-                outline: 'none',
-                width: '100%',
-              }}
-            />
-          </Stack>
-        </>
-      )}
+      <GlobalStyles
+        styles={{
+          'audio#custom-audio': {
+            '&::-webkit-media-controls-enclosure': {
+              borderRadius: 0,
+            },
+          },
+        }}
+      />
+      <Stack
+        onContextMenu={handleContextMenu}
+        sx={{
+          aspectRatio: '16 / 9',
+          backgroundColor: 'black',
+          minHeight: 128,
+        }}
+      >
+        <Stack
+          onClick={handleClick}
+          sx={{
+            alignItems: 'center',
+            cursor: 'pointer',
+            flexGrow: 1,
+            justifyContent: 'center',
+          }}
+        >
+          <Icon fontSize="large" sx={{ color: 'white' }} />
+        </Stack>
+        {/* biome-ignore lint/a11y/useMediaCaption: false positive */}
+        <audio
+          controls
+          id={id}
+          onKeyDown={handleKeyDown}
+          onPause={() => setPaused(true)}
+          onPlay={() => setPaused(false)}
+          onVolumeChange={handleVolumeChange}
+          ref={ref}
+          src={entry.url}
+          style={{
+            height: 38,
+            outline: 'none',
+            width: '100%',
+          }}
+        />
+      </Stack>
     </>
   )
 }

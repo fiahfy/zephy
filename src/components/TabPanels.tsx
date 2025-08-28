@@ -2,8 +2,7 @@ import { Box } from '@mui/material'
 import { useEffect } from 'react'
 import TabPanel from '~/components/TabPanel'
 import useWatcher from '~/hooks/useWatcher'
-import { useAppDispatch, useAppSelector } from '~/store'
-import { handle } from '~/store/explorer-list'
+import { useAppSelector } from '~/store'
 import {
   selectCurrentTabId,
   selectDirectoryPaths,
@@ -14,17 +13,14 @@ const TabPanels = () => {
   const currentTabId = useAppSelector(selectCurrentTabId)
   const directoryPaths = useAppSelector(selectDirectoryPaths)
   const tabs = useAppSelector(selectTabs)
-  const dispatch = useAppDispatch()
 
   const { unwatch, watch } = useWatcher()
 
   useEffect(() => {
     const key = 'explorer-list'
-    watch(key, directoryPaths, (eventType, directoryPath, path) =>
-      dispatch(handle(eventType, directoryPath, path)),
-    )
+    watch(key, directoryPaths)
     return () => unwatch(key)
-  }, [directoryPaths, dispatch, unwatch, watch])
+  }, [directoryPaths, unwatch, watch])
 
   return (
     <Box

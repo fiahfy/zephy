@@ -3,14 +3,12 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Entry } from '~/interfaces'
+import type { Entry, FileEventType } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
-import { selectCurrentSelectedContents } from '~/store/explorer-list'
-import { changeFavoritePath, removeFromFavorites } from '~/store/favorite'
+import { changeFavoritePath } from '~/store/favorite'
 import { showError } from '~/store/notification'
 import {
   changeRatingPath,
-  removeRating,
   selectRating,
   selectScoreByPath,
 } from '~/store/rating'
@@ -19,6 +17,7 @@ import { isHiddenFile } from '~/utils/file'
 
 type State = {
   anchor: string | undefined
+  directoryPath: string | undefined
   editing: string | undefined
   entries: Entry[]
   error: boolean
@@ -30,6 +29,7 @@ type State = {
 
 const initialState: State = {
   anchor: undefined,
+  directoryPath: undefined,
   editing: undefined,
   entries: [],
   error: false,
@@ -43,10 +43,14 @@ export const previewSlice = createSlice({
   name: 'preview',
   initialState,
   reducers: {
-    load(state, action: PayloadAction<{ timestamp: number }>) {
-      const { timestamp } = action.payload
+    load(
+      state,
+      action: PayloadAction<{ directoryPath: string; timestamp: number }>,
+    ) {
+      const { directoryPath, timestamp } = action.payload
       return {
         ...state,
+        directoryPath,
         entries: [],
         loading: true,
         error: false,
@@ -233,6 +237,11 @@ export default previewSlice.reducer
 
 export const selectPreview = (state: AppState) => state.preview
 
+export const selectDirectoryPath = createSelector(
+  selectPreview,
+  (preview) => preview.directoryPath,
+)
+
 export const selectEntries = createSelector(
   selectPreview,
   (preview) => preview.entries,
@@ -282,22 +291,6 @@ export const selectContents = createSelector(
       .toSorted((a, b) => a.name.localeCompare(b.name)),
 )
 
-export const selectPreviewContent = createSelector(
-  selectCurrentSelectedContents,
-  (previewContents) =>
-    previewContents.length === 1 ? previewContents[0] : undefined,
-)
-
-export const selectPreviewContentUrl = createSelector(
-  selectPreviewContent,
-  (previewContent) => (previewContent ? previewContent.url : undefined),
-)
-
-export const selectPreviewContentPath = createSelector(
-  selectPreviewContent,
-  (previewContent) => (previewContent ? previewContent.path : undefined),
-)
-
 // Selectors by path
 
 const selectPath = (_state: AppState, path: string) => path
@@ -322,29 +315,26 @@ export const selectSelectedByPath = createSelector(
 
 // Operations
 
-export const load = (): AppThunk => async (dispatch, getState) => {
-  const { load, loaded, loadFailed } = previewSlice.actions
+export const load =
+  (directoryPath: string): AppThunk =>
+  async (dispatch, getState) => {
+    const { load, loaded, loadFailed } = previewSlice.actions
 
-  const previewContent = selectPreviewContent(getState())
-  if (!previewContent) {
-    return
+    const loading = selectLoading(getState())
+    if (loading) {
+      return
+    }
+
+    const timestamp = Date.now()
+
+    dispatch(load({ directoryPath, timestamp }))
+    try {
+      const entries = await window.entryAPI.getEntries(directoryPath)
+      dispatch(loaded({ entries, timestamp }))
+    } catch {
+      dispatch(loadFailed({ timestamp }))
+    }
   }
-
-  const loading = selectLoading(getState())
-  if (loading) {
-    return
-  }
-
-  const timestamp = Date.now()
-
-  dispatch(load({ timestamp }))
-  try {
-    const entries = await window.entryAPI.getEntries(previewContent.path)
-    dispatch(loaded({ entries, timestamp }))
-  } catch {
-    dispatch(loadFailed({ timestamp }))
-  }
-}
 
 export const addSelection =
   (path: string, useAnchor: boolean): AppThunk =>
@@ -559,12 +549,12 @@ export const copy = (): AppThunk => async (_, getState) => {
 }
 
 export const paste = (): AppThunk => async (_, getState) => {
-  const currentContentPath = selectPreviewContentPath(getState())
-  if (!currentContentPath) {
+  const directoryPath = selectDirectoryPath(getState())
+  if (!directoryPath) {
     return
   }
 
-  window.entryAPI.pasteEntries(currentContentPath)
+  window.entryAPI.pasteEntries(directoryPath)
 }
 
 export const moveToTrash =
@@ -616,18 +606,14 @@ export const moveToTrash =
     }
   }
 
-export const handle =
-  (
-    eventType: 'create' | 'update' | 'delete',
-    directoryPath: string,
-    path: string,
-  ): AppThunk =>
+export const handleFileChange =
+  (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
       previewSlice.actions
 
-    const previewContentPath = selectPreviewContentPath(getState())
-    if (directoryPath !== previewContentPath) {
+    const currentDirectoryPath = selectDirectoryPath(getState())
+    if (directoryPath !== currentDirectoryPath) {
       return
     }
 
@@ -651,8 +637,6 @@ export const handle =
         break
       }
       case 'delete':
-        dispatch(removeFromFavorites({ path }))
-        dispatch(removeRating({ path }))
         dispatch(removeEntry({ path }))
         dispatch(removeSelection({ paths: [path] }))
         dispatch(unfocus({ paths: [path] }))

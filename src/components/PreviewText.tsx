@@ -1,8 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useReducer } from 'react'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
-import { useAppSelector } from '~/store'
-import { selectPreviewContentUrl } from '~/store/preview'
+import type { Entry } from '~/interfaces'
 
 type State = {
   status: 'error' | 'loaded' | 'loading'
@@ -32,8 +31,12 @@ const reducer = (_state: State, action: Action) => {
   }
 }
 
-const PreviewText = () => {
-  const url = useAppSelector(selectPreviewContentUrl)
+type Props = {
+  entry: Entry
+}
+
+const PreviewText = (props: Props) => {
+  const { entry } = props
 
   const [{ status, text }, dispatch] = useReducer(reducer, {
     status: 'loading',
@@ -53,19 +56,16 @@ const PreviewText = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (!url) {
-        return
-      }
       dispatch({ type: 'loading' })
       try {
-        const res = await fetch(url)
+        const res = await fetch(entry.url)
         const text = await res.text()
         dispatch({ type: 'loaded', payload: { text } })
       } catch {
         dispatch({ type: 'error' })
       }
     })()
-  }, [url])
+  }, [entry.url])
 
   return (
     <>

@@ -7,55 +7,60 @@ import {
 } from '@mui/material'
 import pluralize from 'pluralize'
 import { useEffect, useMemo, useState } from 'react'
-import type { Content, Metadata } from '~/interfaces'
-import { useAppSelector } from '~/store'
-import { selectCurrentSelectedContents } from '~/store/explorer-list'
-import { selectPreviewContent } from '~/store/preview'
+import type { Entry, Metadata } from '~/interfaces'
 import {
   formatDateTime,
   formatDuration,
   formatFileSize,
 } from '~/utils/formatter'
 
-const getTotalFileSize = (contents: Content[]) =>
-  contents
-    .filter((content) => content.type !== 'directory')
-    .reduce((acc, content) => acc + content.size, 0)
+const getTotalFileSize = (entries: Entry[]) =>
+  entries
+    .filter((entry) => entry.type !== 'directory')
+    .reduce((acc, entry) => acc + entry.size, 0)
 
 const formatDateRange = (
-  contents: Content[],
+  entries: Entry[],
   dateProperty: 'dateCreated' | 'dateLastOpened' | 'dateModified',
 ) => {
-  const content = contents[0]
-  if (!content) {
+  const entry = entries[0]
+  if (!entry) {
     return
   }
-  if (contents.length > 1) {
-    const dates = contents.map((content) => content[dateProperty])
+  if (entries.length > 1) {
+    const dates = entries.map((entry) => entry[dateProperty])
     const minDate = Math.min(...dates)
     const maxDate = Math.max(...dates)
     return minDate === maxDate
       ? formatDateTime(minDate)
       : `${formatDateTime(minDate)} - ${formatDateTime(maxDate)}`
   }
-  return formatDateTime(content[dateProperty])
+  return formatDateTime(entry[dateProperty])
 }
 
-const PreviewInformationTable = () => {
-  const contents = useAppSelector(selectCurrentSelectedContents)
-  const content = useAppSelector(selectPreviewContent)
+type Props = {
+  entries: Entry[]
+}
+
+const PreviewInformationTable = (props: Props) => {
+  const { entries } = props
 
   const [metadata, setMetadata] = useState<Metadata>()
 
-  const caption = useMemo(
-    () =>
-      contents.length > 1
-        ? pluralize('item', contents.length, true)
-        : content?.name,
-    [contents.length, content?.name],
+  const entry = useMemo(
+    () => (entries.length === 1 ? entries[0] : undefined),
+    [entries],
   )
 
-  const fileSize = useMemo(() => getTotalFileSize(contents), [contents])
+  const caption = useMemo(
+    () =>
+      entries.length > 1
+        ? pluralize('item', entries.length, true)
+        : entry?.name,
+    [entries.length, entry?.name],
+  )
+
+  const fileSize = useMemo(() => getTotalFileSize(entries), [entries])
 
   const rows = useMemo(
     () => [
@@ -69,15 +74,15 @@ const PreviewInformationTable = () => {
         : []),
       {
         label: 'Date Created',
-        value: formatDateRange(contents, 'dateCreated'),
+        value: formatDateRange(entries, 'dateCreated'),
       },
       {
         label: 'Date Modified',
-        value: formatDateRange(contents, 'dateModified'),
+        value: formatDateRange(entries, 'dateModified'),
       },
       {
         label: 'Date Last Opened',
-        value: formatDateRange(contents, 'dateLastOpened'),
+        value: formatDateRange(entries, 'dateLastOpened'),
       },
       ...(metadata
         ? [
@@ -100,19 +105,19 @@ const PreviewInformationTable = () => {
           ]
         : []),
     ],
-    [contents, fileSize, metadata],
+    [entries, fileSize, metadata],
   )
 
   useEffect(() => {
     let unmounted = false
     ;(async () => {
-      if (contents.length > 1) {
+      if (entries.length > 1) {
         return
       }
-      if (!content?.path) {
+      if (!entry?.path) {
         return
       }
-      const metadata = await window.entryAPI.getEntryMetadata(content.path)
+      const metadata = await window.entryAPI.getEntryMetadata(entry.path)
       if (unmounted) {
         return
       }
@@ -122,7 +127,7 @@ const PreviewInformationTable = () => {
     return () => {
       unmounted = true
     }
-  }, [contents.length, content?.path])
+  }, [entries.length, entry?.path])
 
   return (
     <Table size="small" sx={{ tableLayout: 'fixed' }}>

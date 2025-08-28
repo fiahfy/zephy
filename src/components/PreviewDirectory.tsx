@@ -14,20 +14,19 @@ import PreviewEmptyState from '~/components/PreviewEmptyState'
 import useDroppable from '~/hooks/useDroppable'
 import usePrevious from '~/hooks/usePrevious'
 import useWatcher from '~/hooks/useWatcher'
-import type { Content } from '~/interfaces'
+import type { Content, Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   blur,
   focusByHorizontal,
   focusByVertical,
   focusTo,
-  handle,
   load,
   selectContents,
+  selectDirectoryPath,
   selectError,
   selectFocused,
   selectLoading,
-  selectPreviewContentPath,
   setAnchor,
   startEditing,
   unselectAll,
@@ -36,17 +35,23 @@ import { createContextMenuHandler } from '~/utils/context-menu'
 
 const maxItemSize = 256
 
-const PreviewDirectory = () => {
+type Props = {
+  entry: Entry
+}
+
+const PreviewDirectory = (props: Props) => {
+  const { entry } = props
+
+  const directoryPath = useAppSelector(selectDirectoryPath)
   const contents = useAppSelector(selectContents)
   const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
   const loading = useAppSelector(selectLoading)
-  const previewContentPath = useAppSelector(selectPreviewContentPath)
   const dispatch = useAppDispatch()
 
   const { unwatch, watch } = useWatcher()
 
-  const { droppableStyle, ...dropHandlers } = useDroppable(previewContentPath)
+  const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
@@ -89,23 +94,23 @@ const PreviewDirectory = () => {
   )
 
   const onContextMenu = useMemo(() => {
-    if (!previewContentPath) {
+    if (!directoryPath) {
       return
     }
     return createContextMenuHandler([
       {
         type: 'newFolder',
-        data: { path: previewContentPath },
+        data: { path: directoryPath },
       },
       { type: 'separator' },
       { type: 'cutEntries', data: { paths: [] } },
       { type: 'copyEntries', data: { paths: [] } },
       {
         type: 'pasteEntries',
-        data: { path: previewContentPath },
+        data: { path: directoryPath },
       },
     ])
-  }, [previewContentPath])
+  }, [directoryPath])
 
   const onClick = useCallback(() => {
     dispatch(blur())
@@ -181,21 +186,18 @@ const PreviewDirectory = () => {
     return () => observer.disconnect()
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
-    dispatch(load())
-  }, [dispatch, previewContentPath])
+    dispatch(load(entry.path))
+  }, [dispatch, entry.path])
 
   useEffect(() => {
-    if (!previewContentPath) {
+    if (!directoryPath) {
       return
     }
     const key = 'preview'
-    watch(key, [previewContentPath], async (eventType, directoryPath, path) =>
-      dispatch(handle(eventType, directoryPath, path)),
-    )
+    watch(key, [directoryPath])
     return () => unwatch(key)
-  }, [dispatch, previewContentPath, unwatch, watch])
+  }, [directoryPath, unwatch, watch])
 
   return (
     <Box

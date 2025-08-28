@@ -13,7 +13,6 @@ import type { Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   expandItems,
-  handle,
   load,
   selectExpandedItems,
   selectItems,
@@ -109,11 +108,9 @@ const ExplorerPanel = () => {
 
   useEffect(() => {
     const key = 'explorer-tree'
-    watch(key, loadedDirectoryPath, (eventType, directoryPath, path) =>
-      dispatch(handle(eventType, directoryPath, path)),
-    )
+    watch(key, loadedDirectoryPath)
     return () => unwatch(key)
-  }, [dispatch, loadedDirectoryPath, unwatch, watch])
+  }, [loadedDirectoryPath, unwatch, watch])
 
   return (
     <Panel onClickRefresh={handleClickRefresh} title="Explorer">

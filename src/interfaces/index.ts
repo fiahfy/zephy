@@ -16,7 +16,7 @@ export type ElectronOperations = {
   openExternal: (url: string) => void
   openTab: () => void
   paste: () => void
-  pathToFileURL: (path: string) => string
+  pathToFileURL: (path: string) => string | undefined
   selectAll: () => void
   startDrag: (paths: string[]) => void
 }

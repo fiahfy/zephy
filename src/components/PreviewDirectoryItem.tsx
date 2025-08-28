@@ -25,9 +25,9 @@ import {
   focus,
   rename,
   select,
+  selectDirectoryPath,
   selectEditingByPath,
   selectFocusedByPath,
-  selectPreviewContentPath,
   selectSelected,
   selectSelectedByPath,
   startEditing,
@@ -44,9 +44,7 @@ type Props = {
 const PreviewDirectoryItem = (props: Props) => {
   const { content } = props
 
-  const directoryPath = useAppSelector((state) =>
-    selectPreviewContentPath(state),
-  )
+  const directoryPath = useAppSelector((state) => selectDirectoryPath(state))
   const editing = useAppSelector((state) =>
     selectEditingByPath(state, content.path),
   )

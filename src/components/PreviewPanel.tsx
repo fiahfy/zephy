@@ -10,15 +10,18 @@ import PreviewText from '~/components/PreviewText'
 import PreviewVideo from '~/components/PreviewVideo'
 import { useAppSelector } from '~/store'
 import { selectCurrentSelectedContents } from '~/store/explorer-list'
-import { selectPreviewContent } from '~/store/preview'
 import { detectFileType } from '~/utils/file'
 
 const PreviewPanel = () => {
   const contents = useAppSelector(selectCurrentSelectedContents)
-  const content = useAppSelector(selectPreviewContent)
 
   const ref = useRef<HTMLElement>(null)
   const footerRef = useRef<HTMLElement>(null)
+
+  const content = useMemo(
+    () => (contents.length === 1 ? contents[0] : undefined),
+    [contents],
+  )
 
   const preview = useMemo(() => {
     if (!content) {
@@ -37,15 +40,15 @@ const PreviewPanel = () => {
   const previewItem = useMemo(() => {
     switch (preview?.type) {
       case 'audio':
-        return <PreviewAudio />
+        return <PreviewAudio entry={preview.content} />
       case 'directory':
-        return <PreviewDirectory />
+        return <PreviewDirectory entry={preview.content} />
       case 'image':
-        return <PreviewImage />
+        return <PreviewImage entry={preview.content} />
       case 'text':
-        return <PreviewText />
+        return <PreviewText entry={preview.content} />
       case 'video':
-        return <PreviewVideo />
+        return <PreviewVideo entry={preview.content} />
       default:
         return <PreviewEmptyState message="No preview" />
     }
@@ -114,8 +117,10 @@ const PreviewPanel = () => {
               zIndex: 1,
             })}
           >
-            <PreviewInformationTable />
-            {preview?.type === 'image' && <PreviewParametersTable />}
+            <PreviewInformationTable entries={contents} />
+            {preview?.type === 'image' && (
+              <PreviewParametersTable entry={preview.content} />
+            )}
           </Box>
         </>
       ) : (
