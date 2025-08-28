@@ -41,6 +41,7 @@ const createWatcher = () => {
     directoryPaths: string[],
     handler: FileEventHandler,
   ) => {
+    await close(id)
     watchers[id] = chokidar
       .watch(directoryPaths, {
         depth: 0,
