@@ -51,16 +51,7 @@ export type WatcherOperations = {
   watch: (directoryPaths: string[]) => () => void
 }
 
-type File = {
-  type: 'file'
-}
-
-type Directory = {
-  children?: Entry[]
-  type: 'directory'
-}
-
-export type Entry = (File | Directory) & {
+type BaseEntry = {
   dateCreated: number
   dateLastOpened: number
   dateModified: number
@@ -69,6 +60,14 @@ export type Entry = (File | Directory) & {
   size: number
   url: string
 }
+type File = BaseEntry & {
+  type: 'file'
+}
+type Directory = BaseEntry & {
+  children?: Entry[]
+  type: 'directory'
+}
+export type Entry = File | Directory
 
 export type Content = Entry & { score: number }
 

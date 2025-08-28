@@ -12,14 +12,7 @@ import {
   stat,
 } from 'fs-extra'
 
-type File = {
-  type: 'file'
-}
-type Directory = {
-  children?: Entry[]
-  type: 'directory'
-}
-type Entry = (File | Directory) & {
+type BaseEntry = {
   dateCreated: number
   dateLastOpened: number
   dateModified: number
@@ -28,6 +21,14 @@ type Entry = (File | Directory) & {
   size: number
   url: string
 }
+type File = BaseEntry & {
+  type: 'file'
+}
+type Directory = BaseEntry & {
+  children?: Entry[]
+  type: 'directory'
+}
+type Entry = File | Directory
 
 // @see https://stackoverflow.com/a/3561711
 const escapeRegex = (s: string) => s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
@@ -159,9 +160,8 @@ export const getRootEntry = async (
 
   const root = await getEntry(rootPath)
 
-  let entry: Directory = {
+  let entry = {
     children: [{ ...root, name: rootPath }],
-    type: 'directory',
   }
 
   entry = await dirnames.reduce(async (promise, _dirname, i) => {
