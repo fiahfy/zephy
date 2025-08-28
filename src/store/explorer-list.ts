@@ -900,7 +900,8 @@ export const startRenamingInCurrentTab =
 export const moveToTrashInCurrentTab =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
-    const { blur, focus, select, unselectAll } = explorerListSlice.actions
+    const { blur, focus, removeEntry, select, unselectAll } =
+      explorerListSlice.actions
 
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
@@ -910,33 +911,40 @@ export const moveToTrashInCurrentTab =
       return
     }
 
-    if (targetPaths.some((targetPath) => selected.includes(targetPath))) {
-      const contents = selectContentsByTabId(getState(), tabId)
-      const path = (() => {
-        const lastIndex = Math.max(
-          ...contents.flatMap((content, i) =>
-            targetPaths.includes(content.path) ? [i] : [],
-          ),
-        )
-        if (lastIndex !== contents.length - 1) {
-          return contents[lastIndex + 1]?.path
-        }
-        const filtered = contents.filter(
-          (content) => !targetPaths.includes(content.path),
-        )
-        return filtered[filtered.length - 1]?.path
-      })()
+    for (const targetPath of targetPaths) {
+      try {
+        await window.entryAPI.moveEntryToTrash(targetPath)
 
-      if (path) {
-        dispatch(select({ tabId, path }))
-        dispatch(focus({ tabId, path }))
-      } else {
-        dispatch(unselectAll({ tabId }))
-        dispatch(blur({ tabId }))
+        if (selected.includes(targetPath)) {
+          const contents = selectContentsByTabId(getState(), tabId)
+          const path = (() => {
+            const lastIndex = Math.max(
+              ...contents.flatMap((content, i) =>
+                content.path === targetPath ? [i] : [],
+              ),
+            )
+            if (lastIndex !== contents.length - 1) {
+              return contents[lastIndex + 1]?.path
+            }
+            const filtered = contents.filter(
+              (content) => content.path !== targetPath,
+            )
+            return filtered[filtered.length - 1]?.path
+          })()
+          if (path) {
+            dispatch(select({ tabId, path }))
+            dispatch(focus({ tabId, path }))
+          } else {
+            dispatch(unselectAll({ tabId }))
+            dispatch(blur({ tabId }))
+          }
+        }
+
+        dispatch(removeEntry({ tabId, path: targetPath }))
+      } catch (e) {
+        showError(e)
       }
     }
-
-    window.entryAPI.moveEntriesToTrash(targetPaths)
   }
 
 export const openInCurrentTab =

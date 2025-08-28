@@ -121,14 +121,14 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     (_event: IpcMainInvokeEvent, paths: string[], directoryPath: string) =>
       moveEntries(paths, directoryPath),
   )
-  ipcMain.on('moveEntriesToTrash', (_event: IpcMainEvent, paths: string[]) =>
-    Promise.all(
-      paths.map(async (path) => {
-        await shell.trashItem(path)
-        // NOTE: Notify event manually due to intermittent failures
-        watcher.notify('delete', dirname(path), path)
-      }),
-    ),
+  ipcMain.handle(
+    'moveEntryToTrash',
+    async (_event: IpcMainInvokeEvent, path: string) => {
+      await shell.trashItem(path)
+      // NOTE: Notify event manually due to intermittent failures
+      //       Send delete events asynchronously to prevent invalid focus/selection behavior
+      setTimeout(() => watcher.notify('delete', dirname(path), path))
+    },
   )
   ipcMain.on('openEntry', (_event: IpcMainEvent, path: string) =>
     shell.openPath(path),
