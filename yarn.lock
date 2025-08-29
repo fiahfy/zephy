@@ -1232,15 +1232,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/electron-window@npm:^0.1.6":
-  version: 0.1.6
-  resolution: "@fiahfy/electron-window@npm:0.1.6"
+"@fiahfy/electron-window@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "@fiahfy/electron-window@npm:0.1.8"
   dependencies:
     electron-window-state: "npm:^5.0.3"
     jsonfile: "npm:^6.2.0"
   peerDependencies:
     electron: ">=27"
-  checksum: 10c0/ff73c99ea406f281147a4d568a33660f9f3779e1c0bae9f53586889e58f40d08d62238653048fe09eae80c317e40fddef391aa166d67f4f2631e01a0e7b24f9f
+  checksum: 10c0/23f83c93660c946fe76cd0ab512d9d8c2f47f4965c3238270318a352a8076175c397a75451e961455882fa0dd737259ff361704ee5d7bb5d18300923c13bd4bb
   languageName: node
   linkType: hard
 
@@ -1796,10 +1796,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rolldown/pluginutils@npm:1.0.0-beta.32":
-  version: 1.0.0-beta.32
-  resolution: "@rolldown/pluginutils@npm:1.0.0-beta.32"
-  checksum: 10c0/ba3582fc3c35c8eb57b0df2d22d0733b1be83d37edcc258203364773f094f58fc0cb7a056d604603573a69dd0105a466506cad467f59074e1e53d0dc26191f06
+"@rolldown/pluginutils@npm:1.0.0-beta.34":
+  version: 1.0.0-beta.34
+  resolution: "@rolldown/pluginutils@npm:1.0.0-beta.34"
+  checksum: 10c0/96565287991825ecd90b60607dae908ebfdde233661fc589c98547a75c1fd0282b2e2a7849c3eb0c9941e2fba34667a8d5cdb8d597370815c19c2f29b4c157b4
   languageName: node
   linkType: hard
 
@@ -2180,12 +2180,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.8":
-  version: 19.1.8
-  resolution: "@types/react-dom@npm:19.1.8"
+"@types/react-dom@npm:^19.1.9":
+  version: 19.1.9
+  resolution: "@types/react-dom@npm:19.1.9"
   peerDependencies:
     "@types/react": ^19.0.0
-  checksum: 10c0/561f9679c99e93adba8ecdf7d5ad69cc9d5e35837fa996246a83713f0ce498fc5b871f9a2a3342c7d440fc02159abe10f29c4a4004527d5d38b2e84f21840793
+  checksum: 10c0/34c8dda86c1590b3ef0e7ecd38f9663a66ba2dd69113ba74fb0adc36b83bbfb8c94c1487a2505282a5f7e5e000d2ebf36f4c0fd41b3b672f5178fd1d4f1f8f58
   languageName: node
   linkType: hard
 
@@ -2198,12 +2198,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.11":
-  version: 19.1.11
-  resolution: "@types/react@npm:19.1.11"
+"@types/react@npm:^19.1.12":
+  version: 19.1.12
+  resolution: "@types/react@npm:19.1.12"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/639b225c2bbcd4b8a30e1ea7a73aec81ae5b952a4c432460b48c9881c9d12e76645c9032d24f15eefae9985a12d5cb26557fe10e9850b2da0fabfb0a1e2d16bd
+  checksum: 10c0/e35912b43da0caaab5252444bab87a31ca22950cde2822b3b3dc32e39c2d42dad1a4cf7b5dde9783aa2d007f0b2cba6ab9563fc6d2dbcaaa833b35178118767c
   languageName: node
   linkType: hard
 
@@ -2232,19 +2232,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "@vitejs/plugin-react@npm:5.0.1"
+"@vitejs/plugin-react@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@vitejs/plugin-react@npm:5.0.2"
   dependencies:
     "@babel/core": "npm:^7.28.3"
     "@babel/plugin-transform-react-jsx-self": "npm:^7.27.1"
     "@babel/plugin-transform-react-jsx-source": "npm:^7.27.1"
-    "@rolldown/pluginutils": "npm:1.0.0-beta.32"
+    "@rolldown/pluginutils": "npm:1.0.0-beta.34"
     "@types/babel__core": "npm:^7.20.5"
     react-refresh: "npm:^0.17.0"
   peerDependencies:
     vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-  checksum: 10c0/2641171beedfc38edc5671abb47706906f9af2a79a6dfff4e946106c9550de4f83ccae41c164f3ee26a3edf07127ecc0e415fe5cddbf7abc71fbb2540016c27d
+  checksum: 10c0/6b02478498d8095b4c5b688b457f8ff35c3274489399f79cf412c2d68213c5e7796d245de27093ccf91b4fb4b644a31e9a759d91caa1ba62da105be3875fc6dd
   languageName: node
   linkType: hard
 
@@ -2536,16 +2536,16 @@ __metadata:
   linkType: hard
 
 "browserslist@npm:^4.24.0":
-  version: 4.25.3
-  resolution: "browserslist@npm:4.25.3"
+  version: 4.25.4
+  resolution: "browserslist@npm:4.25.4"
   dependencies:
-    caniuse-lite: "npm:^1.0.30001735"
-    electron-to-chromium: "npm:^1.5.204"
+    caniuse-lite: "npm:^1.0.30001737"
+    electron-to-chromium: "npm:^1.5.211"
     node-releases: "npm:^2.0.19"
     update-browserslist-db: "npm:^1.1.3"
   bin:
     browserslist: cli.js
-  checksum: 10c0/cefbbf962b7c0f0d77e952a4b4b37469db7f7f02bc2be7297810ac3cf086660f48daf78d00f7aad8a11b682f88b0ee0022594165ead749e9e4158a0aa49cd161
+  checksum: 10c0/2b105948990dc2fc0bc2536b4889aadfa15d637e1d857a121611a704cdf539a68f575a391f6bf8b7ff19db36cee1b7834565571f35a7ea691051d2e7fb4f2eb1
   languageName: node
   linkType: hard
 
@@ -2648,7 +2648,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001735":
+"caniuse-lite@npm:^1.0.30001737":
   version: 1.0.30001737
   resolution: "caniuse-lite@npm:1.0.30001737"
   checksum: 10c0/9d9cfe3b46fe670d171cee10c5c1b0fb641946fd5d6bea26149f804003d53d82ade7ef5a4a640fb3a0eaec47c7839b57e06a6ddae4f0ad2cd58e1187d31997ce
@@ -3152,10 +3152,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-to-chromium@npm:^1.5.204":
-  version: 1.5.209
-  resolution: "electron-to-chromium@npm:1.5.209"
-  checksum: 10c0/ec857aeecf85769310889926d55cf4032f93b213733e68b4bc48eab72e42e190f9f1a2694c8c175435cbd111dfdee420e1e1ffe5b2bd46b2f33324580e938f2c
+"electron-to-chromium@npm:^1.5.211":
+  version: 1.5.211
+  resolution: "electron-to-chromium@npm:1.5.211"
+  checksum: 10c0/587536f2e319b7484cd4c9e83484f461ee06672c588c84bf4d4b6a6b5d00fbdb621d4ca418a68125a86db95d373b890b47de2fb5a0f52592cc8aebc263623e6e
   languageName: node
   linkType: hard
 
@@ -3186,16 +3186,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^37.3.1":
-  version: 37.3.1
-  resolution: "electron@npm:37.3.1"
+"electron@npm:^37.4.0":
+  version: 37.4.0
+  resolution: "electron@npm:37.4.0"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^22.7.7"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/1b171804646f229768c29413629b70b968c4c06686913b69e8615da09c58d63a95817021c31ed3c3bdbba0ad360ad4469773b9dda2662884d7df2866559f95f1
+  checksum: 10c0/92a0c41190e234d302bc612af6cce9af08cd07f6699c1ff21a9365297e73dc9d88c6c4c25ddabf352447e3e555878d2ab0f2f31a14e210dda6de74d2787ff323
   languageName: node
   linkType: hard
 
@@ -6885,7 +6885,7 @@ __metadata:
     "@emotion/styled": "npm:^11.14.1"
     "@fiahfy/biome-config": "npm:^0.0.2"
     "@fiahfy/electron-context-menu": "npm:^0.1.7"
-    "@fiahfy/electron-window": "npm:^0.1.6"
+    "@fiahfy/electron-window": "npm:^0.1.8"
     "@fontsource/roboto": "npm:^5.2.6"
     "@mui/icons-material": "npm:^7.3.1"
     "@mui/material": "npm:^7.3.1"
@@ -6898,13 +6898,13 @@ __metadata:
     "@types/lodash.throttle": "npm:^4"
     "@types/plist": "npm:^3.0.5"
     "@types/pluralize": "npm:^0.0.33"
-    "@types/react": "npm:^19.1.11"
-    "@types/react-dom": "npm:^19.1.8"
-    "@vitejs/plugin-react": "npm:^5.0.1"
+    "@types/react": "npm:^19.1.12"
+    "@types/react-dom": "npm:^19.1.9"
+    "@vitejs/plugin-react": "npm:^5.0.2"
     chokidar: "npm:~3.6.0"
     clsx: "npm:^2.1.1"
     date-fns: "npm:^4.1.0"
-    electron: "npm:^37.3.1"
+    electron: "npm:^37.4.0"
     electron-squirrel-startup: "npm:^1.0.1"
     exifreader: "npm:^4.31.1"
     ffmpeg-static-electron: "npm:^2.0.3"
