@@ -25,7 +25,7 @@ import {
   selectUrlByTabId,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { parseZephyUrl } from '~/utils/url'
+import { isFileUrl, parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -839,11 +839,14 @@ export const rename =
 // Operations for current tab
 
 export const openInCurrentTab =
-  (path?: string): AppThunk =>
+  (url?: string): AppThunk =>
   async (dispatch, getState) => {
-    const selected = selectCurrentSelected(getState())
+    if (url && !isFileUrl(url)) {
+      return dispatch(changeUrl(url))
+    }
 
-    const targetPath = path ?? selected[0]
+    const focused = selectCurrentFocused(getState())
+    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
     if (!targetPath) {
       return
     }

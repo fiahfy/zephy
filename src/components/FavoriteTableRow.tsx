@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import useDroppable from '~/hooks/useDroppable'
 import { useAppDispatch } from '~/store'
-import { changeDirectoryPath, newTabWithDirectoryPath } from '~/store/window'
+import { changeUrl, newTab } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {
@@ -16,11 +16,16 @@ const FavoriteTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
+  const url = useMemo(() => window.electronAPI.pathToFileURL(path), [path])
+
   const buttonHandlers = useButtonBehavior((e) => {
+    if (!url) {
+      return
+    }
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
-      dispatch(newTabWithDirectoryPath(path))
+      dispatch(newTab(url))
     } else {
-      dispatch(changeDirectoryPath(path))
+      dispatch(changeUrl(url))
     }
   })
 
@@ -30,15 +35,15 @@ const FavoriteTableRow = (props: Props) => {
     return createContextMenuHandler([
       {
         type: 'open',
-        data: { path },
+        data: { url },
       },
       {
         type: 'openInNewWindow',
-        data: { path },
+        data: { url },
       },
       {
         type: 'openInNewTab',
-        data: { path },
+        data: { url },
       },
       { type: 'separator' },
       {
@@ -46,7 +51,7 @@ const FavoriteTableRow = (props: Props) => {
         data: { path, favorite: true },
       },
     ])
-  }, [path])
+  }, [path, url])
 
   return (
     <TableRow

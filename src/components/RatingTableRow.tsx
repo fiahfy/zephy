@@ -2,7 +2,7 @@ import { TableRow } from '@mui/material'
 import { type ReactNode, useMemo } from 'react'
 import useButtonBehavior from '~/hooks/useButtonBehavior'
 import { useAppDispatch } from '~/store'
-import { goToRatings, openRatings } from '~/store/window'
+import { changeUrl, newTab } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 import { buildZephyUrl } from '~/utils/url'
 
@@ -16,31 +16,35 @@ const RatingTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
+  const url = useMemo(
+    () => buildZephyUrl({ pathname: 'ratings', params: { score } }),
+    [score],
+  )
+
   const buttonHandlers = useButtonBehavior((e) => {
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
-      dispatch(openRatings(score))
+      dispatch(newTab(url))
     } else {
-      dispatch(goToRatings(score))
+      dispatch(changeUrl(url))
     }
   })
 
   const handleContextMenu = useMemo(() => {
-    const path = buildZephyUrl({ pathname: 'ratings', params: { score } })
     return createContextMenuHandler([
       {
         type: 'open',
-        data: { path },
+        data: { url },
       },
       {
         type: 'openInNewWindow',
-        data: { path },
+        data: { url },
       },
       {
         type: 'openInNewTab',
-        data: { path },
+        data: { url },
       },
     ])
-  }, [score])
+  }, [url])
 
   return (
     <TableRow

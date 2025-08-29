@@ -115,6 +115,7 @@ const PreviewDirectoryItem = (props: Props) => {
 
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
+    const url = content.url
     const path = content.path
     const paths = selectedPaths.includes(path) ? selectedPaths : [path]
     return createContextMenuHandler([
@@ -122,17 +123,17 @@ const PreviewDirectoryItem = (props: Props) => {
         ? [
             {
               type: 'open',
-              data: { path },
+              data: { url },
             },
             ...(directory
               ? [
                   {
                     type: 'openInNewWindow',
-                    data: { path },
+                    data: { url },
                   },
                   {
                     type: 'openInNewTab',
-                    data: { path },
+                    data: { url },
                   },
                 ]
               : []),
@@ -177,7 +178,14 @@ const PreviewDirectoryItem = (props: Props) => {
         data: { path: directoryPath },
       },
     ])
-  }, [content.path, content.type, directoryPath, favorite, selectedPaths])
+  }, [
+    content.path,
+    content.type,
+    content.url,
+    directoryPath,
+    favorite,
+    selectedPaths,
+  ])
 
   const onMouseDown = useCallback(
     (e: MouseEvent) => {

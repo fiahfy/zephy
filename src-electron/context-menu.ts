@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { type ActionCreators, register } from '@fiahfy/electron-context-menu'
 import { app, clipboard, type IpcMainEvent, shell } from 'electron'
 import { canReadPaths, readPaths, writePaths } from './utils/clipboard'
@@ -57,20 +58,20 @@ const registerContextMenu = (
       click: () =>
         send(event, {
           type: 'newTab',
-          data: { path: app.getPath('home'), tabId },
+          data: { url: pathToFileURL(app.getPath('home')).href, tabId },
         }),
       label: 'New Tab',
     }),
-    open: (event, _params, { path }) => ({
-      click: () => send(event, { type: 'open', data: { path } }),
+    open: (event, _params, { url }) => ({
+      click: () => send(event, { type: 'open', data: { url } }),
       label: 'Open',
     }),
-    openInNewTab: (event, _params, { path, tabId }) => ({
-      click: () => send(event, { type: 'newTab', data: { path, tabId } }),
+    openInNewTab: (event, _params, { url, tabId }) => ({
+      click: () => send(event, { type: 'newTab', data: { url, tabId } }),
       label: 'Open in New Tab',
     }),
-    openInNewWindow: (_event, _params, { path }) => ({
-      click: () => createWindow(path),
+    openInNewWindow: (_event, _params, { url }) => ({
+      click: () => createWindow(url),
       label: 'Open in New Window',
     }),
     rename: (event, _params, { path }) => ({

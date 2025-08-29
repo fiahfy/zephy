@@ -811,16 +811,6 @@ export const newWindow =
     dispatch(newTab(url))
   }
 
-export const newWindowWithDirectoryPath =
-  (directoryPath: string): AppThunk =>
-  async (dispatch, getState) => {
-    const { newWindow } = windowSlice.actions
-
-    const id = selectWindowId(getState())
-    dispatch(newWindow({ id }))
-    dispatch(newTabWithDirectoryPath(directoryPath))
-  }
-
 export const newTab =
   (url: string, srcTabId?: number): AppThunk =>
   async (dispatch, getState) => {
@@ -831,17 +821,6 @@ export const newTab =
     const tabId = selectCurrentTabId(getState())
     dispatch(addTab({ tabId }))
     dispatch(changeUrl(url))
-  }
-
-export const newTabWithDirectoryPath =
-  (directoryPath: string, srcTabId?: number): AppThunk =>
-  async (dispatch) => {
-    const url = window.electronAPI.pathToFileURL(directoryPath)
-    if (!url) {
-      return
-    }
-
-    dispatch(newTab(url, srcTabId))
   }
 
 export const duplicateTab =
@@ -936,17 +915,6 @@ export const changeUrl =
     dispatch(changeUrl({ id, title, url }))
   }
 
-export const changeDirectoryPath =
-  (directoryPath: string): AppThunk =>
-  async (dispatch) => {
-    const url = window.electronAPI.pathToFileURL(directoryPath)
-    if (!url) {
-      return
-    }
-
-    dispatch(changeUrl(url))
-  }
-
 export const go =
   (offset: number): AppThunk =>
   async (dispatch, getState) => {
@@ -978,18 +946,6 @@ export const upward = (): AppThunk => async (dispatch, getState) => {
     showError(e)
   }
 }
-
-export const goToRatings =
-  (score: number): AppThunk =>
-  async (dispatch) =>
-    dispatch(
-      changeUrl(buildZephyUrl({ pathname: 'ratings', params: { score } })),
-    )
-
-export const openRatings =
-  (score: number): AppThunk =>
-  async (dispatch) =>
-    dispatch(newTab(buildZephyUrl({ pathname: 'ratings', params: { score } })))
 
 export const goToSettings = (): AppThunk => async (dispatch) =>
   dispatch(changeUrl(buildZephyUrl({ pathname: 'settings' })))

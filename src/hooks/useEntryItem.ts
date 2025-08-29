@@ -14,20 +14,21 @@ const useEntryItem = (entry: Entry) => {
   const onContextMenu = useMemo(() => {
     const directory = entry.type === 'directory'
     const path = entry.path
+    const url = entry.url
     return createContextMenuHandler([
       {
         type: 'open',
-        data: { path },
+        data: { url },
       },
       ...(directory
         ? [
             {
               type: 'openInNewWindow',
-              data: { path },
+              data: { url },
             },
             {
               type: 'openInNewTab',
-              data: { path, tabId },
+              data: { url, tabId },
             },
           ]
         : []),
@@ -55,7 +56,7 @@ const useEntryItem = (entry: Entry) => {
         data: { paths: [path] },
       },
     ])
-  }, [entry.path, entry.type, favorite, tabId])
+  }, [entry.path, entry.type, entry.url, favorite, tabId])
 
   return { onContextMenu }
 }

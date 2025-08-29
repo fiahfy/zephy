@@ -16,6 +16,6 @@ declare global {
     messageAPI: MessageOperations
     watcherAPI: WatcherOperations
     contextMenuAPI: ContextMenuOperations
-    windowAPI: WindowOperations<{ directoryPath: string }>
+    windowAPI: WindowOperations<{ url: string }>
   }
 }

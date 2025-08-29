@@ -91,6 +91,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
 
   const onContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
+    const url = content.url
     const path = content.path
     const paths = selectedPaths.includes(path) ? selectedPaths : [path]
     return createContextMenuHandler([
@@ -98,17 +99,17 @@ const useExplorerItem = (tabId: number, content: Content) => {
         ? [
             {
               type: 'open',
-              data: { path },
+              data: { url },
             },
             ...(directory
               ? [
                   {
                     type: 'openInNewWindow',
-                    data: { path },
+                    data: { url },
                   },
                   {
                     type: 'openInNewTab',
-                    data: { path, tabId },
+                    data: { url, tabId },
                   },
                 ]
               : []),
@@ -156,6 +157,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
   }, [
     content.path,
     content.type,
+    content.url,
     directoryPath,
     favorite,
     selectedPaths,

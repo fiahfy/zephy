@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import {
   app,
   BrowserWindow,
@@ -102,7 +103,10 @@ const registerApplicationMenu = (
           {
             accelerator: 'CmdOrCtrl+t',
             click: () =>
-              send({ type: 'newTab', data: { path: app.getPath('home') } }),
+              send({
+                type: 'newTab',
+                data: { url: pathToFileURL(app.getPath('home')).href },
+              }),
             label: 'New Tab',
           },
           ...[

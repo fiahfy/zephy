@@ -51,7 +51,7 @@ const registerElectronHandlers = () => {
   ipcMain.on('openTab', (event: IpcMainEvent) =>
     event.sender.send('onMessage', {
       type: 'newTab',
-      data: { path: app.getPath('home') },
+      data: { url: pathToFileURL(app.getPath('home')).href },
     }),
   )
   ipcMain.on('paste', (event: IpcMainEvent) =>

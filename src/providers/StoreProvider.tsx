@@ -7,10 +7,7 @@ import { replaceState as replacePreferencesState } from '~/store/preferences'
 import { replaceState as replaceQueryState } from '~/store/query'
 import { replaceState as replaceRatingState } from '~/store/rating'
 import { replaceState as replaceSettingsState } from '~/store/settings'
-import {
-  newWindowWithDirectoryPath,
-  replaceState as replaceWindowState,
-} from '~/store/window'
+import { newWindow, replaceState as replaceWindowState } from '~/store/window'
 import { setWindowId } from '~/store/window-id'
 
 type Props = { children: ReactNode }
@@ -54,9 +51,9 @@ const StoreProvider = (props: Props) => {
       }
       const { id, params } = data
       dispatch(setWindowId({ windowId: id }))
-      const directoryPath = params?.directoryPath
-      if (directoryPath) {
-        dispatch(newWindowWithDirectoryPath(directoryPath))
+      const url = params?.url
+      if (url) {
+        dispatch(newWindow(url))
       }
       setInitialized(true)
     })()

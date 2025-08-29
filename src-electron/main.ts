@@ -1,5 +1,5 @@
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   createManager as createWindowManager,
   type WindowCreator,
@@ -52,9 +52,9 @@ const windowCreator: WindowCreator = (optionsResolver) => {
 
 const windowManager = createWindowManager(windowCreator)
 
-const createWindow = (directoryPath?: string) => {
-  const path = directoryPath ?? app.getPath('home')
-  windowManager.create({ directoryPath: path })
+const createWindow = (url?: string) => {
+  const targetUrl = url ?? pathToFileURL(app.getPath('home')).href
+  windowManager.create({ url: targetUrl })
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
