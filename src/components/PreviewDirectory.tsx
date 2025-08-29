@@ -26,11 +26,13 @@ import {
   selectDirectoryPath,
   selectError,
   selectFocused,
+  selectFocusedContent,
   selectLoading,
   setAnchor,
   startEditing,
   unselectAll,
 } from '~/store/preview'
+import { openContents } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const maxItemSize = 256
@@ -46,6 +48,7 @@ const PreviewDirectory = (props: Props) => {
   const contents = useAppSelector(selectContents)
   const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
+  const focusedContent = useAppSelector(selectFocusedContent)
   const loading = useAppSelector(selectLoading)
   const dispatch = useAppDispatch()
 
@@ -120,9 +123,13 @@ const PreviewDirectory = (props: Props) => {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       switch (e.key) {
-        // TODO: fix
-        // case ' ':
-        //   return dispatch(openContents())
+        case ' ': {
+          const url = focusedContent?.url
+          if (url) {
+            dispatch(openContents(url))
+          }
+          return
+        }
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
             dispatch(startEditing({ path: focused }))
@@ -151,7 +158,7 @@ const PreviewDirectory = (props: Props) => {
           return
       }
     },
-    [columns, dispatch, focused],
+    [columns, dispatch, focused, focusedContent?.url],
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive

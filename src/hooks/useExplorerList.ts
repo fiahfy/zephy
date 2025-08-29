@@ -19,6 +19,7 @@ import {
   selectEditingByTabId,
   selectErrorByTabId,
   selectFocusedByTabId,
+  selectFocusedContentsByTabId,
   selectLoadingByTabId,
   setAnchor,
   startEditing,
@@ -52,6 +53,9 @@ const useExplorerList = (
   )
   const error = useAppSelector((state) => selectErrorByTabId(state, tabId))
   const focused = useAppSelector((state) => selectFocusedByTabId(state, tabId))
+  const focusedContent = useAppSelector((state) =>
+    selectFocusedContentsByTabId(state, tabId),
+  )
   const loading = useAppSelector((state) => selectLoadingByTabId(state, tabId))
   const query = useAppSelector((state) => selectQueryByTabId(state, tabId))
   const scrollPosition = useAppSelector((state) =>
@@ -135,8 +139,13 @@ const useExplorerList = (
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       switch (e.key) {
-        case ' ':
-          return dispatch(openContents())
+        case ' ': {
+          const url = focusedContent?.url
+          if (url) {
+            dispatch(openContents(url))
+          }
+          return
+        }
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
             dispatch(startEditing({ tabId, path: focused }))
@@ -172,7 +181,7 @@ const useExplorerList = (
           return
       }
     },
-    [columns, dispatch, focused, horizontal, tabId],
+    [columns, dispatch, focused, focusedContent?.url, horizontal, tabId],
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive

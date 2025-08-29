@@ -3,7 +3,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Entry, FileEventType } from '~/interfaces'
+import type { Content, Entry, FileEventType } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { changeFavoritePath } from '~/store/favorite'
 import { showError } from '~/store/notification'
@@ -13,7 +13,9 @@ import {
   selectScoreByPath,
 } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
+import { changeUrl, openUrl } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
+import { isFileUrl } from '~/utils/url'
 
 type State = {
   anchor: string | undefined
@@ -291,6 +293,15 @@ export const selectContents = createSelector(
       .toSorted((a, b) => a.name.localeCompare(b.name)),
 )
 
+export const selectFocusedContent = createSelector(
+  (state: AppState) => state,
+  selectContents,
+  (state, contents) =>
+    contents.find((content: Content) =>
+      selectFocusedByPath(state, content.path),
+    ),
+)
+
 // Selectors by path
 
 const selectPath = (_state: AppState, path: string) => path
@@ -503,6 +514,31 @@ export const rename =
       dispatch(focus({ path: entry.path }))
     } catch (e) {
       dispatch(showError(e))
+    }
+  }
+
+export const open =
+  (url?: string): AppThunk =>
+  async (dispatch, getState) => {
+    if (url && !isFileUrl(url)) {
+      return dispatch(changeUrl(url))
+    }
+
+    const focused = selectFocused(getState())
+    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
+    if (!targetPath) {
+      return
+    }
+
+    try {
+      const entry = await window.entryAPI.getEntry(targetPath)
+      if (entry.type === 'directory') {
+        dispatch(changeUrl(entry.url))
+      } else {
+        dispatch(openUrl(entry.url))
+      }
+    } catch (e) {
+      showError(e)
     }
   }
 

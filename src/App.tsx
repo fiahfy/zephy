@@ -15,6 +15,7 @@ import {
   copy as copyInExplorerList,
   moveToTrash as moveToTrashInExplorerList,
   newFolder as newFolderInExplorerList,
+  open as openInExplorerList,
   paste as pasteInExplorerList,
   refresh,
   selectAll as selectAllInExplorerList,
@@ -33,6 +34,7 @@ import {
   copy as copyInPreview,
   moveToTrash as moveToTrashInPreview,
   newFolder as newFolderInPreview,
+  open as openInPreview,
   paste as pasteInPreview,
   selectAll as selectAllInPreview,
   startRenaming as startRenamingInPreview,
@@ -48,7 +50,6 @@ import {
   go,
   goToSettings,
   newTab,
-  open,
   openContents,
   selectCurrentSortOption,
   selectCurrentTabId,
@@ -151,9 +152,16 @@ const App = () => {
         case 'newTab':
           return dispatch(newTab(data.url, data.tabId))
         case 'open':
-          return dispatch(open(data?.url))
+          switch (focusedElement()) {
+            case 'explorer-list':
+              return dispatch(openInExplorerList(data?.url))
+            case 'preview':
+              return dispatch(openInPreview(data?.url))
+            default:
+              return
+          }
         case 'openContents':
-          return dispatch(openContents(data?.url))
+          return dispatch(openContents(data.url))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'refresh':

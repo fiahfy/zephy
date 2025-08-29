@@ -15,6 +15,8 @@ import {
 } from '~/store/rating'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import {
+  changeUrl,
+  openUrl,
   selectCurrentDirectoryPath,
   selectCurrentTabId,
   selectDirectoryPathByTabId,
@@ -24,7 +26,7 @@ import {
   selectUrlByTabId,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { parseZephyUrl } from '~/utils/url'
+import { isFileUrl, parseZephyUrl } from '~/utils/url'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -528,6 +530,16 @@ export const selectContentsByTabId = createSelector(
   },
 )
 
+export const selectFocusedContentsByTabId = createSelector(
+  (state: AppState) => state,
+  selectTabId,
+  selectContentsByTabId,
+  (state, tabId, contents) =>
+    contents.find((content: Content) =>
+      selectFocusedByTabIdAndPath(state, tabId, content.path),
+    ),
+)
+
 export const selectSelectedContentsByTabId = createSelector(
   (state: AppState) => state,
   selectTabId,
@@ -842,6 +854,31 @@ export const refresh = (): AppThunk => async (dispatch, getState) => {
 
   dispatch(load(tabId))
 }
+
+export const open =
+  (url?: string): AppThunk =>
+  async (dispatch, getState) => {
+    if (url && !isFileUrl(url)) {
+      return dispatch(changeUrl(url))
+    }
+
+    const focused = selectCurrentFocused(getState())
+    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
+    if (!targetPath) {
+      return
+    }
+
+    try {
+      const entry = await window.entryAPI.getEntry(targetPath)
+      if (entry.type === 'directory') {
+        dispatch(changeUrl(entry.url))
+      } else {
+        dispatch(openUrl(entry.url))
+      }
+    } catch (e) {
+      showError(e)
+    }
+  }
 
 export const selectAll = (): AppThunk => async (dispatch, getState) => {
   const { selectAll } = explorerListSlice.actions

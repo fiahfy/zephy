@@ -32,6 +32,9 @@ const FavoriteTableRow = (props: Props) => {
   const { droppableStyle, ...dropHandlers } = useDroppable(path)
 
   const handleContextMenu = useMemo(() => {
+    if (!url) {
+      return
+    }
     return createContextMenuHandler([
       {
         type: 'open',
