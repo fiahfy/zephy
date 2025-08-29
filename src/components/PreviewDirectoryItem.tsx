@@ -112,7 +112,7 @@ const PreviewDirectoryItem = (props: Props) => {
     },
   )
 
-  const onContextMenu = useMemo(() => {
+  const handleContextMenu = useMemo(() => {
     const directory = content.type === 'directory'
     const url = content.url
     const path = content.path
@@ -127,6 +127,10 @@ const PreviewDirectoryItem = (props: Props) => {
             ...(directory
               ? [
                   {
+                    type: 'openContents',
+                    data: { url },
+                  },
+                  {
                     type: 'openInNewWindow',
                     data: { url },
                   },
@@ -136,6 +140,7 @@ const PreviewDirectoryItem = (props: Props) => {
                   },
                 ]
               : []),
+            { type: 'separator' },
             {
               type: 'revealInExplorer',
               data: { path },
@@ -186,7 +191,7 @@ const PreviewDirectoryItem = (props: Props) => {
     selectedPaths,
   ])
 
-  const onMouseDown = useCallback(
+  const handleMouseDown = useCallback(
     (e: MouseEvent) => {
       if (editing) {
         e.preventDefault()
@@ -211,9 +216,9 @@ const PreviewDirectoryItem = (props: Props) => {
       component="div"
       draggable={draggable}
       onClick={onClick}
-      onContextMenu={onContextMenu}
+      onContextMenu={handleContextMenu}
       onDoubleClick={onDoubleClick}
-      onMouseDown={onMouseDown}
+      onMouseDown={handleMouseDown}
       sx={(theme) => ({
         borderRadius: theme.spacing(0.5),
         cursor: 'pointer',

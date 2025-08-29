@@ -25,6 +25,7 @@ import {
   unselectAll,
 } from '~/store/explorer-list'
 import {
+  openContents,
   selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectScrollPositionByTabId,
@@ -134,6 +135,8 @@ const useExplorerList = (
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       switch (e.key) {
+        case ' ':
+          return dispatch(openContents())
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
             dispatch(startEditing({ tabId, path: focused }))

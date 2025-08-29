@@ -22,15 +22,17 @@ import {
   type ReactNode,
   type Ref,
   useCallback,
+  useMemo,
 } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import Icon from '~/components/Icon'
 import useDraggable from '~/hooks/useDraggable'
 import useDroppable from '~/hooks/useDroppable'
-import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
-import { useAppDispatch } from '~/store'
-import { changeUrl, newTab, openUrl } from '~/store/window'
+import { useAppDispatch, useAppSelector } from '~/store'
+import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
+import { changeUrl, newTab, openUrl, selectCurrentTabId } from '~/store/window'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 const StyledTreeItemRoot = styled(TreeItemRoot)(() => ({
   position: 'relative',
@@ -113,9 +115,12 @@ const ExplorerTreeItemRoot = forwardRef(
 
     const entry = item.entry
 
+    const favorite = useAppSelector((state) =>
+      selectFavoriteByPath(selectFavorite(state), entry.path),
+    )
+    const tabId = useAppSelector(selectCurrentTabId)
     const dispatch = useAppDispatch()
 
-    const { onContextMenu } = useEntryItem(entry)
     const { draggable, ...dragHandlers } = useDraggable(entry.path)
     const { droppableStyle, ...dropHandlers } = useDroppable(
       entry.type === 'directory' ? entry.path : undefined,
@@ -152,6 +157,53 @@ const ExplorerTreeItemRoot = forwardRef(
       },
       [iconContainerProps.onClick],
     )
+    const handleContextMenu = useMemo(() => {
+      const directory = entry.type === 'directory'
+      const path = entry.path
+      const url = entry.url
+      return createContextMenuHandler([
+        {
+          type: 'open',
+          data: { url },
+        },
+        ...(directory
+          ? [
+              {
+                type: 'openInNewWindow',
+                data: { url },
+              },
+              {
+                type: 'openInNewTab',
+                data: { url, tabId },
+              },
+            ]
+          : []),
+        { type: 'separator' },
+        {
+          type: 'revealInFinder',
+          data: { path },
+        },
+        { type: 'separator' },
+        {
+          type: 'copyPath',
+          data: { path },
+        },
+        { type: 'separator' },
+        ...(directory
+          ? [
+              {
+                type: 'toggleFavorite',
+                data: { path, favorite },
+              },
+            ]
+          : []),
+        { type: 'separator' },
+        {
+          type: 'moveToTrash',
+          data: { paths: [path] },
+        },
+      ])
+    }, [entry.path, entry.type, entry.url, favorite, tabId])
 
     return (
       <TreeItemProvider {...getContextProviderProps()}>
@@ -159,7 +211,7 @@ const ExplorerTreeItemRoot = forwardRef(
           {...getRootProps(other)}
           draggable={draggable}
           onClick={handleClick}
-          onContextMenu={onContextMenu}
+          onContextMenu={handleContextMenu}
           onDoubleClick={handleDoubleClick}
           {...dragHandlers}
           {...dropHandlers}

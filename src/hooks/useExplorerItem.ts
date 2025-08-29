@@ -108,6 +108,10 @@ const useExplorerItem = (tabId: number, content: Content) => {
             ...(directory
               ? [
                   {
+                    type: 'openContents',
+                    data: { url },
+                  },
+                  {
                     type: 'openInNewWindow',
                     data: { url },
                   },
@@ -117,6 +121,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
                   },
                 ]
               : []),
+            { type: 'separator' },
             {
               type: 'revealInExplorer',
               data: { path },

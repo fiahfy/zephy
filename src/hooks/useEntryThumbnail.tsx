@@ -59,7 +59,7 @@ const useEntryThumbnail = (entry: Entry) => {
       try {
         const entries = await window.entryAPI.getEntries(path)
         return entries
-          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.path))
+          .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
           .toSorted((a, b) => a.name.localeCompare(b.name))
           .map((entry) => entry.path)
       } catch {

@@ -25,7 +25,7 @@ import { handleFileChange as handleFileChangeForPreview } from '~/store/preview'
 import { addQuery } from '~/store/query'
 import { changeRatingPath, removeRating } from '~/store/rating'
 import { selectWindowId } from '~/store/window-id'
-import { detectFileType } from '~/utils/file'
+import { detectFileType, isHiddenFile } from '~/utils/file'
 import { buildZephyUrl, getTitle, isFileUrl } from '~/utils/url'
 import {
   selectShouldOpenWithPhoty,
@@ -926,6 +926,41 @@ export const open =
       } else {
         dispatch(openUrl(entry.url))
       }
+    } catch (e) {
+      showError(e)
+    }
+  }
+
+export const openContents =
+  (url?: string): AppThunk =>
+  async (dispatch, getState) => {
+    if (url && !isFileUrl(url)) {
+      return
+    }
+
+    const focused = selectCurrentFocused(getState())
+    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
+    if (!targetPath) {
+      return
+    }
+
+    try {
+      const entry = await window.entryAPI.getEntry(targetPath)
+      if (entry.type === 'file') {
+        return dispatch(openUrl(entry.url))
+      }
+
+      const entries = await window.entryAPI.getEntries(targetPath)
+      const child = entries
+        .filter((entry) => !isHiddenFile(entry.name))
+        .filter((entry) => entry.type === 'file')
+        .toSorted((a, b) => a.name.localeCompare(b.name))[0]
+
+      if (!child) {
+        return
+      }
+
+      dispatch(openUrl(child.url))
     } catch (e) {
       showError(e)
     }

@@ -49,6 +49,7 @@ import {
   goToSettings,
   newTab,
   open,
+  openContents,
   selectCurrentSortOption,
   selectCurrentTabId,
   selectCurrentTitle,
@@ -151,6 +152,8 @@ const App = () => {
           return dispatch(newTab(data.url, data.tabId))
         case 'open':
           return dispatch(open(data?.url))
+        case 'openContents':
+          return dispatch(openContents(data?.url))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'refresh':

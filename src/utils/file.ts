@@ -1,6 +1,6 @@
 import mime from 'mime'
 
-export const isHiddenFile = (path: string) => path.startsWith('.')
+export const isHiddenFile = (filename: string) => filename.startsWith('.')
 
 export const detectFileType = (path: string) => {
   const type = mime.getType(path)

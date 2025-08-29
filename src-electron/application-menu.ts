@@ -125,7 +125,6 @@ const registerApplicationMenu = (
           },
           { type: 'separator' },
           {
-            accelerator: 'CmdOrCtrl+O',
             click: () => send({ type: 'open' }),
             label: 'Open',
           },

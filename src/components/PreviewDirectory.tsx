@@ -93,7 +93,7 @@ const PreviewDirectory = (props: Props) => {
     [loading, error],
   )
 
-  const onContextMenu = useMemo(() => {
+  const handleContextMenu = useMemo(() => {
     if (!directoryPath) {
       return
     }
@@ -112,14 +112,17 @@ const PreviewDirectory = (props: Props) => {
     ])
   }, [directoryPath])
 
-  const onClick = useCallback(() => {
+  const handleClick = useCallback(() => {
     dispatch(blur())
     dispatch(unselectAll())
   }, [dispatch])
 
-  const onKeyDown = useCallback(
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       switch (e.key) {
+        // TODO: fix
+        // case ' ':
+        //   return dispatch(openContents())
         case 'Enter':
           if (!e.nativeEvent.isComposing && focused) {
             dispatch(startEditing({ path: focused }))
@@ -209,9 +212,9 @@ const PreviewDirectory = (props: Props) => {
     >
       <Box
         className="preview"
-        onClick={onClick}
-        onContextMenu={onContextMenu}
-        onKeyDown={onKeyDown}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        onKeyDown={handleKeyDown}
         ref={ref}
         sx={{
           height: '100%',

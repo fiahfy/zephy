@@ -66,6 +66,11 @@ const registerContextMenu = (
       click: () => send(event, { type: 'open', data: { url } }),
       label: 'Open',
     }),
+    openContents: (event, _params, { url }) => ({
+      accelerator: 'Space',
+      click: () => send(event, { type: 'openContents', data: { url } }),
+      label: 'Open Contents',
+    }),
     openInNewTab: (event, _params, { url, tabId }) => ({
       click: () => send(event, { type: 'newTab', data: { url, tabId } }),
       label: 'Open in New Tab',
@@ -75,6 +80,7 @@ const registerContextMenu = (
       label: 'Open in New Window',
     }),
     rename: (event, _params, { path }) => ({
+      accelerator: 'Enter',
       click: () => send(event, { type: 'rename', data: { path } }),
       label: 'Rename...',
     }),
