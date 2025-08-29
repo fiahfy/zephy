@@ -15,7 +15,6 @@ import {
   copyInCurrentTab,
   moveToTrashInCurrentTab,
   newFolderInCurrentTab,
-  openInCurrentTab,
   pasteInCurrentTab,
   refreshInCurrentTab,
   selectAllInCurrentTab,
@@ -40,6 +39,8 @@ import {
 } from '~/store/preview'
 import {
   back,
+  changeSidebarHidden,
+  changeViewMode,
   closeOtherTabs,
   closeTab,
   duplicateTab,
@@ -47,13 +48,12 @@ import {
   go,
   goToSettings,
   newTab,
+  open,
   selectCurrentSortOption,
   selectCurrentTabId,
   selectCurrentTitle,
   selectCurrentViewMode,
   selectSidebar,
-  setCurrentViewMode,
-  setSidebarHidden,
   sort,
   updateApplicationMenu,
 } from '~/store/window'
@@ -94,9 +94,9 @@ const App = () => {
         case 'back':
           return dispatch(back())
         case 'changeSidebarHidden':
-          return dispatch(setSidebarHidden(data.variant, data.hidden))
+          return dispatch(changeSidebarHidden(data.variant, data.hidden))
         case 'changeViewMode':
-          return dispatch(setCurrentViewMode(data.viewMode))
+          return dispatch(changeViewMode(data.viewMode))
         case 'closeOtherTabs':
           return dispatch(closeOtherTabs(data.tabId))
         case 'closeTab':
@@ -150,7 +150,7 @@ const App = () => {
         case 'newTab':
           return dispatch(newTab(data.url, data.tabId))
         case 'open':
-          return dispatch(openInCurrentTab(data?.url))
+          return dispatch(open(data?.url))
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'refresh':

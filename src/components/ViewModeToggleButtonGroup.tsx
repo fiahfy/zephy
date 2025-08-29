@@ -6,7 +6,7 @@ import {
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { type MouseEvent, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
-import { selectCurrentViewMode, setCurrentViewMode } from '~/store/window'
+import { changeViewMode, selectCurrentViewMode } from '~/store/window'
 
 const ViewModeToggleButtonGroup = () => {
   const viewMode = useAppSelector(selectCurrentViewMode)
@@ -17,7 +17,7 @@ const ViewModeToggleButtonGroup = () => {
       if (!value) {
         return
       }
-      dispatch(setCurrentViewMode(value))
+      dispatch(changeViewMode(value))
     },
     [dispatch],
   )

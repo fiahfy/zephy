@@ -14,9 +14,9 @@ import {
   selectFavoriteByPath,
   toggleFavorite,
 } from '~/store/favorite'
-import { openUrl } from '~/store/settings'
 import {
   changeUrl,
+  openUrl,
   selectCurrentDirectoryPath,
   selectCurrentUrl,
 } from '~/store/window'

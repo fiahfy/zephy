@@ -13,6 +13,7 @@ import {
   removeSelection,
   removeTab,
   selectCurrentContents,
+  selectCurrentFocused,
   selectCurrentLoading,
   selectCurrentSelected,
   unfocus,
@@ -24,7 +25,12 @@ import { handleFileChange as handleFileChangeForPreview } from '~/store/preview'
 import { addQuery } from '~/store/query'
 import { changeRatingPath, removeRating } from '~/store/rating'
 import { selectWindowId } from '~/store/window-id'
-import { buildZephyUrl, getTitle } from '~/utils/url'
+import { detectFileType } from '~/utils/file'
+import { buildZephyUrl, getTitle, isFileUrl } from '~/utils/url'
+import {
+  selectShouldOpenWithPhoty,
+  selectShouldOpenWithVisty,
+} from './settings'
 
 type History = {
   query: string
@@ -880,7 +886,7 @@ export const changeTab =
 
 // Operations for sidebar
 
-export const setSidebarHidden =
+export const changeSidebarHidden =
   (variant: 'primary' | 'secondary', hidden: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarHidden } = windowSlice.actions
@@ -889,7 +895,7 @@ export const setSidebarHidden =
     dispatch(setSidebarHidden({ id, variant, hidden }))
   }
 
-export const setSidebarWidth =
+export const changeSidebarWidth =
   (variant: 'primary' | 'secondary', width: number): AppThunk =>
   async (dispatch, getState) => {
     const { setSidebarWidth } = windowSlice.actions
@@ -899,6 +905,60 @@ export const setSidebarWidth =
   }
 
 // Operations for current tab
+
+export const open =
+  (url?: string): AppThunk =>
+  async (dispatch, getState) => {
+    if (url && !isFileUrl(url)) {
+      return dispatch(changeUrl(url))
+    }
+
+    const focused = selectCurrentFocused(getState())
+    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
+    if (!targetPath) {
+      return
+    }
+
+    try {
+      const entry = await window.entryAPI.getEntry(targetPath)
+      if (entry.type === 'directory') {
+        dispatch(changeUrl(entry.url))
+      } else {
+        dispatch(openUrl(entry.url))
+      }
+    } catch (e) {
+      showError(e)
+    }
+  }
+
+export const openUrl =
+  (url: string): AppThunk =>
+  async (_, getState) => {
+    const path = window.electronAPI.fileURLToPath(url)
+    if (!path) {
+      return
+    }
+
+    const encoded = encodeURIComponent(path)
+    const fileType = detectFileType(path)
+    switch (fileType) {
+      case 'image': {
+        const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
+        return shouldOpenWithPhoty
+          ? window.electronAPI.openExternal(`photy://open?path=${encoded}`)
+          : window.entryAPI.openEntry(path)
+      }
+      case 'video':
+      case 'audio': {
+        const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
+        return shouldOpenWithVisty
+          ? window.electronAPI.openExternal(`visty://open?path=${encoded}`)
+          : window.entryAPI.openEntry(path)
+      }
+      default:
+        return window.entryAPI.openEntry(path)
+    }
+  }
 
 export const changeUrl =
   (url: string): AppThunk =>
@@ -994,7 +1054,7 @@ export const sort =
     )
   }
 
-export const setCurrentViewMode =
+export const changeViewMode =
   (viewMode: ViewMode): AppThunk =>
   async (dispatch, getState) => {
     const { setViewMode } = windowSlice.actions

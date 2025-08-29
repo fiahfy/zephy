@@ -11,10 +11,10 @@ import {
 } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
+  changeSidebarHidden,
+  changeSidebarWidth,
   selectSidebarHiddenByVariant,
   selectSidebarWidthByVariant,
-  setSidebarHidden,
-  setSidebarWidth,
 } from '~/store/window'
 
 const minContentWidth = 100
@@ -82,9 +82,9 @@ const Sidebar = (props: Props) => {
           newWidth > minContentWidth &&
           document.body.offsetWidth - oppositeWidth - newWidth > minContentWidth
         ) {
-          dispatch(setSidebarWidth(variant, newWidth))
+          dispatch(changeSidebarWidth(variant, newWidth))
         }
-        dispatch(setSidebarHidden(variant, newWidth < minContentWidth / 2))
+        dispatch(changeSidebarHidden(variant, newWidth < minContentWidth / 2))
       }, 100),
     [dispatch, oppositeWidth, position, variant],
   )
@@ -111,7 +111,9 @@ const Sidebar = (props: Props) => {
   useEffect(() => {
     const handler = throttle(() => {
       if (width + minContentWidth > window.innerWidth) {
-        dispatch(setSidebarWidth(variant, window.innerWidth - minContentWidth))
+        dispatch(
+          changeSidebarWidth(variant, window.innerWidth - minContentWidth),
+        )
       }
     }, 100)
     window.addEventListener('resize', handler)

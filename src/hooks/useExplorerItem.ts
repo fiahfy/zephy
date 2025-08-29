@@ -15,8 +15,12 @@ import {
   toggleSelection,
 } from '~/store/explorer-list'
 import { selectFavorite, selectFavoriteByPath } from '~/store/favorite'
-import { openUrl } from '~/store/settings'
-import { changeUrl, newTab, selectDirectoryPathByTabId } from '~/store/window'
+import {
+  changeUrl,
+  newTab,
+  openUrl,
+  selectDirectoryPathByTabId,
+} from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const useExplorerItem = (tabId: number, content: Content) => {

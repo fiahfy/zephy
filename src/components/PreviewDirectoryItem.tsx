@@ -33,8 +33,7 @@ import {
   startEditing,
   toggleSelection,
 } from '~/store/preview'
-import { openUrl } from '~/store/settings'
-import { changeUrl, newTab } from '~/store/window'
+import { changeUrl, newTab, openUrl } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 type Props = {

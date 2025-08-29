@@ -30,8 +30,7 @@ import useDroppable from '~/hooks/useDroppable'
 import useEntryItem from '~/hooks/useEntryItem'
 import type { Entry } from '~/interfaces'
 import { useAppDispatch } from '~/store'
-import { openUrl } from '~/store/settings'
-import { changeUrl, newTab } from '~/store/window'
+import { changeUrl, newTab, openUrl } from '~/store/window'
 
 const StyledTreeItemRoot = styled(TreeItemRoot)(() => ({
   position: 'relative',
