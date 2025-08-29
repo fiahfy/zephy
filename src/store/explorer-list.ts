@@ -837,25 +837,23 @@ export const rename =
 
 // Operations for current tab
 
-export const refreshInCurrentTab =
-  (): AppThunk => async (dispatch, getState) => {
-    const tabId = selectCurrentTabId(getState())
+export const refresh = (): AppThunk => async (dispatch, getState) => {
+  const tabId = selectCurrentTabId(getState())
 
-    dispatch(load(tabId))
-  }
+  dispatch(load(tabId))
+}
 
-export const selectAllInCurrentTab =
-  (): AppThunk => async (dispatch, getState) => {
-    const { selectAll } = explorerListSlice.actions
+export const selectAll = (): AppThunk => async (dispatch, getState) => {
+  const { selectAll } = explorerListSlice.actions
 
-    const tabId = selectCurrentTabId(getState())
-    const contents = selectContentsByTabId(getState(), tabId)
+  const tabId = selectCurrentTabId(getState())
+  const contents = selectContentsByTabId(getState(), tabId)
 
-    const paths = contents.map((content) => content.path)
-    dispatch(selectAll({ tabId, paths }))
-  }
+  const paths = contents.map((content) => content.path)
+  dispatch(selectAll({ tabId, paths }))
+}
 
-export const startRenamingInCurrentTab =
+export const startRenaming =
   (path?: string): AppThunk =>
   async (dispatch, getState) => {
     const { focus, select, startEditing } = explorerListSlice.actions
@@ -873,7 +871,7 @@ export const startRenamingInCurrentTab =
     dispatch(startEditing({ tabId, path: targetPath }))
   }
 
-export const newFolderInCurrentTab =
+export const newFolder =
   (directoryPath: string): AppThunk =>
   async (dispatch, getState) => {
     const { addEntry, focus, select, startEditing } = explorerListSlice.actions
@@ -887,12 +885,12 @@ export const newFolderInCurrentTab =
     dispatch(startEditing({ tabId, path: entry.path }))
   }
 
-export const copyInCurrentTab = (): AppThunk => async (_, getState) => {
+export const copy = (): AppThunk => async (_, getState) => {
   const selected = selectCurrentSelected(getState())
   window.entryAPI.copyEntries(selected)
 }
 
-export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
+export const paste = (): AppThunk => async (_, getState) => {
   const currentDirectoryPath = selectCurrentDirectoryPath(getState())
   if (!currentDirectoryPath) {
     return
@@ -901,7 +899,7 @@ export const pasteInCurrentTab = (): AppThunk => async (_, getState) => {
   window.entryAPI.pasteEntries(currentDirectoryPath)
 }
 
-export const moveToTrashInCurrentTab =
+export const moveToTrash =
   (paths?: string[]): AppThunk =>
   async (dispatch, getState) => {
     const { blur, focus, removeEntry, select, unselectAll } =

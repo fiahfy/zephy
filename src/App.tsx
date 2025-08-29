@@ -12,13 +12,13 @@ import useTheme from '~/hooks/useTheme'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  copyInCurrentTab,
-  moveToTrashInCurrentTab,
-  newFolderInCurrentTab,
-  pasteInCurrentTab,
-  refreshInCurrentTab,
-  selectAllInCurrentTab,
-  startRenamingInCurrentTab,
+  copy as copyInExplorerList,
+  moveToTrash as moveToTrashInExplorerList,
+  newFolder as newFolderInExplorerList,
+  paste as pasteInExplorerList,
+  refresh,
+  selectAll as selectAllInExplorerList,
+  startRenaming as startRenamingInExplorerList,
 } from '~/store/explorer-list'
 import { load } from '~/store/explorer-tree'
 import { addToFavorites, removeFromFavorites } from '~/store/favorite'
@@ -30,12 +30,12 @@ import {
   toggleSizeColumnVisible,
 } from '~/store/preferences'
 import {
-  copy,
-  moveToTrash,
-  newFolder,
-  paste,
-  selectAll,
-  startRenaming,
+  copy as copyInPreview,
+  moveToTrash as moveToTrashInPreview,
+  newFolder as newFolderInPreview,
+  paste as pasteInPreview,
+  selectAll as selectAllInPreview,
+  startRenaming as startRenamingInPreview,
 } from '~/store/preview'
 import {
   back,
@@ -104,9 +104,9 @@ const App = () => {
         case 'copy':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(copyInCurrentTab())
+              return dispatch(copyInExplorerList())
             case 'preview':
-              return dispatch(copy())
+              return dispatch(copyInPreview())
             default:
               return window.electronAPI.copy()
           }
@@ -132,18 +132,18 @@ const App = () => {
         case 'moveToTrash':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(moveToTrashInCurrentTab(data?.paths))
+              return dispatch(moveToTrashInExplorerList(data?.paths))
             case 'preview':
-              return dispatch(moveToTrash(data?.paths))
+              return dispatch(moveToTrashInPreview(data?.paths))
             default:
               return
           }
         case 'newFolder':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(newFolderInCurrentTab(data.path))
+              return dispatch(newFolderInExplorerList(data.path))
             case 'preview':
-              return dispatch(newFolder(data.path))
+              return dispatch(newFolderInPreview(data.path))
             default:
               return window.electronAPI.paste()
           }
@@ -154,13 +154,13 @@ const App = () => {
         case 'removeFromFavorites':
           return dispatch(removeFromFavorites(data.path))
         case 'refresh':
-          return dispatch(refreshInCurrentTab())
+          return dispatch(refresh())
         case 'rename':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(startRenamingInCurrentTab(data?.path))
+              return dispatch(startRenamingInExplorerList(data?.path))
             case 'preview':
-              return dispatch(startRenaming(data?.path))
+              return dispatch(startRenamingInPreview(data?.path))
             default:
               return
           }
@@ -169,18 +169,18 @@ const App = () => {
         case 'paste':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(pasteInCurrentTab())
+              return dispatch(pasteInExplorerList())
             case 'preview':
-              return dispatch(paste())
+              return dispatch(pasteInPreview())
             default:
               return window.electronAPI.paste()
           }
         case 'selectAll':
           switch (focusedElement()) {
             case 'explorer-list':
-              return dispatch(selectAllInCurrentTab())
+              return dispatch(selectAllInExplorerList())
             case 'preview':
-              return dispatch(selectAll())
+              return dispatch(selectAllInPreview())
             default:
               return window.electronAPI.selectAll()
           }

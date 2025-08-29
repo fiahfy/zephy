@@ -13,10 +13,7 @@ import ViewModeToggleButtonGroup from '~/components/ViewModeToggleButtonGroup'
 import useLongPress from '~/hooks/useLongPress'
 import useTrafficLight from '~/hooks/useTrafficLight'
 import { useAppDispatch, useAppSelector } from '~/store'
-import {
-  refreshInCurrentTab,
-  selectCurrentLoading,
-} from '~/store/explorer-list'
+import { refresh, selectCurrentLoading } from '~/store/explorer-list'
 import {
   back,
   forward,
@@ -134,7 +131,7 @@ const AddressBar = () => {
 
   const handleClickRefresh = useCallback(async () => {
     setUrlInput(url)
-    dispatch(refreshInCurrentTab())
+    dispatch(refresh())
   }, [dispatch, url])
 
   const handleChangeUrl = useCallback((value: string) => {
