@@ -27,18 +27,52 @@ const generateThumbnailFilename = async (path: string) => {
   return `${basename}.png`
 }
 
+const getSize = async (path: string) => {
+  const metadata = await getMetadata(path)
+  const width = metadata?.width
+  const height = metadata?.height
+  return width && height
+    ? {
+        width,
+        height,
+      }
+    : undefined
+}
+
+const resizeToFill = (
+  size: { width: number; height: number },
+  fillSize = 256,
+) => {
+  const { width, height } = size
+  if (width <= fillSize && height <= fillSize) {
+    return size
+  }
+  const aspectRatio = width / height
+  if (aspectRatio > 1) {
+    return { width: Math.round(fillSize * aspectRatio), height: fillSize }
+  } else {
+    return { width: fillSize, height: Math.round(fillSize / aspectRatio) }
+  }
+}
+
 const createThumbnail = async (path: string, thumbnailDir: string) => {
   try {
     const thumbnailFilename = await generateThumbnailFilename(path)
     const thumbnailPath = join(thumbnailDir, thumbnailFilename)
     const exists = await pathExists(thumbnailPath)
     if (!exists) {
+      const size = await getSize(path)
+      const resized = size ? resizeToFill(size) : undefined
+      const sizeOption = resized
+        ? `${resized.width}x${resized.height}`
+        : undefined
       await new Promise<void>((resolve, reject) => {
         ffmpeg(path)
           .screenshots({
             count: 1,
             folder: thumbnailDir,
             filename: thumbnailFilename,
+            size: sizeOption,
           })
           .on('error', (e) => reject(e))
           .on('end', () => resolve())
