@@ -90,7 +90,7 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
   )
   ipcMain.handle(
     'createEntryThumbnailUrl',
-    (_event: IpcMainInvokeEvent, path: string) =>
+    (_event: IpcMainInvokeEvent, path: string | string[]) =>
       createThumbnailUrl(path, thumbnailDir),
   )
   ipcMain.handle(
