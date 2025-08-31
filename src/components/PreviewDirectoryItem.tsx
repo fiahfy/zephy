@@ -72,7 +72,7 @@ const PreviewDirectoryItem = (props: Props) => {
   )
 
   const { onClick, onDoubleClick } = usePreventClickOnDoubleClick(
-    (e: MouseEvent) => {
+    (e) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (e.shiftKey) {
@@ -94,7 +94,7 @@ const PreviewDirectoryItem = (props: Props) => {
         dispatch(startEditing({ path: content.path }))
       }
     },
-    async (e: MouseEvent) => {
+    async (e) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (editing) {
