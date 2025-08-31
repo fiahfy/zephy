@@ -142,6 +142,7 @@ const useExplorerList = (
         case ' ': {
           const url = focusedContent?.url
           if (url) {
+            e.preventDefault()
             dispatch(openContents(url))
           }
           return

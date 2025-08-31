@@ -126,6 +126,7 @@ const PreviewDirectory = (props: Props) => {
         case ' ': {
           const url = focusedContent?.url
           if (url) {
+            e.preventDefault()
             dispatch(openContents(url))
           }
           return
