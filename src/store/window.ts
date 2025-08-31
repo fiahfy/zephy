@@ -29,7 +29,7 @@ import {
 } from '~/store/settings'
 import { selectWindowId } from '~/store/window-id'
 import { detectFileType, isHiddenFile } from '~/utils/file'
-import { buildZephyUrl, getTitle, isFileUrl } from '~/utils/url'
+import { buildUrl, getTitle, parseUrl } from '~/utils/url'
 
 type History = {
   query: string
@@ -908,22 +908,22 @@ export const changeSidebarWidth =
 export const openContents =
   (url: string): AppThunk =>
   async (dispatch) => {
-    if (!isFileUrl(url)) {
+    const params = parseUrl(url)
+    if (params?.type !== 'file') {
       return
     }
 
-    const targetPath = window.electronAPI.fileURLToPath(url)
-    if (!targetPath) {
+    if (!params.path) {
       return
     }
 
     try {
-      const entry = await window.entryAPI.getEntry(targetPath)
+      const entry = await window.entryAPI.getEntry(params.path)
       if (entry.type === 'file') {
         return dispatch(openUrl(entry.url))
       }
 
-      const entries = await window.entryAPI.getEntries(targetPath)
+      const entries = await window.entryAPI.getEntries(entry.path)
       const child = entries
         .filter((entry) => !isHiddenFile(entry.name))
         .filter((entry) => entry.type === 'file')
@@ -942,29 +942,29 @@ export const openContents =
 export const openUrl =
   (url: string): AppThunk =>
   async (_, getState) => {
-    const path = window.electronAPI.fileURLToPath(url)
-    if (!path) {
+    const params = parseUrl(url)
+    if (params?.type !== 'file' || !params.path) {
       return
     }
 
-    const encoded = encodeURIComponent(path)
-    const fileType = detectFileType(path)
+    const encoded = encodeURIComponent(params.path)
+    const fileType = detectFileType(params.path)
     switch (fileType) {
       case 'image': {
         const shouldOpenWithPhoty = selectShouldOpenWithPhoty(getState())
         return shouldOpenWithPhoty
           ? window.electronAPI.openExternal(`photy://open?path=${encoded}`)
-          : window.entryAPI.openEntry(path)
+          : window.entryAPI.openEntry(params.path)
       }
       case 'video':
       case 'audio': {
         const shouldOpenWithVisty = selectShouldOpenWithVisty(getState())
         return shouldOpenWithVisty
           ? window.electronAPI.openExternal(`visty://open?path=${encoded}`)
-          : window.entryAPI.openEntry(path)
+          : window.entryAPI.openEntry(params.path)
       }
       default:
-        return window.entryAPI.openEntry(path)
+        return window.entryAPI.openEntry(params.path)
     }
   }
 
@@ -979,7 +979,7 @@ export const changeUrl =
       return
     }
 
-    const title = await getTitle(url)
+    const title = getTitle(url)
     dispatch(changeUrl({ id, title, url }))
   }
 
@@ -1015,8 +1015,12 @@ export const upward = (): AppThunk => async (dispatch, getState) => {
   }
 }
 
-export const goToSettings = (): AppThunk => async (dispatch) =>
-  dispatch(changeUrl(buildZephyUrl({ pathname: 'settings' })))
+export const goToSettings = (): AppThunk => async (dispatch) => {
+  const url = buildUrl({ type: 'settings' })
+  if (url) {
+    dispatch(changeUrl(url))
+  }
+}
 
 export const setScrollPosition =
   (scrollPosition: number): AppThunk =>

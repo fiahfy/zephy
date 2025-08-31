@@ -23,6 +23,7 @@ const electronOperations = {
   paste: () => ipcRenderer.send('paste'),
   pathToFileURL: (path: string) => ipcRenderer.sendSync('pathToFileURL', path),
   selectAll: () => ipcRenderer.send('selectAll'),
+  sep: ipcRenderer.sendSync('sep'),
   startDrag: (paths: string[]) => ipcRenderer.send('startDrag', paths),
 }
 

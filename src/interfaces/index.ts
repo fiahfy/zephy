@@ -18,6 +18,7 @@ export type ElectronOperations = {
   paste: () => void
   pathToFileURL: (path: string) => string | undefined
   selectAll: () => void
+  sep: string
   startDrag: (paths: string[]) => void
 }
 

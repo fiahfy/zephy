@@ -4,7 +4,7 @@ import useButtonBehavior from '~/hooks/useButtonBehavior'
 import { useAppDispatch } from '~/store'
 import { changeUrl, newTab } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
-import { buildZephyUrl } from '~/utils/url'
+import { buildUrl } from '~/utils/url'
 
 type Props = {
   children: ReactNode
@@ -16,12 +16,12 @@ const RatingTableRow = (props: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const url = useMemo(
-    () => buildZephyUrl({ pathname: 'ratings', params: { score } }),
-    [score],
-  )
+  const url = useMemo(() => buildUrl({ type: 'ratings', score }), [score])
 
   const buttonHandlers = useButtonBehavior((e) => {
+    if (!url) {
+      return
+    }
     if (e && ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey))) {
       dispatch(newTab(url))
     } else {

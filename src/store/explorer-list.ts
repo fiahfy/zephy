@@ -26,7 +26,7 @@ import {
   selectUrlByTabId,
 } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { isFileUrl, parseZephyUrl } from '~/utils/url'
+import { parseUrl } from '~/utils/url'
 
 type ExplorerState = {
   anchor: string | undefined
@@ -632,28 +632,21 @@ export const load =
     dispatch(load({ tabId, timestamp }))
     try {
       const entries: Entry[] = await (async () => {
-        const u = new URL(url)
-        switch (u.protocol) {
-          case 'file:': {
-            const directoryPath = window.electronAPI.fileURLToPath(url)
-            if (!directoryPath) {
+        const params = parseUrl(url)
+        switch (params?.type) {
+          case 'file': {
+            if (!params.path) {
               throw new Error()
             }
-            return await window.entryAPI.getEntries(directoryPath)
+            return await window.entryAPI.getEntries(params.path)
           }
-          case 'zephy:': {
-            const parsed = parseZephyUrl(url)
-            if (!parsed) {
-              throw new Error()
-            }
-            if (parsed.pathname === 'ratings') {
-              const scoreToPathsMap = selectScoreToPathsMap(getState())
-              const paths = scoreToPathsMap[parsed.params.score] ?? []
-              return await window.entryAPI.getEntriesForPaths(paths)
-            } else {
-              return []
-            }
+          case 'ratings': {
+            const scoreToPathsMap = selectScoreToPathsMap(getState())
+            const paths = scoreToPathsMap[params.score] ?? []
+            return await window.entryAPI.getEntriesForPaths(paths)
           }
+          case 'settings':
+            return []
           default:
             throw new Error()
         }
@@ -858,18 +851,25 @@ export const refresh = (): AppThunk => async (dispatch, getState) => {
 export const open =
   (url?: string): AppThunk =>
   async (dispatch, getState) => {
-    if (url && !isFileUrl(url)) {
-      return dispatch(changeUrl(url))
+    let path: string | undefined
+
+    if (url) {
+      const params = parseUrl(url)
+      if (params?.type !== 'file') {
+        return dispatch(changeUrl(url))
+      }
+
+      path = params?.path
+    } else {
+      path = selectCurrentFocused(getState())
     }
 
-    const focused = selectCurrentFocused(getState())
-    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
-    if (!targetPath) {
+    if (!path) {
       return
     }
 
     try {
-      const entry = await window.entryAPI.getEntry(targetPath)
+      const entry = await window.entryAPI.getEntry(path)
       if (entry.type === 'directory') {
         dispatch(changeUrl(entry.url))
       } else {

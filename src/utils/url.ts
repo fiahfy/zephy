@@ -1,101 +1,75 @@
-type ZephyUrlParams =
-  | { pathname: 'ratings'; params: { score: number } }
-  | { pathname: 'settings' }
+type UrlParams =
+  | { type: 'file'; path: string | undefined }
+  | { type: 'ratings'; score: number }
+  | { type: 'settings' }
 
-export const buildZephyUrl = (inputs: ZephyUrlParams) => {
-  switch (inputs.pathname) {
+export const buildUrl = (params: UrlParams) => {
+  switch (params.type) {
+    case 'file':
+      return params.path
+        ? window.electronAPI.pathToFileURL(params.path)
+        : undefined
     case 'ratings':
-      return `zephy://ratings/${inputs.params.score}`
+      return `zephy://ratings/${params.score}`
     case 'settings':
       return 'zephy://settings'
   }
 }
 
-export const parseZephyUrl = (url: string): ZephyUrlParams | undefined => {
-  if (!url.startsWith('zephy://')) {
-    return undefined
-  }
-  const u = new URL(url)
-  const host = u.host
-  switch (host) {
-    case 'ratings': {
-      const score = Number(u.pathname.split('/')[1] ?? '')
-      return {
-        pathname: 'ratings' as const,
-        params: { score },
-      }
-    }
-    case 'settings':
-      return { pathname: 'settings' as const }
-    default:
-      return undefined
-  }
-}
-
-export const isFileUrl = (url: string) => {
-  try {
-    const u = new URL(url)
-    return u.protocol === 'file:'
-  } catch {
-    return false
-  }
-}
-
-export const getTitle = async (url: string) => {
+export const parseUrl = (url: string): UrlParams | undefined => {
   try {
     const u = new URL(url)
     switch (u.protocol) {
-      case 'file:': {
-        try {
-          const directoryPath = window.electronAPI.fileURLToPath(url)
-          if (!directoryPath) {
-            throw new Error()
-          }
-          const entry = await window.entryAPI.getEntry(directoryPath)
-          return entry.name
-        } catch {
-          return '<Error>'
-        }
-      }
+      case 'file:':
+        return { type: 'file', path: window.electronAPI.fileURLToPath(url) }
       case 'zephy:':
         switch (u.host) {
           case 'ratings': {
             const score = Number(u.pathname.split('/')[1] ?? '')
-            return `Ratings (${score})`
+            return { type: 'ratings', score }
           }
           case 'settings':
-            return 'Settings'
+            return { type: 'settings' }
           default:
-            throw new Error()
+            return undefined
         }
       default:
-        throw new Error()
+        return undefined
     }
   } catch {
-    return url
+    return undefined
+  }
+}
+
+export const isFileUrl = (url: string) => parseUrl(url)?.type === 'file'
+
+export const getTitle = (url: string) => {
+  const params = parseUrl(url)
+  switch (params?.type) {
+    case 'file': {
+      const sep = window.electronAPI.sep
+      const names = params.path?.split(sep) ?? []
+      return names[names.length - 1] ?? params.path ?? ''
+    }
+    case 'ratings':
+      return `Ratings (${params.score})`
+    case 'settings':
+      return 'Settings'
+    default:
+      return 'Error'
   }
 }
 
 export const getIconType = (url: string) => {
-  try {
-    const u = new URL(url)
-    switch (u.protocol) {
-      case 'file:': {
-        return 'folder'
-      }
-      case 'zephy:':
-        switch (u.host) {
-          case 'ratings':
-            return 'star'
-          case 'settings':
-            return 'settings'
-          default:
-            throw new Error()
-        }
-      default:
-        throw new Error()
-    }
-  } catch {
-    return 'error-outline'
+  const params = parseUrl(url)
+  switch (params?.type) {
+    case 'file':
+      return 'folder'
+    case 'ratings':
+      return 'star'
+    case 'settings':
+      return 'settings'
+    default:
+      return 'error-outline'
   }
 }

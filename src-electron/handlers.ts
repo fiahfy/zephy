@@ -1,4 +1,4 @@
-import { dirname, join } from 'node:path'
+import { dirname, join, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   app,
@@ -67,6 +67,9 @@ const registerElectronHandlers = () => {
   ipcMain.on('selectAll', (event: IpcMainEvent) =>
     BrowserWindow.fromWebContents(event.sender)?.webContents.selectAll(),
   )
+  ipcMain.on('sep', (event: IpcMainEvent) => {
+    event.returnValue = sep
+  })
   ipcMain.on('startDrag', (event: IpcMainEvent, paths: string[]) =>
     event.sender.startDrag({
       file: '',

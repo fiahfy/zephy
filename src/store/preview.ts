@@ -15,7 +15,7 @@ import {
 import { selectShouldShowHiddenFiles } from '~/store/settings'
 import { changeUrl, openUrl } from '~/store/window'
 import { isHiddenFile } from '~/utils/file'
-import { isFileUrl } from '~/utils/url'
+import { parseUrl } from '~/utils/url'
 
 type State = {
   anchor: string | undefined
@@ -520,18 +520,25 @@ export const rename =
 export const open =
   (url?: string): AppThunk =>
   async (dispatch, getState) => {
-    if (url && !isFileUrl(url)) {
-      return dispatch(changeUrl(url))
+    let path: string | undefined
+
+    if (url) {
+      const params = parseUrl(url)
+      if (params?.type !== 'file') {
+        return dispatch(changeUrl(url))
+      }
+
+      path = params?.path
+    } else {
+      path = selectFocused(getState())
     }
 
-    const focused = selectFocused(getState())
-    const targetPath = url ? window.electronAPI.fileURLToPath(url) : focused
-    if (!targetPath) {
+    if (!path) {
       return
     }
 
     try {
-      const entry = await window.entryAPI.getEntry(targetPath)
+      const entry = await window.entryAPI.getEntry(path)
       if (entry.type === 'directory') {
         dispatch(changeUrl(entry.url))
       } else {
