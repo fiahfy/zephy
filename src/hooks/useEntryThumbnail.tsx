@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import useSemaphore from '~/hooks/useSemaphore'
 import type { Entry } from '~/interfaces'
 import { useAppSelector } from '~/store'
 import { selectShouldShowHiddenFiles } from '~/store/settings'
@@ -37,6 +38,8 @@ const reducer = (_state: State, action: Action) => {
 const useEntryThumbnail = (entry: Entry) => {
   const shouldShowHiddenFiles = useAppSelector(selectShouldShowHiddenFiles)
 
+  const { semaphore } = useSemaphore()
+
   const [{ itemCount, status, thumbnail }, dispatch] = useReducer(reducer, {
     itemCount: undefined,
     status: 'loading',
@@ -71,36 +74,56 @@ const useEntryThumbnail = (entry: Entry) => {
 
   useEffect(() => {
     let unmounted = false
+    let acquired = false
+
     ;(async () => {
-      dispatch({ type: 'loading' })
+      try {
+        dispatch({ type: 'loading' })
 
-      const paths =
-        entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
-      const thumbnail = await window.entryAPI.createEntryThumbnailUrl(paths)
-      const success = await new Promise<boolean>((resolve) => {
-        if (!thumbnail) {
-          return resolve(true)
+        await semaphore.acquire()
+        acquired = true
+
+        if (unmounted) {
+          return
         }
-        const img = new Image()
-        img.onload = () => resolve(true)
-        img.onerror = () => resolve(false)
-        img.src = thumbnail
-      })
 
-      if (unmounted) {
-        return
+        const paths =
+          entry.type === 'directory' ? await getPaths(entry.path) : [entry.path]
+        const thumbnail = await window.entryAPI.createEntryThumbnailUrl(paths)
+        const success = await new Promise<boolean>((resolve) => {
+          if (!thumbnail) {
+            return resolve(true)
+          }
+          const img = new Image()
+          img.onload = () => resolve(true)
+          img.onerror = () => resolve(false)
+          img.src = thumbnail
+        })
+
+        if (unmounted) {
+          return
+        }
+
+        dispatch({
+          type: success ? 'loaded' : 'error',
+          payload: { itemCount: paths.length, thumbnail },
+        })
+      } finally {
+        if (acquired) {
+          semaphore.release()
+          acquired = false
+        }
       }
-
-      dispatch({
-        type: success ? 'loaded' : 'error',
-        payload: { itemCount: paths.length, thumbnail },
-      })
     })()
 
     return () => {
       unmounted = true
+      if (acquired) {
+        semaphore.release()
+        acquired = false
+      }
     }
-  }, [entry.path, entry.type, getPaths])
+  }, [entry.path, entry.type, getPaths, semaphore])
 
   return { itemCount, message, status, thumbnail }
 }

@@ -11,6 +11,8 @@ import registerContextMenu from './context-menu'
 import registerHandlers from './handlers'
 import createWatcher from './watcher'
 
+process.env.UV_THREADPOOL_SIZE = '16'
+
 const dirPath = dirname(fileURLToPath(import.meta.url))
 
 const watcher = createWatcher()

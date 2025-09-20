@@ -1258,6 +1258,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fiahfy/semaphore@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@fiahfy/semaphore@npm:0.0.2"
+  checksum: 10c0/be591e2693268932ecc271dcb75eab6bb373d5d646d11042b92d5824b58117afd113b6b9b699f57f909d3d164f4d016abe375fe1c3ab03e81e2a2b9150898816
+  languageName: node
+  linkType: hard
+
 "@floating-ui/utils@npm:^0.2.10":
   version: 0.2.10
   resolution: "@floating-ui/utils@npm:0.2.10"
@@ -7254,6 +7261,7 @@ __metadata:
     "@fiahfy/biome-config": "npm:^0.0.2"
     "@fiahfy/electron-context-menu": "npm:^0.1.7"
     "@fiahfy/electron-window": "npm:^0.1.8"
+    "@fiahfy/semaphore": "npm:^0.0.2"
     "@fontsource/roboto": "npm:^5.2.6"
     "@mui/icons-material": "npm:^7.3.2"
     "@mui/material": "npm:^7.3.2"
