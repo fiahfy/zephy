@@ -622,11 +622,6 @@ export const load =
       return
     }
 
-    const loading = selectLoadingByTabId(getState(), tabId)
-    if (loading) {
-      return
-    }
-
     const timestamp = Date.now()
 
     dispatch(load({ tabId, timestamp }))

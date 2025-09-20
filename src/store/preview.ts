@@ -328,13 +328,8 @@ export const selectSelectedByPath = createSelector(
 
 export const load =
   (directoryPath: string): AppThunk =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const { load, loaded, loadFailed } = previewSlice.actions
-
-    const loading = selectLoading(getState())
-    if (loading) {
-      return
-    }
 
     const timestamp = Date.now()
 
