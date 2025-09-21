@@ -7,7 +7,7 @@ type Props = { children: ReactNode }
 const SemaphoreProvider = (props: Props) => {
   const { children } = props
 
-  const s = useRef(semaphore(3))
+  const s = useRef(semaphore(16))
 
   const value = { semaphore: s.current }
 

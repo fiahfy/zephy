@@ -74,15 +74,12 @@ const useEntryThumbnail = (entry: Entry) => {
 
   useEffect(() => {
     let unmounted = false
-    let acquired = false
 
     ;(async () => {
+      dispatch({ type: 'loading' })
+
+      await semaphore.acquire()
       try {
-        dispatch({ type: 'loading' })
-
-        await semaphore.acquire()
-        acquired = true
-
         if (unmounted) {
           return
         }
@@ -109,19 +106,12 @@ const useEntryThumbnail = (entry: Entry) => {
           payload: { itemCount: paths.length, thumbnail },
         })
       } finally {
-        if (acquired) {
-          semaphore.release()
-          acquired = false
-        }
+        semaphore.release()
       }
     })()
 
     return () => {
       unmounted = true
-      if (acquired) {
-        semaphore.release()
-        acquired = false
-      }
     }
   }, [entry.path, entry.type, getPaths, semaphore])
 

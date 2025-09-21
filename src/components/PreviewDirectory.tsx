@@ -13,6 +13,7 @@ import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
 import useDroppable from '~/hooks/useDroppable'
 import usePrevious from '~/hooks/usePrevious'
+import useSemaphore from '~/hooks/useSemaphore'
 import useWatcher from '~/hooks/useWatcher'
 import type { Content, Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -51,6 +52,8 @@ const PreviewDirectory = (props: Props) => {
   const focusedContent = useAppSelector(selectFocusedContent)
   const loading = useAppSelector(selectLoading)
   const dispatch = useAppDispatch()
+
+  const { semaphore } = useSemaphore()
 
   const { unwatch, watch } = useWatcher()
 
