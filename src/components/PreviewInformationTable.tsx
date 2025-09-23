@@ -142,6 +142,7 @@ const PreviewInformationTable = (props: Props) => {
             pb: 0.5,
             px: 1,
             userSelect: 'text',
+            wordBreak: 'break-word',
           })}
           variant="caption"
         >
