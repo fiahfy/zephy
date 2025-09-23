@@ -1,3 +1,4 @@
+import { KeyboardArrowDown as KeyboardArrowDownIcon } from '@mui/icons-material'
 import { TableCell, TableSortLabel, Typography } from '@mui/material'
 import { type MouseEvent, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -56,6 +57,7 @@ const ExplorerTableHeaderCell = (props: Props) => {
       variant="head"
     >
       <TableSortLabel
+        IconComponent={KeyboardArrowDownIcon}
         active={sortOption.orderBy === dataKey}
         direction={sortOption.orderBy === dataKey ? sortOption.order : 'asc'}
         onClick={handleClick}
