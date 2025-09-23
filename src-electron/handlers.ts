@@ -127,11 +127,13 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
     'moveEntry',
     async (_event: IpcMainInvokeEvent, path: string, directoryPath: string) => {
       const entry = await moveEntry(path, directoryPath)
-      // NOTE: Notify event manually due to intermittent failures
-      setTimeout(() => {
-        watcher.notify('delete', dirname(path), path)
-        watcher.notify('create', dirname(entry.path), entry.path)
-      })
+      if (entry.path !== path) {
+        // NOTE: Notify event manually due to intermittent failures
+        setTimeout(() => {
+          watcher.notify('delete', dirname(path), path)
+          watcher.notify('create', dirname(entry.path), entry.path)
+        })
+      }
       return entry
     },
   )
