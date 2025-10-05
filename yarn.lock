@@ -235,7 +235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:^2.2.4":
+"@biomejs/biome@npm:2.2.4":
   version: 2.2.4
   resolution: "@biomejs/biome@npm:2.2.4"
   dependencies:
@@ -337,7 +337,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dnd-kit/core@npm:^6.3.1":
+"@dnd-kit/core@npm:6.3.1":
   version: 6.3.1
   resolution: "@dnd-kit/core@npm:6.3.1"
   dependencies:
@@ -351,7 +351,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dnd-kit/modifiers@npm:^9.0.0":
+"@dnd-kit/modifiers@npm:9.0.0":
   version: 9.0.0
   resolution: "@dnd-kit/modifiers@npm:9.0.0"
   dependencies:
@@ -364,7 +364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dnd-kit/sortable@npm:^10.0.0":
+"@dnd-kit/sortable@npm:10.0.0":
   version: 10.0.0
   resolution: "@dnd-kit/sortable@npm:10.0.0"
   dependencies:
@@ -388,7 +388,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/cli@npm:^7.9.0":
+"@electron-forge/cli@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/cli@npm:7.9.0"
   dependencies:
@@ -483,7 +483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-deb@npm:^7.9.0":
+"@electron-forge/maker-deb@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/maker-deb@npm:7.9.0"
   dependencies:
@@ -497,7 +497,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-dmg@npm:^7.9.0":
+"@electron-forge/maker-dmg@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/maker-dmg@npm:7.9.0"
   dependencies:
@@ -512,7 +512,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-rpm@npm:^7.9.0":
+"@electron-forge/maker-rpm@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/maker-rpm@npm:7.9.0"
   dependencies:
@@ -526,7 +526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-squirrel@npm:^7.9.0":
+"@electron-forge/maker-squirrel@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/maker-squirrel@npm:7.9.0"
   dependencies:
@@ -541,7 +541,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-zip@npm:^7.9.0":
+"@electron-forge/maker-zip@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/maker-zip@npm:7.9.0"
   dependencies:
@@ -554,7 +554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-auto-unpack-natives@npm:^7.9.0":
+"@electron-forge/plugin-auto-unpack-natives@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/plugin-auto-unpack-natives@npm:7.9.0"
   dependencies:
@@ -573,7 +573,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-fuses@npm:^7.9.0":
+"@electron-forge/plugin-fuses@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/plugin-fuses@npm:7.9.0"
   dependencies:
@@ -585,7 +585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-vite@npm:^7.9.0":
+"@electron-forge/plugin-vite@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/plugin-vite@npm:7.9.0"
   dependencies:
@@ -608,7 +608,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/publisher-github@npm:^7.9.0":
+"@electron-forge/publisher-github@npm:7.9.0":
   version: 7.9.0
   resolution: "@electron-forge/publisher-github@npm:7.9.0"
   dependencies:
@@ -721,7 +721,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/fuses@npm:^2.0.0":
+"@electron/fuses@npm:2.0.0":
   version: 2.0.0
   resolution: "@electron/fuses@npm:2.0.0"
   bin:
@@ -957,7 +957,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.14.0":
+"@emotion/react@npm:11.14.0":
   version: 11.14.0
   resolution: "@emotion/react@npm:11.14.0"
   dependencies:
@@ -998,7 +998,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/styled@npm:^11.14.1":
+"@emotion/styled@npm:11.14.1":
   version: 11.14.1
   resolution: "@emotion/styled@npm:11.14.1"
   dependencies:
@@ -1230,14 +1230,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/biome-config@npm:^0.0.2":
+"@fiahfy/biome-config@npm:0.0.2":
   version: 0.0.2
   resolution: "@fiahfy/biome-config@npm:0.0.2"
   checksum: 10c0/0ceac3da40a761d6f88ba29d63f7d0191f173fefd1308248d77daff0f40e41c2048c458843aab9359cf8a144fb4c3c40df3098dfaf740fc7ba1fda2ad40ce63c
   languageName: node
   linkType: hard
 
-"@fiahfy/electron-context-menu@npm:^0.1.7":
+"@fiahfy/electron-context-menu@npm:0.1.7":
   version: 0.1.7
   resolution: "@fiahfy/electron-context-menu@npm:0.1.7"
   peerDependencies:
@@ -1246,7 +1246,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/electron-window@npm:^0.1.8":
+"@fiahfy/electron-window@npm:0.1.8":
   version: 0.1.8
   resolution: "@fiahfy/electron-window@npm:0.1.8"
   dependencies:
@@ -1258,7 +1258,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/semaphore@npm:^0.0.2":
+"@fiahfy/semaphore@npm:0.0.2":
   version: 0.0.2
   resolution: "@fiahfy/semaphore@npm:0.0.2"
   checksum: 10c0/be591e2693268932ecc271dcb75eab6bb373d5d646d11042b92d5824b58117afd113b6b9b699f57f909d3d164f4d016abe375fe1c3ab03e81e2a2b9150898816
@@ -1272,7 +1272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fontsource/roboto@npm:^5.2.6":
+"@fontsource/roboto@npm:5.2.6":
   version: 5.2.6
   resolution: "@fontsource/roboto@npm:5.2.6"
   checksum: 10c0/a2fbadf2f3b8ebb859e7b13ad82d25e8b43901c30ad93b08095c201617fcfded279d99e64a7b110614d2a1b5bca77631df7d009abf1ad6c6a4df301ceb330a51
@@ -1564,7 +1564,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^7.3.2":
+"@mui/icons-material@npm:7.3.2":
   version: 7.3.2
   resolution: "@mui/icons-material@npm:7.3.2"
   dependencies:
@@ -1580,7 +1580,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^7.3.2":
+"@mui/material@npm:7.3.2":
   version: 7.3.2
   resolution: "@mui/material@npm:7.3.2"
   dependencies:
@@ -1732,7 +1732,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-tree-view@npm:^8.11.2":
+"@mui/x-tree-view@npm:8.11.2":
   version: 8.11.2
   resolution: "@mui/x-tree-view@npm:8.11.2"
   dependencies:
@@ -1997,7 +1997,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reduxjs/toolkit@npm:^2.9.0":
+"@reduxjs/toolkit@npm:2.9.0":
   version: 2.9.0
   resolution: "@reduxjs/toolkit@npm:2.9.0"
   dependencies:
@@ -2026,7 +2026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-esm-shim@npm:^0.1.8":
+"@rollup/plugin-esm-shim@npm:0.1.8":
   version: 0.1.8
   resolution: "@rollup/plugin-esm-shim@npm:0.1.8"
   dependencies:
@@ -2218,7 +2218,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.13.12":
+"@tanstack/react-virtual@npm:3.13.12":
   version: 3.13.12
   resolution: "@tanstack/react-virtual@npm:3.13.12"
   dependencies:
@@ -2306,7 +2306,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/electron-squirrel-startup@npm:^1.0.2":
+"@types/electron-squirrel-startup@npm:1.0.2":
   version: 1.0.2
   resolution: "@types/electron-squirrel-startup@npm:1.0.2"
   checksum: 10c0/d6d6b7b26ef1a0814f7fec15649032d3d518c961155ac3b8e08408d1fff6b08d0e1597ef2926ede34e37dee091129b72e064ba711820a91b3d9f12574a3666a8
@@ -2320,7 +2320,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fluent-ffmpeg@npm:^2.1.27":
+"@types/fluent-ffmpeg@npm:2.1.27":
   version: 2.1.27
   resolution: "@types/fluent-ffmpeg@npm:2.1.27"
   dependencies:
@@ -2354,7 +2354,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash.throttle@npm:^4":
+"@types/lodash.throttle@npm:4":
   version: 4.1.9
   resolution: "@types/lodash.throttle@npm:4.1.9"
   dependencies:
@@ -2404,7 +2404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/plist@npm:^3.0.5":
+"@types/plist@npm:3.0.5":
   version: 3.0.5
   resolution: "@types/plist@npm:3.0.5"
   dependencies:
@@ -2414,7 +2414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/pluralize@npm:^0.0.33":
+"@types/pluralize@npm:0.0.33":
   version: 0.0.33
   resolution: "@types/pluralize@npm:0.0.33"
   checksum: 10c0/24899caf85b79dd291a6b6e9b9f3b67b452b18d578d0ac0d531a705bf5ee0361d9386ea1f8532c64de9e22c6e9606c5497787bb5e31bd299c487980436c59785
@@ -2428,7 +2428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.9":
+"@types/react-dom@npm:19.1.9":
   version: 19.1.9
   resolution: "@types/react-dom@npm:19.1.9"
   peerDependencies:
@@ -2446,7 +2446,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.13":
+"@types/react@npm:19.1.13":
   version: 19.1.13
   resolution: "@types/react@npm:19.1.13"
   dependencies:
@@ -2487,7 +2487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^5.0.2":
+"@vitejs/plugin-react@npm:5.0.2":
   version: 5.0.2
   resolution: "@vitejs/plugin-react@npm:5.0.2"
   dependencies:
@@ -2953,7 +2953,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:~3.6.0":
+"chokidar@npm:3.6.0":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
   dependencies:
@@ -3080,7 +3080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^2.1.1":
+"clsx@npm:2.1.1, clsx@npm:^2.1.1":
   version: 2.1.1
   resolution: "clsx@npm:2.1.1"
   checksum: 10c0/c4c8eb865f8c82baab07e71bfa8897c73454881c4f99d6bc81585aecd7c441746c1399d08363dc096c550cceaf97bd4ce1e8854e1771e9998d9f94c4fe075839
@@ -3231,7 +3231,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^4.1.0":
+"date-fns@npm:4.1.0":
   version: 4.1.0
   resolution: "date-fns@npm:4.1.0"
   checksum: 10c0/b79ff32830e6b7faa009590af6ae0fb8c3fd9ffad46d930548fbb5acf473773b4712ae887e156ba91a7b3dc30591ce0f517d69fd83bd9c38650fdc03b4e0bac8
@@ -3438,7 +3438,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-squirrel-startup@npm:^1.0.1":
+"electron-squirrel-startup@npm:1.0.1":
   version: 1.0.1
   resolution: "electron-squirrel-startup@npm:1.0.1"
   dependencies:
@@ -3481,7 +3481,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^38.1.0":
+"electron@npm:38.1.0":
   version: 38.1.0
   resolution: "electron@npm:38.1.0"
   dependencies:
@@ -3709,7 +3709,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exifreader@npm:^4.31.2":
+"exifreader@npm:4.31.2":
   version: 4.31.2
   resolution: "exifreader@npm:4.31.2"
   dependencies:
@@ -3799,14 +3799,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ffmpeg-static-electron@npm:^2.0.3":
+"ffmpeg-static-electron@npm:2.0.3":
   version: 2.0.3
   resolution: "ffmpeg-static-electron@npm:2.0.3"
   checksum: 10c0/7211a53290f7d26477cbc103c9dfea9e57e91f5ddeeb46a71c10803eb3f74db154e7b93f047040b92976ef9ff6e00b54a79760255c9421ba38bcdfdf65d3f102
   languageName: node
   linkType: hard
 
-"ffprobe-static-electron@npm:^2.0.2":
+"ffprobe-static-electron@npm:2.0.2":
   version: 2.0.2
   resolution: "ffprobe-static-electron@npm:2.0.2"
   checksum: 10c0/4527af5029d520d564cb193ff2b7293601ed42e33323c9a6e85638c4f68fb114717b7c297e42e7fdc957392742afcfc884531dfb5e31dd5594bec407328aa64f
@@ -3876,7 +3876,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fluent-ffmpeg@npm:^2.1.3":
+"fluent-ffmpeg@npm:2.1.3":
   version: 2.1.3
   resolution: "fluent-ffmpeg@npm:2.1.3"
   dependencies:
@@ -3905,6 +3905,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:11.3.1, fs-extra@npm:^11.1.0, fs-extra@npm:^11.1.1":
+  version: 11.3.1
+  resolution: "fs-extra@npm:11.3.1"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^6.0.1"
+    universalify: "npm:^2.0.0"
+  checksum: 10c0/61e5b7285b1ca72c68dfe1058b2514294a922683afac2a80aa90540f9bd85370763d675e3b408ef500077d355956fece3bd24b546790e261c3d3015967e2b2d9
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0, fs-extra@npm:^10.1.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
@@ -3913,17 +3924,6 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 10c0/5f579466e7109719d162a9249abbeffe7f426eb133ea486e020b89bc6d67a741134076bf439983f2eb79276ceaf6bd7b7c1e43c3fd67fe889863e69072fb0a5e
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:^11.1.0, fs-extra@npm:^11.1.1, fs-extra@npm:^11.3.1":
-  version: 11.3.1
-  resolution: "fs-extra@npm:11.3.1"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10c0/61e5b7285b1ca72c68dfe1058b2514294a922683afac2a80aa90540f9bd85370763d675e3b408ef500077d355956fece3bd24b546790e261c3d3015967e2b2d9
   languageName: node
   linkType: hard
 
@@ -4355,7 +4355,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.1.7":
+"husky@npm:9.1.7":
   version: 9.1.7
   resolution: "husky@npm:9.1.7"
   bin:
@@ -4794,7 +4794,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.throttle@npm:^4.1.1":
+"lodash.throttle@npm:4.1.1":
   version: 4.1.1
   resolution: "lodash.throttle@npm:4.1.1"
   checksum: 10c0/14628013e9e7f65ac904fc82fd8ecb0e55a9c4c2416434b1dd9cf64ae70a8937f0b15376a39a68248530adc64887ed0fe2b75204b2c9ec3eea1cb2d66ddd125d
@@ -4996,7 +4996,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime@npm:^4.1.0":
+"mime@npm:4.1.0":
   version: 4.1.0
   resolution: "mime@npm:4.1.0"
   bin:
@@ -5731,7 +5731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"plist@npm:^3.0.0, plist@npm:^3.0.5, plist@npm:^3.1.0":
+"plist@npm:3.1.0, plist@npm:^3.0.0, plist@npm:^3.0.5, plist@npm:^3.1.0":
   version: 3.1.0
   resolution: "plist@npm:3.1.0"
   dependencies:
@@ -5742,7 +5742,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pluralize@npm:^8.0.0":
+"pluralize@npm:8.0.0":
   version: 8.0.0
   resolution: "pluralize@npm:8.0.0"
   checksum: 10c0/2044cfc34b2e8c88b73379ea4a36fc577db04f651c2909041b054c981cd863dd5373ebd030123ab058d194ae615d3a97cfdac653991e499d10caf592e8b3dc33
@@ -5863,7 +5863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.1.1":
+"react-dom@npm:19.1.1":
   version: 19.1.1
   resolution: "react-dom@npm:19.1.1"
   dependencies:
@@ -5888,7 +5888,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^9.2.0":
+"react-redux@npm:9.2.0":
   version: 9.2.0
   resolution: "react-redux@npm:9.2.0"
   dependencies:
@@ -5929,7 +5929,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.1.1":
+"react@npm:19.1.1":
   version: 19.1.1
   resolution: "react@npm:19.1.1"
   checksum: 10c0/8c9769a2dfd02e603af6445058325e6c8a24b47b185d0e461f66a6454765ddcaecb3f0a90184836c68bb509f3c38248359edbc42f0d07c23eb500a5c30c87b4e
@@ -5997,7 +5997,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-persist@npm:^6.0.0":
+"redux-persist@npm:6.0.0":
   version: 6.0.0
   resolution: "redux-persist@npm:6.0.0"
   peerDependencies:
@@ -6788,7 +6788,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.9.2":
+"typescript@npm:5.9.2":
   version: 5.9.2
   resolution: "typescript@npm:5.9.2"
   bin:
@@ -6798,7 +6798,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.9.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>":
   version: 5.9.2
   resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"
   bin:
@@ -6943,7 +6943,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-tsconfig-paths@npm:^5.1.4":
+"vite-tsconfig-paths@npm:5.1.4":
   version: 5.1.4
   resolution: "vite-tsconfig-paths@npm:5.1.4"
   dependencies:
@@ -6959,7 +6959,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^7.1.5":
+"vite@npm:7.1.5":
   version: 7.1.5
   resolution: "vite@npm:7.1.5"
   dependencies:
@@ -7241,63 +7241,63 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "zephy@workspace:."
   dependencies:
-    "@biomejs/biome": "npm:^2.2.4"
-    "@dnd-kit/core": "npm:^6.3.1"
-    "@dnd-kit/modifiers": "npm:^9.0.0"
-    "@dnd-kit/sortable": "npm:^10.0.0"
-    "@electron-forge/cli": "npm:^7.9.0"
-    "@electron-forge/maker-deb": "npm:^7.9.0"
-    "@electron-forge/maker-dmg": "npm:^7.9.0"
-    "@electron-forge/maker-rpm": "npm:^7.9.0"
-    "@electron-forge/maker-squirrel": "npm:^7.9.0"
-    "@electron-forge/maker-zip": "npm:^7.9.0"
-    "@electron-forge/plugin-auto-unpack-natives": "npm:^7.9.0"
-    "@electron-forge/plugin-fuses": "npm:^7.9.0"
-    "@electron-forge/plugin-vite": "npm:^7.9.0"
-    "@electron-forge/publisher-github": "npm:^7.9.0"
-    "@electron/fuses": "npm:^2.0.0"
-    "@emotion/react": "npm:^11.14.0"
-    "@emotion/styled": "npm:^11.14.1"
-    "@fiahfy/biome-config": "npm:^0.0.2"
-    "@fiahfy/electron-context-menu": "npm:^0.1.7"
-    "@fiahfy/electron-window": "npm:^0.1.8"
-    "@fiahfy/semaphore": "npm:^0.0.2"
-    "@fontsource/roboto": "npm:^5.2.6"
-    "@mui/icons-material": "npm:^7.3.2"
-    "@mui/material": "npm:^7.3.2"
-    "@mui/x-tree-view": "npm:^8.11.2"
-    "@reduxjs/toolkit": "npm:^2.9.0"
-    "@rollup/plugin-esm-shim": "npm:^0.1.8"
-    "@tanstack/react-virtual": "npm:^3.13.12"
-    "@types/electron-squirrel-startup": "npm:^1.0.2"
-    "@types/fluent-ffmpeg": "npm:^2.1.27"
-    "@types/lodash.throttle": "npm:^4"
-    "@types/plist": "npm:^3.0.5"
-    "@types/pluralize": "npm:^0.0.33"
-    "@types/react": "npm:^19.1.13"
-    "@types/react-dom": "npm:^19.1.9"
-    "@vitejs/plugin-react": "npm:^5.0.2"
-    chokidar: "npm:~3.6.0"
-    clsx: "npm:^2.1.1"
-    date-fns: "npm:^4.1.0"
-    electron: "npm:^38.1.0"
-    electron-squirrel-startup: "npm:^1.0.1"
-    exifreader: "npm:^4.31.2"
-    ffmpeg-static-electron: "npm:^2.0.3"
-    ffprobe-static-electron: "npm:^2.0.2"
-    fluent-ffmpeg: "npm:^2.1.3"
-    fs-extra: "npm:^11.3.1"
-    husky: "npm:^9.1.7"
-    lodash.throttle: "npm:^4.1.1"
-    mime: "npm:^4.1.0"
-    plist: "npm:^3.1.0"
-    pluralize: "npm:^8.0.0"
-    react: "npm:^19.1.1"
-    react-dom: "npm:^19.1.1"
-    react-redux: "npm:^9.2.0"
-    redux-persist: "npm:^6.0.0"
-    typescript: "npm:^5.9.2"
-    vite: "npm:^7.1.5"
-    vite-tsconfig-paths: "npm:^5.1.4"
+    "@biomejs/biome": "npm:2.2.4"
+    "@dnd-kit/core": "npm:6.3.1"
+    "@dnd-kit/modifiers": "npm:9.0.0"
+    "@dnd-kit/sortable": "npm:10.0.0"
+    "@electron-forge/cli": "npm:7.9.0"
+    "@electron-forge/maker-deb": "npm:7.9.0"
+    "@electron-forge/maker-dmg": "npm:7.9.0"
+    "@electron-forge/maker-rpm": "npm:7.9.0"
+    "@electron-forge/maker-squirrel": "npm:7.9.0"
+    "@electron-forge/maker-zip": "npm:7.9.0"
+    "@electron-forge/plugin-auto-unpack-natives": "npm:7.9.0"
+    "@electron-forge/plugin-fuses": "npm:7.9.0"
+    "@electron-forge/plugin-vite": "npm:7.9.0"
+    "@electron-forge/publisher-github": "npm:7.9.0"
+    "@electron/fuses": "npm:2.0.0"
+    "@emotion/react": "npm:11.14.0"
+    "@emotion/styled": "npm:11.14.1"
+    "@fiahfy/biome-config": "npm:0.0.2"
+    "@fiahfy/electron-context-menu": "npm:0.1.7"
+    "@fiahfy/electron-window": "npm:0.1.8"
+    "@fiahfy/semaphore": "npm:0.0.2"
+    "@fontsource/roboto": "npm:5.2.6"
+    "@mui/icons-material": "npm:7.3.2"
+    "@mui/material": "npm:7.3.2"
+    "@mui/x-tree-view": "npm:8.11.2"
+    "@reduxjs/toolkit": "npm:2.9.0"
+    "@rollup/plugin-esm-shim": "npm:0.1.8"
+    "@tanstack/react-virtual": "npm:3.13.12"
+    "@types/electron-squirrel-startup": "npm:1.0.2"
+    "@types/fluent-ffmpeg": "npm:2.1.27"
+    "@types/lodash.throttle": "npm:4"
+    "@types/plist": "npm:3.0.5"
+    "@types/pluralize": "npm:0.0.33"
+    "@types/react": "npm:19.1.13"
+    "@types/react-dom": "npm:19.1.9"
+    "@vitejs/plugin-react": "npm:5.0.2"
+    chokidar: "npm:3.6.0"
+    clsx: "npm:2.1.1"
+    date-fns: "npm:4.1.0"
+    electron: "npm:38.1.0"
+    electron-squirrel-startup: "npm:1.0.1"
+    exifreader: "npm:4.31.2"
+    ffmpeg-static-electron: "npm:2.0.3"
+    ffprobe-static-electron: "npm:2.0.2"
+    fluent-ffmpeg: "npm:2.1.3"
+    fs-extra: "npm:11.3.1"
+    husky: "npm:9.1.7"
+    lodash.throttle: "npm:4.1.1"
+    mime: "npm:4.1.0"
+    plist: "npm:3.1.0"
+    pluralize: "npm:8.0.0"
+    react: "npm:19.1.1"
+    react-dom: "npm:19.1.1"
+    react-redux: "npm:9.2.0"
+    redux-persist: "npm:6.0.0"
+    typescript: "npm:5.9.2"
+    vite: "npm:7.1.5"
+    vite-tsconfig-paths: "npm:5.1.4"
   languageName: unknown
   linkType: soft
