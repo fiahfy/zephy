@@ -76,7 +76,7 @@
     "prepare": "husky",
     "publish": "electron-forge publish",
     "test": "yarn lint && yarn type-check",
-    "type-check": "tsc"
+    "type-check": "tsc --noEmit"
   },
   "type": "module"
 }
