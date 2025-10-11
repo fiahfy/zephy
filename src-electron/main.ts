@@ -1,5 +1,6 @@
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { register as registerStorage } from '@fiahfy/electron-storage'
 import {
   createManager as createWindowManager,
   type WindowCreator,
@@ -89,6 +90,7 @@ app.whenReady().then(() => {
   registerApplicationMenu(createWindow)
   registerContextMenu(createWindow)
   registerHandlers(watcher)
+  registerStorage()
 
   const browserWindows = windowManager.restore()
   if (browserWindows.length === 0) {

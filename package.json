@@ -9,6 +9,7 @@
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@fiahfy/electron-context-menu": "0.1.7",
+    "@fiahfy/electron-storage": "0.0.3",
     "@fiahfy/electron-window": "0.1.8",
     "@fiahfy/semaphore": "0.0.2",
     "@fontsource/roboto": "5.2.8",

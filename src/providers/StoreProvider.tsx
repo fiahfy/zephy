@@ -20,14 +20,13 @@ const StoreProvider = (props: Props) => {
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    const handler = (e: StorageEvent) => {
-      if (e.key !== storageKey) {
+    const removeListener = window.storageAPI.onDidChange((newValue) => {
+      const value = newValue[storageKey]
+      if (typeof value !== 'string') {
         return
       }
-      if (!e.newValue) {
-        return
-      }
-      const newState = JSON.parse(e.newValue)
+
+      const newState = JSON.parse(value)
       dispatch(replaceFavoriteState({ state: JSON.parse(newState.favorite) }))
       dispatch(
         replacePreferencesState({ state: JSON.parse(newState.preferences) }),
@@ -36,11 +35,9 @@ const StoreProvider = (props: Props) => {
       dispatch(replaceRatingState({ state: JSON.parse(newState.rating) }))
       dispatch(replaceSettingsState({ state: JSON.parse(newState.settings) }))
       dispatch(replaceWindowState({ state: JSON.parse(newState.window) }))
-    }
+    })
 
-    window.addEventListener('storage', handler)
-
-    return () => window.removeEventListener('storage', handler)
+    return () => removeListener()
   }, [dispatch])
 
   useEffect(() => {

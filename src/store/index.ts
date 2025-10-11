@@ -1,3 +1,4 @@
+import { createStorage } from '@fiahfy/electron-storage/renderer'
 import {
   type Action,
   combineReducers,
@@ -20,7 +21,6 @@ import {
   REGISTER,
   REHYDRATE,
 } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
 import explorerListReducer from '~/store/explorer-list'
 import explorerTreeReducer from '~/store/explorer-tree'
 import favoriteReducer from '~/store/favorite'
@@ -32,6 +32,8 @@ import ratingReducer from '~/store/rating'
 import settingsReducer from '~/store/settings'
 import windowReducer from '~/store/window'
 import windowIdReducer from '~/store/window-id'
+
+const storage = createStorage(window.storageAPI)
 
 const reducers = combineReducers({
   explorerList: explorerListReducer,
