@@ -15,6 +15,7 @@ jobs:
           node-version: 20
       - run: corepack enable
       - run: yarn
+      - run: yarn build-electron
       - run: yarn publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
