@@ -42,7 +42,7 @@ const StoreProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      const data = await window.windowAPI.restore()
+      const data = await window.windowAPI.getData()
       if (!data) {
         return
       }

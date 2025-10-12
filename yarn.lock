@@ -1257,15 +1257,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fiahfy/electron-window@npm:0.1.8":
-  version: 0.1.8
-  resolution: "@fiahfy/electron-window@npm:0.1.8"
+"@fiahfy/electron-window@npm:0.1.9":
+  version: 0.1.9
+  resolution: "@fiahfy/electron-window@npm:0.1.9"
   dependencies:
-    electron-window-state: "npm:^5.0.3"
-    jsonfile: "npm:^6.2.0"
+    electron-window-state: "npm:5.0.3"
+    jsonfile: "npm:6.2.0"
   peerDependencies:
     electron: ">=27"
-  checksum: 10c0/23f83c93660c946fe76cd0ab512d9d8c2f47f4965c3238270318a352a8076175c397a75451e961455882fa0dd737259ff361704ee5d7bb5d18300923c13bd4bb
+  checksum: 10c0/7f01f135cdac5935024827091b860e8958bebec66e4b49104845541106c4f19815527ebe01b7a8176703c15745d799584cfe7c9809bfe95cd236abb523559319
   languageName: node
   linkType: hard
 
@@ -3546,7 +3546,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-window-state@npm:^5.0.3":
+"electron-window-state@npm:5.0.3":
   version: 5.0.3
   resolution: "electron-window-state@npm:5.0.3"
   dependencies:
@@ -4814,19 +4814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonfile@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "jsonfile@npm:4.0.0"
-  dependencies:
-    graceful-fs: "npm:^4.1.6"
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: 10c0/7dc94b628d57a66b71fb1b79510d460d662eb975b5f876d723f81549c2e9cd316d58a2ddf742b2b93a4fa6b17b2accaf1a738a0e2ea114bdfb13a32e5377e480
-  languageName: node
-  linkType: hard
-
-"jsonfile@npm:^6.0.1, jsonfile@npm:^6.2.0":
+"jsonfile@npm:6.2.0, jsonfile@npm:^6.0.1":
   version: 6.2.0
   resolution: "jsonfile@npm:6.2.0"
   dependencies:
@@ -4836,6 +4824,18 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 10c0/7f4f43b08d1869ded8a6822213d13ae3b99d651151d77efd1557ced0889c466296a7d9684e397bd126acf5eb2cfcb605808c3e681d0fdccd2fe5a04b47e76c0d
+  languageName: node
+  linkType: hard
+
+"jsonfile@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "jsonfile@npm:4.0.0"
+  dependencies:
+    graceful-fs: "npm:^4.1.6"
+  dependenciesMeta:
+    graceful-fs:
+      optional: true
+  checksum: 10c0/7dc94b628d57a66b71fb1b79510d460d662eb975b5f876d723f81549c2e9cd316d58a2ddf742b2b93a4fa6b17b2accaf1a738a0e2ea114bdfb13a32e5377e480
   languageName: node
   linkType: hard
 
@@ -7439,7 +7439,7 @@ __metadata:
     "@fiahfy/biome-config": "npm:0.0.2"
     "@fiahfy/electron-context-menu": "npm:0.1.7"
     "@fiahfy/electron-storage": "npm:0.0.3"
-    "@fiahfy/electron-window": "npm:0.1.8"
+    "@fiahfy/electron-window": "npm:0.1.9"
     "@fiahfy/semaphore": "npm:0.0.2"
     "@fontsource/roboto": "npm:5.2.8"
     "@mui/icons-material": "npm:7.3.4"
