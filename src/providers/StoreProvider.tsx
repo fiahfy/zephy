@@ -26,15 +26,19 @@ const StoreProvider = (props: Props) => {
         return
       }
 
-      const newState = JSON.parse(value)
-      dispatch(replaceFavoriteState({ state: JSON.parse(newState.favorite) }))
-      dispatch(
-        replacePreferencesState({ state: JSON.parse(newState.preferences) }),
+      const state = Object.fromEntries(
+        Object.entries(JSON.parse(value)).map(([key, value]) => [
+          key,
+          typeof value === 'string' ? JSON.parse(value) : undefined,
+        ]),
       )
-      dispatch(replaceQueryState({ state: JSON.parse(newState.query) }))
-      dispatch(replaceRatingState({ state: JSON.parse(newState.rating) }))
-      dispatch(replaceSettingsState({ state: JSON.parse(newState.settings) }))
-      dispatch(replaceWindowState({ state: JSON.parse(newState.window) }))
+
+      dispatch(replaceFavoriteState({ state: state.favorite }))
+      dispatch(replacePreferencesState({ state: state.preferences }))
+      dispatch(replaceQueryState({ state: state.query }))
+      dispatch(replaceRatingState({ state: state.rating }))
+      dispatch(replaceSettingsState({ state: state.settings }))
+      dispatch(replaceWindowState({ state: state.window }))
     })
 
     return () => removeListener()
