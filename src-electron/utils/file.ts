@@ -88,13 +88,23 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
   if (!exists) {
     return filename
   }
-  const parsed = parse(path)
-  const name = parsed.name.replace(/ copy( \d+)?$/, '')
-  const ext = parsed.ext
+
+  const [name, ext] = await (async () => {
+    const parsed = parse(path)
+    const stats = await stat(path)
+    if (stats.isDirectory()) {
+      return [parsed.base, '']
+    } else {
+      return [parsed.name, parsed.ext]
+    }
+  })()
+
+  const base = name.replace(/ copy( \d+)?$/, '')
+
   const entries = await getEntries(directoryPath)
   const numbers = entries.reduce((acc, entry) => {
     const reg = new RegExp(
-      `^${escapeRegex(name)} copy( (\\d+))?${escapeRegex(ext)}$`,
+      `^${escapeRegex(base)} copy( (\\d+))?${escapeRegex(ext)}$`,
     )
     const match = entry.name.match(reg)
     if (match) {
@@ -105,8 +115,8 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
   }, [] as number[])
   const newNumber = Math.max(...[0, ...numbers]) + 1
   return newNumber === 1
-    ? `${name} copy${ext}`
-    : `${name} copy ${newNumber}${ext}`
+    ? `${base} copy${ext}`
+    : `${base} copy ${newNumber}${ext}`
 }
 
 export const getEntry = async (path: string): Promise<Entry> => {
