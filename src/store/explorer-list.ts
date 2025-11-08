@@ -518,10 +518,14 @@ export const selectContentsByTabId = createSelector(
     }
     return entries
       .filter((entry) => shouldShowHiddenFiles || !isHiddenFile(entry.name))
-      .filter(
-        (entry) =>
-          !query || entry.name.toLowerCase().includes(query.toLowerCase()),
-      )
+      .filter((entry) => {
+        if (!query) {
+          return true
+        }
+        const normalizedQuery = query.toLowerCase().normalize('NFC')
+        const normalizedName = entry.name.toLowerCase().normalize('NFC')
+        return normalizedName.includes(normalizedQuery)
+      })
       .map((entry) => ({
         ...entry,
         score: selectScoreByPath(rating, entry.path),

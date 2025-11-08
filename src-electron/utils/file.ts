@@ -89,7 +89,7 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
     return filename
   }
   const parsed = parse(path)
-  const name = parsed.name.replace(/ copy( \d+)?$/, '').normalize('NFC')
+  const name = parsed.name.replace(/ copy( \d+)?$/, '')
   const ext = parsed.ext
   const entries = await getEntries(directoryPath)
   const numbers = entries.reduce((acc, entry) => {
@@ -119,7 +119,7 @@ export const getEntry = async (path: string): Promise<Entry> => {
     dateCreated: stats.birthtimeMs,
     dateLastOpened: stats.atimeMs,
     dateModified: stats.mtimeMs,
-    name: basename(path).normalize('NFC'),
+    name: basename(path),
     path,
     size: type === 'directory' ? 0 : stats.size,
     type,
