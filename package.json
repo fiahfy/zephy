@@ -1,6 +1,6 @@
 {
   "name": "zephy",
-  "description": "Simple File Browser based on Electron.",
+  "description": "Simple file browser based on Electron.",
   "version": "0.0.8-dev",
   "dependencies": {
     "@dnd-kit/core": "6.3.1",
