@@ -824,7 +824,7 @@ export const focusTo =
 
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
-  async (dispatch) => {
+  async (dispatch, getState) => {
     const { focus, select, updateEntry } = explorerListSlice.actions
 
     try {
@@ -832,8 +832,11 @@ export const rename =
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(updateEntry({ tabId, path, entry }))
-      dispatch(select({ tabId, path: entry.path }))
-      dispatch(focus({ tabId, path: entry.path }))
+      const selected = selectSelectedByTabId(getState(), tabId)
+      if (selected.length === 1 && selected[0] === path) {
+        dispatch(select({ tabId, path: entry.path }))
+        dispatch(focus({ tabId, path: entry.path }))
+      }
     } catch (e) {
       dispatch(showError(e))
     }
@@ -937,10 +940,7 @@ export const paste = (): AppThunk => async (_, getState) => {
 
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
-  async (dispatch, getState) => {
-    const { blur, focus, removeEntry, select, unselectAll } =
-      explorerListSlice.actions
-
+  async (_dispatch, getState) => {
     const tabId = selectCurrentTabId(getState())
     const selected = selectSelectedByTabId(getState(), tabId)
 
@@ -952,33 +952,6 @@ export const moveToTrash =
     for (const targetPath of targetPaths) {
       try {
         await window.entryAPI.moveEntryToTrash(targetPath)
-
-        if (selected.includes(targetPath)) {
-          const contents = selectContentsByTabId(getState(), tabId)
-          const path = (() => {
-            const lastIndex = Math.max(
-              ...contents.flatMap((content, i) =>
-                content.path === targetPath ? [i] : [],
-              ),
-            )
-            if (lastIndex !== contents.length - 1) {
-              return contents[lastIndex + 1]?.path
-            }
-            const filtered = contents.filter(
-              (content) => content.path !== targetPath,
-            )
-            return filtered[filtered.length - 1]?.path
-          })()
-          if (path) {
-            dispatch(select({ tabId, path }))
-            dispatch(focus({ tabId, path }))
-          } else {
-            dispatch(unselectAll({ tabId }))
-            dispatch(blur({ tabId }))
-          }
-        }
-
-        dispatch(removeEntry({ tabId, path: targetPath }))
       } catch (e) {
         showError(e)
       }
@@ -990,8 +963,15 @@ export const moveToTrash =
 export const handleFileChange =
   (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
-      explorerListSlice.actions
+    const {
+      addEntry,
+      focus,
+      removeEntry,
+      removeSelection,
+      select,
+      unfocus,
+      updateEntry,
+    } = explorerListSlice.actions
 
     const tabs = selectTabs(getState())
 
@@ -1020,11 +1000,27 @@ export const handleFileChange =
           }
           break
         }
-        case 'delete':
+        case 'delete': {
+          const selected = selectSelectedByTabId(getState(), tabId)
+          const newPath = (() => {
+            if (selected.length === 1 && selected[0] === path) {
+              const contents = selectContentsByTabId(getState(), tabId)
+              const index = contents.findIndex(
+                (content) => content.path === path,
+              )
+              return contents[index + 1]?.path
+            }
+          })()
           dispatch(removeEntry({ tabId, path }))
-          dispatch(removeSelection({ tabId, paths: [path] }))
-          dispatch(unfocus({ tabId, paths: [path] }))
+          if (newPath) {
+            dispatch(select({ tabId, path: newPath }))
+            dispatch(focus({ tabId, path: newPath }))
+          } else {
+            dispatch(removeSelection({ tabId, paths: [path] }))
+            dispatch(unfocus({ tabId, paths: [path] }))
+          }
           break
+        }
       }
     }
   }

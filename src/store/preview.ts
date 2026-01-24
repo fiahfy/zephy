@@ -497,7 +497,7 @@ export const focusTo =
 
 export const rename =
   (path: string, newName: string): AppThunk =>
-  async (dispatch) => {
+  async (dispatch, getState) => {
     const { focus, select, updateEntry } = previewSlice.actions
 
     try {
@@ -505,8 +505,11 @@ export const rename =
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
       dispatch(updateEntry({ path, entry }))
-      dispatch(select({ path: entry.path }))
-      dispatch(focus({ path: entry.path }))
+      const selected = selectSelected(getState())
+      if (selected.length === 1 && selected[0] === path) {
+        dispatch(select({ path: entry.path }))
+        dispatch(focus({ path: entry.path }))
+      }
     } catch (e) {
       dispatch(showError(e))
     }
@@ -597,10 +600,7 @@ export const paste = (): AppThunk => async (_, getState) => {
 
 export const moveToTrash =
   (paths?: string[]): AppThunk =>
-  async (dispatch, getState) => {
-    const { blur, focus, removeEntry, select, unselectAll } =
-      previewSlice.actions
-
+  async (_dispatch, getState) => {
     const selected = selectSelected(getState())
 
     const targetPaths = paths ?? selected
@@ -611,33 +611,6 @@ export const moveToTrash =
     for (const targetPath of targetPaths) {
       try {
         await window.entryAPI.moveEntryToTrash(targetPath)
-
-        if (selected.includes(targetPath)) {
-          const contents = selectContents(getState())
-          const path = (() => {
-            const lastIndex = Math.max(
-              ...contents.flatMap((content, i) =>
-                content.path === targetPath ? [i] : [],
-              ),
-            )
-            if (lastIndex !== contents.length - 1) {
-              return contents[lastIndex + 1]?.path
-            }
-            const filtered = contents.filter(
-              (content) => content.path !== targetPath,
-            )
-            return filtered[filtered.length - 1]?.path
-          })()
-          if (path) {
-            dispatch(select({ path }))
-            dispatch(focus({ path }))
-          } else {
-            dispatch(unselectAll())
-            dispatch(blur())
-          }
-        }
-
-        dispatch(removeEntry({ path: targetPath }))
       } catch (e) {
         showError(e)
       }
@@ -647,8 +620,15 @@ export const moveToTrash =
 export const handleFileChange =
   (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
-    const { addEntry, removeEntry, removeSelection, unfocus, updateEntry } =
-      previewSlice.actions
+    const {
+      addEntry,
+      focus,
+      removeEntry,
+      removeSelection,
+      select,
+      unfocus,
+      updateEntry,
+    } = previewSlice.actions
 
     const targetDirectoryPath = selectDirectoryPath(getState())
     if (directoryPath !== targetDirectoryPath) {
@@ -674,10 +654,24 @@ export const handleFileChange =
         }
         break
       }
-      case 'delete':
+      case 'delete': {
+        const selected = selectSelected(getState())
+        const newPath = (() => {
+          if (selected.length === 1 && selected[0] === path) {
+            const contents = selectContents(getState())
+            const index = contents.findIndex((content) => content.path === path)
+            return contents[index + 1]?.path
+          }
+        })()
         dispatch(removeEntry({ path }))
-        dispatch(removeSelection({ paths: [path] }))
-        dispatch(unfocus({ paths: [path] }))
+        if (newPath) {
+          dispatch(select({ path: newPath }))
+          dispatch(focus({ path: newPath }))
+        } else {
+          dispatch(removeSelection({ paths: [path] }))
+          dispatch(unfocus({ paths: [path] }))
+        }
         break
+      }
     }
   }
