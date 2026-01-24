@@ -113,7 +113,7 @@ const generateCopyFilename = async (path: string, directoryPath: string) => {
     }
     return acc
   }, [] as number[])
-  const newNumber = Math.max(...[0, ...numbers]) + 1
+  const newNumber = findMissingNumber(numbers)
   return newNumber === 1
     ? `${base} copy${ext}`
     : `${base} copy ${newNumber}${ext}`
