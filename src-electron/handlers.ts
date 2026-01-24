@@ -159,7 +159,10 @@ const registerEntryHandlers = (watcher: ReturnType<typeof createWatcher>) => {
       const entry = await renameEntry(path, newName)
       // NOTE: No delete events are emitted when only changing letter case (uppercase/lowercase)
       //       Send delete events asynchronously to prevent temporary disappearance of entries
-      setTimeout(() => watcher.notify('delete', dirname(path), path))
+      setTimeout(() => {
+        watcher.notify('delete', dirname(path), path)
+        watcher.notify('create', dirname(entry.path), entry.path)
+      })
       return entry
     },
   )
