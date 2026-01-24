@@ -220,33 +220,6 @@ export const explorerListSlice = createSlice({
         },
       }
     },
-    updateEntry(
-      state,
-      action: PayloadAction<{
-        tabId: number
-        path: string
-        entry: Entry
-      }>,
-    ) {
-      const { tabId, path, entry } = action.payload
-      const explorer = findExplorer(state, tabId)
-      if (!explorer.entries.find((e) => e.path === path)) {
-        return state
-      }
-      const entries = [
-        ...explorer.entries.filter(
-          (e) => e.path !== path && e.path !== entry.path,
-        ),
-        entry,
-      ]
-      return {
-        ...state,
-        [tabId]: {
-          ...explorer,
-          entries,
-        },
-      }
-    },
     startEditing(
       state,
       action: PayloadAction<{
@@ -576,6 +549,12 @@ export const selectSelectedByTabIdAndPath = createSelector(
   (selected, path) => selected.includes(path),
 )
 
+export const selectExactlySelectedByTabIdAndPath = createSelector(
+  selectSelectedByTabId,
+  selectPath,
+  (selected, path) => selected.length === 1 && selected[0] === path,
+)
+
 // Selectors for current tab
 
 export const selectCurrentExplorer = createSelector(
@@ -825,18 +804,28 @@ export const focusTo =
 export const rename =
   (tabId: number, path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
-    const { focus, select, updateEntry } = explorerListSlice.actions
+    const { addEntry, focus, select, removeEntry } = explorerListSlice.actions
 
     try {
       const entry = await window.entryAPI.renameEntry(path, newName)
+      const newPath = (() => {
+        const selected = selectExactlySelectedByTabIdAndPath(
+          getState(),
+          tabId,
+          path,
+        )
+        if (selected) {
+          return entry.path
+        }
+      })()
+      dispatch(removeEntry({ tabId, path }))
+      dispatch(addEntry({ tabId, entry }))
+      if (newPath) {
+        dispatch(select({ tabId, path: newPath }))
+        dispatch(focus({ tabId, path: newPath }))
+      }
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-      dispatch(updateEntry({ tabId, path, entry }))
-      const selected = selectSelectedByTabId(getState(), tabId)
-      if (selected.length === 1 && selected[0] === path) {
-        dispatch(select({ tabId, path: entry.path }))
-        dispatch(focus({ tabId, path: entry.path }))
-      }
     } catch (e) {
       dispatch(showError(e))
     }
@@ -963,15 +952,8 @@ export const moveToTrash =
 export const handleFileChange =
   (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
-    const {
-      addEntry,
-      focus,
-      removeEntry,
-      removeSelection,
-      select,
-      unfocus,
-      updateEntry,
-    } = explorerListSlice.actions
+    const { addEntry, focus, removeEntry, removeSelection, select, unfocus } =
+      explorerListSlice.actions
 
     const tabs = selectTabs(getState())
 
@@ -982,7 +964,8 @@ export const handleFileChange =
       }
 
       switch (eventType) {
-        case 'create': {
+        case 'create':
+        case 'update': {
           try {
             const entry = await window.entryAPI.getEntry(path)
             dispatch(addEntry({ tabId, entry }))
@@ -991,19 +974,14 @@ export const handleFileChange =
           }
           break
         }
-        case 'update': {
-          try {
-            const entry = await window.entryAPI.getEntry(path)
-            dispatch(updateEntry({ tabId, path, entry }))
-          } catch {
-            // noop
-          }
-          break
-        }
         case 'delete': {
-          const selected = selectSelectedByTabId(getState(), tabId)
           const newPath = (() => {
-            if (selected.length === 1 && selected[0] === path) {
+            const selected = selectExactlySelectedByTabIdAndPath(
+              getState(),
+              tabId,
+              path,
+            )
+            if (selected) {
               const contents = selectContentsByTabId(getState(), tabId)
               const index = contents.findIndex(
                 (content) => content.path === path,

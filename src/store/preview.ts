@@ -133,28 +133,6 @@ export const previewSlice = createSlice({
         selected,
       }
     },
-    updateEntry(
-      state,
-      action: PayloadAction<{
-        path: string
-        entry: Entry
-      }>,
-    ) {
-      const { path, entry } = action.payload
-      if (!state.entries.find((e) => e.path === path)) {
-        return state
-      }
-      const entries = [
-        ...state.entries.filter(
-          (e) => e.path !== path && e.path !== entry.path,
-        ),
-        entry,
-      ]
-      return {
-        ...state,
-        entries,
-      }
-    },
     startEditing(
       state,
       action: PayloadAction<{
@@ -322,6 +300,12 @@ export const selectSelectedByPath = createSelector(
   selectSelected,
   selectPath,
   (selected, path) => selected.includes(path),
+)
+
+export const selectExactlySelectedByPath = createSelector(
+  selectSelected,
+  selectPath,
+  (selected, path) => selected.length === 1 && selected[0] === path,
 )
 
 // Operations
@@ -498,18 +482,24 @@ export const focusTo =
 export const rename =
   (path: string, newName: string): AppThunk =>
   async (dispatch, getState) => {
-    const { focus, select, updateEntry } = previewSlice.actions
+    const { addEntry, focus, select, removeEntry } = previewSlice.actions
 
     try {
       const entry = await window.entryAPI.renameEntry(path, newName)
+      const newPath = (() => {
+        const selected = selectExactlySelectedByPath(getState(), path)
+        if (selected) {
+          return entry.path
+        }
+      })()
+      dispatch(removeEntry({ path }))
+      dispatch(addEntry({ entry }))
+      if (newPath) {
+        dispatch(select({ path: newPath }))
+        dispatch(focus({ path: newPath }))
+      }
       dispatch(changeFavoritePath({ oldPath: path, newPath: entry.path }))
       dispatch(changeRatingPath({ oldPath: path, newPath: entry.path }))
-      dispatch(updateEntry({ path, entry }))
-      const selected = selectSelected(getState())
-      if (selected.length === 1 && selected[0] === path) {
-        dispatch(select({ path: entry.path }))
-        dispatch(focus({ path: entry.path }))
-      }
     } catch (e) {
       dispatch(showError(e))
     }
@@ -620,15 +610,8 @@ export const moveToTrash =
 export const handleFileChange =
   (eventType: FileEventType, directoryPath: string, path: string): AppThunk =>
   async (dispatch, getState) => {
-    const {
-      addEntry,
-      focus,
-      removeEntry,
-      removeSelection,
-      select,
-      unfocus,
-      updateEntry,
-    } = previewSlice.actions
+    const { addEntry, focus, removeEntry, removeSelection, select, unfocus } =
+      previewSlice.actions
 
     const targetDirectoryPath = selectDirectoryPath(getState())
     if (directoryPath !== targetDirectoryPath) {
@@ -636,7 +619,8 @@ export const handleFileChange =
     }
 
     switch (eventType) {
-      case 'create': {
+      case 'create':
+      case 'update': {
         try {
           const entry = await window.entryAPI.getEntry(path)
           dispatch(addEntry({ entry }))
@@ -645,19 +629,10 @@ export const handleFileChange =
         }
         break
       }
-      case 'update': {
-        try {
-          const entry = await window.entryAPI.getEntry(path)
-          dispatch(updateEntry({ path, entry }))
-        } catch {
-          // noop
-        }
-        break
-      }
       case 'delete': {
-        const selected = selectSelected(getState())
         const newPath = (() => {
-          if (selected.length === 1 && selected[0] === path) {
+          const selected = selectExactlySelectedByPath(getState(), path)
+          if (selected) {
             const contents = selectContents(getState())
             const index = contents.findIndex((content) => content.path === path)
             return contents[index + 1]?.path
