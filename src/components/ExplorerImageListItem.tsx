@@ -153,6 +153,7 @@ const ExplorerImageListItem = (props: Props) => {
           px: 1,
           py: 0.5,
           '.MuiImageListItemBar-titleWrap': {
+            minWidth: 0,
             overflow: 'visible',
             p: 0,
             '.MuiImageListItemBar-title': {

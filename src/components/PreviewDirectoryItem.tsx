@@ -212,7 +212,10 @@ const PreviewDirectoryItem = (props: Props) => {
 
   return (
     <ImageListItem
-      className={clsx({ 'Mui-focused': focused, 'Mui-selected': selected })}
+      className={clsx({
+        'Mui-focused': focused && !editing,
+        'Mui-selected': selected,
+      })}
       component="div"
       draggable={draggable}
       onClick={onClick}
@@ -305,6 +308,7 @@ const PreviewDirectoryItem = (props: Props) => {
           px: 1,
           py: 0.5,
           '.MuiImageListItemBar-titleWrap': {
+            minWidth: 0,
             overflow: 'visible',
             p: 0,
             '.MuiImageListItemBar-title': {
