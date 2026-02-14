@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import Explorer from '~/components/Explorer'
 import Settings from '~/components/Settings'
-import usePrevious from '~/hooks/usePrevious'
 import { useAppDispatch, useAppSelector } from '~/store'
 import { load } from '~/store/explorer-list'
 import { selectUrlByTabId } from '~/store/window'
@@ -16,8 +15,6 @@ const TabPanel = (props: Props) => {
   const url = useAppSelector((state) => selectUrlByTabId(state, tabId))
   const dispatch = useAppDispatch()
 
-  const prevUrl = usePrevious(url)
-
   const Component = useMemo(() => {
     switch (url) {
       case 'zephy://settings':
@@ -28,10 +25,10 @@ const TabPanel = (props: Props) => {
   }, [url])
 
   useEffect(() => {
-    if (prevUrl !== url) {
+    if (url) {
       dispatch(load(tabId))
     }
-  }, [dispatch, prevUrl, tabId, url])
+  }, [dispatch, tabId, url])
 
   return <Component tabId={tabId} />
 }

@@ -12,7 +12,6 @@ import {
 import PreviewDirectoryItem from '~/components/PreviewDirectoryItem'
 import PreviewEmptyState from '~/components/PreviewEmptyState'
 import useDroppable from '~/hooks/useDroppable'
-import usePrevious from '~/hooks/usePrevious'
 import useWatcher from '~/hooks/useWatcher'
 import type { Content, Entry } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
@@ -24,6 +23,7 @@ import {
   load,
   selectContents,
   selectDirectoryPath,
+  selectEditing,
   selectError,
   selectFocused,
   selectFocusedContent,
@@ -46,6 +46,7 @@ const PreviewDirectory = (props: Props) => {
 
   const directoryPath = useAppSelector(selectDirectoryPath)
   const contents = useAppSelector(selectContents)
+  const editing = useAppSelector(selectEditing)
   const error = useAppSelector(selectError)
   const focused = useAppSelector(selectFocused)
   const focusedContent = useAppSelector(selectFocusedContent)
@@ -83,8 +84,6 @@ const PreviewDirectory = (props: Props) => {
     estimateSize: () => size,
     getScrollElement: () => ref.current,
   })
-
-  const previousFocused = usePrevious(focused)
 
   const noDataText = useMemo(
     () =>
@@ -165,15 +164,36 @@ const PreviewDirectory = (props: Props) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.measure(), [virtualizer, size])
 
+  const scroll = useMemo(
+    () =>
+      throttle(
+        (rowIndex: number) =>
+          setTimeout(() => virtualizer.scrollToIndex(rowIndex)),
+        300,
+      ),
+    [virtualizer],
+  )
+
   useEffect(() => {
-    if (focused && previousFocused !== focused) {
-      const index = contents.findIndex((content) => content.path === focused)
-      if (index >= 0) {
-        const rowIndex = Math.floor(index / columns)
-        virtualizer.scrollToIndex(rowIndex)
-      }
+    if (!focused) {
+      return
     }
-  }, [columns, contents, focused, previousFocused, virtualizer])
+    const index = contents.findIndex((content) => content.path === focused)
+    if (index >= 0) {
+      const rowIndex = Math.floor(index / columns)
+      scroll(rowIndex)
+    }
+  }, [columns, contents, focused, scroll])
+
+  useEffect(() => {
+    const el = ref?.current
+    if (!el) {
+      return
+    }
+    if (focused && !editing) {
+      el.focus()
+    }
+  }, [editing, focused])
 
   useEffect(() => {
     if (!loading) {

@@ -1,4 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
+import throttle from 'lodash.throttle'
 import {
   type KeyboardEvent,
   type RefObject,
@@ -7,7 +8,6 @@ import {
   useMemo,
   useState,
 } from 'react'
-import usePrevious from '~/hooks/usePrevious'
 import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
@@ -27,6 +27,7 @@ import {
 } from '~/store/explorer-list'
 import {
   openContents,
+  selectCurrentByTabId,
   selectDirectoryPathByTabId,
   selectQueryByTabId,
   selectScrollPositionByTabId,
@@ -47,6 +48,7 @@ const useExplorerList = (
   const contents = useAppSelector((state) =>
     selectContentsByTabId(state, tabId),
   )
+  const current = useAppSelector((state) => selectCurrentByTabId(state, tabId))
   const editing = useAppSelector((state) => selectEditingByTabId(state, tabId))
   const directoryPath = useAppSelector((state) =>
     selectDirectoryPathByTabId(state, tabId),
@@ -70,6 +72,8 @@ const useExplorerList = (
   )
   const dispatch = useAppDispatch()
 
+  const [restoring, setRestoring] = useState(true)
+
   const chunks = useMemo(
     () =>
       contents.reduce((acc, _, i) => {
@@ -87,12 +91,6 @@ const useExplorerList = (
     getScrollElement: () => ref.current,
     horizontal,
   })
-
-  const previousEditing = usePrevious(editing)
-  const previousFocused = usePrevious(focused)
-  const previousLoading = usePrevious(loading)
-
-  const [restoring, setRestoring] = useState(false)
 
   const noDataText = useMemo(
     () =>
@@ -194,25 +192,53 @@ const useExplorerList = (
     [virtualizer, sortOption.order, sortOption.orderBy],
   )
 
+  const scroll = useMemo(
+    () =>
+      throttle(
+        (rowIndex: number) =>
+          setTimeout(() => virtualizer.scrollToIndex(rowIndex)),
+        300,
+      ),
+    [virtualizer],
+  )
+
   useEffect(() => {
-    if (focused && previousFocused !== focused) {
-      const index = contents.findIndex((content) => content.path === focused)
-      if (index >= 0) {
-        const rowIndex = Math.floor(index / columns)
-        virtualizer.scrollToIndex(rowIndex)
-      }
+    if (restoring) {
+      return
     }
-  }, [columns, contents, focused, previousFocused, virtualizer])
+    if (!focused) {
+      return
+    }
+    const index = contents.findIndex((content) => content.path === focused)
+    if (index >= 0) {
+      const rowIndex = Math.floor(index / columns)
+      scroll(rowIndex)
+    }
+  }, [columns, contents, focused, restoring, scroll])
 
   useEffect(() => {
     const el = ref?.current
     if (!el) {
       return
     }
-    if (focused && previousEditing && !editing) {
+    if (focused && !editing) {
       el.focus()
     }
-  }, [editing, focused, previousEditing, ref])
+  }, [editing, focused, ref])
+
+  useEffect(() => {
+    const restoring = !current || loading
+    if (restoring) {
+      setRestoring(true)
+    } else {
+      window.setTimeout(() => {
+        virtualizer.scrollToOffset(scrollPosition)
+        window.setTimeout(() => setRestoring(false))
+      })
+    }
+    //   // NOTE: Do not clear timer
+    //   // return () => clearTimeout(timer)
+  }, [current, loading, scrollPosition, virtualizer])
 
   useEffect(() => {
     const el = ref.current
@@ -233,20 +259,6 @@ const useExplorerList = (
     el.addEventListener('scrollend', handler)
     return () => el.removeEventListener('scrollend', handler)
   }, [dispatch, horizontal, loading, ref])
-
-  useEffect(() => {
-    if (!previousLoading && loading) {
-      setRestoring(true)
-    }
-    if (previousLoading && !loading) {
-      window.setTimeout(() => {
-        virtualizer.scrollToOffset(scrollPosition)
-        setRestoring(false)
-      })
-    }
-    // NOTE: Do not clear timer
-    // return () => clearTimeout(timer)
-  }, [loading, previousLoading, scrollPosition, virtualizer])
 
   return {
     chunks,

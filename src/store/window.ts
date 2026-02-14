@@ -643,6 +643,12 @@ export const selectSidebarWidthByVariant = createSelector(
 
 const selectTabId = (_state: AppState, tabId: number) => tabId
 
+export const selectCurrentByTabId = createSelector(
+  selectCurrentTabId,
+  selectTabId,
+  (currentTabId, tabId) => currentTabId === tabId,
+)
+
 export const selectTabByTabId = createSelector(
   selectTabs,
   selectTabId,
