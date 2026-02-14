@@ -596,11 +596,10 @@ export const selectCurrentSelectedContents = createSelector(
 // Operations by tabId
 
 export const load =
-  (tabId: number): AppThunk =>
+  (tabId: number, url: string): AppThunk =>
   async (dispatch, getState) => {
     const { load, loaded, loadFailed } = explorerListSlice.actions
 
-    const url = selectUrlByTabId(getState(), tabId)
     if (!url) {
       return
     }
@@ -835,8 +834,9 @@ export const rename =
 
 export const refresh = (): AppThunk => async (dispatch, getState) => {
   const tabId = selectCurrentTabId(getState())
+  const url = selectUrlByTabId(getState(), tabId)
 
-  dispatch(load(tabId))
+  dispatch(load(tabId, url))
 }
 
 export const open =

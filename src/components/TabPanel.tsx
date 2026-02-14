@@ -25,9 +25,7 @@ const TabPanel = (props: Props) => {
   }, [url])
 
   useEffect(() => {
-    if (url) {
-      dispatch(load(tabId))
-    }
+    dispatch(load(tabId, url))
   }, [dispatch, tabId, url])
 
   return <Component tabId={tabId} />
