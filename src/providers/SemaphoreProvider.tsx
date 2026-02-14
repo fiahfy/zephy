@@ -7,9 +7,9 @@ type Props = { children: ReactNode }
 const SemaphoreProvider = (props: Props) => {
   const { children } = props
 
-  const s = useRef(semaphore(16))
+  const sem = useRef(semaphore(16))
 
-  const value = { semaphore: s.current }
+  const value = { semaphore: sem.current }
 
   return (
     <SemaphoreContext.Provider value={value}>
