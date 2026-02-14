@@ -82,7 +82,17 @@ const ExplorerGallery = (props: Props) => {
         position: 'relative',
       }}
     >
-      {chunks.length > 0 && <ExplorerGalleryMain tabId={tabId} />}
+      {chunks.length > 0 && (
+        <Box
+          sx={{
+            flexGrow: 1,
+            minHeight: 0,
+            visibility: restoring ? 'hidden' : undefined,
+          }}
+        >
+          <ExplorerGalleryMain tabId={tabId} />
+        </Box>
+      )}
       <Box
         className="explorer-list"
         onClick={onClick}

@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { useMemo } from 'react'
 import ExplorerGalleryMainContent from '~/components/ExplorerGalleryMainContent'
 import ExplorerGalleryMainEmptyState from '~/components/ExplorerGalleryMainEmptyState'
@@ -19,13 +18,13 @@ const ExplorerGalleryMain = (props: Props) => {
   const content = useMemo(() => contents[0], [contents])
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: 0 }}>
+    <>
       {content ? (
         <ExplorerGalleryMainContent content={content} />
       ) : (
         <ExplorerGalleryMainEmptyState message="No selected" />
       )}
-    </Box>
+    </>
   )
 }
 
