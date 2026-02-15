@@ -1,4 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
+import debounce from 'lodash.debounce'
 import throttle from 'lodash.throttle'
 import {
   type KeyboardEvent,
@@ -37,6 +38,7 @@ import {
   setScrollPosition,
 } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
+import usePrevious from './usePrevious'
 
 const useExplorerList = (
   tabId: number,
@@ -73,6 +75,9 @@ const useExplorerList = (
   const dispatch = useAppDispatch()
 
   const [restoring, setRestoring] = useState(true)
+
+  const canShow = useMemo(() => current && !loading, [current, loading])
+  const previousCanShow = usePrevious(canShow)
 
   const chunks = useMemo(
     () =>
@@ -192,6 +197,11 @@ const useExplorerList = (
     [virtualizer, sortOption.order, sortOption.orderBy],
   )
 
+  const focusedIndex = useMemo(
+    () => contents.findIndex((content) => content.path === focused),
+    [contents, focused],
+  )
+
   const scroll = useMemo(
     () =>
       throttle(
@@ -203,18 +213,11 @@ const useExplorerList = (
   )
 
   useEffect(() => {
-    if (restoring) {
-      return
-    }
-    if (!focused) {
-      return
-    }
-    const index = contents.findIndex((content) => content.path === focused)
-    if (index >= 0) {
-      const rowIndex = Math.floor(index / columns)
+    if (focusedIndex >= 0) {
+      const rowIndex = Math.floor(focusedIndex / columns)
       scroll(rowIndex)
     }
-  }, [columns, contents, focused, restoring, scroll])
+  }, [columns, focusedIndex, scroll])
 
   useEffect(() => {
     const el = ref?.current
@@ -227,10 +230,11 @@ const useExplorerList = (
   }, [editing, focused, ref])
 
   useEffect(() => {
-    const restoring = !current || loading
-    if (restoring) {
+    // NOTE: scrollPosition に反応してしまうため、切り替わったタイミングのみで発火するようにする
+    if (previousCanShow && !canShow) {
       setRestoring(true)
-    } else {
+    }
+    if (!previousCanShow && canShow) {
       window.setTimeout(() => {
         virtualizer.scrollToOffset(scrollPosition)
         window.setTimeout(() => setRestoring(false))
@@ -238,27 +242,24 @@ const useExplorerList = (
     }
     //   // NOTE: Do not clear timer
     //   // return () => clearTimeout(timer)
-  }, [current, loading, scrollPosition, virtualizer])
+  }, [canShow, previousCanShow, scrollPosition, virtualizer])
 
   useEffect(() => {
     const el = ref.current
     if (!el) {
       return
     }
-    const handler = (e: Event) => {
+    const handler = debounce((e: Event) => {
       if (e.target instanceof HTMLElement) {
-        if (!loading) {
-          dispatch(
-            setScrollPosition(
-              horizontal ? e.target.scrollLeft : e.target.scrollTop,
-            ),
-          )
-        }
+        const scrollPosition = horizontal
+          ? e.target.scrollLeft
+          : e.target.scrollTop
+        dispatch(setScrollPosition(scrollPosition))
       }
-    }
+    }, 300)
     el.addEventListener('scrollend', handler)
     return () => el.removeEventListener('scrollend', handler)
-  }, [dispatch, horizontal, loading, ref])
+  }, [dispatch, horizontal, ref])
 
   return {
     chunks,

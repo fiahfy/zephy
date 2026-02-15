@@ -164,6 +164,11 @@ const PreviewDirectory = (props: Props) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => virtualizer.measure(), [virtualizer, size])
 
+  const focusedIndex = useMemo(
+    () => contents.findIndex((content) => content.path === focused),
+    [contents, focused],
+  )
+
   const scroll = useMemo(
     () =>
       throttle(
@@ -175,15 +180,11 @@ const PreviewDirectory = (props: Props) => {
   )
 
   useEffect(() => {
-    if (!focused) {
-      return
-    }
-    const index = contents.findIndex((content) => content.path === focused)
-    if (index >= 0) {
-      const rowIndex = Math.floor(index / columns)
+    if (focusedIndex >= 0) {
+      const rowIndex = Math.floor(focusedIndex / columns)
       scroll(rowIndex)
     }
-  }, [columns, contents, focused, scroll])
+  }, [columns, focusedIndex, scroll])
 
   useEffect(() => {
     const el = ref?.current
