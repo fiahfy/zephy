@@ -50,13 +50,13 @@ const ExplorerGallery = (props: Props) => {
     if (!el) {
       return
     }
-    const handleResize = throttle((entries: ResizeObserverEntry[]) => {
+    const handler = throttle((entries: ResizeObserverEntry[]) => {
       const entry = entries[0]
       if (entry) {
         setWrapperWidth(entry.contentRect.width)
       }
     }, 100)
-    const observer = new ResizeObserver(handleResize)
+    const observer = new ResizeObserver(handler)
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
