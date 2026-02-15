@@ -232,10 +232,10 @@ const useExplorerList = (
 
   useEffect(() => {
     // NOTE: scrollPosition に反応してしまうため、切り替わったタイミングのみで発火するようにする
-    if (previousCanShow && !canShow) {
+    if (previousCanShow === true && !canShow) {
       setRestoring(true)
     }
-    if (!previousCanShow && canShow) {
+    if (previousCanShow === false && canShow) {
       window.setTimeout(() => {
         virtualizer.scrollToOffset(scrollPosition)
         window.setTimeout(() => setRestoring(false))
