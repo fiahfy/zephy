@@ -601,25 +601,6 @@ export const selectSidebar = createSelector(
   (currentWindow) => currentWindow.sidebar,
 )
 
-export const selectTabs = createSelector(
-  selectCurrentWindow,
-  (currentWindow) => currentWindow.tabs,
-)
-
-export const selectDirectoryPaths = createSelector(
-  selectTabs,
-  (state: AppState) => state,
-  (tabs, state) =>
-    tabs
-      .map((tab) => selectDirectoryPathByTabId(state, tab.id))
-      .filter((url): url is string => typeof url === 'string'),
-)
-
-export const selectCanCloseTab = createSelector(
-  selectTabs,
-  (tabs) => tabs.length > 1,
-)
-
 // Selectors by variant
 
 const selectSidebarVariant = (
@@ -637,6 +618,40 @@ export const selectSidebarWidthByVariant = createSelector(
   selectSidebar,
   selectSidebarVariant,
   (sidebar, variant) => sidebar[variant].width,
+)
+
+// Selectors for tabs
+
+export const selectTabs = createSelector(
+  selectCurrentWindow,
+  (currentWindow) => currentWindow.tabs,
+)
+
+export const selectHistories = createSelector(selectTabs, (tabs) =>
+  tabs.map((tab) => {
+    const history = tab.history
+    return (
+      history.histories[history.index] ?? {
+        query: '',
+        scrollPosition: 0,
+        title: '',
+        url: '',
+      }
+    )
+  }),
+)
+
+export const selectDirectoryPaths = createSelector(
+  selectHistories,
+  (histories) =>
+    histories
+      .map((history) => window.electronAPI.fileURLToPath(history.url))
+      .filter((url): url is string => typeof url === 'string'),
+)
+
+export const selectCanCloseTab = createSelector(
+  selectTabs,
+  (tabs) => tabs.length > 1,
 )
 
 // Selector by tabId
