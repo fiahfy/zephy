@@ -75,7 +75,7 @@ const ExplorerImageList = (props: Props) => {
         }}
         tabIndex={0}
       >
-        {wrapperWidth > 0 && (
+        {chunks.length > 0 && (
           <Box
             sx={{
               height: `${virtualizer.getTotalSize()}px`,

@@ -91,7 +91,8 @@ const useExplorerList = (
   )
 
   const virtualizer = useVirtualizer({
-    count: chunks.length,
+    // NOTE: estimateSize が決定していない場合は出力を防ぐため 0 とする
+    count: estimateSize ? chunks.length : 0,
     estimateSize: () => estimateSize,
     getScrollElement: () => ref.current,
     horizontal,

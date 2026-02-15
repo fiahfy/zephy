@@ -109,7 +109,7 @@ const ExplorerGallery = (props: Props) => {
         }}
         tabIndex={0}
       >
-        {wrapperWidth > 0 && (
+        {chunks.length > 0 && (
           <Box
             sx={{
               height: size,
