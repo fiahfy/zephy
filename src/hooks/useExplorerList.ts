@@ -74,10 +74,12 @@ const useExplorerList = (
   )
   const dispatch = useAppDispatch()
 
-  const [restoring, setRestoring] = useState(true)
+  const [restoring, setRestoring] = useState(false)
 
   const canShow = useMemo(() => current && !loading, [current, loading])
   const previousCanShow = usePrevious(canShow)
+
+  const previousFocused = usePrevious(focused)
 
   const chunks = useMemo(
     () =>
@@ -198,11 +200,6 @@ const useExplorerList = (
     [virtualizer, sortOption.order, sortOption.orderBy],
   )
 
-  const focusedIndex = useMemo(
-    () => contents.findIndex((content) => content.path === focused),
-    [contents, focused],
-  )
-
   const scroll = useMemo(
     () =>
       throttle(
@@ -214,11 +211,19 @@ const useExplorerList = (
   )
 
   useEffect(() => {
-    if (focusedIndex >= 0) {
-      const rowIndex = Math.floor(focusedIndex / columns)
-      scroll(rowIndex)
+    if (!previousFocused || !focused) {
+      return
     }
-  }, [columns, focusedIndex, scroll])
+    if (previousFocused === focused) {
+      return
+    }
+    const index = contents.findIndex((content) => content.path === focused)
+    if (index < 0) {
+      return
+    }
+    const rowIndex = Math.floor(index / columns)
+    scroll(rowIndex)
+  }, [columns, contents, focused, previousFocused, scroll])
 
   useEffect(() => {
     const el = ref?.current
@@ -250,16 +255,22 @@ const useExplorerList = (
     if (!el) {
       return
     }
+
+    const storeScrollPosition = (element: HTMLElement) => {
+      const scrollPosition = horizontal ? element.scrollLeft : element.scrollTop
+      dispatch(setScrollPosition(scrollPosition))
+    }
+
     const handler = debounce((e: Event) => {
       if (e.target instanceof HTMLElement) {
-        const scrollPosition = horizontal
-          ? e.target.scrollLeft
-          : e.target.scrollTop
-        dispatch(setScrollPosition(scrollPosition))
+        storeScrollPosition(e.target)
       }
     }, 300)
     el.addEventListener('scrollend', handler)
-    return () => el.removeEventListener('scrollend', handler)
+    return () => {
+      el.removeEventListener('scrollend', handler)
+      storeScrollPosition(el)
+    }
   }, [dispatch, horizontal, ref])
 
   return {
