@@ -211,6 +211,7 @@ const useExplorerList = (
   )
 
   useEffect(() => {
+    // NOTE: mount 時に反応してしまうため、切り替わったタイミングのみで発火するようにする
     if (!previousFocused || !focused) {
       return
     }
@@ -236,7 +237,7 @@ const useExplorerList = (
   }, [editing, focused, ref])
 
   useEffect(() => {
-    // NOTE: scrollPosition に反応してしまうため、切り替わったタイミングのみで発火するようにする
+    // NOTE: mount 時と scrollPosition に反応してしまうため、切り替わったタイミングのみで発火するようにする
     if (previousCanShow === true && !canShow) {
       setRestoring(true)
     }
@@ -261,15 +262,25 @@ const useExplorerList = (
       dispatch(setScrollPosition(scrollPosition))
     }
 
-    const handler = debounce((e: Event) => {
+    let scrolled = false
+
+    const handleScroll = () => {
+      scrolled = true
+    }
+    const handleScrollEnd = debounce((e: Event) => {
       if (e.target instanceof HTMLElement) {
         storeScrollPosition(e.target)
       }
     }, 300)
-    el.addEventListener('scrollend', handler)
+    el.addEventListener('scroll', handleScroll)
+    el.addEventListener('scrollend', handleScrollEnd)
     return () => {
-      el.removeEventListener('scrollend', handler)
-      storeScrollPosition(el)
+      el.removeEventListener('scroll', handleScroll)
+      el.removeEventListener('scrollend', handleScrollEnd)
+      // NOTE: useEffect が2回実行されるため1回目の unmount での動作を防ぐ
+      if (scrolled) {
+        storeScrollPosition(el)
+      }
     }
   }, [dispatch, horizontal, ref])
 
