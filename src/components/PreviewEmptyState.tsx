@@ -17,6 +17,7 @@ const PreviewEmptyState = (props: Props) => {
         justifyContent: 'center',
         pointerEvents: 'none',
         minHeight: 128,
+        width: '100%',
         ...sx,
       }}
     >
