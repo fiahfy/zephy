@@ -203,9 +203,11 @@ const useExplorerList = (
   const scroll = useMemo(
     () =>
       throttle(
-        (rowIndex: number) =>
-          setTimeout(() => virtualizer.scrollToIndex(rowIndex)),
+        (rowIndex: number) => {
+          window.setTimeout(() => virtualizer.scrollToIndex(rowIndex))
+        },
         300,
+        { leading: false },
       ),
     [virtualizer],
   )
