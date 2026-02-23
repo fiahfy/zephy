@@ -1,14 +1,15 @@
 import { Box } from '@mui/material'
-import { createElement, useMemo } from 'react'
+import { createElement, useEffect, useMemo } from 'react'
 import ExplorerGallery from '~/components/ExplorerGallery'
 import ExplorerImageList from '~/components/ExplorerImageList'
 import ExplorerTable from '~/components/ExplorerTable'
 import useDroppable from '~/hooks/useDroppable'
-import { useAppSelector } from '~/store'
+import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectDirectoryPathByTabId,
   selectUrlByTabId,
   selectViewModeByTabIdAndUrl,
+  setScrollPosition,
 } from '~/store/window'
 
 type Props = {
@@ -26,6 +27,8 @@ const Explorer = (props: Props) => {
     selectViewModeByTabIdAndUrl(state, tabId, url),
   )
 
+  const dispatch = useAppDispatch()
+
   const { droppableStyle, ...dropHandlers } = useDroppable(directoryPath)
 
   const Component = useMemo(() => {
@@ -38,6 +41,11 @@ const Explorer = (props: Props) => {
         return ExplorerTable
     }
   }, [viewMode])
+
+  // NOTE: 初回起動時にスクロール位置を戻す
+  useEffect(() => {
+    dispatch(setScrollPosition(tabId, 0))
+  }, [dispatch, tabId])
 
   return (
     <Box sx={{ height: '100%', ...droppableStyle }} {...dropHandlers}>

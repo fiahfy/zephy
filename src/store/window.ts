@@ -302,6 +302,42 @@ export const windowSlice = createSlice({
         },
       }
     },
+    setScrollPosition(
+      state,
+      action: PayloadAction<{
+        id: number
+        tabId: number
+        scrollPosition: number
+      }>,
+    ) {
+      const { id, tabId, scrollPosition } = action.payload
+      const window = state[id]
+      if (!window) {
+        return state
+      }
+      const tab = window.tabs.find((tab) => tab.id === tabId)
+      if (!tab) {
+        return state
+      }
+      const histories = tab.history.histories.map((history, i) =>
+        i === tab.history.index ? { ...history, scrollPosition } : history,
+      )
+      const tabs = window.tabs.map((tab) =>
+        tab.id === tabId
+          ? {
+              ...tab,
+              history: { ...tab.history, histories },
+            }
+          : tab,
+      )
+      return {
+        ...state,
+        [id]: {
+          ...window,
+          tabs,
+        },
+      }
+    },
     changeUrl(
       state,
       action: PayloadAction<{
@@ -391,38 +427,6 @@ export const windowSlice = createSlice({
       }
       const histories = tab.history.histories.map((history, i) =>
         i === tab.history.index ? { ...history, query } : history,
-      )
-      const tabs = window.tabs.map((tab) =>
-        tab.id === window.tabId
-          ? {
-              ...tab,
-              history: { ...tab.history, histories },
-            }
-          : tab,
-      )
-      return {
-        ...state,
-        [id]: {
-          ...window,
-          tabs,
-        },
-      }
-    },
-    setScrollPosition(
-      state,
-      action: PayloadAction<{ id: number; scrollPosition: number }>,
-    ) {
-      const { id, scrollPosition } = action.payload
-      const window = state[id]
-      if (!window) {
-        return state
-      }
-      const tab = window.tabs.find((tab) => tab.id === window.tabId)
-      if (!tab) {
-        return state
-      }
-      const histories = tab.history.histories.map((history, i) =>
-        i === tab.history.index ? { ...history, scrollPosition } : history,
       )
       const tabs = window.tabs.map((tab) =>
         tab.id === window.tabId
@@ -904,6 +908,15 @@ export const changeTab =
     dispatch(changeTab({ id, tabId }))
   }
 
+export const setScrollPosition =
+  (tabId: number, scrollPosition: number): AppThunk =>
+  async (dispatch, getState) => {
+    const { setScrollPosition } = windowSlice.actions
+
+    const id = selectWindowId(getState())
+    dispatch(setScrollPosition({ id, tabId, scrollPosition }))
+  }
+
 // Operations for sidebar
 
 export const changeSidebarHidden =
@@ -1042,15 +1055,6 @@ export const goToSettings = (): AppThunk => async (dispatch) => {
     dispatch(changeUrl(url))
   }
 }
-
-export const setScrollPosition =
-  (scrollPosition: number): AppThunk =>
-  async (dispatch, getState) => {
-    const { setScrollPosition } = windowSlice.actions
-
-    const id = selectWindowId(getState())
-    dispatch(setScrollPosition({ id, scrollPosition }))
-  }
 
 export const search =
   (query: string): AppThunk =>

@@ -197,7 +197,7 @@ const useExplorerList = (
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(
     () => virtualizer.scrollToOffset(0),
-    [virtualizer, sortOption.order, sortOption.orderBy],
+    [virtualizer, sortOption.order, sortOption.orderBy, query],
   )
 
   const scroll = useMemo(
@@ -261,7 +261,7 @@ const useExplorerList = (
 
     const storeScrollPosition = (element: HTMLElement) => {
       const scrollPosition = horizontal ? element.scrollLeft : element.scrollTop
-      dispatch(setScrollPosition(scrollPosition))
+      dispatch(setScrollPosition(tabId, scrollPosition))
     }
 
     let scrolled = false
@@ -284,7 +284,7 @@ const useExplorerList = (
         storeScrollPosition(el)
       }
     }
-  }, [dispatch, horizontal, ref])
+  }, [dispatch, horizontal, ref, tabId])
 
   return {
     chunks,
