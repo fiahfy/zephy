@@ -326,7 +326,7 @@ const App = () => {
             },
           },
           '.col-resizing *': {
-            cursor: 'col-resize',
+            cursor: 'col-resize!important',
             userSelect: 'none',
           },
         }}
