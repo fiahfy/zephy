@@ -98,7 +98,7 @@ const PreviewDirectoryItem = (props: Props) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (editing) {
-        return
+        dispatch(finishEditing())
       }
       if (content.type === 'directory') {
         if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {

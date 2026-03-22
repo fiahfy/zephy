@@ -49,6 +49,16 @@ const EntryNameTextField = (props: Props) => {
     setName(value)
   }, [])
 
+  const handleClick = useCallback(
+    (e: MouseEvent<HTMLInputElement>) => e.stopPropagation(),
+    [],
+  )
+
+  const handleDoubleClick = useCallback(
+    (e: MouseEvent<HTMLInputElement>) => e.stopPropagation(),
+    [],
+  )
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       e.stopPropagation()
@@ -138,7 +148,9 @@ const EntryNameTextField = (props: Props) => {
             multiline={multiline}
             onBlur={handleBlur}
             onChange={handleChange}
+            onClick={handleClick}
             onContextMenu={handleContextMenu}
+            onDoubleClick={handleDoubleClick}
             onKeyDown={handleKeyDown}
             onMouseDown={handleMouseDown}
             size="small"

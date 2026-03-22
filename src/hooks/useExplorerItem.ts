@@ -4,7 +4,9 @@ import type { Content } from '~/interfaces'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   addSelection,
+  finishEditing,
   focus,
+  rename,
   select,
   selectContentsByTabId,
   selectEditingByTabIdAndPath,
@@ -74,7 +76,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
       // NOTE: Prevent container event
       e.stopPropagation()
       if (editing) {
-        return
+        dispatch(finishEditing({ tabId }))
       }
       if (content.type === 'directory') {
         if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
@@ -182,6 +184,16 @@ const useExplorerItem = (tabId: number, content: Content) => {
     [editing],
   )
 
+  const onFinishEditing = useCallback(
+    (changedValue: string | undefined) => {
+      dispatch(finishEditing({ tabId }))
+      if (changedValue) {
+        dispatch(rename(tabId, content.path, changedValue))
+      }
+    },
+    [content.path, dispatch, tabId],
+  )
+
   return {
     contents,
     draggingPaths,
@@ -190,6 +202,7 @@ const useExplorerItem = (tabId: number, content: Content) => {
     onClick,
     onContextMenu,
     onDoubleClick,
+    onFinishEditing,
     onMouseDown,
     selected,
   }

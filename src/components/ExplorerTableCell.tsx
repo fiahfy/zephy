@@ -4,14 +4,11 @@ import {
   type TableCellProps,
   Typography,
 } from '@mui/material'
-import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import EntryNameTextField from '~/components/EntryNameTextField'
 import Rating from '~/components/ExplorerRating'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
-import { useAppDispatch } from '~/store'
-import { finishEditing, rename } from '~/store/explorer-list'
 import { formatDateTime, formatFileSize } from '~/utils/formatter'
 
 type Key = keyof Content
@@ -28,19 +25,7 @@ type Props = {
 const ExplorerTableCell = (props: Props) => {
   const { align, content, dataKey, height, tabId, width } = props
 
-  const dispatch = useAppDispatch()
-
-  const { editing } = useExplorerItem(tabId, content)
-
-  const handleFinish = useCallback(
-    (changedValue: string | undefined) => {
-      dispatch(finishEditing({ tabId }))
-      if (changedValue) {
-        dispatch(rename(tabId, content.path, changedValue))
-      }
-    },
-    [content.path, dispatch, tabId],
-  )
+  const { editing, onFinishEditing } = useExplorerItem(tabId, content)
 
   return (
     <TableCell
@@ -67,7 +52,7 @@ const ExplorerTableCell = (props: Props) => {
           <EntryIcon entry={content} />
           <EntryNameTextField
             entry={content}
-            onFinish={handleFinish}
+            onFinish={onFinishEditing}
             readOnly={!editing}
           />
         </Stack>

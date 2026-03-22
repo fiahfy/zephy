@@ -8,7 +8,6 @@ import {
 import { alpha } from '@mui/material/styles'
 import clsx from 'clsx'
 import pluralize from 'pluralize'
-import { useCallback } from 'react'
 import EntryIcon from '~/components/EntryIcon'
 import EntryNameTextField from '~/components/EntryNameTextField'
 import Rating from '~/components/ExplorerRating'
@@ -17,8 +16,6 @@ import useDroppable from '~/hooks/useDroppable'
 import useEntryThumbnail from '~/hooks/useEntryThumbnail'
 import useExplorerItem from '~/hooks/useExplorerItem'
 import type { Content } from '~/interfaces'
-import { useAppDispatch } from '~/store'
-import { finishEditing, rename } from '~/store/explorer-list'
 
 type Props = {
   content: Content
@@ -28,8 +25,6 @@ type Props = {
 const ExplorerImageListItem = (props: Props) => {
   const { content, tabId } = props
 
-  const dispatch = useAppDispatch()
-
   const {
     draggingPaths,
     editing,
@@ -37,6 +32,7 @@ const ExplorerImageListItem = (props: Props) => {
     onClick,
     onContextMenu,
     onDoubleClick,
+    onFinishEditing,
     onMouseDown,
     selected,
   } = useExplorerItem(tabId, content)
@@ -46,16 +42,6 @@ const ExplorerImageListItem = (props: Props) => {
   const { draggable, ...dragHandlers } = useDraggable(draggingPaths)
   const { droppableStyle, ...dropHandlers } = useDroppable(
     content.type === 'directory' ? content.path : undefined,
-  )
-
-  const handleFinish = useCallback(
-    (changedValue: string | undefined) => {
-      dispatch(finishEditing({ tabId }))
-      if (changedValue) {
-        dispatch(rename(tabId, content.path, changedValue))
-      }
-    },
-    [content.path, dispatch, tabId],
   )
 
   return (
@@ -172,7 +158,7 @@ const ExplorerImageListItem = (props: Props) => {
             <EntryNameTextField
               entry={content}
               multiline
-              onFinish={handleFinish}
+              onFinish={onFinishEditing}
               readOnly={!editing}
             />
           </Stack>
